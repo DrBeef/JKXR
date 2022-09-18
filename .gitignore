@@ -1,32 +1,45 @@
-# Prerequisites
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows shortcuts
+*.lnk
+
+# build files
+*.o
 *.d
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
+#binaries
 *.so
-*.dylib
-*.dll
 
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
+#libs
 *.a
-*.lib
 
-# Executables
-*.exe
-*.out
-*.app
+#files created by build
+.idea
+*.apk
+*.ap_
+*.class
+projects/Android/build/*
+assets/oculussig*
+Projects/Android/.cxx/*
+*.json
+*.bin
+Projects/Android/.gradle/*
+*.ser
+Projects/Android/.idea/*
+Projects/Android/.externalNativeBuild/*
+drbeef-release-key.keystore
+assets/pak6.pak
+Projects/Android/Android.iml
+Projects/Projects.iml
+assets/pak0.pk3
+assets/sp_pak_weapons.pk3
+assets/z_zvr_weapons.pk3
+assets/sp_vpak8.pk3

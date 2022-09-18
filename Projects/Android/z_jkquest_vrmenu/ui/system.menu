@@ -1,0 +1,694 @@
+#include "ui/menudef.h"
+
+{
+\\ SETUP MENU \\
+
+
+
+
+menuDef {
+	name "system_menu"
+	visible 0
+	fullscreen 0
+	rect 100 125 443 340
+	focusColor 1 .75 0 1
+	style 1
+	border 1
+	onOpen { setitemcolor fadebox backcolor 0 0 0 1 ; fadeout fadebox ; hide grpSystem ; hide grpapplysystem ; show graphics ; show graphicsapply }
+	onEsc { close system_menu ; close setup_menu ; open main }
+
+
+
+
+	itemDef 
+	{
+		name window
+		group grpSystembutton
+		rect 0 2 443 300	
+		style WINDOW_STYLE_FILLED
+		border 1
+		bordercolor .5 .5 .5 .5
+		forecolor 1 1 1 1
+		backcolor 0 0 0 .25
+		visible 1
+		decoration
+	}
+
+
+
+
+// 	System		//
+
+itemDef {
+	name ctr_graphics
+	text "Graphics"
+	type ITEM_TYPE_BUTTON
+	textscale .22
+	group grpSystembutton
+	style WINDOW_STYLE_FILLED
+	rect 56 10 100 12
+	textalign 1
+	textalignx 50
+	textaligny 10
+	forecolor 1 1 1 1
+ 	visible 1
+	action { play "sound/misc/kcaction.wav" ; 
+	hide grpSystem ; hide grpapplysystem ; show graphics ; show graphicsapply }
+	mouseEnter { show message_graphics  } 
+	mouseExit { hide message_graphics  } 
+	}
+
+	itemDef 
+	{
+		name ctr_graphics
+		group grpControlbutton
+		rect 2 4 439 20	
+		style WINDOW_STYLE_FILLED
+		border 1
+		bordercolor .1 .1 .1 .2
+		forecolor 1 1 1 1
+		backcolor .3 0.5 0.2 .25
+		visible 1
+		decoration
+	}
+
+itemDef {
+	name ctr_graphics
+	text "SYSTEM"
+ 	type 1
+	textfont UI_FONT_NORMAL
+	style 0	
+	textstyle 6
+	rect 222.5 -12 64 14 
+	textalign ITEM_ALIGN_CENTER
+	textscale .22		
+	textalignx 2
+	textaligny 12
+	forecolor .9 .9 .9 .8
+	visible 1 
+	decoration
+	}
+
+
+
+	itemDef {
+		name graphics
+		text "Set Recommended"
+		type 1	
+		textscale .24
+		group grpsystem
+//		background "ui/assets/button_back.tga"
+		style WINDOW_STYLE_FILLED
+		rect 82 30 290 12
+		textalign 1
+		textalignx 145
+		textaligny 12
+		forecolor 1 1 1 1
+		backcolor 1 1 1 .07 
+		visible 1
+		textalign ITEM_ALIGN_CENTER
+		action { play "sound/misc/kcaction.wav" ; 
+open rec_restart_popmenu ; hide graphics ; hide graphicsapply }	
+		}
+
+
+
+
+
+
+itemDef {
+    	name graphics				
+	group grpSystem
+	text "Quality:"
+   	type ITEM_TYPE_MULTI	
+	cvar "ui_glCustom"
+	cvarFloatList { "High Quality" 0 "Normal" 1 "Fast" 2 "Fastest" 3 "Custom" 4 }
+
+	cvarTest		"ui_glCustom"
+	hideCvar		{ "999" }	// 999 is 'recommended'
+
+	rect 82 55 290 12
+   	textalign ITEM_ALIGN_RIGHT
+   	textalignx 142 
+   	textaligny 10
+	textscale .22
+	style WINDOW_STYLE_FILLED
+	backcolor 1 1 1 .07         
+   	forecolor 1 1 1 1
+   	visible 0 
+	action { uiScript update "ui_glCustom" }
+	}
+
+
+
+	itemDef {
+		name graphics				
+		group grpSystem
+		text "Quality:  Recommended"
+		type ITEM_TYPE_BUTTON	
+
+		cvarTest		"ui_glCustom"
+		showCvar		{ "999" }	// 999 is 'recommended'
+
+		rect 82 55 290 12
+		textalign ITEM_ALIGN_CENTER
+		textalignx 162 
+		textaligny 10
+		textscale .22
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 0
+		action {
+			setcvar ui_glCustom 0;	// go back to regular selection group
+			uiScript update "ui_glCustom" }
+		}
+
+
+
+	itemDef {
+   		name graphics
+		group grpSystem
+      		type ITEM_TYPE_YESNO
+		text "GL Extensions:"
+		cvar "r_allowExtensions"
+		rect 82 70 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .22  
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07     
+      	forecolor 1 1 1 1
+      	visible 0
+		action { uiScript glCustom }
+	}
+	
+	itemDef {
+   		name graphics
+		group grpSystem
+   		type ITEM_TYPE_MULTI	
+		text "Anisotropic Filter Level:"
+		cvar "r_ext_texture_filter_anisotropic"
+		cvarFloatList {  "1" 1 "2" 2 "4" 4 "8" 8 "16" 16 }
+		rect 82 85 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .22 
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07       
+      	forecolor 1 1 1 1
+      	visible 0 
+		action { uiScript glCustom }
+	}
+
+	itemDef {
+   		name graphics
+		group grpSystem
+   		type ITEM_TYPE_MULTI
+		text "Color Depth:"
+		cvar "r_colorbits"
+		cvarFloatList { "Desktop Default" 0 "16-bit" 16 "32-bit" 32 }
+		rect 82 100 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .22 
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07      
+      	forecolor 1 1 1 1
+      	visible 0 
+		action { uiScript glCustom ; uiScript update "r_colorbits" }
+	}
+
+	itemDef {
+      	name graphics
+		group grpSystem
+      	type ITEM_TYPE_MULTI			
+		text "Lighting:"
+		cvar "r_vertexlight"
+		cvarFloatList { "Light Map (high)" 0 "Vertex (low)" 1  }
+		rect 82 130 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .22   
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07     
+      	forecolor 1 1 1 1
+      	visible 0 
+		action { uiScript glCustom }
+	}
+
+	itemDef {
+   		name graphics
+		group grpSystem
+    		type ITEM_TYPE_MULTI
+		text "Geometric Detail:"
+		cvar "r_lodbias"
+		cvarFloatList { "High" 0 "Medium" 1 "Low" 2 }
+		rect 82 145 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .22 
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07       
+      	forecolor 1 1 1 1
+      	visible 0 
+		action { uiScript glCustom ; uiScript update "r_lodbias" }
+	}
+
+	itemDef {
+		name graphics
+		group grpSystem
+		type ITEM_TYPE_MULTI
+		text "Character Textures:"
+		cvar "r_picmip2"
+		cvarFloatList { "Low" 3 "Normal" 2 "High" 1 "Extra" 0 }
+		rect 82 160 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .23 
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07       
+      	forecolor 1 1 1 1
+      	visible 0 
+		action { uiScript glCustom }
+   		}
+	
+	itemDef {
+		name graphics
+		group grpSystem
+		type ITEM_TYPE_MULTI
+		text "General Textures:"
+		cvar "r_picmip"
+		cvarFloatList { "Low" 2 "Normal" 1 "High" 0 }
+		rect 82 175 290 12
+	     	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .23 
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07       
+      	forecolor 1 1 1 1
+      	visible 0 
+ 		action { uiScript glCustom }
+   		}
+
+
+
+
+
+
+
+	itemDef {
+      	name graphics
+		group grpSystem
+      	type ITEM_TYPE_MULTI
+		text "Texture Filter:"
+		cvar "r_textureMode"
+		cvarStrList { "No filter", "GL_NEAREST",  "Bilinear (no mipmap)", "GL_LINEAR", "Bilinear", "GL_LINEAR_MIPMAP_NEAREST", "Trilinear", "GL_LINEAR_MIPMAP_LINEAR"  }
+		rect 82 190 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .22  
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07      
+      	forecolor 1 1 1 1
+      	visible 0 
+		action { uiScript glCustom }
+		}
+
+	itemDef {
+      	name graphics
+		group grpSystem
+      	type ITEM_TYPE_YESNO
+		text "Compress Textures:"
+		cvar "r_ext_compressed_textures"
+		rect 82 205 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .22 
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07       
+      	forecolor 1 1 1 1
+      	visible 0 
+		action { uiScript glCustom }
+		}
+	itemDef {
+		name graphics
+		group grpSystem
+		type ITEM_TYPE_MULTI
+		text "Texture Quality:"
+		cvar "r_texturebits"
+		cvarFloatList { "Default" 0 "16 bit" 16 "32 bit" 32 }
+		rect 82 220 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .23 
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07       
+      	forecolor 1 1 1 1
+      	visible 0 
+		action { uiScript glCustom }
+    		}
+
+
+	itemDef {
+  		name graphics
+		group grpSystem
+      	type ITEM_TYPE_SLIDER
+		text "Brightness:"
+		cvarfloat "r_gamma" 1 0.5 3
+ 		rect 82 235 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142 
+      	textaligny 10
+		textscale .22 
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07       
+      	forecolor 1 1 1 1
+
+		cvarTest "r_ignorehwgamma"
+		showcvar { "1" }
+
+      	visible 0 
+		action { uiScript glCustom }
+    		}
+
+//
+// Nvidia
+// 
+	itemDef {
+		name graphics
+		group grpSystem
+		type ITEM_TYPE_YESNO
+
+		text "Nvidia Distance Fog:"
+		cvar "r_ext_NV_fog_dist"
+
+// would be nice to be able to do an extension check from the menu
+//		extensionTest "GL_NV_fog_distance"
+
+		rect 82 250 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .23 
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07       
+      	forecolor 1 1 1 1
+      	visible 0 
+		action { uiScript glCustom }
+    		}
+
+
+
+//
+// ATI
+//
+	itemDef {
+		name graphics
+		group grpSystem
+		type ITEM_TYPE_YESNO
+
+		text "Trueform:"
+		cvar "r_ext_ATI_pntriangles"
+
+// would be nice to be able to do an extension check from the menu
+//		extensionTest "GL_ATIX_pn_triangles"
+
+		rect 82 265 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .22 
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07       
+      	forecolor 1 1 1 1
+      	visible 0 
+		action { uiScript glCustom }
+   		}
+
+
+//cvar_t	*r_ext_ATI_pntriangles;
+//cvar_t	*r_ati_truform_tess;
+//cvar_t	*r_ati_truform_mode;
+
+
+
+
+
+
+
+	itemDef {
+		name graphicsapply
+		text "Apply"
+		type 1	
+		textscale .25
+		style WINDOW_STYLE_FILLED
+		group grpsystem
+		rect 181 280 100 20
+		textalign 1
+		textalignx 50
+		textaligny 15
+		forecolor 1 1 1 1
+		backcolor .1 .1 .1 .1 
+		visible 1
+		border 1
+		bordercolor .5 .5 .5 .5
+		action { play "sound/misc/kcaction.wav" ; 
+open vid_restart_popmenu ; hide graphics ; hide graphicsapply }
+		mouseEnter { setitemcolor graphicsapply backcolor .3 .5 .2 .25 }
+      	mouseExit { setitemcolor graphicsapply backcolor .1 .1 .1 .1 }
+
+		}
+
+
+
+
+
+
+
+
+
+	itemDef {
+      	name graphics
+		group grpSystem
+		style WINDOW_STYLE_SHADER
+		background "ui/assets/framebutton.tga"
+ 		rect 181 357 100 26
+      	visible 1 
+		decoration  	  
+    		}
+
+	itemDef {
+      	name graphics
+		group grpSystem
+		style WINDOW_STYLE_SHADER
+		background "ui/assets/leftbutton.tga"
+   	   	rect 169 357 13 26
+   	   	visible 1 
+		decoration  	  
+   	 	}
+
+	itemDef {
+	      	name graphics
+		group grpSystem
+		style WINDOW_STYLE_SHADER
+		background "ui/assets/rightbutton.tga"
+      		rect 280 357 13 26
+     	 	visible 1 
+		decoration  	  
+    		}
+
+	
+    		
+
+
+itemDef {
+	name ctr_driver
+	text "Driver info"
+	type 1
+//	textfont UI_FONT_NORMAL
+	textscale .22
+	group grpSystembutton
+	style WINDOW_STYLE_FILLED
+	background "ui/assets/button_back.tga"
+	rect 180 10 100 12
+	textalign 1
+	textalignx 50
+	textaligny 10
+	forecolor .9 .9 .9 .8
+	backcolor .1 .1 .1 0 
+	visible 1
+	action { play "sound/misc/kcaction.wav" ; 
+	hide grpSystem ; show driver }
+	mouseEnter { show message_driver ; setitemcolor  ctr_driver backcolor .3 .3 .3 0 } 
+	mouseExit { hide message_driver ; setitemcolor 	ctr_driver backcolor .1 .1 .1 0 } 
+	}
+
+
+
+	
+itemDef {
+		name driver
+		group grpSystem
+		rect 10 30 400 300	
+		ownerdraw UI_GLINFO
+		textalign 0
+		textalignx 0
+		textaligny 23
+		textscale .15
+		forecolor 1 1 1 1
+		visible 0
+		decoration
+		style 1
+		
+	}
+ 	
+
+
+itemDef {
+	name ctr_other
+	text "Sound"
+	type 1
+//	textfont UI_FONT_NORMAL
+	textscale .22
+	group grpSystembutton
+	style WINDOW_STYLE_FILLED
+	rect 306 10 100 12
+	textalign 1
+	textalignx 50
+	textaligny 10
+	forecolor .9 .9 .9 .8
+	backcolor .1 .1 .1 0 
+	visible 1
+	action { play "sound/misc/kcaction.wav" ; 
+	hide grpSystem ; show other }
+	mouseEnter { show message_other ; setitemcolor ctr_other backcolor .3 .3 .3 0 } 
+	mouseExit { hide message_other ; setitemcolor ctr_other backcolor .1 .1 .1 0} 	
+	}
+
+
+
+itemDef {
+      	name other			
+		group grpSystem
+      	style 1
+		text "Sound"
+		rect 163 30 128 20
+      	textalign ITEM_ALIGN_CENTER
+      	textalignx 64 
+      	textaligny 20
+		textscale .22
+      	forecolor .9 .9 .9 .9
+      	visible 0 
+		decoration
+    	}
+
+	itemDef {
+		name other
+		group grpSystem
+		type ITEM_TYPE_SLIDER
+		text "Effects Volume:  "
+		cvarfloat "s_volume" 0.7 0 1
+		rect 82 60 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .22    
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07   
+		forecolor 1 1 1 1
+		visible 0 
+    		}
+	
+	itemDef {
+		name other
+		group grpSystem
+		type ITEM_TYPE_SLIDER
+		text "Music Volume:  "
+		cvarfloat "s_musicvolume" 0.25 0 1
+		rect 82 90 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .22  
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07     
+		forecolor 1 1 1 1
+		visible 0 
+    		}
+
+	itemDef {
+		name other
+		group grpSystem
+		type ITEM_TYPE_MULTI
+		text "Sound Quality:  "
+		cvar "s_khz"
+		cvarFloatList { "22 khz (high)" 22 "11 khz (low)" 11 }
+		rect 82 120 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .22 
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07       
+		forecolor 1 1 1 1
+		visible 0 
+		action { show applysystem }
+    		}
+
+
+	itemDef {
+		name applysystem
+		group grpapplySystem
+		text "Apply"
+		type 1
+		style WINDOW_STYLE_FILLED	
+		textscale .25
+		rect 181 140 100 20
+		textalign 1
+		textalignx 50
+		textaligny 15
+		forecolor 1 1 1 1
+		backcolor .1 .1 .1 .1 
+		visible 1
+		border 1
+		bordercolor .5 .5 .5 .5
+		action { play "sound/misc/kcaction.wav" ; 
+open snd_restart_popmenu ; hide other ; hide applysystem }
+		mouseEnter { setitemcolor applysystem backcolor .3 .5 .2 .25 }
+      	mouseExit { setitemcolor applysystem backcolor .1 .1 .1 .1 }
+
+		}
+
+
+
+
+
+itemDef {
+     	name fadebox
+     	style WINDOW_STYLE_FILLED
+ 	background "ui/assets/fadebox.tga"
+	forecolor 0 0 0 1
+	backcolor 0 0 0 1
+	rect 0 0 640 480
+     	visible 1 
+	decoration
+    	}
+
+	
+
+
+}
+
+
+}

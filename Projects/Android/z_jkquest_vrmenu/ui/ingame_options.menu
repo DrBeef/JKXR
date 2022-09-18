@@ -1,0 +1,401 @@
+#include "ui/menudef.h"
+
+{
+\\ SETUP MENU \\
+
+menuDef {
+		name "ingame_options"
+		visible 0
+		fullscreen 0
+		outOfBoundsClick			// this closes the window if it gets a click out of the rectangle
+		rect 100 125 443 340
+		focusColor 1 .75 0 1
+		style 1
+		border 1
+
+		onopen { hide grpOptions ; show performance }
+
+
+
+itemDef 
+	{
+	name window
+	group ingamebox
+	rect 0 2 443 300	
+	style WINDOW_STYLE_FILLED
+	border 1
+	bordercolor .5 .5 .5 .5
+	forecolor 1 1 1 1
+	backcolor 0 0 0 .25
+	visible 1
+	decoration
+	}
+
+	itemDef 
+	{
+		name window2
+		group grpControlbutton
+		rect 2 4 439 20	
+		style WINDOW_STYLE_FILLED
+		border 1
+		bordercolor .1 .1 .1 .2
+		forecolor 1 1 1 1
+		backcolor .3 0.5 0.2 .25
+		visible 1
+		decoration
+	}
+
+
+/////////////////
+// Performance
+/////////////////
+
+itemDef {
+	name ctr_performance
+	text "Performance"
+	type 1
+	textscale .23
+	group grpControlbutton
+//	rect 50 10 100 12
+	rect 92 10 100 12
+	textalign 1
+	textalignx 50
+	textaligny 10
+	forecolor 1 1 1 1
+	backcolor .1 .1 .1 0 
+	visible 1
+	action { hide grpOptions ; show performance }
+	mouseEnter { setitemcolor ctr_performance backcolor .1 .37 .1 1 }
+		mouseExit { setitemcolor ctr_performance backcolor .37 .1 .1 1 }
+	}
+
+
+
+itemDef {
+	name performance
+	group grpOptions
+	type ITEM_TYPE_MULTI	
+	text "Wall Mark Lifetime:"
+	cvar "cg_markTime"
+	cvarFloatList { "Normal" 20000 "Short" 10000 "Off" 0 "Long" 30000 }
+		rect 82 30 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1 
+	}
+
+
+// itemDef {
+//	name performance
+//	group grpOptions
+//	type ITEM_TYPE_YESNO
+//	text "Show Floating Scores:"
+//	cvar "cg_scorePlums"
+//		rect 82 60 290 12
+//		textalign ITEM_ALIGN_RIGHT
+//		textalignx 142
+//		textaligny 10
+//		textscale .23
+//		style WINDOW_STYLE_FILLED
+//		backcolor 1 1 1 .07
+//		forecolor 1 1 1 1
+//		visible 1 
+//	}
+
+itemDef {
+	name performance
+	group grpOptions
+	type ITEM_TYPE_MULTI	
+	text "Ejecting Brass:"
+	cvar "cg_brassTime"
+	cvarFloatList { "Med" 1250 "Off" 0 "High" 2500 }
+		rect 82 45 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1 
+	}
+
+itemDef {
+	name performance
+	group grpOptions
+	type ITEM_TYPE_YESNO
+	text "Dynamic Lights:"
+	cvar "r_dynamiclight"
+		rect 82 60 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1 
+	}
+
+itemDef {
+	name performance
+	group grpOptions
+	type ITEM_TYPE_YESNO
+	text "Low Quality Sky:"
+	cvar "r_fastsky"
+		rect 82 75 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1 
+	}
+
+itemDef {
+	name performance
+	group grpOptions
+	type ITEM_TYPE_YESNO
+	text "Draw Portal Skies:"
+	cvar "cg_skybox"
+		rect 82 90 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1  
+	}
+
+	itemDef {
+		name performance
+		type ITEM_TYPE_MULTI	
+		group grpOptions
+		text "Corona Dist:"
+		cvar "cg_coronafardist"
+		cvarFloatList { "normal" 1536 "far" 4096 "you crazy" 16000 "off" 0 "near" 800 }
+		rect 82 120 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1 
+	}
+
+
+
+
+	itemDef {
+		name performance
+		group grpOptions
+		type ITEM_TYPE_MULTI	
+		text "Particle Dist:"
+		cvar "cg_particleDist"
+		cvarFloatList { "normal" 1024 "far" 2048 "off" 0 "near" 512 }
+		rect 82 135 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1 
+		}
+
+
+//////////////////////
+//
+// extension specific stuff
+//
+//////////////////////
+
+	itemDef {
+		name performance
+		group grpOptions
+		type ITEM_TYPE_MULTI	
+		text "Nvidia fog type:"
+
+		cvarTest "r_ext_NV_fog_dist"
+		showcvar { "1" }
+		cvar "r_nv_fogdist_mode"
+		cvarStrList { "NV Radial", "GL_EYE_RADIAL_NV", "NV Plane", "GL_EYE_PLANE_ABSOLUTE_NV" }
+
+		rect 82 150 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1 
+		}
+
+
+// end extension specific stuff
+//
+//////////////////////
+
+
+
+
+
+/////////////////
+// view
+/////////////////
+	
+itemDef {
+	name ctr_view
+	text "View"
+	type 1
+	textscale .23
+	group grpControlbutton
+	rect 270 10 100 12
+	textalign 1
+	textalignx 50
+	textaligny 10
+	forecolor 1 1 1 1
+	backcolor .1 .1 .1 0 
+	visible 1
+	action { hide grpOptions ; show view }
+	mouseEnter { setitemcolor ctr_view backcolor .1 .37 .1 1 }
+		mouseExit { setitemcolor ctr_view backcolor .37 .1 .1 1 }
+
+}
+	itemDef {
+		name view				
+		type ITEM_TYPE_MULTI	
+		group grpOptions
+		text "Cursor Hints:"
+		cvar "cg_cursorHints"
+		cvarFloatList { "strobe pulse" 2 "alpha pulse" 3 "solid" 4 "off" 0 "size pulse" 1 }
+		textalign ITEM_ALIGN_RIGHT
+		rect 82 30 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 0
+	}
+
+
+
+
+	itemDef {
+		name view
+		group grpOptions
+		type ITEM_TYPE_SLIDER
+		text "HUD Alpha:"
+		cvarfloat "cg_hudAlpha" .6 .1 1
+		rect 82 85 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07        
+      	forecolor 1 1 1 1
+      	visible 0
+    		}
+
+
+	// this \/ is actually lower than the crosshair stuff physically,
+	// but up here for reference to other sliders
+
+	itemDef {
+
+	// only show this in this menu if "r_ignorehwgamma" is not set.  if it's set, it will require a
+	// vid_restart, so the option shows in the system->graphics location
+
+		cvarTest "r_ignorehwgamma"
+		showcvar { "0" }
+
+		name view
+		group grpOptions
+		type ITEM_TYPE_SLIDER
+		text "Brightness:"
+		cvarfloat "r_gamma" 1 0.5 3
+		rect 82 125 290 12
+// 		rect 72 220 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+      	forecolor 1 1 1 1
+      	visible 0 
+    		}
+
+
+	itemDef {
+		name view
+		group grpOptions
+		text "Crosshair:"
+ 		type 1	
+		rect 190 210 60 12
+		textalign ITEM_ALIGN_CENTER
+		textscale .23		
+		textalignx 30
+		textaligny 12
+		forecolor 1 1 1 1
+		visible 0 
+		decoration
+		}
+
+	itemDef {
+		name view				
+		group grpOptions
+		rect 194 150 50 50
+		ownerdraw UI_CROSSHAIR
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 0 
+		textaligny 50  
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07      
+		forecolor 1 1 1 1
+		visible 0
+   		}
+
+	}
+
+
+
+//////////////////////////////
+
+
+
+
+itemDef {
+      name slider_message
+      rect 30 15 640 30 
+	text "Drag the Slider to Increase and Decrease"      
+	forecolor 1 .75 0 1
+	textscale .23
+	textalignx 221
+	textalign 1
+	textaligny 20
+	visible 0
+      decoration 
+	}
+
+}
+
+
+}

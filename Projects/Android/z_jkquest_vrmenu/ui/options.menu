@@ -1,0 +1,297 @@
+#include "ui/menudef.h"
+
+{
+\\ SETUP MENU \\
+
+menuDef {
+	name "options_menu"
+	visible 0
+	fullscreen 0
+	rect 100 125 443 340
+	focusColor 1 .75 0 1
+	style 1
+	border 1
+	onOpen { setitemcolor fadebox backcolor 0 0 0 1 ;
+			fadeout fadebox }
+	onEsc { close options_menu ; close setup_menu ; open main }
+
+
+	
+itemDef 
+	{
+	name window
+	group grpSystembutton
+	rect 0 2 443 300	
+	style WINDOW_STYLE_FILLED
+	border 1
+	bordercolor .5 .5 .5 .5
+	forecolor 1 1 1 1
+	backcolor 0 0 0 .25
+	visible 1
+	decoration
+	}
+
+
+itemDef {
+	name window
+	text "GAME OPTIONS"
+ 	type 1
+	textfont UI_FONT_NORMAL
+	style 0	
+	textstyle 6
+	rect 222.5 -12 64 14 
+	textalign ITEM_ALIGN_CENTER
+	textscale .22		
+	textalignx 2
+	textaligny 12
+	forecolor .9 .9 .9 .9
+	visible 1 
+	decoration
+}
+	itemDef 
+	{
+		name window2
+		group grpControlbutton
+		rect 2 4 439 20	
+		style WINDOW_STYLE_FILLED
+		border 1
+		bordercolor .1 .1 .1 .2
+		forecolor 1 1 1 1
+		backcolor .3 0.5 0.2 .25
+		visible 1
+		decoration
+	}
+
+
+	
+	
+itemDef 
+	{
+	name ctr_performance
+	text "Performance"
+	type 1
+	textscale .22
+	group grpSystembutton
+	style WINDOW_STYLE_FILLED
+	rect 172 10 100 12
+	textalign 1
+	textalignx 50
+	textaligny 10
+	forecolor 1 1 1 1
+	backcolor .1 .1 .1 0 
+	visible 1
+	action { play "sound/misc/kcaction.wav" ; 
+	hide grpOptions ; show performance }
+	mouseEnter { show message_graphics ; setitemcolor ctr_performance backcolor .3 .3 .3 0 } 
+	mouseExit { hide message_graphics ; setitemcolor ctr_performance backcolor .1 .1 .1 0 } 
+	}
+
+
+
+	itemDef {
+		name performance
+		group grpOptions
+		text "Wall Mark Lifetime:  "
+		type ITEM_TYPE_MULTI	
+		cvar "cg_markTime"
+		cvarFloatList {"Normal" 20000 "Short" 10000 "Off" 0 "Long" 30000  }
+		rect 82 30 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .22
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1
+    		}
+
+	
+	itemDef {
+		name performance
+		group grpOptions
+		text "Ejecting Brass:  "
+		type ITEM_TYPE_MULTI	
+		cvar "cg_brassTime"
+		cvarFloatList { "High" 2500 "Med" 1250 "Off" 0 }
+		rect 82 45 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .22
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1
+    		}
+
+	itemDef {
+		name performance
+		group grpOptions
+		type ITEM_TYPE_YESNO
+		text "Dynamic Lights:  "
+		cvar "r_dynamiclight"
+		rect 82 60 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .22
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1 
+    		}
+
+
+	itemDef {
+		name performance
+		group grpOptions
+		type ITEM_TYPE_YESNO
+		text "Low Quality Sky:  "
+		cvar "r_fastsky"
+		rect 82 75 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .22
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1
+    		}
+
+itemDef {
+	name performance
+	group grpOptions
+	type ITEM_TYPE_YESNO
+	text "Draw Portal Skies:"
+	cvar "cg_skybox"
+		rect 82 90 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1  
+	}	
+
+
+	itemDef {
+		name performance
+		type ITEM_TYPE_MULTI	
+		group grpOptions
+		text "Corona Dist:  "
+		rect 82 105 290 12
+		cvar "cg_coronafardist"
+		cvarFloatList { "normal" 1536 "far" 4096 "you crazy" 16000 "off" 0 "near" 800 }
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .22
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1
+		}
+
+
+
+	itemDef {
+		name performance
+		group grpOptions
+		type ITEM_TYPE_YESNO
+		text "Particles:  "
+		cvar "cg_wolfparticles"
+		rect 82 120 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .22
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 1 
+    		}
+
+
+
+itemDef {
+	name ctr_view
+	text "View"
+	type 1
+	textscale .22
+	group grpSystembutton
+	style WINDOW_STYLE_FILLED
+	rect 270 10 100 12
+	textalign 1
+	textalignx 50
+	textaligny 10
+	forecolor 1 1 1 1
+	backcolor .1 .1 .1 0 
+	visible 1
+	action { play "sound/misc/kcaction.wav" ; 
+	hide grpOptions ; show view }
+	mouseEnter { show message_driver ; setitemcolor ctr_view backcolor .3 .3 .3 0 } 
+	mouseExit { hide message_driver ; setitemcolor ctr_view backcolor .1 .1 .1 0 } 
+	}
+
+
+
+
+	itemDef {
+		name view				
+		type ITEM_TYPE_MULTI	
+		group grpOptions
+		text "Cursor Hints:"
+		cvar "cg_cursorHints"
+		cvarFloatList { "strobe pulse" 2 "alpha pulse" 3 "solid" 4 "off" 0 "size pulse" 1 }
+		textalign ITEM_ALIGN_RIGHT
+		rect 82 30 290 12
+		textalign ITEM_ALIGN_RIGHT
+		textalignx 142
+		textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07
+		forecolor 1 1 1 1
+		visible 0
+	}
+
+
+
+	itemDef {
+		name view
+		group grpOptions
+		type ITEM_TYPE_SLIDER
+		text "HUD Alpha:"
+		cvarfloat "cg_hudAlpha" .6 .1 1
+		rect 82 45 290 12
+      	textalign ITEM_ALIGN_RIGHT
+      	textalignx 142
+      	textaligny 10
+		textscale .23
+		style WINDOW_STYLE_FILLED
+		backcolor 1 1 1 .07        
+      	forecolor 1 1 1 1
+      	visible 0
+   		}
+
+
+
+	itemDef {
+		name fadebox
+		style WINDOW_STYLE_FILLED
+		background "ui/assets/fadebox.tga"
+		forecolor 0 0 0 1
+		backcolor 0 0 0 1
+		rect 0 0 640 480
+		visible 1 
+		decoration
+    	}
+
+	
+
+
+}
