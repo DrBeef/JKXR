@@ -1,0 +1,14 @@
+ Volume in drive C is Windows
+ Volume Serial Number is 7008-7702
+
+ Directory of C:\Dev\Quest\JKQuest\VrSamples\JKQuest\Projects\Android\jni\OpenJK\code\ui
+
+02/09/2022  14:48             1,323 gameinfo.cpp
+02/09/2022  14:48            10,803 ui_atoms.cpp
+02/09/2022  14:48             3,142 ui_connect.cpp
+02/09/2022  14:48           167,750 ui_main.cpp
+02/09/2022  14:48            23,618 ui_saber.cpp
+02/09/2022  14:48           239,737 ui_shared.cpp
+02/09/2022  14:48             4,007 ui_syscalls.cpp
+               7 File(s)        450,380 bytes
+               0 Dir(s)  726,378,385,408 bytes free

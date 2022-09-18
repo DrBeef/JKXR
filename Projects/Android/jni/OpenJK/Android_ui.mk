@@ -21,20 +21,16 @@ LOCAL_SHARED_LIBRARIES :=
 LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES)
 
 JK3_SRC = \
-	${MPDir}/game/bg_misc.c \
-	${MPDir}/game/bg_saberLoad.c \
-	${MPDir}/game/bg_saga.c \
-	${MPDir}/game/bg_vehicleLoad.c \
-	${MPDir}/game/bg_weapons.c \
-	${MPDir}/ui/ui_atoms.c \
-	${MPDir}/ui/ui_cvar.c \
-	${MPDir}/ui/ui_force.c \
-	${MPDir}/ui/ui_gameinfo.c \
-	${MPDir}/ui/ui_main.c \
-	${MPDir}/ui/ui_saber.c \
-	${MPDir}/ui/ui_shared.c \
-	${MPDir}/ui/ui_syscalls.c \
-	${MPDir}/qcommon/q_shared.c \
+	${SPDir}/game/bg_misc.cpp \
+	${SPDir}/game/bg_vehicleLoad.cpp \
+	${SPDir}/ui/gameinfo.cpp \
+	${SPDir}/ui/ui_atoms.cpp \
+	${SPDir}/ui/ui_connect.cpp \
+	${SPDir}/ui/ui_main.cpp \
+	${SPDir}/ui/ui_saber.cpp \
+	${SPDir}/ui/ui_shared.cpp \
+	${SPDir}/ui/ui_syscalls.cpp \
+	${SPDir}/qcommon/q_shared.cpp \
 	${OPENJK_PATH}/shared/qcommon/q_math.c \
 	${OPENJK_PATH}/shared/qcommon/q_color.c \
 	${OPENJK_PATH}/shared/qcommon/q_string.c \

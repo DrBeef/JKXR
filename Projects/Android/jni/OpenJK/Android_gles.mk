@@ -18,54 +18,54 @@ LOCAL_LDLIBS +=  -lGLESv3 -landroid -lEGL -ldl -llog
 LOCAL_STATIC_LIBRARIES := libpng libjpeg 
 #LOCAL_SHARED_LIBRARIES :=
 
-LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES) $(TOP_DIR)/libpng $(LOCAL_PATH)/$(MPDir)/rd-gles $(TOP_DIR)
+LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES) $(TOP_DIR)/libpng $(LOCAL_PATH)/$(SPDir)/rd-gles $(TOP_DIR)
 
 JK3_SRC = \
-	${MPDir}/rd-gles/G2_API.cpp \
-	${MPDir}/rd-gles/G2_bolts.cpp \
-	${MPDir}/rd-gles/G2_bones.cpp \
-	${MPDir}/rd-gles/G2_misc.cpp \
-	${MPDir}/rd-gles/G2_surfaces.cpp \
-	${MPDir}/rd-gles/tr_arioche.cpp \
-	${MPDir}/rd-gles/tr_backend.cpp \
-	${MPDir}/rd-gles/tr_bsp.cpp \
-	${MPDir}/rd-gles/tr_cmds.cpp \
-	${MPDir}/rd-gles/tr_curve.cpp \
-	${MPDir}/rd-gles/tr_decals.cpp \
-	${MPDir}/rd-gles/tr_ghoul2.cpp \
-	${MPDir}/rd-gles/tr_image.cpp \
-	${MPDir}/rd-gles/tr_init.cpp \
-	${MPDir}/rd-gles/tr_light.cpp \
-	${MPDir}/rd-gles/tr_main.cpp \
-	${MPDir}/rd-gles/tr_marks.cpp \
-	${MPDir}/rd-gles/tr_mesh.cpp \
-	${MPDir}/rd-gles/tr_model.cpp \
-	${MPDir}/rd-gles/tr_quicksprite.cpp \
-	${MPDir}/rd-gles/tr_scene.cpp \
-	${MPDir}/rd-gles/tr_shade.cpp \
-	${MPDir}/rd-gles/tr_shade_calc.cpp \
-	${MPDir}/rd-gles/tr_shader.cpp \
-	${MPDir}/rd-gles/tr_shadows.cpp \
-	${MPDir}/rd-gles/tr_skin.cpp \
-	${MPDir}/rd-gles/tr_sky.cpp \
-	${MPDir}/rd-gles/tr_subs.cpp \
-	${MPDir}/rd-gles/tr_surface.cpp \
-	${MPDir}/rd-gles/tr_surfacesprites.cpp \
-	${MPDir}/rd-gles/tr_terrain.cpp \
-	${MPDir}/rd-gles/tr_world.cpp \
-	${MPDir}/rd-gles/tr_WorldEffects.cpp \
-	${MPDir}/ghoul2/G2_gore.cpp \
-	${MPDir}/rd-common/tr_font.cpp \
-	${MPDir}/rd-common/tr_image_load.cpp \
-	${MPDir}/rd-common/tr_image_manipulation.cpp \
-	${MPDir}/rd-common/tr_image_jpg.cpp \
-	${MPDir}/rd-common/tr_image_tga.cpp \
-	${MPDir}/rd-common/tr_image_png.cpp \
-	${MPDir}/rd-common/tr_noise.cpp \
-	${MPDir}/qcommon/GenericParser2.cpp \
-	${MPDir}/qcommon/matcomp.cpp \
-	${MPDir}/android/android_glimp.cpp \
-	${MPDir}/qcommon/q_shared.c \
+	${SPDir}/rd-gles/G2_API.cpp \
+	${SPDir}/rd-gles/G2_bolts.cpp \
+	${SPDir}/rd-gles/G2_bones.cpp \
+	${SPDir}/rd-gles/G2_misc.cpp \
+	${SPDir}/rd-gles/G2_surfaces.cpp \
+	${SPDir}/rd-gles/tr_arioche.cpp \
+	${SPDir}/rd-gles/tr_backend.cpp \
+	${SPDir}/rd-gles/tr_bsp.cpp \
+	${SPDir}/rd-gles/tr_cmds.cpp \
+	${SPDir}/rd-gles/tr_curve.cpp \
+	${SPDir}/rd-gles/tr_decals.cpp \
+	${SPDir}/rd-gles/tr_ghoul2.cpp \
+	${SPDir}/rd-gles/tr_image.cpp \
+	${SPDir}/rd-gles/tr_init.cpp \
+	${SPDir}/rd-gles/tr_light.cpp \
+	${SPDir}/rd-gles/tr_main.cpp \
+	${SPDir}/rd-gles/tr_marks.cpp \
+	${SPDir}/rd-gles/tr_mesh.cpp \
+	${SPDir}/rd-gles/tr_model.cpp \
+	${SPDir}/rd-gles/tr_quicksprite.cpp \
+	${SPDir}/rd-gles/tr_scene.cpp \
+	${SPDir}/rd-gles/tr_shade.cpp \
+	${SPDir}/rd-gles/tr_shade_calc.cpp \
+	${SPDir}/rd-gles/tr_shader.cpp \
+	${SPDir}/rd-gles/tr_shadows.cpp \
+	${SPDir}/rd-gles/tr_skin.cpp \
+	${SPDir}/rd-gles/tr_sky.cpp \
+	${SPDir}/rd-gles/tr_subs.cpp \
+	${SPDir}/rd-gles/tr_surface.cpp \
+	${SPDir}/rd-gles/tr_surfacesprites.cpp \
+	${SPDir}/rd-gles/tr_terrain.cpp \
+	${SPDir}/rd-gles/tr_world.cpp \
+	${SPDir}/rd-gles/tr_WorldEffects.cpp \
+	${SPDir}/ghoul2/G2_gore.cpp \
+	${SPDir}/rd-common/tr_font.cpp \
+	${SPDir}/rd-common/tr_image_load.cpp \
+	${SPDir}/rd-common/tr_image_manipulation.cpp \
+	${SPDir}/rd-common/tr_image_jpg.cpp \
+	${SPDir}/rd-common/tr_image_tga.cpp \
+	${SPDir}/rd-common/tr_image_png.cpp \
+	${SPDir}/rd-common/tr_noise.cpp \
+	${SPDir}/qcommon/GenericParser2.cpp \
+	${SPDir}/qcommon/matcomp.cpp \
+	${SPDir}/android/android_glimp.cpp \
+	${SPDir}/qcommon/q_shared.cpp \
 	${OPENJK_PATH}/shared/qcommon/q_math.c \
 	${OPENJK_PATH}/shared/qcommon/q_color.c \
 	${OPENJK_PATH}/shared/qcommon/q_string.c \
