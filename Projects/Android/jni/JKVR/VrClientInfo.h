@@ -5,17 +5,17 @@
 #define WEAPON_RECOIL           15.0f;
 
 typedef struct {
-    qboolean screen;
+    bool screen;
     float  fov;
-    qboolean weapon_stabilised;
-    qboolean right_handed;
-    qboolean player_moving;
-    qboolean visible_hud;
-    qboolean dualwield;
+    bool weapon_stabilised;
+    bool right_handed;
+    bool player_moving;
+    bool visible_hud;
+    bool dualwield;
     int weaponid;
     int lastweaponid;
     int backpackitemactive; //0 - nothing, 1 - grenades, 2 - knife, 3 - Binoculars
-    qboolean mountedgun;
+    bool mountedgun;
 
     vec3_t hmdposition;
     vec3_t hmdposition_last; // Don't use this, it is just for calculating delta!
@@ -38,17 +38,17 @@ typedef struct {
     vec3_t weaponoffset_history[NUM_WEAPON_SAMPLES];
     float weaponoffset_history_timestamp[NUM_WEAPON_SAMPLES];
 
-    qboolean pistol;                // True if the weapon is a pistol
+    bool pistol;                // True if the weapon is a pistol
 
     //Lots of scope weapon stuff
-    qboolean scopeengaged;          // Scope has been engaged on a scoped weapon
-    qboolean scopedweapon;          // Weapon scope is available
-    qboolean scopedetached;         // Scope has been detached from weapon
-    qboolean detachablescope;       // Scope can be detached from weapon
+    bool scopeengaged;          // Scope has been engaged on a scoped weapon
+    bool scopedweapon;          // Weapon scope is available
+    bool scopedetached;         // Scope has been detached from weapon
+    bool detachablescope;       // Scope can be detached from weapon
 
-    qboolean hasbinoculars;
+    bool hasbinoculars;
 
-    qboolean velocitytriggered; // Weapon attack triggered by velocity (knife)
+    bool velocitytriggered; // Weapon attack triggered by velocity (knife)
 
     vec3_t offhandangles;
     vec3_t offhandangles_last; // Don't use this, it is just for calculating delta!
@@ -59,11 +59,11 @@ typedef struct {
     //
     // Teleport Stuff
     //
-    qboolean teleportenabled;
-    qboolean teleportseek; // player looking to teleport
-    qboolean teleportready; // player pointing to a valid teleport location
+    bool teleportenabled;
+    bool teleportseek; // player looking to teleport
+    bool teleportready; // player pointing to a valid teleport location
     vec3_t   teleportdest; // teleport destination
-    qboolean teleportexecute; // execute the teleport
+    bool teleportexecute; // execute the teleport
 
 
 

@@ -43,7 +43,7 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 
 //#include <SDL2/SDL.h>
 //#include <SDL2/SDL_main.h>
-#include <src/client/client.h>
+#include <client/client.h>
 
 #include "VrCompositor.h"
 #include "VrInput.h"
@@ -134,13 +134,11 @@ LAMBDA1VR Stuff
 ================================================================================
 */
 
-qboolean JKVR_useScreenLayer()
+bool JKVR_useScreenLayer()
 {
-	vr.screen = (qboolean)(showingScreenLayer ||
+	vr.screen = (bool)(showingScreenLayer ||
             (cls.state == CA_CINEMATIC) ||
             (cls.state == CA_LOADING) ||
-            (clc.demoplaying) ||
-			(cl.cameraMode) ||
             ( Key_GetCatcher( ) & KEYCATCH_UI ) ||
             ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ));
 
@@ -812,7 +810,7 @@ void updateHMDOrientation()
 
 void setHMDPosition( float x, float y, float z )
 {
-	static qboolean s_useScreen = qfalse;
+	static bool s_useScreen = qfalse;
 
 	VectorSet(vr.hmdposition, x, y, z);
 
@@ -833,7 +831,7 @@ void setHMDPosition( float x, float y, float z )
 	}
 }
 
-qboolean isMultiplayer()
+bool isMultiplayer()
 {
 	return Cvar_VariableValue("maxclients") > 1;
 }
@@ -1206,7 +1204,7 @@ typedef struct
 static void ovrMessage_Init( ovrMessage * message, const int id, const int wait )
 {
 	message->Id = id;
-	message->Wait = wait;
+	message->Wait = (ovrMQWait)wait;
 	memset( message->Parms, 0, sizeof( message->Parms ) );
 }
 
@@ -1391,7 +1389,7 @@ long shutdownCountdown;
 int m_width;
 int m_height;
 
-qboolean R_SetMode( void );
+bool R_SetMode( void );
 
 void JKVR_GetScreenRes(int *width, int *height)
 {
@@ -1467,7 +1465,7 @@ void JKVR_Init()
 static ovrAppThread * gAppThread = NULL;
 static ovrApp gAppState;
 static ovrJava java;
-static qboolean destroyed = qfalse;
+static bool destroyed = qfalse;
 
 void JKVR_prepareEyeBuffer(int eye )
 {
@@ -1504,7 +1502,7 @@ void JKVR_finishEyeBuffer(int eye )
 	ovrFramebuffer_SetNone();
 }
 
-qboolean JKVR_processMessageQueue() {
+bool JKVR_processMessageQueue() {
 	for ( ; ; )
 	{
 		ovrMessage message;
@@ -1586,10 +1584,10 @@ void * AppThreadFunction(void * parm ) {
 	gAppThread = (ovrAppThread *) parm;
 
 	java.Vm = gAppThread->JavaVm;
-	(*java.Vm)->AttachCurrentThread(java.Vm, &java.Env, NULL);
+	java.Vm->AttachCurrentThread(&java.Env, NULL);
 	java.ActivityObject = gAppThread->ActivityObject;
 
-	jclass cls = (*java.Env)->GetObjectClass(java.Env, java.ActivityObject);
+	jclass cls = java.Env->GetObjectClass(java.ActivityObject);
 
 	// Note that AttachCurrentThread will reset the thread name.
 	prctl(PR_SET_NAME, (long) "OVR::Main", 0, 0, 0);
@@ -1800,7 +1798,7 @@ void JKVR_getHMDOrientation() {//Get orientation
 void shutdownVR() {
 	ovrRenderer_Destroy( &gAppState.Renderer );
 	ovrEgl_DestroyContext( &gAppState.Egl );
-	(*java.Vm)->DetachCurrentThread( java.Vm );
+	java.Vm->DetachCurrentThread( );
 	vrapi_Shutdown();
 }
 
@@ -1925,9 +1923,9 @@ void JKVR_submitFrame()
 
 static void ovrAppThread_Create( ovrAppThread * appThread, JNIEnv * env, jobject activityObject, jclass activityClass )
 {
-	(*env)->GetJavaVM( env, &appThread->JavaVm );
-	appThread->ActivityObject = (*env)->NewGlobalRef( env, activityObject );
-	appThread->ActivityClass = (*env)->NewGlobalRef( env, activityClass );
+	env->GetJavaVM( &appThread->JavaVm );
+	appThread->ActivityObject = env->NewGlobalRef( activityObject );
+	appThread->ActivityClass = (jclass)env->NewGlobalRef( activityClass );
 	appThread->Thread = 0;
 	appThread->NativeWindow = NULL;
 	ovrMessageQueue_Create( &appThread->MessageQueue );
@@ -1942,8 +1940,8 @@ static void ovrAppThread_Create( ovrAppThread * appThread, JNIEnv * env, jobject
 static void ovrAppThread_Destroy( ovrAppThread * appThread, JNIEnv * env )
 {
 	pthread_join( appThread->Thread, NULL );
-	(*env)->DeleteGlobalRef( env, appThread->ActivityObject );
-	(*env)->DeleteGlobalRef( env, appThread->ActivityClass );
+	env->DeleteGlobalRef( appThread->ActivityObject );
+	env->DeleteGlobalRef( appThread->ActivityClass );
 	ovrMessageQueue_Destroy( &appThread->MessageQueue );
 }
 
@@ -1957,12 +1955,6 @@ Activity lifecycle
 
 
 jmethodID android_shutdown;
-jmethodID android_haptic_event;
-jmethodID android_haptic_updateevent;
-jmethodID android_haptic_stopevent;
-jmethodID android_haptic_endframe;
-jmethodID android_haptic_enable;
-jmethodID android_haptic_disable;
 static JavaVM *jVM;
 static jobject jniCallbackObj=0;
 
@@ -1971,99 +1963,18 @@ void jni_shutdown()
 	ALOGV("Calling: jni_shutdown");
 	JNIEnv *env;
 	jobject tmp;
-	if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
+	if ((jVM->GetEnv((void**) &env, JNI_VERSION_1_4))<0)
 	{
-		(*jVM)->AttachCurrentThread(jVM,&env, NULL);
+		jVM->AttachCurrentThread(&env, NULL);
 	}
-	return (*env)->CallVoidMethod(env, jniCallbackObj, android_shutdown);
-}
-
-void jni_haptic_event(const char* event, int position, int flags, int intensity, float angle, float yHeight)
-{
-    JNIEnv *env;
-    jobject tmp;
-    if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
-    {
-        (*jVM)->AttachCurrentThread(jVM,&env, NULL);
-    }
-
-    jstring StringArg1 = (*env)->NewStringUTF(env, event);
-
-    return (*env)->CallVoidMethod(env, jniCallbackObj, android_haptic_event, StringArg1, position, flags, intensity, angle, yHeight);
-}
-
-void jni_haptic_updateevent(const char* event, int intensity, float angle)
-{
-    JNIEnv *env;
-    jobject tmp;
-    if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
-    {
-        (*jVM)->AttachCurrentThread(jVM,&env, NULL);
-    }
-
-    jstring StringArg1 = (*env)->NewStringUTF(env, event);
-
-    return (*env)->CallVoidMethod(env, jniCallbackObj, android_haptic_updateevent, StringArg1, intensity, angle);
-}
-
-void jni_haptic_stopevent(const char* event)
-{
-    ALOGV("Calling: jni_haptic_stopevent");
-    JNIEnv *env;
-    jobject tmp;
-    if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
-    {
-        (*jVM)->AttachCurrentThread(jVM,&env, NULL);
-    }
-
-    jstring StringArg1 = (*env)->NewStringUTF(env, event);
-
-    return (*env)->CallVoidMethod(env, jniCallbackObj, android_haptic_stopevent, StringArg1);
-}
-
-void jni_haptic_endframe()
-{
-    JNIEnv *env;
-    jobject tmp;
-    if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
-    {
-        (*jVM)->AttachCurrentThread(jVM,&env, NULL);
-    }
-
-    return (*env)->CallVoidMethod(env, jniCallbackObj, android_haptic_endframe);
-}
-
-void jni_haptic_enable()
-{
-    ALOGV("Calling: jni_haptic_enable");
-    JNIEnv *env;
-    jobject tmp;
-    if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
-    {
-        (*jVM)->AttachCurrentThread(jVM,&env, NULL);
-    }
-
-    return (*env)->CallVoidMethod(env, jniCallbackObj, android_haptic_enable);
-}
-
-void jni_haptic_disable()
-{
-    ALOGV("Calling: jni_haptic_disable");
-    JNIEnv *env;
-    jobject tmp;
-    if (((*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4))<0)
-    {
-        (*jVM)->AttachCurrentThread(jVM,&env, NULL);
-    }
-
-    return (*env)->CallVoidMethod(env, jniCallbackObj, android_haptic_disable);
+	return env->CallVoidMethod(jniCallbackObj, android_shutdown);
 }
 
 int JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	JNIEnv *env;
     jVM = vm;
-	if((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK)
+	if(vm->GetEnv((void**) &env, JNI_VERSION_1_4) != JNI_OK)
 	{
 		ALOGE("Failed JNI_OnLoad");
 		return -1;
@@ -2088,7 +1999,7 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onCreate( JNIEnv * 
 	};
 
 	jboolean iscopy;
-	const char *arg = (*env)->GetStringUTFChars(env, commandLineParams, &iscopy);
+	const char *arg = env->GetStringUTFChars(commandLineParams, &iscopy);
 
 	char *cmdLine = NULL;
 	if (arg && strlen(arg))
@@ -2096,10 +2007,10 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onCreate( JNIEnv * 
 		cmdLine = strdup(arg);
 	}
 
-	(*env)->ReleaseStringUTFChars(env, commandLineParams, arg);
+	env->ReleaseStringUTFChars(commandLineParams, arg);
 
 	ALOGV("Command line %s", cmdLine);
-	argv = malloc(sizeof(char*) * 255);
+	argv = (char**)malloc(sizeof(char*) * 255);
 	argc = ParseCommandLine(strdup(cmdLine), argv);
 
 	/* verify the argtable[] entries were allocated sucessfully */
@@ -2152,16 +2063,10 @@ JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onStart( JNIEnv * en
 	ALOGV( "    GLES3JNILib::onStart()" );
 
 
-    jniCallbackObj = (jobject)(*env)->NewGlobalRef(env, obj1);
-	jclass callbackClass = (*env)->GetObjectClass(env, jniCallbackObj);
+    jniCallbackObj = (jobject)env->NewGlobalRef( obj1);
+	jclass callbackClass = env->GetObjectClass( jniCallbackObj);
 
-	android_shutdown = (*env)->GetMethodID(env,callbackClass,"shutdown","()V");
-	android_haptic_event = (*env)->GetMethodID(env, callbackClass, "haptic_event", "(Ljava/lang/String;IIIFF)V");
-	android_haptic_updateevent = (*env)->GetMethodID(env, callbackClass, "haptic_updateevent", "(Ljava/lang/String;IF)V");
-	android_haptic_stopevent = (*env)->GetMethodID(env, callbackClass, "haptic_stopevent", "(Ljava/lang/String;)V");
-	android_haptic_endframe = (*env)->GetMethodID(env, callbackClass, "haptic_endframe", "()V");
-	android_haptic_enable = (*env)->GetMethodID(env, callbackClass, "haptic_enable", "()V");
-	android_haptic_disable = (*env)->GetMethodID(env, callbackClass, "haptic_disable", "()V");
+	android_shutdown = env->GetMethodID(callbackClass,"shutdown","()V");
 
 	ovrAppThread * appThread = (ovrAppThread *)((size_t)handle);
 	ovrMessage message;

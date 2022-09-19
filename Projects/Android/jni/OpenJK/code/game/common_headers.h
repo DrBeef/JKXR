@@ -25,7 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define COMMON_HEADERS_H_INC
 
 #if !defined(__Q_SHARED_H)
-	#include "qcommon/q_shared.h"
+	#include "../qcommon/q_shared.h"
 #endif
 
 //#if !defined(Q_SHAREDBASIC_H_INC)

@@ -589,7 +589,7 @@ void Matrix4x4_Transpose( matrix4x4 out, cmatrix4x4 in1 )
 	out[3][3] = in1[3][3];
 }
 
-qboolean Matrix4x4_Invert_Full( matrix4x4 out, cmatrix4x4 in1 )
+bool Matrix4x4_Invert_Full( matrix4x4 out, cmatrix4x4 in1 )
 {
 	float	*temp;
 	float	*r[4];

@@ -336,6 +336,7 @@ void GL_State( uint32_t stateBits )
 	//
 	if ( diff & GLS_POLYMODE_LINE )
 	{
+#ifndef HAVE_GLES
 		if ( stateBits & GLS_POLYMODE_LINE )
 		{
 			qglPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -344,6 +345,7 @@ void GL_State( uint32_t stateBits )
 		{
 			qglPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		}
+#endif
 	}
 
 	//

@@ -17,7 +17,7 @@ Authors		:	Simon Brown
 #include "VrInput.h"
 #include "VrCvars.h"
 
-#include "../jk2/code/client/client.h"
+#include "client/client.h"
 
 cvar_t	*sv_cheats;
 
@@ -31,7 +31,7 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
 	//always right handed for this
 	vr.right_handed = true;
 
-    static qboolean dominantGripPushed = false;
+    static bool dominantGripPushed = false;
 
 	/*
     char cvar_name[64];
@@ -62,17 +62,17 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
     }
 
     //Menu button
-	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, K_ESCAPE);
+	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, A_ESCAPE);
 
-    static qboolean resetCursor = qtrue;
+    static bool resetCursor = qtrue;
     if ( JKVR_useScreenLayer() )
     {
         interactWithTouchScreen(resetCursor, pDominantTrackedRemoteNew, pDominantTrackedRemoteOld);
         resetCursor = qfalse;
 
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton1, K_MOUSE1);
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, ovrButton_Trigger, K_MOUSE1);
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, K_ESCAPE);
+        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton1, A_MOUSE1);
+        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, ovrButton_Trigger, A_MOUSE1);
+        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, A_ESCAPE);
     }
     else
     {
@@ -163,7 +163,7 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
         float  item_inc[7] = {0.002, 0.02, 0.02, 0.02, 0.1, 0.1, 0.1};
 
         //Weapon/Inventory Chooser
-        static qboolean itemSwitched = false;
+        static bool itemSwitched = false;
         if (between(-0.2f, pDominantTrackedRemoteNew->Joystick.y, 0.2f) &&
             (between(0.8f, pDominantTrackedRemoteNew->Joystick.x, 1.0f) ||
              between(-1.0f, pDominantTrackedRemoteNew->Joystick.x, -0.8f)))

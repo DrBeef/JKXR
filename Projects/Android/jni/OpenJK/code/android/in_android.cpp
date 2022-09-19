@@ -13,7 +13,7 @@
 #include <errno.h>
 #include <pthread.h>
 
-#include "../client/client.h"
+#include "qcommon/qcommon.h"
 
 
 #include <android/log.h>
@@ -451,11 +451,11 @@ void PortableFrame(void){
 
 int PortableInMenu(void){
 
-	if ((Key_GetCatcher( ) & KEYCATCH_UI) ||
-			(Key_GetCatcher( ) & KEYCATCH_CGAME) )
+//	if ((Key_GetCatcher( ) & KEYCATCH_UI))// ||
+			//(Key_GetCatcher( ) & KEYCATCH_GAME) )
 		return 1;
-	else
-		return 0;
+//	else
+//		return 0;
 }
 
 int PortableInAutomap(void)

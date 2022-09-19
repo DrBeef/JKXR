@@ -1375,8 +1375,9 @@ void		R_ShaderList_f( void );
 //
 // tr_arb.c
 //
+#ifndef HAVE_GLES
 void ARB_InitGlowShaders( void );
-
+#endif
 
 /*
 ====================================================================

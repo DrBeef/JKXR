@@ -104,12 +104,12 @@ renderState
 
 typedef struct
 {
-    GLuint					VertexBuffer;
-    GLuint					IndexBuffer;
-    GLuint					VertexArrayObject;
-    GLuint	                Program;
-    GLuint	                VertexShader;
-    GLuint	                FragmentShader;
+    GLint					VertexBuffer;
+    GLint					IndexBuffer;
+    GLint					VertexArrayObject;
+    GLint	                Program;
+    GLint	                VertexShader;
+    GLint	                FragmentShader;
 } renderState;
 
 void getCurrentRenderState( renderState * state);

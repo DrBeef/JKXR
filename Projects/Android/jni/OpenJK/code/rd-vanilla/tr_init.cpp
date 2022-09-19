@@ -260,16 +260,46 @@ void R_Splash()
 		const float y1 = 240 - height / 2;
 		const float y2 = 240 + height / 2;
 
+#ifdef HAVE_GLES
+		GLimp_EndFrame();
+	GLfloat tex[] = {
+	 0,0 ,
+	 1,0,
+	 0,1,
+	 1,1
+	};
+	GLfloat vtx[] = {
+	 x1, y1,
+	 x2, y1,
+	 x1, y2,
+	 x2, y2
+	};
+	GLboolean text = qglIsEnabled(GL_TEXTURE_COORD_ARRAY);
+	GLboolean glcol = qglIsEnabled(GL_COLOR_ARRAY);
+	if (glcol)
+		qglDisableClientState(GL_COLOR_ARRAY);
+	if (!text)
+		qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
+	qglEnableClientState( GL_VERTEX_ARRAY );
+	qglTexCoordPointer( 2, GL_FLOAT, 0, tex );
+	qglVertexPointer  ( 2, GL_FLOAT, 0, vtx );
+	qglDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+	if (glcol)
+		qglDisableClientState(GL_COLOR_ARRAY);
+	if (!text)
+		qglDisableClientState( GL_TEXTURE_COORD_ARRAY );
+#else
 		qglBegin (GL_TRIANGLE_STRIP);
-			qglTexCoord2f( 0,  0 );
-			qglVertex2f(x1, y1);
-			qglTexCoord2f( 1 ,  0 );
-			qglVertex2f(x2, y1);
-			qglTexCoord2f( 0, 1 );
-			qglVertex2f(x1, y2);
-			qglTexCoord2f( 1, 1 );
-			qglVertex2f(x2, y2);
+		qglTexCoord2f( 0,  0 );
+		qglVertex2f(x1, y1);
+		qglTexCoord2f( 1 ,  0 );
+		qglVertex2f(x2, y1);
+		qglTexCoord2f( 0, 1 );
+		qglVertex2f(x1, y2);
+		qglTexCoord2f( 1, 1 );
+		qglVertex2f(x2, y2);
 		qglEnd();
+#endif
 	}
 
 	ri.WIN_Present( &window );
@@ -1168,14 +1198,19 @@ void GL_SetDefaultState( void )
 	//
 	glState.glStateBits = GLS_DEPTHTEST_DISABLE | GLS_DEPTHMASK_TRUE;
 
+#ifndef HAVE_GLES
 	qglPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+#endif
 	qglDepthMask( GL_TRUE );
 	qglDisable( GL_DEPTH_TEST );
 	qglEnable( GL_SCISSOR_TEST );
 	qglDisable( GL_CULL_FACE );
 	qglDisable( GL_BLEND );
-	qglDisable( GL_ALPHA_TEST );
-	qglBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+#ifdef HAVE_GLES
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+#endif
 }
 
 

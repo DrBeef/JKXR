@@ -49,7 +49,10 @@ static	edgeDef_t	edgeDefs[SHADER_MAX_VERTEXES][MAX_EDGE_DEFS];
 static	int			numEdgeDefs[SHADER_MAX_VERTEXES];
 static	int			facing[SHADER_MAX_INDEXES/3];
 static	vec3_t		shadowXyz[SHADER_MAX_VERTEXES];
-
+#ifdef HAVE_GLES
+static unsigned short indexes[6 * MAX_EDGE_DEFS * SHADER_MAX_VERTEXES + SHADER_MAX_INDEXES * 2];
+static int idx = 0;
+#endif
 
 void R_AddEdgeDef( int i1, int i2, int facing ) {
 	int		c;
@@ -69,8 +72,8 @@ void R_RenderShadowEdges( void ) {
 	int		c;
 	int		j;
 	int		i2;
-	//int		c_edges, c_rejected;
 #if 0
+	int		c_edges, c_rejected;
 	int		c2, k;
 	int		hit[2];
 #endif
@@ -88,6 +91,10 @@ void R_RenderShadowEdges( void ) {
 	c_rejected = 0;
 #endif
 
+#ifdef HAVE_GLES
+	idx = 0;
+#endif
+
 	for ( i = 0 ; i < tess.numVertexes ; i++ ) {
 		c = numEdgeDefs[ i ];
 		for ( j = 0 ; j < c ; j++ ) {
@@ -100,12 +107,23 @@ void R_RenderShadowEdges( void ) {
 			//we are going to render all edges even though it is a tiny bit slower. -rww
 #if 1
 			i2 = edgeDefs[ i ][ j ].i2;
+#ifdef HAVE_GLES
+			// A single drawing call is better than many. So I prefer a singe TRIANGLES call than many TRIANGLE_STRIP call
+			// even if it seems less efficiant, it's faster on the PANDORA
+			indexes[idx++] = i;
+			indexes[idx++] = i + tess.numVertexes;
+			indexes[idx++] = i2;
+			indexes[idx++] = i2;
+			indexes[idx++] = i + tess.numVertexes;
+			indexes[idx++] = i2 + tess.numVertexes;
+#else
 			qglBegin( GL_TRIANGLE_STRIP );
-				qglVertex3fv( tess.xyz[ i ] );
-				qglVertex3fv( shadowXyz[ i ] );
-				qglVertex3fv( tess.xyz[ i2 ] );
-				qglVertex3fv( shadowXyz[ i2 ] );
+			qglVertex3fv( tess.xyz[ i ] );
+			qglVertex3fv( tess.xyz[ i + tess.numVertexes ] );
+			qglVertex3fv( tess.xyz[ i2 ] );
+			qglVertex3fv( tess.xyz[ i2 + tess.numVertexes ] );
 			qglEnd();
+#endif
 #else
 			hit[0] = 0;
 			hit[1] = 0;
@@ -120,12 +138,13 @@ void R_RenderShadowEdges( void ) {
 
 			// if it doesn't share the edge with another front facing
 			// triangle, it is a sil edge
-			if ( hit[ 1 ] == 0 ) {
+			if (hit[1] != 1)
+			{
 				qglBegin( GL_TRIANGLE_STRIP );
 				qglVertex3fv( tess.xyz[ i ] );
-				qglVertex3fv( shadowXyz[ i ] );
+				qglVertex3fv( tess.xyz[ i + tess.numVertexes ] );
 				qglVertex3fv( tess.xyz[ i2 ] );
-				qglVertex3fv( shadowXyz[ i2 ] );
+				qglVertex3fv( tess.xyz[ i2 + tess.numVertexes ] );
 				qglEnd();
 				c_edges++;
 			} else {
@@ -151,17 +170,30 @@ void R_RenderShadowEdges( void ) {
 		o2 = tess.indexes[ i*3 + 1 ];
 		o3 = tess.indexes[ i*3 + 2 ];
 
+#ifdef HAVE_GLES
+		indexes[idx++]=o1;
+		indexes[idx++]=o2;
+		indexes[idx++]=o3;
+		indexes[idx++]=o3 + tess.numVertexes;
+		indexes[idx++]=o2 + tess.numVertexes;
+		indexes[idx++]=o1 + tess.numVertexes;
+#else
 		qglBegin(GL_TRIANGLES);
-			qglVertex3fv(tess.xyz[o1]);
-			qglVertex3fv(tess.xyz[o2]);
-			qglVertex3fv(tess.xyz[o3]);
+		qglVertex3fv(tess.xyz[o1]);
+		qglVertex3fv(tess.xyz[o2]);
+		qglVertex3fv(tess.xyz[o3]);
 		qglEnd();
 		qglBegin(GL_TRIANGLES);
-			qglVertex3fv(shadowXyz[o3]);
-			qglVertex3fv(shadowXyz[o2]);
-			qglVertex3fv(shadowXyz[o1]);
+		qglVertex3fv(tess.xyz[o3 + tess.numVertexes]);
+		qglVertex3fv(tess.xyz[o2 + tess.numVertexes]);
+		qglVertex3fv(tess.xyz[o1 + tess.numVertexes]);
 		qglEnd();
+#endif
 	}
+#ifdef HAVE_GLES
+	qglDrawElements(GL_TRIANGLES, idx, GL_UNSIGNED_SHORT, indexes);
+#endif
+
 #endif
 }
 
@@ -228,6 +260,11 @@ void RB_DoShadowTessEnd( vec3_t lightPos )
 	int		numTris;
 	vec3_t	lightDir;
 
+	// we can only do this if we have enough space in the vertex buffers
+	if ( tess.numVertexes >= SHADER_MAX_VERTEXES / 2 ) {
+		return;
+	}
+
 	if ( glConfig.stencilBits < 4 ) {
 		return;
 	}
@@ -252,16 +289,16 @@ void RB_DoShadowTessEnd( vec3_t lightPos )
 		VectorAdd(tess.xyz[i], backEnd.ori.origin, worldxyz);
 		groundDist = worldxyz[2] - backEnd.currentEntity->e.shadowPlane;
 		groundDist += 16.0f; //fudge factor
-		VectorMA( tess.xyz[i], -groundDist, lightDir, shadowXyz[i] );
+		VectorMA( tess.xyz[i], -groundDist, lightDir, tess.xyz[i+tess.numVertexes] );
 	}
 #else
 	if (lightPos)
 	{
 		for ( i = 0 ; i < tess.numVertexes ; i++ )
 		{
-			shadowXyz[i][0] = tess.xyz[i][0]+(( tess.xyz[i][0]-lightPos[0] )*128.0f);
-			shadowXyz[i][1] = tess.xyz[i][1]+(( tess.xyz[i][1]-lightPos[1] )*128.0f);
-			shadowXyz[i][2] = tess.xyz[i][2]+(( tess.xyz[i][2]-lightPos[2] )*128.0f);
+			tess.xyz[i+tess.numVertexes][0] = tess.xyz[i][0]+(( tess.xyz[i][0]-lightPos[0] )*128.0f);
+			tess.xyz[i+tess.numVertexes][1] = tess.xyz[i][1]+(( tess.xyz[i][1]-lightPos[1] )*128.0f);
+			tess.xyz[i+tess.numVertexes][2] = tess.xyz[i][2]+(( tess.xyz[i][2]-lightPos[2] )*128.0f);
 		}
 	}
 	else
@@ -270,7 +307,7 @@ void RB_DoShadowTessEnd( vec3_t lightPos )
 
 		// project vertexes away from light direction
 		for ( i = 0 ; i < tess.numVertexes ; i++ ) {
-			VectorMA( tess.xyz[i], -512, lightDir, shadowXyz[i] );
+			VectorMA( tess.xyz[i], -512, lightDir, tess.xyz[i+tess.numVertexes] );
 		}
 	}
 #endif
@@ -307,8 +344,8 @@ void RB_DoShadowTessEnd( vec3_t lightPos )
 			planeEq[1] = v1[2]*(v2[0]-v3[0]) + v2[2]*(v3[0]-v1[0]) + v3[2]*(v1[0]-v2[0]);
 			planeEq[2] = v1[0]*(v2[1]-v3[1]) + v2[0]*(v3[1]-v1[1]) + v3[0]*(v1[1]-v2[1]);
 			planeEq[3] = -( v1[0]*( v2[1]*v3[2] - v3[1]*v2[2] ) +
-						v2[0]*(v3[1]*v1[2] - v1[1]*v3[2]) +
-						v3[0]*(v1[1]*v2[2] - v2[1]*v1[2]) );
+							v2[0]*(v3[1]*v1[2] - v1[1]*v3[2]) +
+							v3[0]*(v1[1]*v2[2] - v2[1]*v1[2]) );
 
 			d = planeEq[0]*lightPos[0]+
 				planeEq[1]*lightPos[1]+
@@ -346,30 +383,52 @@ void RB_DoShadowTessEnd( vec3_t lightPos )
 	//qglDisable(GL_DEPTH_TEST);
 #endif
 
+#ifdef HAVE_GLES
+	GLboolean text = qglIsEnabled(GL_TEXTURE_COORD_ARRAY);
+	GLboolean glcol = qglIsEnabled(GL_COLOR_ARRAY);
+	if (text)
+		qglDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	if (glcol)
+		qglDisableClientState( GL_COLOR_ARRAY );
+	qglVertexPointer (3, GL_FLOAT, 16, tess.xyz);
+#endif
+
 #ifdef _STENCIL_REVERSE
 	qglDepthFunc(GL_LESS);
 
 	//now using the Carmack Reverse<tm> -rww
-	if (glConfig.doStencilShadowsInOneDrawcall)
-	{
-		GL_Cull(CT_TWO_SIDED);
-		qglStencilOpSeparate(GL_FRONT, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
-		qglStencilOpSeparate(GL_BACK, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
-
-		R_RenderShadowEdges();
-		qglDisable(GL_STENCIL_TEST);
-	}
-	else
-	{
-		GL_Cull(CT_FRONT_SIDED);
-		qglStencilOp(GL_KEEP, GL_INCR, GL_KEEP);
-
-		R_RenderShadowEdges();
-
+	if ( backEnd.viewParms.isMirror ) {
+		//qglCullFace( GL_BACK );
 		GL_Cull(CT_BACK_SIDED);
-		qglStencilOp(GL_KEEP, GL_DECR, GL_KEEP);
+		qglStencilOp( GL_KEEP, GL_INCR, GL_KEEP );
 
 		R_RenderShadowEdges();
+
+		//qglCullFace( GL_FRONT );
+		GL_Cull(CT_FRONT_SIDED);
+		qglStencilOp( GL_KEEP, GL_DECR, GL_KEEP );
+
+#ifdef HAVE_GLES
+		qglDrawElements(GL_TRIANGLES, idx, GL_UNSIGNED_SHORT, indexes);
+#else
+		R_RenderShadowEdges();
+#endif
+	} else {
+		//qglCullFace( GL_FRONT );
+		GL_Cull(CT_FRONT_SIDED);
+		qglStencilOp( GL_KEEP, GL_INCR, GL_KEEP );
+
+		R_RenderShadowEdges();
+
+		//qglCullFace( GL_BACK );
+		GL_Cull(CT_BACK_SIDED);
+		qglStencilOp( GL_KEEP, GL_DECR, GL_KEEP );
+
+#ifdef HAVE_GLES
+		qglDrawElements(GL_TRIANGLES, idx, GL_UNSIGNED_SHORT, indexes);
+#else
+		R_RenderShadowEdges();
+#endif
 	}
 
 	qglDepthFunc(GL_LEQUAL);
@@ -384,7 +443,11 @@ void RB_DoShadowTessEnd( vec3_t lightPos )
 		qglCullFace( GL_BACK );
 		qglStencilOp( GL_KEEP, GL_KEEP, GL_DECR );
 
+		#ifdef HAVE_GLES
+		qglDrawElements(GL_TRIANGLES, idx, GL_UNSIGNED_SHORT, indexes);
+		#else
 		R_RenderShadowEdges();
+		#endif
 	} else {
 		qglCullFace( GL_BACK );
 		qglStencilOp( GL_KEEP, GL_KEEP, GL_INCR );
@@ -394,12 +457,23 @@ void RB_DoShadowTessEnd( vec3_t lightPos )
 		qglCullFace( GL_FRONT );
 		qglStencilOp( GL_KEEP, GL_KEEP, GL_DECR );
 
+		#ifdef HAVE_GLES
+		qglDrawElements(GL_TRIANGLES, idx, GL_UNSIGNED_SHORT, indexes);
+		#else
 		R_RenderShadowEdges();
+		#endif
 	}
 #endif
 
 	// reenable writing to the color buffer
 	qglColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
+
+#ifdef HAVE_GLES
+	if (text)
+		qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
+	if (glcol)
+		qglEnableClientState( GL_COLOR_ARRAY );
+#endif
 
 #ifdef _DEBUG_STENCIL_SHADOWS
 	qglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -426,7 +500,7 @@ void RB_ShadowFinish( void ) {
 	}
 
 #ifdef _DEBUG_STENCIL_SHADOWS
-	return;
+		return;
 #endif
 
 	qglEnable( GL_STENCIL_TEST );
@@ -446,7 +520,7 @@ void RB_ShadowFinish( void ) {
 	GL_Bind( tr.whiteImage );
 
 	qglPushMatrix();
-    qglLoadIdentity ();
+	qglLoadIdentity ();
 
 //	qglColor3f( 0.6f, 0.6f, 0.6f );
 //	GL_State( GLS_DEPTHMASK_TRUE | GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ZERO );
@@ -458,12 +532,33 @@ void RB_ShadowFinish( void ) {
 	//GL_State( GLS_DEPTHMASK_TRUE | GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA );
 	GL_State( GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA );
 
+#ifdef HAVE_GLES
+	GLfloat vtx[] = {
+	 -100,  100, -10,
+	  100,  100, -10,
+	  100, -100, -10,
+	 -100, -100, -10
+	};
+	GLboolean text = qglIsEnabled(GL_TEXTURE_COORD_ARRAY);
+	GLboolean glcol = qglIsEnabled(GL_COLOR_ARRAY);
+	if (text)
+		qglDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	if (glcol)
+		qglDisableClientState( GL_COLOR_ARRAY );
+	qglVertexPointer  ( 3, GL_FLOAT, 0, vtx );
+	qglDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
+	if (text)
+		qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
+	if (glcol)
+		qglEnableClientState( GL_COLOR_ARRAY );
+#else
 	qglBegin( GL_QUADS );
 	qglVertex3f( -100, 100, -10 );
 	qglVertex3f( 100, 100, -10 );
 	qglVertex3f( 100, -100, -10 );
 	qglVertex3f( -100, -100, -10 );
 	qglEnd ();
+#endif
 
 	qglColor4f(1,1,1,1);
 	qglDisable( GL_STENCIL_TEST );

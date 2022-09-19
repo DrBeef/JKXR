@@ -3851,7 +3851,9 @@ static void CreateInternalShaders( void ) {
 	tr.distortionShader = FinishShader();
 	shader.defaultShader = true;
 
+#ifndef HAVE_GLES
 	ARB_InitGlowShaders();
+#endif
 }
 
 static void CreateExternalShaders( void ) {

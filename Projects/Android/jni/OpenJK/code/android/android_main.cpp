@@ -578,7 +578,7 @@ void *Sys_LoadGameDll( const char *name, void *(QDECL **moduleAPI)(int, ...) )
 	char	*fn;
 	char	filename[MAX_OSPATH];
 
-	Com_sprintf (filename, sizeof(filename), "%s" ARCH_STRING DLL_EXT, name);
+	//Com_sprintf (filename, sizeof(filename), "%s" ARCH_STRING DLL_EXT, name);
 
 #if 0
 	libHandle = Sys_LoadLibrary( filename );
@@ -593,7 +593,7 @@ void *Sys_LoadGameDll( const char *name, void *(QDECL **moduleAPI)(int, ...) )
 
 	char  lib_path[512];
 	sprintf(lib_path,"%s/lib%s", getLibPath(),filename);
-	LOGI("Trying to load Android lib: %s",lib_path);
+	//LOGI("Trying to load Android lib: %s",lib_path);
 	libHandle = dlopen (lib_path, RTLD_LAZY );
 
 
@@ -792,10 +792,10 @@ int main ( int argc, char* argv[] )
 #else
 	// hide the early console since we've reached the point where we
 	// have a working graphics subsystems
-	if (!com_dedicated->integer && !com_viewlog->integer)
+/*	if (!com_dedicated->integer && !com_viewlog->integer)
 	{
 		Sys_ShowConsole(0, qfalse);
-	}
+	}*/
 #endif
 
 	// main game loop

@@ -100,21 +100,7 @@ Sys_GetClipboardData
 ==================
 */
 char *Sys_GetClipboardData( void ) {
-#ifdef DEDICATED
 	return NULL;
-#else
-	if ( !SDL_HasClipboardText() )
-		return NULL;
-
-	char *cbText = SDL_GetClipboardText();
-	size_t len = strlen( cbText ) + 1;
-
-	char *buf = (char *)Z_Malloc( len, TAG_CLIPBOARD );
-	Q_strncpyz( buf, cbText, len );
-
-	SDL_free( cbText );
-	return buf;
-#endif
 }
 
 /*

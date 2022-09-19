@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 #include <math.h>
 
-#include "../jk2/code/qcommon/q_shared.h"
+//#include "qcommon/q_shared.h"
 
 // euler angle order
 #define PITCH		0
@@ -112,7 +112,7 @@ float anglemod( const float a );
 unsigned short FloatToHalf( float v );
 float HalfToFloat( unsigned short h );
 int SignbitsForPlane( const vec3_t normal );
-int NearestPOW( int value, qboolean roundDown );
+int NearestPOW( int value, bool roundDown );
 void SinCos( float radians, float *sine, float *cosine );
 #ifdef XASH_VECTORIZE_SINCOS
 void SinCosFastVector4(float r1, float r2, float r3, float r4,
@@ -148,8 +148,8 @@ void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, 
 
 void ClearBounds( vec3_t mins, vec3_t maxs );
 //void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs );
-qboolean BoundsIntersect( const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2 );
-qboolean BoundsAndSphereIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t origin, float radius );
+bool BoundsIntersect( const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2 );
+bool BoundsAndSphereIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t origin, float radius );
 float RadiusFromBounds( const vec3_t mins, const vec3_t maxs );
 
 void AngleQuaternion( const vec3_t angles, vec4_t q );
@@ -200,7 +200,7 @@ void Matrix4x4_SetOrigin( matrix4x4 out, float x, float y, float z );
 void Matrix4x4_Invert_Simple( matrix4x4 out, cmatrix4x4 in1 );
 void Matrix4x4_OriginFromMatrix( cmatrix4x4 in, float *out );
 void Matrix4x4_Transpose( matrix4x4 out, cmatrix4x4 in1 );
-qboolean Matrix4x4_Invert_Full( matrix4x4 out, cmatrix4x4 in1 );
+bool Matrix4x4_Invert_Full( matrix4x4 out, cmatrix4x4 in1 );
 
 extern vec3_t		vec3_origin;
 extern const matrix3x4	matrix3x4_identity;

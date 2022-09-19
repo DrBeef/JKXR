@@ -126,9 +126,9 @@ void GL_TextureMode( const char *string ) {
 	}
 
 	if ( i == numTextureModes ) {
-		ri.Printf (PRINT_ALL, "bad filter name\n");
+		ri->Printf( PRINT_ALL, "bad filter name\n" );
 		for ( i = 0; i < numTextureModes ; i++ ) {
-			ri.Printf( PRINT_ALL, "%s\n", modes[i].name);
+			ri->Printf( PRINT_ALL, "%s\n", modes[i].name );
 		}
 		return;
 	}
@@ -138,13 +138,10 @@ void GL_TextureMode( const char *string ) {
 
 	// If the level they requested is less than possible, set the max possible...
 	if ( r_ext_texture_filter_anisotropic->value > glConfig.maxTextureFilterAnisotropy )
-	{
-		ri.Cvar_SetValue( "r_ext_texture_filter_anisotropic", glConfig.maxTextureFilterAnisotropy );
-	}
+		ri->Cvar_SetValue( "r_ext_texture_filter_anisotropic", glConfig.maxTextureFilterAnisotropy );
 
 	// change all the existing mipmap texture objects
-//	int iNumImages =
-	   				 R_Images_StartIteration();
+	R_Images_StartIteration();
 	while ( (glt   = R_Images_GetNextIteration()) != NULL)
 	{
 		if ( glt->mipmap ) {
@@ -166,56 +163,67 @@ void GL_TextureMode( const char *string ) {
 static float R_BytesPerTex (int format)
 {
 	switch ( format ) {
-	case 1:
-		//"I    "
-		return 1;
-		break;
-	case 2:
-		//"IA   "
-		return 2;
-		break;
-	case 3:
-		//"RGB  "
-		return glConfig.colorBits/8.0f;
-		break;
-	case 4:
-		//"RGBA "
-		return glConfig.colorBits/8.0f;
-		break;
+		case 1:
+			//"I    "
+			return 1;
+			break;
+		case 2:
+			//"IA   "
+			return 2;
+			break;
+		case 3:
+			//"RGB  "
+#ifdef HAVE_GLES
+			return 3;
+#else
+			return glConfig.colorBits/8.0f;
+#endif
+			break;
+		case 4:
+			//"RGBA "
+#ifdef HAVE_GLES
+			return 4;
+#else
+			return glConfig.colorBits/8.0f;
+#endif
+			break;
 
-	case GL_RGBA4:
-		//"RGBA4"
-		return 2;
-		break;
-	case GL_RGB5:
-		//"RGB5 "
-		return 2;
-		break;
+		case GL_RGBA4:
+			//"RGBA4"
+			return 2;
+			break;
+		case GL_RGB5:
+			//"RGB5 "
+			return 2;
+			break;
 
-	case GL_RGBA8:
-		//"RGBA8"
-		return 4;
-		break;
-	case GL_RGB8:
-		//"RGB8"
-		return 4;
-		break;
+#ifndef HAVE_GLES
+		case GL_RGBA8:
+			//"RGBA8"
+			return 4;
+			break;
+		case GL_RGB8:
+			//"RGB8"
+			return 4;
+			break;
 
-	case GL_RGB4_S3TC:
-		//"S3TC "
-		return 0.33333f;
-		break;
-	case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
-		//"DXT1 "
-		return 0.33333f;
-		break;
-	case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
-		//"DXT5 "
-		return 1;
-		break;
-	default:
-		//"???? "
-		return 4;
+		case GL_RGB4_S3TC:
+			//"S3TC "
+			return 0.33333f;
+			break;
+		case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
+			//"DXT1 "
+			return 0.33333f;
+			break;
+		case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
+			//"DXT5 "
+			return 1;
+			break;
+
+#endif
+		default:
+			//"???? "
+			return 4;
 	}
 }
 
@@ -287,6 +295,7 @@ void R_ImageList_f( void ) {
 		case 4:
 			ri.Printf( PRINT_ALL, "RGBA " );
 			break;
+#ifndef HAVE_GLES
 		case GL_RGBA8:
 			ri.Printf( PRINT_ALL, "RGBA8" );
 			break;
@@ -308,6 +317,7 @@ void R_ImageList_f( void ) {
 		case GL_RGB5:
 			ri.Printf( PRINT_ALL, "RGB5 " );
 			break;
+#endif
 		default:
 			ri.Printf( PRINT_ALL, "???? " );
 		}

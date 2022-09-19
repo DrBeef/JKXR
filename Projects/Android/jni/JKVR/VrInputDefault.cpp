@@ -17,8 +17,8 @@ Authors		:	Simon Brown
 #include "VrInput.h"
 #include "VrCvars.h"
 
-#include <src/qcommon/qcommon.h>
-#include <src/client/client.h>
+#include <qcommon/qcommon.h>
+#include <client/client.h>
 
 
 #define WP_AKIMBO           20
@@ -44,7 +44,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
 	vr.teleportenabled = vr_teleport->integer != 0;
 
-    static qboolean dominantGripPushed = false;
+    static bool dominantGripPushed = false;
 	static float dominantGripPushTime = 0.0f;
     static bool canUseBackpack = false;
     static bool canUseQuickSave = false;
@@ -130,17 +130,17 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
     }
 
     //Menu button
-	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, K_ESCAPE);
+	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, A_ESCAPE);
 
-    static qboolean resetCursor = qtrue;
+    static bool resetCursor = qtrue;
     if ( JKVR_useScreenLayer() )
     {
         interactWithTouchScreen(resetCursor, pDominantTrackedRemoteNew, pDominantTrackedRemoteOld);
         resetCursor = qfalse;
 
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton1, K_MOUSE1);
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, ovrButton_Trigger, K_MOUSE1);
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, K_ESCAPE);
+        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton1, A_MOUSE1);
+        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, ovrButton_Trigger, A_MOUSE1);
+        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, A_ESCAPE);
     }
     else
     {
@@ -160,7 +160,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
         float controllerYawHeading = 0.0f;
         //Turn on weapon stabilisation?
-        qboolean stabilised = qfalse;
+        bool stabilised = qfalse;
         if (!vr.pistol && // Don't stabilise pistols
             (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger) && (distance < STABILISATION_DISTANCE))
         {
@@ -170,8 +170,8 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         vr.weapon_stabilised = stabilised;
 
         //Engage scope / virtual stock if conditions are right
-        qboolean scopeready = vr.weapon_stabilised && (distanceToHMD < SCOPE_ENGAGE_DISTANCE);
-        static qboolean lastScopeReady = qfalse;
+        bool scopeready = vr.weapon_stabilised && (distanceToHMD < SCOPE_ENGAGE_DISTANCE);
+        static bool lastScopeReady = qfalse;
         if (scopeready != lastScopeReady) {
             if (vr.scopedweapon && !vr.scopedetached) {
                 if (!vr.scopeengaged && scopeready) {
@@ -195,7 +195,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         }
 
         //Engage scope / virtual stock (iron sight lock) if conditions are right
-        static qboolean scopeEngaged = qfalse;
+        static bool scopeEngaged = qfalse;
         if (scopeEngaged != vr.scopeengaged)
         {
             scopeEngaged = vr.scopeengaged;
@@ -205,8 +205,8 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         }
 
 
-        static qboolean binocularstate = qfalse;
-        qboolean binocularsactive = (vr.hasbinoculars && vr.backpackitemactive == 3 &&
+        static bool binocularstate = qfalse;
+        bool binocularsactive = (vr.hasbinoculars && vr.backpackitemactive == 3 &&
                 (distanceToHMD < BINOCULAR_ENGAGE_DISTANCE) &&
                 (pDominantTracking->Status & (VRAPI_TRACKING_STATUS_POSITION_TRACKED | VRAPI_TRACKING_STATUS_POSITION_VALID)));
         if (binocularstate != binocularsactive)
@@ -237,10 +237,10 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             VectorCopy(vr.current_weaponoffset, vr.calculated_weaponoffset);
 
             //Does weapon velocity trigger attack (knife) and is it fast enough
-            static qboolean velocityTriggeredAttack = false;
+            static bool velocityTriggeredAttack = false;
             if (vr.velocitytriggered)
             {
-                static qboolean fired = qfalse;
+                static bool fired = qfalse;
                 float velocity = sqrtf(powf(pWeapon->HeadPose.LinearVelocity.x, 2) +
                                        powf(pWeapon->HeadPose.LinearVelocity.y, 2) +
                                        powf(pWeapon->HeadPose.LinearVelocity.z, 2));
@@ -534,7 +534,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
                 if ((primaryButtonsNew & primaryButton2) != (primaryButtonsOld & primaryButton2))
                 {
-                    Sys_QueEvent( 0, SE_KEY, K_SPACE, (primaryButtonsNew & primaryButton2) != 0, 0, NULL );
+                    //Sys_QueEvent( 0, SE_KEY, A_SPACE, (primaryButtonsNew & primaryButton2) != 0, 0, NULL );
                 }
             }
 
@@ -543,7 +543,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
             //We need to record if we have started firing primary so that releasing trigger will stop firing, if user has pushed grip
             //in meantime, then it wouldn't stop the gun firing and it would get stuck
-            static qboolean firing = false;
+            static bool firing = false;
             if (dominantGripPushed && vr.backpackitemactive == 0)
             {
                 if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
@@ -593,7 +593,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 }
                 else if (binocularsactive) // trigger can zoom-in binoculars, remove from face to reset
                 {
-                    static qboolean zoomin = true;
+                    static bool zoomin = true;
                     if (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) {
                         sendButtonActionSimple(zoomin ? "weapnext" : "weapprev");
                     } else if (pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger)
@@ -613,7 +613,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             }
 
 			//Weapon Chooser
-			static qboolean itemSwitched = false;
+			static bool itemSwitched = false;
 			if (between(-0.2f, pPrimaryJoystick->x, 0.2f) &&
 				(between(0.8f, pPrimaryJoystick->y, 1.0f) ||
 				 between(-1.0f, pPrimaryJoystick->y, -0.8f)))
@@ -663,7 +663,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                   remote_movementForward);
 
 
-            static qboolean stopUseItemNextFrame = false;
+            static bool stopUseItemNextFrame = false;
             if (stopUseItemNextFrame)
             {
                 Cbuf_AddText("-useitem\n");
@@ -712,7 +712,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 //Run
                 handleTrackedControllerButton(pOffTrackedRemoteNew,
                                               pOffTrackedRemoteOld,
-                                              ovrButton_Trigger, K_SHIFT);
+                                              ovrButton_Trigger, A_SHIFT);
 
             } else {
                 if (pOffTrackedRemoteNew->Buttons & ovrButton_Trigger)

@@ -5,7 +5,10 @@
 
 #include <android/log.h>
 
-#include "mathlib.h"
+#include "../qcommon/q_shared.h"
+#include "../qcommon/qcommon.h"
+
+
 #include "VrClientInfo.h"
 
 #define LOG_TAG "JKVR"
@@ -22,14 +25,14 @@
 #define ALOGV(...)
 #endif
 
-qboolean jk2_initialised;
+bool jk2_initialised;
 
 long long global_time;
 
 float playerHeight;
 float playerYaw;
 
-qboolean showingScreenLayer;
+bool showingScreenLayer;
 
 ovrTracking2 tracking;
 
@@ -45,19 +48,19 @@ vr_client_info_t vr;
 
 float radians(float deg);
 float degrees(float rad);
-qboolean isMultiplayer();
+bool isMultiplayer();
 double GetTimeInMilliSeconds();
 float length(float x, float y);
 float nonLinearFilter(float in);
-qboolean between(float min, float val, float max);
+bool between(float min, float val, float max);
 void rotateAboutOrigin(float v1, float v2, float rotation, vec2_t out);
 void QuatToYawPitchRoll(ovrQuatf q, vec3_t rotation, vec3_t out);
 void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key);
-void interactWithTouchScreen(qboolean reset, ovrInputStateTrackedRemote *newState, ovrInputStateTrackedRemote *oldState);
+void interactWithTouchScreen(bool reset, ovrInputStateTrackedRemote *newState, ovrInputStateTrackedRemote *oldState);
 int GetRefresh();
 
 //Called from engine code
-qboolean JKVR_useScreenLayer();
+bool JKVR_useScreenLayer();
 void JKVR_GetScreenRes(int *width, int *height);
 void JKVR_Vibrate(int duration, int channel, float intensity );
 void JKVR_Haptic(int duration, int channel, float intensity, char *description, float yaw, float height);
@@ -67,9 +70,9 @@ void JKVR_HapticEndFrame();
 void JKVR_HapticStopEvent(const char* event);
 void JKVR_HapticEnable();
 void JKVR_HapticDisable();
-qboolean JKVR_processMessageQueue();
+bool JKVR_processMessageQueue();
 void JKVR_FrameSetup();
-void JKVR_setUseScreenLayer(qboolean use);
+void JKVR_setUseScreenLayer(bool use);
 void JKVR_processHaptics();
 void JKVR_getHMDOrientation();
 void JKVR_getTrackedRemotesOrientation();

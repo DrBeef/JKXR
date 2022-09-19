@@ -18,7 +18,7 @@ LOCAL_LDLIBS +=  -lGLESv3 -landroid -lEGL -ldl -llog
 #LOCAL_STATIC_LIBRARIES := s-setup  lz
 LOCAL_SHARED_LIBRARIES :=
 
-LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES)
+LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES) $(SPDir)/rd-vanilla $(SPDir)/rd-common
 
 JK3_SRC = \
 	${SPDir}/game/bg_misc.cpp \

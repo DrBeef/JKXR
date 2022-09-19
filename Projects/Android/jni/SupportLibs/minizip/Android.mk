@@ -5,6 +5,8 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE    := libminizip
 
+LOCAL_C_INCLUDES :=  $(SUPPORT_LIBS)/minizip/include/minizip
+
 LOCAL_SRC_FILES = \
     ioapi.c \
 	unzip.c

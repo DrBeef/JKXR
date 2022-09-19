@@ -11,13 +11,15 @@ APP_CFLAGS += -Wl,--no-undefined
 APPLICATIONMK_PATH = $(call my-dir)
 
 TOP_DIR			:= $(APPLICATIONMK_PATH)
-GL4ES_PATH		:= $(TOP_DIR)/SupportLibs/gl4es
+SUPPORT_LIBS	:= $(TOP_DIR)/SupportLibs
+GL4ES_PATH		:= $(SUPPORT_LIBS)/gl4es
 OPENJK_PATH		:= $(TOP_DIR)/OpenJK
+SHARED_PATH		:= $(OPENJK_PATH)/shared
 SPDir			:= $(OPENJK_PATH)/code
 
 APP_ALLOW_MISSING_DEPS=true
 
-APP_MODULES := gl4es rd-gles_arm jagamearm uiarm cgamearm openjk_sp
+APP_MODULES := gl4es rd-gles_arm jagamearm uiarm openjk_sp
 APP_STL := c++_shared
 
 

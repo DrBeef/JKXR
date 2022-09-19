@@ -15,7 +15,8 @@ Authors		:	Simon Brown
 
 #include "VrInput.h"
 
-#include <src/qcommon/qcommon.h>
+#include <qcommon/qcommon.h>
+#include <qcommon/q_platform.h>
 
 //keys.h
 void Sys_QueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr );
@@ -70,7 +71,7 @@ void sendButtonActionSimple(const char* action)
     Cbuf_AddText( command );
 }
 
-qboolean between(float min, float val, float max)
+bool between(float min, float val, float max)
 {
     return (min < val) && (val < max);
 }
@@ -86,8 +87,9 @@ void sendButtonAction(const char* action, long buttonDown)
     Cbuf_AddText( command );
 }
 
-void acquireTrackedRemotesData(const ovrMobile *Ovr, double displayTime) {//The amount of yaw changed by controller
-    for ( int i = 0; ; i++ ) {
+void acquireTrackedRemotesData(ovrMobile *Ovr, double displayTime) {//The amount of yaw changed by controller
+
+    for ( uint32_t i = 0; ; i++ ) {
         ovrInputCapabilityHeader cap;
         ovrResult result = vrapi_EnumerateInputDevices(Ovr, i, &cap);
         if (result < 0) {
@@ -168,10 +170,10 @@ void updateScopeAngles()
 void PortableMouseAbs(float x,float y);
 float clamp(float _min, float _val, float _max)
 {
-    return max(min(_val, _max), _min);
+    return fmax(fmin(_val, _max), _min);
 }
 
-void interactWithTouchScreen(qboolean reset, ovrInputStateTrackedRemote *newState, ovrInputStateTrackedRemote *oldState) {
+void interactWithTouchScreen(bool reset, ovrInputStateTrackedRemote *newState, ovrInputStateTrackedRemote *oldState) {
     static float cursorX = 0.25f;
     static float cursorY = 0.125f;
 

@@ -18,6 +18,7 @@ Filename	:	VrCompositor.c
 #include <EGL/eglext.h>
 #include <GLES3/gl3.h>
 #include <GLES3/gl3ext.h>
+#include <GLES/gl2ext.h>
 
 
 

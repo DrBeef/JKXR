@@ -68,7 +68,7 @@ float HalfToFloat( unsigned short h )
 NearestPOW
 =================
 */
-int NearestPOW( int value, qboolean roundDown )
+int NearestPOW( int value, bool roundDown )
 {
 	int	n = 1;
 
@@ -393,7 +393,7 @@ void InterpolateAngles( vec3_t start, vec3_t end, vec3_t out, float frac )
 BoundsIntersect
 =================
 */
-qboolean BoundsIntersect( const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2 )
+bool BoundsIntersect( const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2 )
 {
 	if( mins1[0] > maxs2[0] || mins1[1] > maxs2[1] || mins1[2] > maxs2[2] )
 		return qfalse;
@@ -407,7 +407,7 @@ qboolean BoundsIntersect( const vec3_t mins1, const vec3_t maxs1, const vec3_t m
 BoundsAndSphereIntersect
 =================
 */
-qboolean BoundsAndSphereIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t origin, float radius )
+bool BoundsAndSphereIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t origin, float radius )
 {
 	if( mins[0] > origin[0] + radius || mins[1] > origin[1] + radius || mins[2] > origin[2] + radius )
 		return qfalse;
