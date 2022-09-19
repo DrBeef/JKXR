@@ -312,7 +312,7 @@ void RE_LAGoggles( void )
 	tr.refdef.rdflags |= (RDF_doLAGoggles|RDF_doFullbright);
 	tr.refdef.doLAGoggles = qtrue;
 
-	fog_t		*fog = &tr.world->fogs[tr.world->numfogs];
+	jk_fog_t		*fog = &tr.world->fogs[tr.world->numfogs];
 
 	fog->parms.color[0] = 0.75f;
 	fog->parms.color[1] = 0.42f + Q_flrand(0.0f, 1.0f) * 0.025f;

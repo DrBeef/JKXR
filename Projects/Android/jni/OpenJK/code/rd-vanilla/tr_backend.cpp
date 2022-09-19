@@ -483,7 +483,7 @@ static void RB_BeginDrawingView (void) {
 				clearBits |= GL_COLOR_BUFFER_BIT;
 				if (tr.world && tr.world->globalFog != -1)
 				{
-					const fog_t		*fog = &tr.world->fogs[tr.world->globalFog];
+					const jk_fog_t		*fog = &tr.world->fogs[tr.world->globalFog];
 					qglClearColor(fog->parms.color[0],  fog->parms.color[1], fog->parms.color[2], 1.0f );
 				}
 				else
@@ -499,7 +499,7 @@ static void RB_BeginDrawingView (void) {
 		{
 			if (tr.world && tr.world->globalFog != -1)
 			{
-				const fog_t		*fog = &tr.world->fogs[tr.world->globalFog];
+				const jk_fog_t		*fog = &tr.world->fogs[tr.world->globalFog];
 				qglClearColor(fog->parms.color[0],  fog->parms.color[1], fog->parms.color[2], 1.0f );
 			}
 			else
@@ -514,7 +514,7 @@ static void RB_BeginDrawingView (void) {
 	{
 		if (tr.world && tr.world->globalFog != -1)
 		{ //this is because of a bug in multiple scenes I think, it needs to clear for the second scene but it doesn't normally.
-			const fog_t		*fog = &tr.world->fogs[tr.world->globalFog];
+			const jk_fog_t		*fog = &tr.world->fogs[tr.world->globalFog];
 
 			qglClearColor(fog->parms.color[0],  fog->parms.color[1], fog->parms.color[2], 1.0f );
 			clearBits |= GL_COLOR_BUFFER_BIT;
@@ -550,7 +550,11 @@ static void RB_BeginDrawingView (void) {
 	// clip to the plane of the portal
 	if ( backEnd.viewParms.isPortal ) {
 		float	plane[4];
+#ifdef HAVE_GLES
+		float	plane2[4];
+#else
 		double	plane2[4];
+#endif
 
 		plane[0] = backEnd.viewParms.portalPlane.normal[0];
 		plane[1] = backEnd.viewParms.portalPlane.normal[1];
@@ -924,7 +928,11 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 					}
 
 					//now copy a portion of the screen to this texture
+#ifdef HAVE_GLES
+						qglCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cX, cY, rad, rad, 0);
+#else
 					qglCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, cX, cY, rad, rad, 0);
+#endif
 
 					lastPostEnt = pRender->entNum;
 				}
@@ -1333,6 +1341,7 @@ const void	*RB_DrawSurfs( const void *data ) {
 		combiner (pixel shader), I combine the adjacent pixels using a weighting factor. - Aurelio
 	*/
 
+#ifndef HAVE_GLES
 	// Render dynamic glowing/flaring objects.
 	if ( !(backEnd.refdef.rdflags & RDF_NOWORLDMODEL) && g_bDynamicGlowSupported && r_DynamicGlow->integer )
 	{
@@ -1389,6 +1398,7 @@ const void	*RB_DrawSurfs( const void *data ) {
 		// Draw the glow additively over the screen.
 		RB_DrawGlowOverlay();
 	}
+#endif
 
 	return (const void *)(cmd + 1);
 }
@@ -1405,19 +1415,21 @@ const void	*RB_DrawBuffer( const void *data ) {
 
 	cmd = (const drawBufferCommand_t *)data;
 
+#ifndef HAVE_GLES
 	qglDrawBuffer( cmd->buffer );
+#endif
 
 		// clear screen for debugging
 	if (!( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) && tr.world && tr.refdef.rdflags & RDF_doLAGoggles)
 	{
-		const fog_t		*fog = &tr.world->fogs[tr.world->numfogs];
+		const jk_fog_t		*fog = &tr.world->fogs[tr.world->numfogs];
 
 		qglClearColor(fog->parms.color[0],  fog->parms.color[1], fog->parms.color[2], 1.0f );
 		qglClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	else if (!( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) && tr.world && tr.world->globalFog != -1 && tr.sceneCount)//don't clear during menus, wait for real scene
 	{
-		const fog_t		*fog = &tr.world->fogs[tr.world->globalFog];
+		const jk_fog_t		*fog = &tr.world->fogs[tr.world->globalFog];
 
 		qglClearColor(fog->parms.color[0],  fog->parms.color[1], fog->parms.color[2], 1.0f );
 		qglClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -1477,19 +1489,29 @@ Also called by RE_EndRegistration
 void RB_ShowImages( void ) {
 	image_t	*image;
 	float	x, y, w, h;
-	//int		start, end;
+//	int		start, end;
 
 	if ( !backEnd.projection2D ) {
 		RB_SetGL2D();
 	}
 
+	qglClear( GL_COLOR_BUFFER_BIT );
+
 	qglFinish();
 
-	//start = ri.Milliseconds();
+//	start = ri->Milliseconds()*ri->Cvar_VariableValue( "timescale" );
 
+
+#ifdef HAVE_GLES
+	GLboolean text = qglIsEnabled(GL_TEXTURE_COORD_ARRAY);
+	GLboolean glcol = qglIsEnabled(GL_COLOR_ARRAY);
+	if (glcol)
+		qglDisableClientState(GL_COLOR_ARRAY);
+	if (!text)
+		qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
+#endif
 	int i=0;
-//	int iNumImages =
-	   				 R_Images_StartIteration();
+	R_Images_StartIteration();
 	while ( (image = R_Images_GetNextIteration()) != NULL)
 	{
 		w = glConfig.vidWidth / 20;
@@ -1504,23 +1526,48 @@ void RB_ShowImages( void ) {
 		}
 
 		GL_Bind( image );
+
+#ifdef HAVE_GLES
+		GLfloat tex[] = {
+		 0, 0,
+		 1, 0,
+		 1, 1,
+		 0, 1
+		};
+		GLfloat vtx[] = {
+		 x, y,
+		 x + w, y,
+		 x + w, y + h,
+		 x, y + h
+		};
+		qglTexCoordPointer( 2, GL_FLOAT, 0, tex );
+		qglVertexPointer  ( 2, GL_FLOAT, 0, vtx );
+		qglDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
+#else
 		qglBegin (GL_QUADS);
-			qglTexCoord2f( 0, 0 );
-			qglVertex2f( x, y );
-			qglTexCoord2f( 1, 0 );
-			qglVertex2f( x + w, y );
-			qglTexCoord2f( 1, 1 );
-			qglVertex2f( x + w, y + h );
-			qglTexCoord2f( 0, 1 );
-			qglVertex2f( x, y + h );
+		qglTexCoord2f( 0, 0 );
+		qglVertex2f( x, y );
+		qglTexCoord2f( 1, 0 );
+		qglVertex2f( x + w, y );
+		qglTexCoord2f( 1, 1 );
+		qglVertex2f( x + w, y + h );
+		qglTexCoord2f( 0, 1 );
+		qglVertex2f( x, y + h );
 		qglEnd();
+#endif
 		i++;
 	}
 
+#ifdef HAVE_GLES
+	if (glcol)
+		qglEnableClientState(GL_COLOR_ARRAY);
+	if (!text)
+		qglDisableClientState( GL_TEXTURE_COORD_ARRAY );
+#endif
 	qglFinish();
 
-	//end = ri.Milliseconds();
-	//ri.Printf( PRINT_ALL, "%i msec to draw all images\n", end - start );
+//	end = ri->Milliseconds()*ri->Cvar_VariableValue( "timescale" );
+//	ri->Printf( PRINT_ALL, "%i msec to draw all images\n", end - start );
 }
 
 
@@ -1548,12 +1595,13 @@ const void	*RB_SwapBuffers( const void *data ) {
 
 	// we measure overdraw by reading back the stencil buffer and
 	// counting up the number of increments that have happened
+#ifndef HAVE_GLES
 	if ( r_measureOverdraw->integer ) {
 		int i;
 		long sum = 0;
 		unsigned char *stencilReadback;
 
-		stencilReadback = (unsigned char *) R_Malloc( glConfig.vidWidth * glConfig.vidHeight, TAG_TEMP_WORKSPACE, qfalse );
+		stencilReadback = (unsigned char *)Hunk_AllocateTempMemory( glConfig.vidWidth * glConfig.vidHeight );
 		qglReadPixels( 0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencilReadback );
 
 		for ( i = 0; i < glConfig.vidWidth * glConfig.vidHeight; i++ ) {
@@ -1561,8 +1609,9 @@ const void	*RB_SwapBuffers( const void *data ) {
 		}
 
 		backEnd.pc.c_overDraw += sum;
-		R_Free( stencilReadback );
+		Hunk_FreeTempMemory( stencilReadback );
 	}
+#endif
 
     if ( !glState.finishCalled ) {
         qglFinish();
@@ -1650,6 +1699,7 @@ void RB_ExecuteRenderCommands( const void *data ) {
 
 }
 
+#ifndef HAVE_GLES
 // What Pixel Shader type is currently active (regcoms or fragment programs).
 GLuint g_uiCurrentPixelShaderType = 0x0;
 
@@ -1671,9 +1721,9 @@ void BeginPixelShader( GLuint uiType, GLuint uiID )
 
 			g_uiCurrentPixelShaderType = GL_REGISTER_COMBINERS_NV;
 		}
-		return;
+			return;
 
-		// Using Fragment Programs, so call the program.
+			// Using Fragment Programs, so call the program.
 		case GL_FRAGMENT_PROGRAM_ARB:
 		{
 			// Just in case...
@@ -1685,7 +1735,7 @@ void BeginPixelShader( GLuint uiType, GLuint uiID )
 
 			g_uiCurrentPixelShaderType = GL_FRAGMENT_PROGRAM_ARB;
 		}
-		return;
+			return;
 	}
 }
 
@@ -1706,6 +1756,7 @@ static inline void RB_BlurGlowTexture()
 {
 	qglDisable (GL_CLIP_PLANE0);
 	GL_Cull( CT_TWO_SIDED );
+	qglDisable( GL_DEPTH_TEST );
 
 	// Go into orthographic 2d mode.
 	qglMatrixMode(GL_PROJECTION);
@@ -1716,7 +1767,7 @@ static inline void RB_BlurGlowTexture()
 	qglPushMatrix();
 	qglLoadIdentity();
 
-	GL_State(GLS_DEPTHTEST_DISABLE);
+	GL_State(0);
 
 	/////////////////////////////////////////////////////////
 	// Setup vertex and pixel programs.
@@ -1757,21 +1808,21 @@ static inline void RB_BlurGlowTexture()
 	GLuint uiTex = tr.screenGlow;
 
 	qglActiveTextureARB( GL_TEXTURE3_ARB );
-	qglEnable( GL_TEXTURE_RECTANGLE_ARB );
-	qglBindTexture( GL_TEXTURE_RECTANGLE_ARB, uiTex );
+	qglEnable( GL_TEXTURE_RECTANGLE_EXT );
+	qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, uiTex );
 
 	qglActiveTextureARB( GL_TEXTURE2_ARB );
-	qglEnable( GL_TEXTURE_RECTANGLE_ARB );
-	qglBindTexture( GL_TEXTURE_RECTANGLE_ARB, uiTex );
+	qglEnable( GL_TEXTURE_RECTANGLE_EXT );
+	qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, uiTex );
 
 	qglActiveTextureARB( GL_TEXTURE1_ARB );
-	qglEnable( GL_TEXTURE_RECTANGLE_ARB );
-	qglBindTexture( GL_TEXTURE_RECTANGLE_ARB, uiTex );
+	qglEnable( GL_TEXTURE_RECTANGLE_EXT );
+	qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, uiTex );
 
 	qglActiveTextureARB(GL_TEXTURE0_ARB );
 	qglDisable( GL_TEXTURE_2D );
-	qglEnable( GL_TEXTURE_RECTANGLE_ARB );
-	qglBindTexture( GL_TEXTURE_RECTANGLE_ARB, uiTex );
+	qglEnable( GL_TEXTURE_RECTANGLE_EXT );
+	qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, uiTex );
 
 	/////////////////////////////////////////////////////////
 	// Draw the blur passes (each pass blurs it more, increasing the blur radius ).
@@ -1791,6 +1842,8 @@ static inline void RB_BlurGlowTexture()
 		// After first pass put the tex coords to the viewport size.
 		if ( iNumBlurPasses == 1 )
 		{
+			// OK, very weird, but dependent on which texture rectangle extension we're using, the
+			// texture either needs to be always texure correct or view correct...
 			if ( !g_bTextureRectangleHack )
 			{
 				iTexWidth = backEnd.viewParms.viewportWidth;
@@ -1800,43 +1853,43 @@ static inline void RB_BlurGlowTexture()
 			uiTex = tr.blurImage;
 			qglActiveTextureARB( GL_TEXTURE3_ARB );
 			qglDisable( GL_TEXTURE_2D );
-			qglEnable( GL_TEXTURE_RECTANGLE_ARB );
-			qglBindTexture( GL_TEXTURE_RECTANGLE_ARB, uiTex );
+			qglEnable( GL_TEXTURE_RECTANGLE_EXT );
+			qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, uiTex );
 			qglActiveTextureARB( GL_TEXTURE2_ARB );
 			qglDisable( GL_TEXTURE_2D );
-			qglEnable( GL_TEXTURE_RECTANGLE_ARB );
-			qglBindTexture( GL_TEXTURE_RECTANGLE_ARB, uiTex );
+			qglEnable( GL_TEXTURE_RECTANGLE_EXT );
+			qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, uiTex );
 			qglActiveTextureARB( GL_TEXTURE1_ARB );
 			qglDisable( GL_TEXTURE_2D );
-			qglEnable( GL_TEXTURE_RECTANGLE_ARB );
-			qglBindTexture( GL_TEXTURE_RECTANGLE_ARB, uiTex );
+			qglEnable( GL_TEXTURE_RECTANGLE_EXT );
+			qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, uiTex );
 			qglActiveTextureARB(GL_TEXTURE0_ARB );
 			qglDisable( GL_TEXTURE_2D );
-			qglEnable( GL_TEXTURE_RECTANGLE_ARB );
-			qglBindTexture( GL_TEXTURE_RECTANGLE_ARB, uiTex );
+			qglEnable( GL_TEXTURE_RECTANGLE_EXT );
+			qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, uiTex );
 
 			// Copy the current image over.
-			qglBindTexture( GL_TEXTURE_RECTANGLE_ARB, uiTex );
-			qglCopyTexSubImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, backEnd.viewParms.viewportWidth, backEnd.viewParms.viewportHeight );
+			qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, uiTex );
+			qglCopyTexSubImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, 0, 0, 0, 0, backEnd.viewParms.viewportWidth, backEnd.viewParms.viewportHeight );
 		}
 
 		// Draw the fullscreen quad.
 		qglBegin( GL_QUADS );
-			qglMultiTexCoord2fARB( GL_TEXTURE0_ARB, 0, iTexHeight );
-			qglVertex2f( 0, 0 );
+		qglMultiTexCoord2fARB( GL_TEXTURE0_ARB, 0, iTexHeight );
+		qglVertex2f( 0, 0 );
 
-			qglMultiTexCoord2fARB( GL_TEXTURE0_ARB, 0, 0 );
-			qglVertex2f( 0, backEnd.viewParms.viewportHeight );
+		qglMultiTexCoord2fARB( GL_TEXTURE0_ARB, 0, 0 );
+		qglVertex2f( 0, backEnd.viewParms.viewportHeight );
 
-			qglMultiTexCoord2fARB( GL_TEXTURE0_ARB, iTexWidth, 0 );
-			qglVertex2f( backEnd.viewParms.viewportWidth, backEnd.viewParms.viewportHeight );
+		qglMultiTexCoord2fARB( GL_TEXTURE0_ARB, iTexWidth, 0 );
+		qglVertex2f( backEnd.viewParms.viewportWidth, backEnd.viewParms.viewportHeight );
 
-			qglMultiTexCoord2fARB( GL_TEXTURE0_ARB, iTexWidth, iTexHeight );
-			qglVertex2f( backEnd.viewParms.viewportWidth, 0 );
+		qglMultiTexCoord2fARB( GL_TEXTURE0_ARB, iTexWidth, iTexHeight );
+		qglVertex2f( backEnd.viewParms.viewportWidth, 0 );
 		qglEnd();
 
-		qglBindTexture( GL_TEXTURE_RECTANGLE_ARB, tr.blurImage );
-		qglCopyTexSubImage2D( GL_TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, backEnd.viewParms.viewportWidth, backEnd.viewParms.viewportHeight );
+		qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, tr.blurImage );
+		qglCopyTexSubImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, 0, 0, 0, 0, backEnd.viewParms.viewportWidth, backEnd.viewParms.viewportHeight );
 
 		// Increase the texel offsets.
 		// NOTE: This is possibly the most important input to the effect. Even by using an exponential function I've been able to
@@ -1849,16 +1902,16 @@ static inline void RB_BlurGlowTexture()
 
 	// Disable multi-texturing.
 	qglActiveTextureARB( GL_TEXTURE3_ARB );
-	qglDisable( GL_TEXTURE_RECTANGLE_ARB );
+	qglDisable( GL_TEXTURE_RECTANGLE_EXT );
 
 	qglActiveTextureARB( GL_TEXTURE2_ARB );
-	qglDisable( GL_TEXTURE_RECTANGLE_ARB );
+	qglDisable( GL_TEXTURE_RECTANGLE_EXT );
 
 	qglActiveTextureARB( GL_TEXTURE1_ARB );
-	qglDisable( GL_TEXTURE_RECTANGLE_ARB );
+	qglDisable( GL_TEXTURE_RECTANGLE_EXT );
 
 	qglActiveTextureARB(GL_TEXTURE0_ARB );
-	qglDisable( GL_TEXTURE_RECTANGLE_ARB );
+	qglDisable( GL_TEXTURE_RECTANGLE_EXT );
 	qglEnable( GL_TEXTURE_2D );
 
 	qglDisable( GL_VERTEX_PROGRAM_ARB );
@@ -1870,6 +1923,8 @@ static inline void RB_BlurGlowTexture()
 	qglPopMatrix();
 
 	qglDisable( GL_BLEND );
+	qglEnable( GL_DEPTH_TEST );
+
 	glState.currenttmu = 0;	//this matches the last one we activated
 }
 
@@ -1878,6 +1933,7 @@ static inline void RB_DrawGlowOverlay()
 {
 	qglDisable (GL_CLIP_PLANE0);
 	GL_Cull( CT_TWO_SIDED );
+	qglDisable( GL_DEPTH_TEST );
 
 	// Go into orthographic 2d mode.
 	qglMatrixMode(GL_PROJECTION);
@@ -1888,29 +1944,29 @@ static inline void RB_DrawGlowOverlay()
 	qglPushMatrix();
 	qglLoadIdentity();
 
-	GL_State(GLS_DEPTHTEST_DISABLE);
+	GL_State(0);
 
 	qglDisable( GL_TEXTURE_2D );
-	qglEnable( GL_TEXTURE_RECTANGLE_ARB );
+	qglEnable( GL_TEXTURE_RECTANGLE_EXT );
 
 	// For debug purposes.
 	if ( r_DynamicGlow->integer != 2 )
 	{
 		// Render the normal scene texture.
-		qglBindTexture( GL_TEXTURE_RECTANGLE_ARB, tr.sceneImage );
+		qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, tr.sceneImage );
 		qglBegin(GL_QUADS);
-			qglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-			qglTexCoord2f( 0, glConfig.vidHeight );
-			qglVertex2f( 0, 0 );
+		qglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+		qglTexCoord2f( 0, glConfig.vidHeight );
+		qglVertex2f( 0, 0 );
 
-			qglTexCoord2f( 0, 0 );
-			qglVertex2f( 0, glConfig.vidHeight );
+		qglTexCoord2f( 0, 0 );
+		qglVertex2f( 0, glConfig.vidHeight );
 
-			qglTexCoord2f( glConfig.vidWidth, 0 );
-			qglVertex2f( glConfig.vidWidth, glConfig.vidHeight );
+		qglTexCoord2f( glConfig.vidWidth, 0 );
+		qglVertex2f( glConfig.vidWidth, glConfig.vidHeight );
 
-			qglTexCoord2f( glConfig.vidWidth, glConfig.vidHeight );
-			qglVertex2f( glConfig.vidWidth, 0 );
+		qglTexCoord2f( glConfig.vidWidth, glConfig.vidHeight );
+		qglVertex2f( glConfig.vidWidth, 0 );
 		qglEnd();
 	}
 
@@ -1927,29 +1983,84 @@ static inline void RB_DrawGlowOverlay()
 	qglEnable( GL_BLEND );
 
 	// Now additively render the glow texture.
-	qglBindTexture( GL_TEXTURE_RECTANGLE_ARB, tr.blurImage );
+	qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, tr.blurImage );
 	qglBegin(GL_QUADS);
-		qglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-		qglTexCoord2f( 0, r_DynamicGlowHeight->integer );
-		qglVertex2f( 0, 0 );
+	qglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+	qglTexCoord2f( 0, r_DynamicGlowHeight->integer );
+	qglVertex2f( 0, 0 );
 
-		qglTexCoord2f( 0, 0 );
-		qglVertex2f( 0, glConfig.vidHeight );
+	qglTexCoord2f( 0, 0 );
+	qglVertex2f( 0, glConfig.vidHeight );
 
-		qglTexCoord2f( r_DynamicGlowWidth->integer, 0 );
-		qglVertex2f( glConfig.vidWidth, glConfig.vidHeight );
+	qglTexCoord2f( r_DynamicGlowWidth->integer, 0 );
+	qglVertex2f( glConfig.vidWidth, glConfig.vidHeight );
 
-		qglTexCoord2f( r_DynamicGlowWidth->integer, r_DynamicGlowHeight->integer );
-		qglVertex2f( glConfig.vidWidth, 0 );
+	qglTexCoord2f( r_DynamicGlowWidth->integer, r_DynamicGlowHeight->integer );
+	qglVertex2f( glConfig.vidWidth, 0 );
 	qglEnd();
 
-	qglDisable( GL_TEXTURE_RECTANGLE_ARB );
+	qglDisable( GL_TEXTURE_RECTANGLE_EXT );
 	qglEnable( GL_TEXTURE_2D );
 	qglBlendFunc( GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR );
 	qglDisable( GL_BLEND );
+
+	// NOTE: Multi-texture wasn't that much faster (we're obviously not bottlenecked by transform pipeline),
+	// and besides, soft glow looks better anyways.
+/*	else
+	{
+		int iTexWidth = glConfig.vidWidth, iTexHeight = glConfig.vidHeight;
+		if ( GL_TEXTURE_RECTANGLE_EXT == GL_TEXTURE_RECTANGLE_NV )
+		{
+			iTexWidth = r_DynamicGlowWidth->integer;
+			iTexHeight = r_DynamicGlowHeight->integer;
+		}
+
+		qglActiveTextureARB( GL_TEXTURE1_ARB );
+		qglDisable( GL_TEXTURE_2D );
+		qglEnable( GL_TEXTURE_RECTANGLE_EXT );
+		qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, tr.screenGlow );
+		qglTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
+
+		qglActiveTextureARB(GL_TEXTURE0_ARB );
+		qglDisable( GL_TEXTURE_2D );
+		qglEnable( GL_TEXTURE_RECTANGLE_EXT );
+		qglBindTexture( GL_TEXTURE_RECTANGLE_EXT, tr.sceneImage );
+		qglTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
+
+		qglBegin(GL_QUADS);
+			qglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+			qglMultiTexCoord2fARB( GL_TEXTURE1_ARB, 0, iTexHeight );
+			qglMultiTexCoord2fARB( GL_TEXTURE0_ARB, 0, glConfig.vidHeight );
+			qglVertex2f( 0, 0 );
+
+			qglMultiTexCoord2fARB( GL_TEXTURE1_ARB, 0, 0 );
+			qglMultiTexCoord2fARB( GL_TEXTURE0_ARB, 0, 0 );
+			qglVertex2f( 0, glConfig.vidHeight );
+
+			qglMultiTexCoord2fARB( GL_TEXTURE1_ARB, iTexWidth, 0 );
+			qglMultiTexCoord2fARB( GL_TEXTURE0_ARB, glConfig.vidWidth, 0 );
+			qglVertex2f( glConfig.vidWidth, glConfig.vidHeight );
+
+			qglMultiTexCoord2fARB( GL_TEXTURE1_ARB, iTexWidth, iTexHeight );
+			qglMultiTexCoord2fARB( GL_TEXTURE0_ARB, glConfig.vidWidth, glConfig.vidHeight );
+			qglVertex2f( glConfig.vidWidth, 0 );
+		qglEnd();
+
+		qglActiveTextureARB( GL_TEXTURE1_ARB );
+		qglTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+		qglDisable( GL_TEXTURE_RECTANGLE_EXT );
+
+		qglActiveTextureARB(GL_TEXTURE0_ARB );
+		qglTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+		qglDisable( GL_TEXTURE_RECTANGLE_EXT );
+		qglEnable( GL_TEXTURE_2D );
+	}*/
 
 	qglMatrixMode(GL_PROJECTION);
 	qglPopMatrix();
 	qglMatrixMode(GL_MODELVIEW);
 	qglPopMatrix();
+
+	qglEnable( GL_DEPTH_TEST );
 }
+#endif //HAVE_GLES

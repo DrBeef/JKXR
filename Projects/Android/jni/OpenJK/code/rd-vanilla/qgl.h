@@ -29,6 +29,9 @@
 #ifdef HAVE_GLES
 #include <GLES/gl.h>
 #include <EGL/egl.h>
+
+#define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
+#define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
 #else
 #include <GL/gl.h>
 #include <GL/glx.h>

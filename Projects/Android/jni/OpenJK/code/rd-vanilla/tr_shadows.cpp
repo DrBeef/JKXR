@@ -677,7 +677,11 @@ void RB_CaptureScreenImage(void)
 		cY = 0;
 	}
 
+#ifdef HAVE_GLES
+		qglCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cX, cY, radX, radY, 0);
+#else
 	qglCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, cX, cY, radX, radY, 0);
+#endif
 }
 
 
@@ -750,20 +754,49 @@ void RB_DistortionFill(void)
 		GL_State(0);
 	}
 
+#ifdef HAVE_GLES
+	qglColor4f(1.0f, 1.0f, 1.0f, alpha);
+	GLboolean text = qglIsEnabled(GL_TEXTURE_COORD_ARRAY);
+	GLboolean glcol = qglIsEnabled(GL_COLOR_ARRAY);
+	if (!text)
+		qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
+	if (glcol)
+		qglDisableClientState( GL_COLOR_ARRAY );
+	GLfloat tex[] = {
+		0+spost2, 1-spost,
+		0+spost2, 0+spost,
+		1-spost2, 0+spost,
+		1-spost2, 1-spost
+	};
+	GLfloat vtx[] = {
+		0, 0,
+		0, glConfig.vidHeight,
+		glConfig.vidWidth, glConfig.vidHeight,
+		glConfig.vidWidth, 0
+	};
+	qglTexCoordPointer( 2, GL_FLOAT, 0, tex );
+	qglVertexPointer  ( 2, GL_FLOAT, 0, vtx );
+	qglDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
+/*	if (glcol)
+		qglEnableClientState( GL_COLOR_ARRAY );
+	if (!text)
+		qglDisableClientState( GL_TEXTURE_COORD_ARRAY );*/
+#else
 	qglBegin(GL_QUADS);
-		qglColor4f(1.0f, 1.0f, 1.0f, alpha);
-		qglTexCoord2f(0+spost2, 1-spost);
-		qglVertex2f(0, 0);
+	qglColor4f(1.0f, 1.0f, 1.0f, alpha);
+	qglTexCoord2f(0+spost2, 1-spost);
+	qglVertex2f(0, 0);
 
-		qglTexCoord2f(0+spost2, 0+spost);
-		qglVertex2f(0, glConfig.vidHeight);
+	qglTexCoord2f(0+spost2, 0+spost);
+	qglVertex2f(0, glConfig.vidHeight);
 
-		qglTexCoord2f(1-spost2, 0+spost);
-		qglVertex2f(glConfig.vidWidth, glConfig.vidHeight);
+	qglTexCoord2f(1-spost2, 0+spost);
+	qglVertex2f(glConfig.vidWidth, glConfig.vidHeight);
 
-		qglTexCoord2f(1-spost2, 1-spost);
-		qglVertex2f(glConfig.vidWidth, 0);
+	qglTexCoord2f(1-spost2, 1-spost);
+	qglVertex2f(glConfig.vidWidth, 0);
 	qglEnd();
+#endif
 
 	if (tr_distortionAlpha == 1.0f && tr_distortionStretch == 0.0f)
 	{ //no overrides

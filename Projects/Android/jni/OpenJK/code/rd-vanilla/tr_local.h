@@ -31,10 +31,15 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "mdx_format.h"
 #include "qgl.h"
 
+#if defined(_XBOX) || defined(HAVE_GLES)
+#define GL_INDEX_TYPE		GL_UNSIGNED_SHORT
+typedef unsigned short glIndex_t;
+#else
 #define GL_INDEX_TYPE		GL_UNSIGNED_INT
 typedef unsigned int glIndex_t;
+#endif
 
-extern refimport_t ri;
+//extern refimport_t ri;
 
 
 // 13 bits
@@ -529,7 +534,7 @@ typedef struct {
 	// for clipping distance in fog when outside
 	qboolean	hasSurface;
 	float		surface[4];
-} fog_t;
+} jk_fog_t;
 
 typedef struct {
 	orientationr_t	ori;
@@ -769,7 +774,7 @@ typedef struct {
 	msurface_t	**marksurfaces;
 
 	int			numfogs;
-	fog_t		*fogs;
+	jk_fog_t		*fogs;
 	int			globalFog;
 
 	int			startLightMapIndex;
@@ -902,7 +907,7 @@ typedef struct {
 #define FUNCTABLE_MASK		(FUNCTABLE_SIZE-1)
 
 
-// the renderer front end should never modify glstate_t
+// the renderer front end should never modify jk_glstate_t
 typedef struct {
 	int			currenttextures[2];
 	int			currenttmu;
@@ -910,7 +915,7 @@ typedef struct {
 	int			texEnv[2];
 	int			faceCulling;
 	uint32_t	glStateBits;
-} glstate_t;
+} jk_glstate_t;
 
 
 typedef struct {
@@ -1076,7 +1081,7 @@ void	 R_Images_DeleteImage(image_t *pImage);
 extern backEndState_t	backEnd;
 extern trGlobals_t	tr;
 extern glconfig_t	glConfig;		// outside of TR since it shouldn't be cleared during ref re-init
-extern glstate_t	glState;		// outside of TR since it shouldn't be cleared during ref re-init
+extern jk_glstate_t	glState;		// outside of TR since it shouldn't be cleared during ref re-init
 extern window_t		window;
 
 

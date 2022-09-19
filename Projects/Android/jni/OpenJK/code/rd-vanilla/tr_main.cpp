@@ -1049,7 +1049,7 @@ See if a sprite is inside a fog volume
 */
 int R_SpriteFogNum( trRefEntity_t *ent ) {
 	int				i;
-	fog_t			*fog;
+	jk_fog_t			*fog;
 
 	if ( tr.refdef.rdflags & RDF_NOWORLDMODEL ) {
 		return 0;
@@ -1475,7 +1475,7 @@ void R_SetViewFogIndex (void)
 {
 	if ( tr.world->numfogs > 1 )
 	{//more than just the LA goggles
-		fog_t *fog;
+		jk_fog_t *fog;
 		int contents = ri.SV_PointContents( tr.refdef.vieworg, 0 );
 		if ( (contents&CONTENTS_FOG) )
 		{//only take a tr.refdef.fogIndex if the tr.refdef.vieworg is actually *in* that fog brush (assumption: checks pointcontents for any CONTENTS_FOG, not that particular brush...)

@@ -33,7 +33,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "tr_WorldEffects.h"
 
 glconfig_t	glConfig;
-glstate_t	glState;
+jk_glstate_t	glState;
 window_t	window;
 
 static void GfxInfo_f( void );
@@ -185,6 +185,7 @@ cvar_t	*com_buildScript;
 cvar_t	*r_environmentMapping;
 cvar_t *r_screenshotJpegQuality;
 
+#ifndef HAVE_GLES
 #if !defined(__APPLE__)
 PFNGLSTENCILOPSEPARATEPROC qglStencilOpSeparate;
 #endif
@@ -207,6 +208,7 @@ PFNGLGETCOMBINEROUTPUTPARAMETERFVNVPROC qglGetCombinerOutputParameterfvNV;
 PFNGLGETCOMBINEROUTPUTPARAMETERIVNVPROC qglGetCombinerOutputParameterivNV;
 PFNGLGETFINALCOMBINERINPUTPARAMETERFVNVPROC qglGetFinalCombinerInputParameterfvNV;
 PFNGLGETFINALCOMBINERINPUTPARAMETERIVNVPROC qglGetFinalCombinerInputParameterivNV;
+#endif
 
 PFNGLPROGRAMSTRINGARBPROC qglProgramStringARB;
 PFNGLBINDPROGRAMARBPROC qglBindProgramARB;
@@ -228,8 +230,10 @@ PFNGLGETPROGRAMIVARBPROC qglGetProgramivARB;
 PFNGLGETPROGRAMSTRINGARBPROC qglGetProgramStringARB;
 PFNGLISPROGRAMARBPROC qglIsProgramARB;
 
+#ifndef HAVE_GLES
 PFNGLLOCKARRAYSEXTPROC qglLockArraysEXT;
 PFNGLUNLOCKARRAYSEXTPROC qglUnlockArraysEXT;
+#endif
 
 bool g_bTextureRectangleHack = false;
 
@@ -261,7 +265,7 @@ void R_Splash()
 		const float y2 = 240 + height / 2;
 
 #ifdef HAVE_GLES
-		GLimp_EndFrame();
+		//GLimp_EndFrame();
 	GLfloat tex[] = {
 	 0,0 ,
 	 1,0,
@@ -489,6 +493,7 @@ static void GLimp_InitExtensions( void )
 	glConfig.clampToEdgeAvailable = qtrue;
 	Com_Printf ("...using GL_EXT_texture_edge_clamp\n" );
 
+#ifndef HAVE_GLES
 	// GL_ARB_multitexture
 	qglMultiTexCoord2fARB = NULL;
 	qglActiveTextureARB = NULL;
@@ -553,6 +558,7 @@ static void GLimp_InitExtensions( void )
 	}
 
 	bool bNVRegisterCombiners = false;
+
 	// Register Combiners.
 	if ( ri.GL_ExtensionSupported( "GL_NV_register_combiners" ) )
 	{
@@ -600,7 +606,7 @@ static void GLimp_InitExtensions( void )
 		bNVRegisterCombiners = false;
 		Com_Printf ("...GL_NV_register_combiners not found\n" );
 	}
-
+#endif
 	// NOTE: Vertex and Fragment Programs are very dependant on each other - this is actually a
 	// good thing! So, just check to see which we support (one or the other) and load the shared
 	// function pointers. ARB rocks!
@@ -686,6 +692,7 @@ static void GLimp_InitExtensions( void )
 	// Find out how many general combiners they have.
 	#define GL_MAX_GENERAL_COMBINERS_NV       0x854D
 	GLint iNumGeneralCombiners = 0;
+	bool bNVRegisterCombiners = false;
 	if(bNVRegisterCombiners)
 		qglGetIntegerv( GL_MAX_GENERAL_COMBINERS_NV, &iNumGeneralCombiners );
 
@@ -704,11 +711,13 @@ static void GLimp_InitExtensions( void )
 	}
 
 #if !defined(__APPLE__)
+#ifndef HAVE_GLES
 	qglStencilOpSeparate = (PFNGLSTENCILOPSEPARATEPROC)ri.GL_GetProcAddress("glStencilOpSeparate");
 	if (qglStencilOpSeparate)
 	{
 		glConfig.doStencilShadowsInOneDrawcall = qtrue;
 	}
+#endif
 #else
 	glConfig.doStencilShadowsInOneDrawcall = qtrue;
 #endif
@@ -1824,6 +1833,7 @@ void RE_Shutdown( qboolean destroyWindow, qboolean restarting ) {
 	for ( size_t i = 0; i < numCommands; i++ )
 		ri.Cmd_RemoveCommand( commands[i].cmd );
 
+#ifndef HAVE_GLES
 	if ( r_DynamicGlow && r_DynamicGlow->integer )
 	{
 		// Release the Glow Vertex Shader.
@@ -1856,6 +1866,7 @@ void RE_Shutdown( qboolean destroyWindow, qboolean restarting ) {
 		// Release the blur texture.
 		qglDeleteTextures( 1, &tr.blurImage );
 	}
+#endif
 
 	R_ShutdownWorldEffects();
 	R_ShutdownFonts();

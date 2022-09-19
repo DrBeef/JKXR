@@ -981,7 +981,7 @@ R_LoadFogs
 */
 static	void R_LoadFogs( lump_t *l, lump_t *brushesLump, lump_t *sidesLump, world_t &worldData, int index ) {
 	int			i;
-	fog_t		*out;
+	jk_fog_t		*out;
 	dfog_t		*fogs;
 	dbrush_t 	*brushes, *brush;
 	dbrushside_t	*sides;
@@ -1001,7 +1001,7 @@ static	void R_LoadFogs( lump_t *l, lump_t *brushesLump, lump_t *sidesLump, world
 
 	// create fog strucutres for them
 	worldData.numfogs = count + 1;
-	worldData.fogs = (fog_t *)R_Hunk_Alloc ( (worldData.numfogs+1)*sizeof(*out), qtrue);
+	worldData.fogs = (jk_fog_t *)R_Hunk_Alloc ( (worldData.numfogs+1)*sizeof(*out), qtrue);
 	worldData.globalFog = -1;
 	out = worldData.fogs + 1;
 

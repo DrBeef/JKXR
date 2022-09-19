@@ -443,6 +443,7 @@ static int PowerOf2(int iArg)
 	return iArg;
 }
 
+#ifndef HAVE_GLES
 Dissolve_t Dissolve={0};
 #define fDISSOLVE_SECONDS 0.75f
 
@@ -1060,4 +1061,4 @@ qboolean RE_InitDissolve(qboolean bForceCircularExtroWipe)
 
 	return bReturn;
 }
-
+#endif

@@ -786,7 +786,7 @@ R_AComputeFogNum
 static int R_GComputeFogNum( trRefEntity_t *ent ) {
 
 	int				i;
-	fog_t			*fog;
+	jk_fog_t			*fog;
 
 	if ( tr.refdef.rdflags & RDF_NOWORLDMODEL ) {
 		return 0;

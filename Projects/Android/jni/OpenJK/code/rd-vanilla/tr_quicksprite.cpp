@@ -85,7 +85,7 @@ void CQuickSpriteSystem::Flush(void)
 	if (mUseFog && r_drawfog->integer == 2 &&
 		mFogIndex == tr.world->globalFog)
 	{ //enable hardware fog when we draw this thing if applicable -rww
-		fog_t *fog = tr.world->fogs + mFogIndex;
+		jk_fog_t *fog = tr.world->fogs + mFogIndex;
 
 		qglFogf(GL_FOG_MODE, GL_EXP2);
 		qglFogf(GL_FOG_DENSITY, logtestExp2 / fog->parms.depthForOpaque);
@@ -163,7 +163,7 @@ void CQuickSpriteSystem::Flush(void)
 	if (mUseFog && (r_drawfog->integer != 2 || mFogIndex != tr.world->globalFog))
 #endif
 	{
-		fog_t *fog = tr.world->fogs + mFogIndex;
+		jk_fog_t *fog = tr.world->fogs + mFogIndex;
 
 		//
 		// render the fog pass

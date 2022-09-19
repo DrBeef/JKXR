@@ -821,7 +821,7 @@ void RB_CalcFogTexCoords( float *st ) {
 	float		s, t;
 	float		eyeT;
 	qboolean	eyeOutside;
-	fog_t		*fog;
+	jk_fog_t		*fog;
 	vec3_t		localVec;
 	vec4_t		fogDistanceVector, fogDepthVector;
 
