@@ -223,7 +223,7 @@ void *RE_RegisterModels_Malloc(int iSize, void *pvDiskBufferIfJustLoaded, const 
 			const char *const psShaderName	 =		   &((char*)ModelBin.pModelDiskImage)[iShaderNameOffset];
 				  int  *const piShaderPokePtr= (int *) &((char*)ModelBin.pModelDiskImage)[iShaderPokeOffset];
 
-			shader_t *sh = R_FindShader( psShaderName, lightmapsNone, stylesDefault, qtrue );
+			jk_shader_t *sh = R_FindShader( psShaderName, lightmapsNone, stylesDefault, qtrue );
 
 			if ( sh->defaultShader )
 			{
@@ -921,7 +921,7 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
         // register the shaders
         shader = (md3Shader_t *) ( (byte *)surf + surf->ofsShaders );
         for ( j = 0 ; j < surf->numShaders ; j++, shader++ ) {
-            shader_t	*sh;
+            jk_shader_t	*sh;
 
             sh = R_FindShader( shader->name, lightmapsNone, stylesDefault, qtrue );
 			if ( sh->defaultShader ) {

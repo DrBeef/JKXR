@@ -214,7 +214,7 @@ public:
 	const int			entNum;
 	const int			modelIndex;
 	const skin_t		*skin;
-	const shader_t		*cust_shader;
+	const jk_shader_t		*cust_shader;
 	intptr_t			*TransformedVertsArray;
 	const EG2_Collision	eG2TraceType;
 	bool				hitOne;
@@ -243,7 +243,7 @@ public:
 		int					initentNum,
 		int					initmodelIndex,
 		const skin_t		*initskin,
-		const shader_t		*initcust_shader,
+		const jk_shader_t		*initcust_shader,
 		intptr_t			*initTransformedVertsArray,
 		const EG2_Collision	einitG2TraceType,
 #ifdef _G2_GORE
@@ -1181,7 +1181,7 @@ static bool G2_TracePolys(const mdxmSurface_t *surface, const mdxmSurfHierarchy_
 									   hitPoint, &x_pos, &y_pos,newCol.mBarycentricI,newCol.mBarycentricJ);
 
 /*
-					const shader_t		*shader = 0;
+					const jk_shader_t		*shader = 0;
 					// now, we know what surface this hit belongs to, we need to go get the shader handle so we can get the correct hit location and hit material info
 					if ( cust_shader )
 					{
@@ -1562,7 +1562,7 @@ void G2_TraceModels(CGhoul2Info_v &ghoul2, vec3_t rayStart, vec3_t rayEnd, CColl
 {
 	int				i, lod;
 	skin_t			*skin;
-	shader_t		*cust_shader;
+	jk_shader_t		*cust_shader;
 #if !defined(JK2_MODE) || defined(_G2_GORE)
 	qboolean		firstModelOnly = qfalse;
 #endif // !JK2_MODE || _G2_GORE

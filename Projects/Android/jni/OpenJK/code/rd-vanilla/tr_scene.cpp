@@ -98,7 +98,7 @@ Adds all the scene's polys into this view's drawsurf list
 */
 void R_AddPolygonSurfaces( void ) {
 	int			i;
-	shader_t	*sh;
+	jk_shader_t	*sh;
 	srfPoly_t	*poly;
 
 	tr.currentEntityNum = REFENTITYNUM_WORLD;

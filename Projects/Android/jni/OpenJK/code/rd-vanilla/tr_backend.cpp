@@ -641,14 +641,14 @@ typedef struct
 	int			dlighted;
 	int			depthRange;
 	drawSurf_t	*drawSurf;
-	shader_t	*shader;
+	jk_shader_t	*shader;
 } postRender_t;
 
 static postRender_t g_postRenders[MAX_POST_RENDERS];
 static int g_numPostRenders = 0;
 
 void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
-	shader_t		*shader, *oldShader;
+	jk_shader_t		*shader, *oldShader;
 	int				fogNum, oldFogNum;
 	int				entityNum, oldEntityNum;
 	int				dlighted, oldDlighted;
@@ -1033,7 +1033,7 @@ RB_StretchPic
 */
 const void *RB_StretchPic ( const void *data ) {
 	const stretchPicCommand_t	*cmd;
-	shader_t *shader;
+	jk_shader_t *shader;
 	int		numVerts, numIndexes;
 
 	cmd = (const stretchPicCommand_t *)data;
@@ -1111,7 +1111,7 @@ RB_RotatePic
 const void *RB_RotatePic ( const void *data )
 {
 	const rotatePicCommand_t	*cmd;
-	shader_t *shader;
+	jk_shader_t *shader;
 
 	cmd = (const rotatePicCommand_t *)data;
 
@@ -1199,7 +1199,7 @@ RB_RotatePic2
 const void *RB_RotatePic2 ( const void *data )
 {
 	const rotatePicCommand_t	*cmd;
-	shader_t *shader;
+	jk_shader_t *shader;
 
 	cmd = (const rotatePicCommand_t *)data;
 

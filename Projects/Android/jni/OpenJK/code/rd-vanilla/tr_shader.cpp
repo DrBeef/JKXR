@@ -35,7 +35,7 @@ static char *s_shaderText;
 // the shader is parsed into these global variables, then copied into
 // dynamically allocated memory if it is valid.
 static	shaderStage_t	stages[MAX_SHADER_STAGES];
-static	shader_t		shader;
+static	jk_shader_t		shader;
 static	texModInfo_t	texMods[MAX_SHADER_STAGES][TR_MAX_TEXMODS];
 
 // Hash value (generated using the generateHashValueForText function) for the original
@@ -48,7 +48,7 @@ static	texModInfo_t	texMods[MAX_SHADER_STAGES][TR_MAX_TEXMODS];
 
 
 #define FILE_HASH_SIZE		1024
-static	shader_t*		sh_hashTable[FILE_HASH_SIZE];
+static	jk_shader_t*		sh_hashTable[FILE_HASH_SIZE];
 
 const int lightmapsNone[MAXLIGHTMAPS] =
 {
@@ -130,7 +130,7 @@ way to ask for different implicit lighting modes (vertex, lightmap, etc)
 */
 qhandle_t RE_RegisterShaderLightMap( const char *name, const int *lightmapIndex, const byte *styles )
 {
-	shader_t	*sh;
+	jk_shader_t	*sh;
 
 	if ( strlen( name ) >= MAX_QPATH ) {
 		Com_Printf( "Shader name exceeds MAX_QPATH\n" );
@@ -159,10 +159,10 @@ Will always return a valid shader, but it might be the
 default shader if the real one can't be found.
 ==================
 */
-shader_t *R_FindShaderByName( const char *name ) {
+jk_shader_t *R_FindShaderByName( const char *name ) {
 	char		strippedName[MAX_QPATH];
 	int			hash;
-	shader_t	*sh;
+	jk_shader_t	*sh;
 
 	if ( (name==NULL) || (name[0] == 0) ) {  // bk001205
 		return tr.defaultShader;
@@ -193,7 +193,7 @@ shader_t *R_FindShaderByName( const char *name ) {
 void R_RemapShader(const char *shaderName, const char *newShaderName, const char *timeOffset) {
 	char		strippedName[MAX_QPATH];
 	int			hash;
-	shader_t	*sh, *sh2;
+	jk_shader_t	*sh, *sh2;
 	qhandle_t	h;
 
 	sh = R_FindShaderByName( shaderName );
@@ -2698,7 +2698,7 @@ static void FixRenderCommandList( int newShader ) {
 					{
 					int i;
 					drawSurf_t	*drawSurf;
-					shader_t	*shader;
+					jk_shader_t	*shader;
 					int			fogNum;
 					int			entityNum;
 					int			dlightMap;
@@ -2758,7 +2758,7 @@ Sets shader->sortedIndex
 static void SortNewShader( void ) {
 	int		i;
 	float	sort;
-	shader_t	*newShader;
+	jk_shader_t	*newShader;
 
 	newShader = tr.shaders[ tr.numShaders - 1 ];
 	sort = newShader->sort;
@@ -2785,8 +2785,8 @@ static void SortNewShader( void ) {
 GeneratePermanentShader
 ====================
 */
-static shader_t *GeneratePermanentShader( void ) {
-	shader_t	*newShader;
+static jk_shader_t *GeneratePermanentShader( void ) {
+	jk_shader_t	*newShader;
 	int			i, b;
 	int			size;
 
@@ -2796,7 +2796,7 @@ static shader_t *GeneratePermanentShader( void ) {
 		return tr.defaultShader;
 	}
 
-	newShader = (shader_t *)R_Hunk_Alloc( sizeof( shader_t ), qtrue );
+	newShader = (jk_shader_t *)R_Hunk_Alloc( sizeof( jk_shader_t ), qtrue );
 
 	*newShader = shader;
 
@@ -2967,7 +2967,7 @@ Returns a freshly allocated shader with all the needed info
 from the current global working shader
 =========================
 */
-static shader_t *FinishShader( void ) {
+static jk_shader_t *FinishShader( void ) {
 	int				stage, lmStage, stageIndex;
 	qboolean		hasLightmapStage;
 
@@ -3323,7 +3323,7 @@ static const char *FindShaderInShaderText( const char *shadername ) {
 #endif
 }
 
-inline qboolean IsShader(shader_t *sh, const char *name, const int *lightmapIndex, const byte *styles)
+inline qboolean IsShader(jk_shader_t *sh, const char *name, const int *lightmapIndex, const byte *styles)
 {
 	int	i;
 
@@ -3422,12 +3422,12 @@ and src*dest blending applied with the texture, as apropriate for
 most world construction surfaces.
 ===============
 */
-shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage ) {
+jk_shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage ) {
 	char		strippedName[MAX_QPATH];
 	int			hash;
 	const char 	*shaderText;
 	image_t		*image;
-	shader_t	*sh;
+	jk_shader_t	*sh;
 
 	if ( strlen( name ) >= MAX_QPATH ) {
 		Com_Printf( S_COLOR_RED"Shader name exceeds MAX_QPATH! %s\n",name );
@@ -3569,7 +3569,7 @@ way to ask for different implicit lighting modes (vertex, lightmap, etc)
 ====================
 */
 qhandle_t RE_RegisterShader( const char *name ) {
-	shader_t	*sh;
+	jk_shader_t	*sh;
 
 	sh = R_FindShader( name, lightmaps2d, stylesDefault, qtrue );
 
@@ -3594,7 +3594,7 @@ For menu graphics that should never be picmiped
 ====================
 */
 qhandle_t RE_RegisterShaderNoMip( const char *name ) {
-	shader_t	*sh;
+	jk_shader_t	*sh;
 
 	sh = R_FindShader( name, lightmaps2d, stylesDefault, qfalse );
 
@@ -3616,10 +3616,10 @@ qhandle_t RE_RegisterShaderNoMip( const char *name ) {
 R_GetShaderByHandle
 
 When a handle is passed in by another module, this range checks
-it and returns a valid (possibly default) shader_t to be used internally.
+it and returns a valid (possibly default) jk_shader_t to be used internally.
 ====================
 */
-shader_t *R_GetShaderByHandle( qhandle_t hShader ) {
+jk_shader_t *R_GetShaderByHandle( qhandle_t hShader ) {
 	if ( hShader < 0 ) {
 		ri.Printf( PRINT_WARNING, "R_GetShaderByHandle: out of range hShader '%d'\n", hShader );
 		return tr.defaultShader;
@@ -3642,7 +3642,7 @@ A second parameter will cause it to print in sorted order
 void	R_ShaderList_f (void) {
 	int			i;
 	int			count;
-	shader_t	*shader;
+	jk_shader_t	*shader;
 
 	ri.Printf (PRINT_ALL, "-----------------------\n");
 

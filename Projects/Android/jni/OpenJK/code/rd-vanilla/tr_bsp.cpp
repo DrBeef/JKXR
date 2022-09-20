@@ -316,8 +316,8 @@ static	void R_LoadVisibility( lump_t *l, world_t &worldData ) {
 ShaderForShaderNum
 ===============
 */
-static shader_t *ShaderForShaderNum( int shaderNum, const int *lightmapNum, const byte *lightmapStyles, const byte *vertexStyles, world_t &worldData ) {
-	shader_t	*shader;
+static jk_shader_t *ShaderForShaderNum( int shaderNum, const int *lightmapNum, const byte *lightmapStyles, const byte *vertexStyles, world_t &worldData ) {
+	jk_shader_t	*shader;
 	dshader_t	*dsh;
 	const byte	*styles;
 
@@ -988,7 +988,7 @@ static	void R_LoadFogs( lump_t *l, lump_t *brushesLump, lump_t *sidesLump, world
 	int			count, brushesCount, sidesCount;
 	int			sideNum;
 	int			planeNum;
-	shader_t	*shader;
+	jk_shader_t	*shader;
 	float		d;
 	int			firstSide=0;
 	int			lightmaps[MAXLIGHTMAPS] = { LIGHTMAP_NONE } ;

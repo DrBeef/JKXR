@@ -316,103 +316,34 @@ DrawTris
 Draws triangle outlines for debugging
 ================
 */
-static void DrawTris (shaderCommands_t *input)
-{
+static void DrawTris (shaderCommands_t *input) {
+	if (input->numVertexes <= 0) {
+		return;
+	}
+
 	GL_Bind( tr.whiteImage );
+	qglColor3f (1,1,1);
 
-	if ( r_showtriscolor->integer )
-	{
-		int i = r_showtriscolor->integer;
-		if (i == 42) {
-			i = Q_irand(0,8);
-		}
-		switch (i)
-		{
-		case 1:
-			qglColor3f( 1.0, 0.0, 0.0); //red
-			break;
-		case 2:
-			qglColor3f( 0.0, 1.0, 0.0); //green
-			break;
-		case 3:
-			qglColor3f( 1.0, 1.0, 0.0); //yellow
-			break;
-		case 4:
-			qglColor3f( 0.0, 0.0, 1.0); //blue
-			break;
-		case 5:
-			qglColor3f( 0.0, 1.0, 1.0); //cyan
-			break;
-		case 6:
-			qglColor3f( 1.0, 0.0, 1.0); //magenta
-			break;
-		case 7:
-			qglColor3f( 0.8f, 0.8f, 0.8f); //white/grey
-			break;
-		case 8:
-			qglColor3f( 0.0, 0.0, 0.0); //black
-			break;
-		}
-	}
-	else
-	{
-		qglColor3f( 1.0, 1.0, 1.0); //white
+	GL_State( GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE );
+	qglDepthRange( 0, 0 );
+
+	qglDisableClientState (GL_COLOR_ARRAY);
+	qglDisableClientState (GL_TEXTURE_COORD_ARRAY);
+
+	qglVertexPointer (3, GL_FLOAT, 16, input->xyz);	// padded for SIMD
+
+	if (qglLockArraysEXT) {
+		qglLockArraysEXT(0, input->numVertexes);
+		GLimp_LogComment( "glLockArraysEXT\n" );
 	}
 
-	if ( r_showtris->integer == 2 )
-	{
-		// tries to do non-xray style showtris
-		GL_State( GLS_POLYMODE_LINE );
+	R_DrawElements( input->numIndexes, input->indexes );
 
-		qglEnable( GL_POLYGON_OFFSET_LINE );
-		qglPolygonOffset( -1, -2 );
-
-		qglDisableClientState( GL_COLOR_ARRAY );
-		qglDisableClientState( GL_TEXTURE_COORD_ARRAY );
-
-		qglVertexPointer( 3, GL_FLOAT, 16, input->xyz );	// padded for SIMD
-
-		if ( qglLockArraysEXT )
-		{
-			qglLockArraysEXT( 0, input->numVertexes );
-			GLimp_LogComment( "glLockArraysEXT\n" );
-		}
-
-		R_DrawElements( input->numIndexes, input->indexes );
-
-		if ( qglUnlockArraysEXT )
-		{
-			qglUnlockArraysEXT( );
-			GLimp_LogComment( "glUnlockArraysEXT\n" );
-		}
-
-		qglDisable( GL_POLYGON_OFFSET_LINE );
+	if (qglUnlockArraysEXT) {
+		qglUnlockArraysEXT();
+		GLimp_LogComment( "glUnlockArraysEXT\n" );
 	}
-	else
-	{
-		// same old showtris
-		GL_State( GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE );
-		qglDepthRange( 0, 0 );
-
-		qglDisableClientState (GL_COLOR_ARRAY);
-		qglDisableClientState (GL_TEXTURE_COORD_ARRAY);
-
-		qglVertexPointer (3, GL_FLOAT, 16, input->xyz);	// padded for SIMD
-
-		if (qglLockArraysEXT) {
-			qglLockArraysEXT(0, input->numVertexes);
-			GLimp_LogComment( "glLockArraysEXT\n" );
-		}
-
-		R_DrawElements( input->numIndexes, input->indexes );
-
-		if (qglUnlockArraysEXT) {
-			qglUnlockArraysEXT();
-			GLimp_LogComment( "glUnlockArraysEXT\n" );
-		}
-
-		qglDepthRange( 0, 1 );
-	}
+	qglDepthRange( 0, 1 );
 }
 
 /*
@@ -431,6 +362,9 @@ static void DrawNormals (shaderCommands_t *input) {
 	qglDepthRange( 0, 0 );	// never occluded
 	GL_State( GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE );
 
+#ifdef HAVE_GLES
+	/*SEB *TODO* */
+#else
 	qglBegin (GL_LINES);
 	for (i = 0 ; i < input->numVertexes ; i++) {
 		qglVertex3fv (input->xyz[i]);
@@ -438,6 +372,7 @@ static void DrawNormals (shaderCommands_t *input) {
 		qglVertex3fv (temp);
 	}
 	qglEnd ();
+#endif
 
 	qglDepthRange( 0, 1 );
 }
@@ -452,9 +387,9 @@ because a surface may be forced to perform a RB_End due
 to overflow.
 ==============
 */
-void RB_BeginSurface( shader_t *shader, int fogNum ) {
-//	shader_t *state = (shader->remappedShader) ? shader->remappedShader : shader;
-	shader_t *state = shader;
+void RB_BeginSurface( jk_shader_t *shader, int fogNum ) {
+//	jk_shader_t *state = (shader->remappedShader) ? shader->remappedShader : shader;
+	jk_shader_t *state = shader;
 
 	tess.numIndexes = 0;
 	tess.numVertexes = 0;

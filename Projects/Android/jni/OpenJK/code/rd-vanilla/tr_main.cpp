@@ -891,7 +891,7 @@ static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128
 	float shortest = 1000000000;
 	int entityNum;
 	int numTriangles;
-	shader_t *shader;
+	jk_shader_t *shader;
 	int		fogNum;
 	int dlighted;
 	vec4_t clip, eye;
@@ -1159,7 +1159,7 @@ static void R_RadixSort( drawSurf_t *source, int size )
 R_AddDrawSurf
 =================
 */
-void R_AddDrawSurf( const surfaceType_t *surface, const shader_t *shader, int fogIndex, int dlightMap )
+void R_AddDrawSurf( const surfaceType_t *surface, const jk_shader_t *shader, int fogIndex, int dlightMap )
 {
 	int			index;
 
@@ -1190,7 +1190,7 @@ void R_AddDrawSurf( const surfaceType_t *surface, const shader_t *shader, int fo
 R_DecomposeSort
 =================
 */
-void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader,
+void R_DecomposeSort( unsigned sort, int *entityNum, jk_shader_t **shader,
 					 int *fogNum, int *dlightMap ) {
 	*fogNum = ( sort >> QSORT_FOGNUM_SHIFT ) & 31;
 	*shader = tr.sortedShaders[ ( sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1) ];
@@ -1204,7 +1204,7 @@ R_SortDrawSurfs
 =================
 */
 void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
-	shader_t		*shader;
+	jk_shader_t		*shader;
 	int				fogNum;
 	int				entityNum;
 	int				dlighted;
@@ -1260,7 +1260,7 @@ R_AddEntitySurfaces
 */
 void R_AddEntitySurfaces (void) {
 	trRefEntity_t	*ent;
-	shader_t		*shader;
+	jk_shader_t		*shader;
 
 	if ( !r_drawentities->integer ) {
 		return;

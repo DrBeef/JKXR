@@ -429,7 +429,7 @@ static void DrawSkySide( struct image_s *image, const int mins[2], const int max
 #endif
 }
 
-static void DrawSkyBox( shader_t *shader )
+static void DrawSkyBox( jk_shader_t *shader )
 {
 	int		i;
 
@@ -549,7 +549,7 @@ static void FillCloudySkySide( const int mins[2], const int maxs[2], qboolean ad
 	}
 }
 
-static void FillCloudBox( const shader_t *shader, int stage )
+static void FillCloudBox( const jk_shader_t *shader, int stage )
 {
 	int i;
 
