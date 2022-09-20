@@ -443,7 +443,6 @@ static int PowerOf2(int iArg)
 	return iArg;
 }
 
-#ifndef HAVE_GLES
 Dissolve_t Dissolve={0};
 #define fDISSOLVE_SECONDS 0.75f
 
@@ -467,6 +466,7 @@ static void RE_Blit(float fX0, float fY0, float fX1, float fY1, float fX2, float
 	qglColor3f( 1.0f, 1.0f, 1.0f );
 
 
+#ifndef HAVE_GLES
 	qglBegin (GL_QUADS);
 	{
 		// TL...
@@ -494,10 +494,12 @@ static void RE_Blit(float fX0, float fY0, float fX1, float fY1, float fX2, float
 		qglVertex2f( fX3, fY3);
 	}
 	qglEnd ();
+#endif
 }
 
 static void RE_KillDissolve(void)
 {
+#ifndef HAVE_GLES
 	Dissolve.iStartTime = 0;
 
 	if (Dissolve.pImage)
@@ -505,6 +507,7 @@ static void RE_KillDissolve(void)
 		R_Images_DeleteImage(	Dissolve.pImage );
 								Dissolve.pImage = NULL;
 	}
+#endif
 }
 // Draw the dissolve pic to the screen, over the top of what's already been rendered.
 //
@@ -513,6 +516,7 @@ static void RE_KillDissolve(void)
 #define iSAFETY_SPRITE_OVERLAP 2	// #pixels to overlap blit region by, in case some drivers leave onscreen seams
 qboolean RE_ProcessDissolve(void)
 {
+#ifndef HAVE_GLES
 	if (Dissolve.iStartTime)
 	{
 		if (Dissolve.bTouchNeeded)
@@ -790,7 +794,7 @@ qboolean RE_ProcessDissolve(void)
 			RE_KillDissolve();
 		}
 	}
-
+#endif
 	return qfalse;
 }
 
@@ -803,6 +807,7 @@ qboolean RE_InitDissolve(qboolean bForceCircularExtroWipe)
 //	ri.Printf( PRINT_ALL, "RE_InitDissolve()\n");
 	qboolean bReturn = qfalse;
 
+#ifndef HAVE_GLES
 	if (//Dissolve.iStartTime == 0	// no point in interruping an existing one
 		//&&
 		tr.registered == qtrue		// ... stops it crashing during first cinematic before the menus... :-)
@@ -1059,6 +1064,8 @@ qboolean RE_InitDissolve(qboolean bForceCircularExtroWipe)
 		}
 	}
 
+#endif
+
 	return bReturn;
 }
-#endif
+

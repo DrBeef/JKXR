@@ -247,7 +247,7 @@ static qboolean GLW_StartDriverAndSetMode( const char *drivername,
 }
 
 
-void VR_GetScreenRes(int *width, int *height);
+void JKVR_GetScreenRes(int *width, int *height);
 
 /*
  ** GLW_InitExtensions
@@ -478,7 +478,7 @@ void GLimp_Init( void ) {
 
     int android_screen_width;
     int android_screen_height;
-	VR_GetScreenRes(&android_screen_width, &android_screen_height);
+	JKVR_GetScreenRes(&android_screen_width, &android_screen_height);
 	glConfig.vidWidth = android_screen_width;
 	glConfig.vidHeight = android_screen_height;
 	glConfig.colorBits = 32;

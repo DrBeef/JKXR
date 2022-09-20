@@ -274,7 +274,7 @@ void Sys_In_Restart_f( void )
 	IN_Shutdown();
 	IN_Init();
 #else
-	IN_Restart( );
+	//IN_Restart( );
 #endif
 }
 
@@ -318,7 +318,7 @@ void Sys_Error( const char *error, ... )
 }
 
 void Sys_Quit (void) {
-	IN_Shutdown();
+	//IN_Shutdown();
 
 	Com_ShutdownZoneMemory();
 	Com_ShutdownHunkMemory();
@@ -563,6 +563,65 @@ void *Sys_LoadLegacyGameDll( const char *name, intptr_t (QDECL **vmMain)(int, ..
 	dllEntry( systemcalls );
 
 	return libHandle;
+}
+
+/*
+=================
+Sys_LoadDll
+
+First try to load library name from system library path,
+from executable path, then fs_basepath.
+=================
+*/
+void *Sys_LoadDll( const char *name, qboolean useSystemLib )
+{
+	void *dllhandle = NULL;
+
+	// Don't load any DLLs that end with the pk3 extension
+	if ( COM_CompareExtension( name, ".pk3" ) )
+	{
+		Com_Printf( S_COLOR_YELLOW "WARNING: Rejecting DLL named \"%s\"", name );
+		return NULL;
+	}
+
+	if ( useSystemLib )
+	{
+		Com_Printf( "Trying to load \"%s\"...\n", name );
+
+		dllhandle = Sys_LoadLibrary( name );
+		if ( dllhandle )
+			return dllhandle;
+
+		Com_Printf( "%s(%s) failed: \"%s\"\n", __FUNCTION__, name, Sys_LibraryError() );
+	}
+
+	const char *binarypath = Sys_BinaryPath();
+	const char *basepath = Cvar_VariableString( "fs_basepath" );
+
+	if ( !*binarypath )
+		binarypath = ".";
+
+	const char *searchPaths[] = {
+			binarypath,
+			basepath,
+	};
+	const size_t numPaths = ARRAY_LEN( searchPaths );
+
+	for ( size_t i = 0; i < numPaths; i++ )
+	{
+		const char *libDir = searchPaths[i];
+		if ( !libDir[0] )
+			continue;
+
+		Com_Printf( "Trying to load \"%s\" from \"%s\"...\n", name, libDir );
+		char *fn = va( "%s%c%s", libDir, PATH_SEP, name );
+		dllhandle = Sys_LoadLibrary( fn );
+		if ( dllhandle )
+			return dllhandle;
+
+		Com_Printf( "%s(%s) failed: \"%s\"\n", __FUNCTION__, fn, Sys_LibraryError() );
+	}
+	return NULL;
 }
 
 void *Sys_LoadGameDll( const char *name, void *(QDECL **moduleAPI)(int, ...) )

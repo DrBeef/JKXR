@@ -226,12 +226,12 @@ void PortableMouse(float dx,float dy)
 }
 
 int absx=0,absy=0;
-void VR_GetScreenRes(int *width, int *height);
+void JKVR_GetScreenRes(int *width, int *height);
 void PortableMouseAbs(float x,float y)
 {
     int width;
     int height;
-    VR_GetScreenRes(&width, &height);
+	JKVR_GetScreenRes(&width, &height);
 	absx = x * width;
 	absy = y * height;
 }
@@ -318,15 +318,11 @@ void PortableInit(int argc,const char ** argv){
 	//Copied form sys_main.c
 	int len, i;
 	char  *cmdline;
-	void Sys_SetDefaultCDPath( const char *path );
 
 	// go back to real user for config loads
 
 
 	//Sys_ParseArgs( argc, argv ); // bk010104 - added this for support
-
-	// TTimo: no CD path
-	Sys_SetDefaultCDPath( "" );
 
 	// merge the command line, this is kinda silly
 	for ( len = 1, i = 1; i < argc; i++ )

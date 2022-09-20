@@ -9,12 +9,12 @@ LOCAL_MODULE    := openjk_sp
 
 
 LOCAL_CFLAGS :=  $(JK3_BASE_CFLAGS)
-LOCAL_CPPFLAGS := $(JK3_BASE_CPPFLAGS) -DBOTLIB -D_JK2EXE
+LOCAL_CPPFLAGS := $(JK3_BASE_CPPFLAGS) -DBOTLIB -D_JK2EXE -DSP_GAME -DUSE_OPENAL
 
 LOCAL_LDLIBS := $(JK3_BASE_LDLIBS)
 
 
-LOCAL_LDLIBS +=  -lGLESv3 -lEGL -llog -lz
+LOCAL_LDLIBS +=  -lGLESv3 -landroid -lEGL -llog -lz
 
 #Needed so lib can be loaded (_exit error)
 LOCAL_LDLIBS += -fuse-ld=bfd 

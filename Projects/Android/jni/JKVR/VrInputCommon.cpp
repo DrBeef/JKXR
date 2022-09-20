@@ -18,6 +18,47 @@ Authors		:	Simon Brown
 #include <qcommon/qcommon.h>
 #include <qcommon/q_platform.h>
 
+cvar_t	*vr_turn_mode;
+cvar_t	*vr_turn_angle;
+cvar_t	*vr_reloadtimeoutms;
+cvar_t	*vr_positional_factor;
+cvar_t	*vr_walkdirection;
+cvar_t	*vr_movement_multiplier;
+cvar_t	*vr_weapon_pitchadjust;
+cvar_t	*vr_lasersight;
+cvar_t	*vr_control_scheme;
+cvar_t	*vr_teleport;
+cvar_t	*vr_virtual_stock;
+cvar_t	*vr_switch_sticks;
+cvar_t	*vr_cinematic_stereo;
+cvar_t	*vr_screen_dist;
+
+ovrInputStateTrackedRemote leftTrackedRemoteState_old;
+ovrInputStateTrackedRemote leftTrackedRemoteState_new;
+ovrTracking leftRemoteTracking_new;
+ovrInputStateTrackedRemote rightTrackedRemoteState_old;
+ovrInputStateTrackedRemote rightTrackedRemoteState_new;
+ovrTracking rightRemoteTracking_new;
+ovrInputStateGamepad footTrackedRemoteState_old;
+ovrInputStateGamepad footTrackedRemoteState_new;
+ovrDeviceID controllerIDs[2];
+
+float remote_movementSideways;
+float remote_movementForward;
+float remote_movementUp;
+float positional_movementSideways;
+float positional_movementForward;
+float snapTurn;
+bool jk2_initialised;
+long long global_time;
+float playerHeight;
+float playerYaw;
+bool showingScreenLayer;
+ovrTracking2 tracking;
+int ducked;
+int resyncClientYawWithGameYaw;
+vr_client_info_t vr;
+
 //keys.h
 void Sys_QueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr );
 void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key)

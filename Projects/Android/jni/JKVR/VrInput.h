@@ -10,30 +10,27 @@
 #define BINOCULAR_ENGAGE_DISTANCE   0.25
 #define VELOCITY_TRIGGER        1.6
 
-ovrInputStateTrackedRemote leftTrackedRemoteState_old;
-ovrInputStateTrackedRemote leftTrackedRemoteState_new;
-ovrTracking leftRemoteTracking_new;
+extern ovrInputStateTrackedRemote leftTrackedRemoteState_old;
+extern ovrInputStateTrackedRemote leftTrackedRemoteState_new;
+extern ovrTracking leftRemoteTracking_new;
+extern ovrInputStateTrackedRemote rightTrackedRemoteState_old;
+extern ovrInputStateTrackedRemote rightTrackedRemoteState_new;
+extern ovrTracking rightRemoteTracking_new;
+extern ovrInputStateGamepad footTrackedRemoteState_old;
+extern ovrInputStateGamepad footTrackedRemoteState_new;
+extern ovrDeviceID controllerIDs[2];
 
-ovrInputStateTrackedRemote rightTrackedRemoteState_old;
-ovrInputStateTrackedRemote rightTrackedRemoteState_new;
-ovrTracking rightRemoteTracking_new;
-
-ovrInputStateGamepad footTrackedRemoteState_old;
-ovrInputStateGamepad footTrackedRemoteState_new;
-
-ovrDeviceID controllerIDs[2];
-
-float remote_movementSideways;
-float remote_movementForward;
-float remote_movementUp;
-float positional_movementSideways;
-float positional_movementForward;
-float snapTurn;
+extern float remote_movementSideways;
+extern float remote_movementForward;
+extern float remote_movementUp;
+extern float positional_movementSideways;
+extern float positional_movementForward;
+extern float snapTurn;
 
 void sendButtonAction(const char* action, long buttonDown);
 void sendButtonActionSimple(const char* action);
 
-void acquireTrackedRemotesData(const ovrMobile *Ovr, double displayTime);
+void acquireTrackedRemotesData(ovrMobile *Ovr, double displayTime);
 
 void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateGamepad *pFootTrackingOld,
                           ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,

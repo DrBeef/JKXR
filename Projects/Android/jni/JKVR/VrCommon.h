@@ -25,25 +25,20 @@
 #define ALOGV(...)
 #endif
 
-bool jk2_initialised;
-
-long long global_time;
-
-float playerHeight;
-float playerYaw;
-
-bool showingScreenLayer;
-
-ovrTracking2 tracking;
+extern bool jk2_initialised;
+extern long long global_time;
+extern float playerHeight;
+extern float playerYaw;
+extern bool showingScreenLayer;
+extern ovrTracking2 tracking;
+extern int ducked;
+extern int resyncClientYawWithGameYaw;
+extern vr_client_info_t vr;
 
 #define DUCK_NOTDUCKED 0
 #define DUCK_BUTTON 1
 #define DUCK_CROUCHED 2
-int ducked;
 
-int resyncClientYawWithGameYaw;
-
-vr_client_info_t vr;
 
 
 float radians(float deg);

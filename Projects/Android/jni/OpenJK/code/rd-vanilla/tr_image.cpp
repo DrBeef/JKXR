@@ -52,7 +52,7 @@ int		gl_filter_max = GL_LINEAR;
 // helper function for GLES format conversions
 byte * gles_convertRGB(byte * data, int width, int height)
 {
-	byte * temp = (byte *) Z_Malloc (width*height*3, TAG_TEMP_WORKSPACE, qfalse);
+	byte * temp = (byte *) R_Malloc (width*height*3, TAG_TEMP_WORKSPACE, qfalse);
 	byte *src = data;
 	byte *dst = temp;
 
@@ -66,7 +66,7 @@ byte * gles_convertRGB(byte * data, int width, int height)
 }
 byte *  gles_convertRGBA4(byte * data, int width, int height)
 {
-	byte * temp = (byte *) Z_Malloc (width*height*2, TAG_TEMP_WORKSPACE, qfalse);
+	byte * temp = (byte *) R_Malloc (width*height*2, TAG_TEMP_WORKSPACE, qfalse);
 
     unsigned int * input = ( unsigned int *)(data);
     unsigned short* output = (unsigned short*)(temp);
@@ -86,7 +86,7 @@ byte *  gles_convertRGBA4(byte * data, int width, int height)
 
 byte * gles_convertRGB5(byte * data, int width, int height)
 {
-	byte * temp = (byte *) Z_Malloc (width*height*2, TAG_TEMP_WORKSPACE, qfalse);
+	byte * temp = (byte *) R_Malloc (width*height*2, TAG_TEMP_WORKSPACE, qfalse);
 	byte *src = data;
 	byte *dst = temp;
 	byte r,g,b;
@@ -107,7 +107,7 @@ byte * gles_convertRGB5(byte * data, int width, int height)
 }
 byte * gles_convertLuminance(byte * data, int width, int height)
 {
-	byte * temp = (byte *) Z_Malloc (width*height, TAG_TEMP_WORKSPACE, qfalse);
+	byte * temp = (byte *) R_Malloc (width*height, TAG_TEMP_WORKSPACE, qfalse);
 	byte *src = data;
 	byte *dst = temp;
 	byte r,g,b;
@@ -125,7 +125,7 @@ byte * gles_convertLuminance(byte * data, int width, int height)
 }
 byte * gles_convertLuminanceAlpha(byte * data, int width, int height)
 {
-	byte * temp = (byte *) Z_Malloc (width*height*2, TAG_TEMP_WORKSPACE, qfalse);
+	byte * temp = (byte *) R_Malloc (width*height*2, TAG_TEMP_WORKSPACE, qfalse);
 	byte *src = data;
 	byte *dst = temp;
 	byte r,g,b;
@@ -869,28 +869,28 @@ static void Upload32( unsigned *data,
 		 case GL_RGB5:
 			temp = gles_convertRGB5((byte*)data, width, height);
 			qglTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, temp);
-			Z_Free(temp);
+			R_Free(temp);
 			break;
 		 case GL_RGBA4:
 			temp = gles_convertRGBA4((byte*)data, width, height);
 			qglTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, temp);
-			Z_Free(temp);
+			R_Free(temp);
 			break;
 		 case 3:
 		 case GL_RGB:
 			temp = gles_convertRGB((byte*)data, width, height);
 			qglTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, temp);
-			Z_Free(temp);
+			R_Free(temp);
 			break;
 		 case 1:
 			temp = gles_convertLuminance((byte*)data, width, height);
 			qglTexImage2D (GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, temp);
-			Z_Free(temp);
+			R_Free(temp);
 			break;
 		 case 2:
 			temp = gles_convertLuminanceAlpha((byte*)data, width, height);
 			qglTexImage2D (GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, temp);
-			Z_Free(temp);
+			R_Free(temp);
 			break;
 		 default:
 			*pformat = GL_RGBA;

@@ -73,7 +73,7 @@ GetClipboardData
 static void GetClipboardData( char *buf, int buflen ) {
 	char	*cbd, *c;
 
-	c = cbd = Sys_GetClipboardData();
+/*	c = cbd = Sys_GetClipboardData();
 	if ( !cbd ) {
 		*buf = 0;
 		return;
@@ -85,7 +85,7 @@ static void GetClipboardData( char *buf, int buflen ) {
 		buf[i] = ConvertUTF32ToExpectedCharset( utf32 );
 	}
 
-	Z_Free( cbd );
+	Z_Free( cbd );*/
 }
 
 /*

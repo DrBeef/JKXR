@@ -362,6 +362,8 @@ extern PFNGLGETPROGRAMIVARBPROC qglGetProgramivARB;
 extern PFNGLGETPROGRAMSTRINGARBPROC qglGetProgramStringARB;
 extern PFNGLISPROGRAMARBPROC qglIsProgramARB;
 
+extern	void ( APIENTRY * qglActiveTextureARB )( GLenum texture );
+
 #ifndef HAVE_GLES
 /*
 ** extension constants
@@ -376,7 +378,6 @@ extern PFNGLISPROGRAMARBPROC qglIsProgramARB;
 // extensions will be function pointers on all platforms
 
 extern	void ( APIENTRY * qglMultiTexCoord2fARB )( GLenum texture, GLfloat s, GLfloat t );
-extern	void ( APIENTRY * qglActiveTextureARB )( GLenum texture );
 extern	void ( APIENTRY * qglClientActiveTextureARB )( GLenum texture );
 
 extern	void ( APIENTRY * qglLockArraysEXT) (GLint, GLint);

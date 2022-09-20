@@ -8,14 +8,14 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := rd-gles_arm
 
 
-LOCAL_CFLAGS :=  $(JK3_BASE_CFLAGS) -DHAVE_GLES -DRENDERER -D_JK2EXE -Wno-narrowing
+LOCAL_CFLAGS :=  $(JK3_BASE_CFLAGS) -DHAVE_GLES -DRENDERER -D_JK2EXE -DSP_GAME -Wno-narrowing
 LOCAL_CPPFLAGS := $(JK3_BASE_CPPFLAGS) 
 
 LOCAL_LDLIBS := $(JK3_BASE_LDLIBS)
 
 
 LOCAL_LDLIBS +=  -lGLESv3 -landroid -lEGL -ldl -llog
-LOCAL_STATIC_LIBRARIES := libpng libjpeg 
+LOCAL_STATIC_LIBRARIES := libpng libjpeg gl4es
 #LOCAL_SHARED_LIBRARIES :=
 
 LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES) $(SUPPORT_LIBS)/libpng $(TOP_DIR) $(SPDir)/rd-vanilla $(SPDir)/rd-common
@@ -66,7 +66,7 @@ JK3_SRC = \
 	${OPENJK_PATH}/shared/qcommon/q_math.c \
 	${OPENJK_PATH}/shared/qcommon/q_color.c \
 	${OPENJK_PATH}/shared/qcommon/q_string.c \
-	
+
 LOCAL_SRC_FILES += $(JK3_SRC) 
 
 

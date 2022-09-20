@@ -407,7 +407,7 @@ qboolean Sys_Mkdir( const char *path )
 
 	return qtrue;
 }
-
+/*
 char *Sys_Cwd( void )
 {
 	static char cwd[MAX_OSPATH];
@@ -418,7 +418,7 @@ char *Sys_Cwd( void )
 		cwd[MAX_OSPATH-1] = '\0';
 
 	return cwd;
-}
+}*/
 
 /* Resolves path names and determines if they are the same */
 /* For use with full OS paths not quake paths */

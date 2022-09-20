@@ -11,12 +11,10 @@ JK3_BASE_CFLAGS += -mfloat-abi=softfp
 JK3_BASE_LDLIBS += -Wl
 
 JK3_BASE_C_INCLUDES :=   $(OPENJK_PATH)/lib $(SPDir)/client $(SPDir)/qclib $(SPDir)/botlib $(SPDir)/d3d  $(SPDir)/server  $(SPDir)/sw  $(SPDir)/libs/freetype2/include $(SPDir)/common  $(SPDir)/gl
-JK3_BASE_C_INCLUDES +=   $(SPDir)/ $(OPENJK_PATH)/code/ $(OPENJK_PATH)/shared/ $(SPDir)/game $(OPENJK_PATH)/lib/gsl-lite/include
+JK3_BASE_C_INCLUDES +=   $(SPDir)/ $(OPENJK_PATH)/code/ $(OPENJK_PATH)/shared/ $(SPDir)/game $(SPDir)/ui $(OPENJK_PATH)/lib/gsl-lite/include
 
 include $(OPENJK_PATH)/Android_client.mk
 include $(OPENJK_PATH)/Android_game.mk
-# include $(OPENJK_PATH)/Android_cgame.mk
-include $(OPENJK_PATH)/Android_ui.mk
 include $(OPENJK_PATH)/Android_gles.mk
 
 

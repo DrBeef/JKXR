@@ -155,7 +155,7 @@ void Sys_Init( void ) {
 static void NORETURN Sys_Exit( int ex ) {
 	IN_Shutdown();
 #ifndef DEDICATED
-	SDL_Quit();
+	//SDL_Quit();
 #endif
 
 	NET_Shutdown();
@@ -192,10 +192,10 @@ static void Sys_ErrorDialog( const char *error )
 		fclose( fp );
 
 		const char *errorMessage = va( "%s\n\nThe crash log was written to %s", error, crashLogPath );
-		if ( SDL_ShowSimpleMessageBox( SDL_MESSAGEBOX_ERROR, "Error", errorMessage, NULL ) < 0 )
+/*		if ( SDL_ShowSimpleMessageBox( SDL_MESSAGEBOX_ERROR, "Error", errorMessage, NULL ) < 0 )
 		{
 			fprintf( stderr, "%s", errorMessage );
-		}
+		}*/
 	}
 	else
 	{
@@ -205,11 +205,11 @@ static void Sys_ErrorDialog( const char *error )
 
 		const char *errorMessage = va( "%s\nCould not write the crash log file, but we printed it to stderr.\n"
 										"Try running the game using a command line interface.", error );
-		if ( SDL_ShowSimpleMessageBox( SDL_MESSAGEBOX_ERROR, "Error", errorMessage, NULL ) < 0 )
+/*		if ( SDL_ShowSimpleMessageBox( SDL_MESSAGEBOX_ERROR, "Error", errorMessage, NULL ) < 0 )
 		{
 			// We really have hit rock bottom here :(
 			fprintf( stderr, "%s", errorMessage );
-		}
+		}*/
 	}
 }
 #endif
@@ -272,64 +272,7 @@ void Sys_UnloadDll( void *dllHandle )
 	Sys_UnloadLibrary(dllHandle);
 }
 
-/*
-=================
-Sys_LoadDll
 
-First try to load library name from system library path,
-from executable path, then fs_basepath.
-=================
-*/
-void *Sys_LoadDll( const char *name, qboolean useSystemLib )
-{
-	void *dllhandle = NULL;
-
-	// Don't load any DLLs that end with the pk3 extension
-	if ( COM_CompareExtension( name, ".pk3" ) )
-	{
-		Com_Printf( S_COLOR_YELLOW "WARNING: Rejecting DLL named \"%s\"", name );
-		return NULL;
-	}
-
-	if ( useSystemLib )
-	{
-		Com_Printf( "Trying to load \"%s\"...\n", name );
-
-		dllhandle = Sys_LoadLibrary( name );
-		if ( dllhandle )
-			return dllhandle;
-
-		Com_Printf( "%s(%s) failed: \"%s\"\n", __FUNCTION__, name, Sys_LibraryError() );
-	}
-
-	const char *binarypath = Sys_BinaryPath();
-	const char *basepath = Cvar_VariableString( "fs_basepath" );
-
-	if ( !*binarypath )
-		binarypath = ".";
-
-	const char *searchPaths[] = {
-		binarypath,
-		basepath,
-	};
-	const size_t numPaths = ARRAY_LEN( searchPaths );
-
-	for ( size_t i = 0; i < numPaths; i++ )
-	{
-		const char *libDir = searchPaths[i];
-		if ( !libDir[0] )
-			continue;
-
-		Com_Printf( "Trying to load \"%s\" from \"%s\"...\n", name, libDir );
-		char *fn = va( "%s%c%s", libDir, PATH_SEP, name );
-		dllhandle = Sys_LoadLibrary( fn );
-		if ( dllhandle )
-			return dllhandle;
-
-		Com_Printf( "%s(%s) failed: \"%s\"\n", __FUNCTION__, fn, Sys_LibraryError() );
-	}
-	return NULL;
-}
 
 #if defined(MACOS_X) && !defined(_JK2EXE)
 void *Sys_LoadMachOBundle( const char *name )
@@ -757,6 +700,7 @@ int main ( int argc, char* argv[] )
 	Com_Init (commandLine);
 
 #ifndef DEDICATED
+	/*
 	SDL_version compiled;
 	SDL_version linked;
 
@@ -765,6 +709,7 @@ int main ( int argc, char* argv[] )
 
 	Com_Printf( "SDL Version Compiled: %d.%d.%d\n", compiled.major, compiled.minor, compiled.patch );
 	Com_Printf( "SDL Version Linked: %d.%d.%d\n", linked.major, linked.minor, linked.patch );
+	 */
 #endif
 
 	NET_Init();
