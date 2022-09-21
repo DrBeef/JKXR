@@ -20,6 +20,12 @@
 static char binaryPath[ MAX_OSPATH ] = { 0 };
 static char installPath[ MAX_OSPATH ] = { 0 };
 
+cvar_t *com_minimized;
+cvar_t *com_unfocused;
+cvar_t *com_maxfps;
+cvar_t *com_maxfpsMinimized;
+cvar_t *com_maxfpsUnfocused;
+
 char *Sys_Cwd( void ) {
 	static char cwd[MAX_OSPATH];
 
@@ -27,6 +33,19 @@ char *Sys_Cwd( void ) {
 	cwd[MAX_OSPATH - 1] = 0;
 
 	return cwd;
+}
+
+/*
+=================
+Sys_ConsoleInput
+
+Handle new console input
+=================
+*/
+char *CON_Input( void );
+char *Sys_ConsoleInput(void)
+{
+	return CON_Input( );
 }
 
 #if defined( DO_LOADDLL_WRAP )
@@ -345,11 +364,90 @@ void Sys_UnloadDll( void *dllHandle )
 	//Sys_UnloadLibrary(dllHandle);
 }
 
-
-
-extern "C"
+enum SearchPathFlag
 {
-extern const char * getLibPath();
+	SEARCH_PATH_MOD		= 1 << 0,
+	SEARCH_PATH_BASE	= 1 << 1,
+	SEARCH_PATH_OPENJK	= 1 << 2,
+	SEARCH_PATH_ROOT	= 1 << 3
+};
+
+
+static void *Sys_LoadDllFromPaths( const char *filename, const char *gamedir, const char **searchPaths,
+								   size_t numPaths, uint32_t searchFlags, const char *callerName )
+{
+	char *fn;
+	void *libHandle;
+
+	if ( searchFlags & SEARCH_PATH_MOD )
+	{
+		for ( size_t i = 0; i < numPaths; i++ )
+		{
+			const char *libDir = searchPaths[i];
+			if ( !libDir[0] )
+				continue;
+
+			fn = FS_BuildOSPath( libDir, gamedir, filename );
+			libHandle = Sys_LoadLibrary( fn );
+			if ( libHandle )
+				return libHandle;
+
+			Com_Printf( "%s(%s) failed: \"%s\"\n", callerName, fn, Sys_LibraryError() );
+		}
+	}
+
+	if ( searchFlags & SEARCH_PATH_BASE )
+	{
+		for ( size_t i = 0; i < numPaths; i++ )
+		{
+			const char *libDir = searchPaths[i];
+			if ( !libDir[0] )
+				continue;
+
+			fn = FS_BuildOSPath( libDir, BASEGAME, filename );
+			libHandle = Sys_LoadLibrary( fn );
+			if ( libHandle )
+				return libHandle;
+
+			Com_Printf( "%s(%s) failed: \"%s\"\n", callerName, fn, Sys_LibraryError() );
+		}
+	}
+
+	if ( searchFlags & SEARCH_PATH_OPENJK )
+	{
+		for ( size_t i = 0; i < numPaths; i++ )
+		{
+			const char *libDir = searchPaths[i];
+			if ( !libDir[0] )
+				continue;
+
+			fn = FS_BuildOSPath( libDir, OPENJKGAME, filename );
+			libHandle = Sys_LoadLibrary( fn );
+			if ( libHandle )
+				return libHandle;
+
+			Com_Printf( "%s(%s) failed: \"%s\"\n", callerName, fn, Sys_LibraryError() );
+		}
+	}
+
+	if ( searchFlags & SEARCH_PATH_ROOT )
+	{
+		for ( size_t i = 0; i < numPaths; i++ )
+		{
+			const char *libDir = searchPaths[i];
+			if ( !libDir[0] )
+				continue;
+
+			fn = va( "%s%c%s", libDir, PATH_SEP, filename );
+			libHandle = Sys_LoadLibrary( fn );
+			if ( libHandle )
+				return libHandle;
+
+			Com_Printf( "%s(%s) failed: \"%s\"\n", callerName, fn, Sys_LibraryError() );
+		}
+	}
+
+	return NULL;
 }
 
 /*
@@ -651,8 +749,8 @@ void *Sys_LoadGameDll( const char *name, void *(QDECL **moduleAPI)(int, ...) )
 
 
 	char  lib_path[512];
-	sprintf(lib_path,"%s/lib%s", getLibPath(),filename);
-	//LOGI("Trying to load Android lib: %s",lib_path);
+	char *libdir = (char*)getenv("JK_GAMELIBDIR");
+	sprintf(lib_path,"%s/lib%s", libdir,filename);
 	libHandle = dlopen (lib_path, RTLD_LAZY );
 
 
@@ -744,6 +842,57 @@ void *Sys_LoadGameDll( const char *name, void *(QDECL **moduleAPI)(int, ...) )
 	return libHandle;
 }
 
+void *Sys_LoadSPGameDll( const char *name, GetGameAPIProc **GetGameAPI )
+{
+	void	*libHandle = NULL;
+	char	filename[MAX_OSPATH];
+
+	assert( GetGameAPI );
+
+	Com_sprintf (filename, sizeof(filename), "%s" ARCH_STRING DLL_EXT, name);
+
+#if defined(MACOS_X) && !defined(_JK2EXE)
+	//First, look for the old-style mac .bundle that's inside a pk3
+    //It's actually zipped, and the zipfile has the same name as 'name'
+    libHandle = Sys_LoadMachOBundle( filename );
+#endif
+
+	if (!libHandle) {
+		char *basepath = Cvar_VariableString( "fs_basepath" );
+		char *homepath = Cvar_VariableString( "fs_homepath" );
+		char *cdpath = Cvar_VariableString( "fs_cdpath" );
+		char *gamedir = Cvar_VariableString( "fs_game" );
+#ifdef MACOS_X
+		char *apppath = Cvar_VariableString( "fs_apppath" );
+#endif
+
+		const char *searchPaths[] = {
+				homepath,
+#ifdef MACOS_X
+				apppath,
+#endif
+				basepath,
+				cdpath,
+		};
+		size_t numPaths = ARRAY_LEN( searchPaths );
+
+		libHandle = Sys_LoadDllFromPaths( filename, gamedir, searchPaths, numPaths,
+										  SEARCH_PATH_BASE | SEARCH_PATH_MOD | SEARCH_PATH_OPENJK | SEARCH_PATH_ROOT,
+										  __FUNCTION__ );
+		if ( !libHandle )
+			return NULL;
+	}
+
+	*GetGameAPI = (GetGameAPIProc *)Sys_LoadFunction( libHandle, "GetGameAPI" );
+	if ( !*GetGameAPI ) {
+		Com_DPrintf ( "%s(%s) failed to find GetGameAPI function:\n...%s!\n", __FUNCTION__, name, Sys_LibraryError() );
+		Sys_UnloadLibrary( libHandle );
+		return NULL;
+	}
+
+	return libHandle;
+}
+
 void    Sys_ConfigureFPU() { // bk001213 - divide by zero
 #ifdef __linux2__
 	#ifdef __i386
@@ -803,6 +952,53 @@ char *Sys_StripAppBundle( char *dir )
 #		define DEFAULT_BASEDIR Sys_BinaryPath()
 #	endif
 #endif
+
+#include "../client/client.h"
+
+void JKVR_Init();
+qboolean shutdown;
+int VR_main( int argc, char* argv[] ) {
+	// int  oldtime, newtime; // bk001204 - unused
+	int len, i;
+	char  *cmdline;
+
+	// merge the command line, this is kinda silly
+	for ( len = 1, i = 1; i < argc; i++ )
+		len += strlen( argv[i] ) + 1;
+	cmdline = (char*)malloc( len );
+	*cmdline = 0;
+	for ( i = 1; i < argc; i++ )
+	{
+		if ( i > 1 ) {
+			strcat( cmdline, " " );
+		}
+		strcat( cmdline, argv[i] );
+	}
+
+	// bk000306 - clear queues
+	//memset( &eventQue[0], 0, MAX_QUED_EVENTS * sizeof( sysEvent_t ) );
+	//memset( &sys_packetReceived[0], 0, MAX_MSGLEN * sizeof( byte ) );
+
+	Com_Init( cmdline );
+	NET_Init();
+	JKVR_Init();
+
+	//Sys_ConsoleInputInit();
+
+
+//	fcntl( 0, F_SETFL, fcntl( 0, F_GETFL, 0 ) | FNDELAY );
+
+	shutdown = qfalse;
+	while ( !shutdown )
+	{
+#ifdef __linux__
+		Sys_ConfigureFPU();
+#endif
+		Com_Frame();
+	}
+
+	CL_ShutdownUI();
+}
 
 int main ( int argc, char* argv[] )
 {

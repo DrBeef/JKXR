@@ -39,7 +39,9 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 #include "VrApi_Input.h"
 #include "VrApi_Types.h"
 
-#include <src/gl/loader.h>
+extern "C" {
+#include "src/gl/loader.h"
+}
 
 //#include <SDL2/SDL.h>
 //#include <SDL2/SDL_main.h>
@@ -1250,7 +1252,9 @@ void Android_MessageBox(const char *title, const char *text)
     ALOGE("%s %s", title, text);
 }
 
+extern "C" {
 void initialize_gl4es();
+}
 
 void JKVR_ResyncClientYawWithGameYaw()
 {
@@ -1766,7 +1770,6 @@ void JKVR_submitFrame()
 
 
 	JKVR_incrementFrameIndex();
-	JKVR_HapticEndFrame();
 }
 
 static void ovrAppThread_Create( ovrAppThread * appThread, JNIEnv * env, jobject activityObject, jclass activityClass )

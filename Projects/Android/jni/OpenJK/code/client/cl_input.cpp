@@ -477,10 +477,10 @@ CL_JoystickMove
 void CL_JoystickMove( usercmd_t *cmd ) {
 	float	anglespeed;
 
-	if ( !in_joystick->integer )
+/*	if ( !in_joystick->integer )
 	{
 		return;
-	}
+	}*/
 
 	if ( !(in_speed.active ^ cl_run->integer) ) {
 		cmd->buttons |= BUTTON_WALKING;

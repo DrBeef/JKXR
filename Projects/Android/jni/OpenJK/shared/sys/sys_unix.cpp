@@ -44,7 +44,7 @@ static char homePath[ MAX_OSPATH ] = { 0 };
 
 void Sys_PlatformInit( void )
 {
-	const char* term = getenv( "TERM" );
+/*	const char* term = getenv( "TERM" );
 
 	signal( SIGHUP, Sys_SigHandler );
 	signal( SIGQUIT, Sys_SigHandler );
@@ -56,6 +56,7 @@ void Sys_PlatformInit( void )
 		stdinIsATTY = qtrue;
 	else
 		stdinIsATTY = qfalse;
+*/
 }
 
 void Sys_PlatformExit( void )

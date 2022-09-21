@@ -618,7 +618,7 @@ void S_Init( void ) {
 	else
 	{
 #endif
-		r = SNDDMA_Init(s_khz->integer);
+		r = static_cast<qboolean>(SNDDMA_Init(s_khz->integer));
 
 		if ( r ) {
 			s_soundStarted = 1;

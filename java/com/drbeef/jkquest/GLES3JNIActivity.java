@@ -171,22 +171,22 @@ import static android.system.Os.setenv;
 		copy_asset("/sdcard/JKQuest", "commandline.txt", false);
 
 		//Copy the weapon adjustment config
-		copy_asset("/sdcard/JKQuest/Main", "weapons_vr.cfg", false);
+//		copy_asset("/sdcard/JKQuest/Main", "weapons_vr.cfg", false);
 
 		//and the demo version - if required
-		copy_asset("/sdcard/JKQuest/Main", "pak0.pk3", false);
+//		copy_asset("/sdcard/JKQuest/Main", "pak0.pk3", false);
 
 		//and the vr weapons
-		copy_asset("/sdcard/JKQuest/Main", "z_zvr_weapons.pk3", true);
+//		copy_asset("/sdcard/JKQuest/Main", "z_zvr_weapons.pk3", true);
 
 		//and the vr menu pk3
-		copy_asset("/sdcard/JKQuest/Main", "z_jkquest_vrmenu.pk3", true);
+//		copy_asset("/sdcard/JKQuest/Main", "z_jkquest_vrmenu.pk3", true);
 
 		//and the venom scripting improvements pak (thank-you _HELLBARON_ !!)
-		copy_asset("/sdcard/JKQuest/Main", "sp_vpak8.pk3", false);
+//		copy_asset("/sdcard/JKQuest/Main", "sp_vpak8.pk3", false);
 
 		//Read these from a file and pass through
-		commandLineParams = new String("jk2");
+		commandLineParams = new String("jk3");
 
 		//See if user is trying to use command line params
 		if (new File("/sdcard/JKQuest/commandline.txt").exists()) // should exist!

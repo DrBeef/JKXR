@@ -9,21 +9,21 @@ LOCAL_MODULE    := openjk_sp
 
 
 LOCAL_CFLAGS :=  $(JK3_BASE_CFLAGS)
-LOCAL_CPPFLAGS := $(JK3_BASE_CPPFLAGS) -DBOTLIB -D_JK2EXE -DSP_GAME -DUSE_OPENAL
+LOCAL_CPPFLAGS := $(JK3_BASE_CPPFLAGS) -DBOTLIB -D_JK2EXE
 
 LOCAL_LDLIBS := $(JK3_BASE_LDLIBS)
 
 
-LOCAL_LDLIBS +=  -lGLESv3 -landroid -lEGL -llog -lz
+LOCAL_LDLIBS +=  -lGLESv3 -landroid -lEGL -llog -lz -lOpenSLES
 
 #Needed so lib can be loaded (_exit error)
 LOCAL_LDLIBS += -fuse-ld=bfd 
 
 LOCAL_STATIC_LIBRARIES := sigc libzip libpng libminizip
-LOCAL_SHARED_LIBRARIES := openal vrapi gl4es
+LOCAL_SHARED_LIBRARIES := vrapi gl4es
 
 
-LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES) $(TOP_DIR) $(GL4ES_PATH) $(GL4ES_PATH)/include $(SUPPORT_LIBS)/openal/include $(SUPPORT_LIBS)/minizip/include $(SPDir)/rd-vanilla $(SPDir)/rd-common
+LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES) $(TOP_DIR) $(GL4ES_PATH) $(GL4ES_PATH)/include $(SUPPORT_LIBS)/minizip/include $(SPDir)/rd-vanilla $(SPDir)/rd-common
 
 
 #############################################################################
@@ -36,6 +36,8 @@ LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES) $(TOP_DIR) $(GL4ES_PATH) $(GL4ES_PAT
 JK3_SRC = \
 		${SPDir}/android/in_android.cpp \
 		${SPDir}/android/android_main.cpp \
+		${SPDir}/android/android_snd.cpp \
+		${SPDir}/android/android_window.cpp \
 	\
 		${SPDir}/client/cl_cgame.cpp \
 		${SPDir}/client/cl_cin.cpp \

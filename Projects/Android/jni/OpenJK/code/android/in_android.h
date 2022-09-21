@@ -2,10 +2,6 @@
 
 
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 int PortableKeyEvent(int state, int code ,int unitcode);
 void PortableAction(int state, int action);
 
@@ -28,6 +24,3 @@ int PortableShowKeyboard(void);
 int PortableInAutomap(void);
 
 
-#ifdef __cplusplus
-}
-#endif
