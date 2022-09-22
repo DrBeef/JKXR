@@ -1354,7 +1354,7 @@ void JKVR_finishEyeBuffer(int eye )
 	ovrFramebuffer_SetNone();
 }
 
-bool JKVR_processMessageQueue() {
+void JKVR_processMessageQueue() {
 	for ( ; ; )
 	{
 		ovrMessage message;
@@ -1422,7 +1422,7 @@ bool JKVR_processMessageQueue() {
 }
 
 void showLoadingIcon();
-void jni_shutdown();
+extern "C" void jni_shutdown();
 void JKVR_incrementFrameIndex();
 void shutdownVR();
 int VR_main( int argc, char* argv[] );
@@ -1804,6 +1804,7 @@ Activity lifecycle
 ================================================================================
 */
 
+extern "C" {
 
 jmethodID android_shutdown;
 static JavaVM *jVM;
@@ -1834,7 +1835,7 @@ int JNI_OnLoad(JavaVM* vm, void* reserved)
 	return JNI_VERSION_1_4;
 }
 
-JNIEXPORT jlong JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onCreate( JNIEnv * env, jclass activityClass, jobject activity,
+JNIEXPORT jlong JNICALL Java_com_drbeef_jkquest_GLES3JNILib_onCreate( JNIEnv * env, jclass activityClass, jobject activity,
 																	   jstring commandLineParams)
 {
 	ALOGV( "    GLES3JNILib::onCreate()" );
@@ -1909,7 +1910,7 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onCreate( JNIEnv * 
 }
 
 
-JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onStart( JNIEnv * env, jobject obj, jlong handle, jobject obj1)
+JNIEXPORT void JNICALL Java_com_drbeef_jkquest_GLES3JNILib_onStart( JNIEnv * env, jobject obj, jlong handle, jobject obj1)
 {
 	ALOGV( "    GLES3JNILib::onStart()" );
 
@@ -1925,7 +1926,7 @@ JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onStart( JNIEnv * en
 	ovrMessageQueue_PostMessage( &appThread->MessageQueue, &message );
 }
 
-JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onResume( JNIEnv * env, jobject obj, jlong handle )
+JNIEXPORT void JNICALL Java_com_drbeef_jkquest_GLES3JNILib_onResume( JNIEnv * env, jobject obj, jlong handle )
 {
 	ALOGV( "    GLES3JNILib::onResume()" );
 	ovrAppThread * appThread = (ovrAppThread *)((size_t)handle);
@@ -1934,7 +1935,7 @@ JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onResume( JNIEnv * e
 	ovrMessageQueue_PostMessage( &appThread->MessageQueue, &message );
 }
 
-JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onPause( JNIEnv * env, jobject obj, jlong handle )
+JNIEXPORT void JNICALL Java_com_drbeef_jkquest_GLES3JNILib_onPause( JNIEnv * env, jobject obj, jlong handle )
 {
 	ALOGV( "    GLES3JNILib::onPause()" );
 	ovrAppThread * appThread = (ovrAppThread *)((size_t)handle);
@@ -1943,7 +1944,7 @@ JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onPause( JNIEnv * en
 	ovrMessageQueue_PostMessage( &appThread->MessageQueue, &message );
 }
 
-JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onStop( JNIEnv * env, jobject obj, jlong handle )
+JNIEXPORT void JNICALL Java_com_drbeef_jkquest_GLES3JNILib_onStop( JNIEnv * env, jobject obj, jlong handle )
 {
 	ALOGV( "    GLES3JNILib::onStop()" );
 	ovrAppThread * appThread = (ovrAppThread *)((size_t)handle);
@@ -1952,7 +1953,7 @@ JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onStop( JNIEnv * env
 	ovrMessageQueue_PostMessage( &appThread->MessageQueue, &message );
 }
 
-JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onDestroy( JNIEnv * env, jobject obj, jlong handle )
+JNIEXPORT void JNICALL Java_com_drbeef_jkquest_GLES3JNILib_onDestroy( JNIEnv * env, jobject obj, jlong handle )
 {
 	ALOGV( "    GLES3JNILib::onDestroy()" );
 	ovrAppThread * appThread = (ovrAppThread *)((size_t)handle);
@@ -1973,7 +1974,7 @@ Surface lifecycle
 ================================================================================
 */
 
-JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onSurfaceCreated( JNIEnv * env, jobject obj, jlong handle, jobject surface )
+JNIEXPORT void JNICALL Java_com_drbeef_jkquest_GLES3JNILib_onSurfaceCreated( JNIEnv * env, jobject obj, jlong handle, jobject surface )
 {
 	ALOGV( "    GLES3JNILib::onSurfaceCreated()" );
 	ovrAppThread * appThread = (ovrAppThread *)((size_t)handle);
@@ -1996,7 +1997,7 @@ JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onSurfaceCreated( JN
 	ovrMessageQueue_PostMessage( &appThread->MessageQueue, &message );
 }
 
-JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onSurfaceChanged( JNIEnv * env, jobject obj, jlong handle, jobject surface )
+JNIEXPORT void JNICALL Java_com_drbeef_jkquest_GLES3JNILib_onSurfaceChanged( JNIEnv * env, jobject obj, jlong handle, jobject surface )
 {
 	ALOGV( "    GLES3JNILib::onSurfaceChanged()" );
 	ovrAppThread * appThread = (ovrAppThread *)((size_t)handle);
@@ -2038,7 +2039,7 @@ JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onSurfaceChanged( JN
 	}
 }
 
-JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onSurfaceDestroyed( JNIEnv * env, jobject obj, jlong handle )
+JNIEXPORT void JNICALL Java_com_drbeef_jkquest_GLES3JNILib_onSurfaceDestroyed( JNIEnv * env, jobject obj, jlong handle )
 {
 	ALOGV( "    GLES3JNILib::onSurfaceDestroyed()" );
 	ovrAppThread * appThread = (ovrAppThread *)((size_t)handle);
@@ -2048,5 +2049,7 @@ JNIEXPORT void JNICALL Java_com_drbeef_jk2quest_GLES3JNILib_onSurfaceDestroyed( 
 	ALOGV( "        ANativeWindow_release( NativeWindow )" );
 	ANativeWindow_release( appThread->NativeWindow );
 	appThread->NativeWindow = NULL;
+}
+
 }
 

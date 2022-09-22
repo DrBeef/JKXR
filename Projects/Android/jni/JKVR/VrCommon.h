@@ -65,7 +65,7 @@ void JKVR_HapticEndFrame();
 void JKVR_HapticStopEvent(const char* event);
 void JKVR_HapticEnable();
 void JKVR_HapticDisable();
-bool JKVR_processMessageQueue();
+void JKVR_processMessageQueue();
 void JKVR_FrameSetup();
 void JKVR_setUseScreenLayer(bool use);
 void JKVR_processHaptics();

@@ -1403,6 +1403,7 @@ const void	*RB_DrawSurfs( const void *data ) {
 	return (const void *)(cmd + 1);
 }
 
+void JKVR_prepareEyeBuffer(int eye );
 
 /*
 =============
@@ -1414,66 +1415,20 @@ const void	*RB_DrawBuffer( const void *data ) {
 	const drawBufferCommand_t	*cmd;
 
 	cmd = (const drawBufferCommand_t *)data;
-
+	/*
 #ifndef HAVE_GLES
 	qglDrawBuffer( cmd->buffer );
 #endif
+*/
+	ri.JKVR_prepareEyeBuffer(cmd->buffer);
 
-		// clear screen for debugging
-	if (!( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) && tr.world && tr.refdef.rdflags & RDF_doLAGoggles)
-	{
-		const jk_fog_t		*fog = &tr.world->fogs[tr.world->numfogs];
-
-		qglClearColor(fog->parms.color[0],  fog->parms.color[1], fog->parms.color[2], 1.0f );
-		qglClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
-	else if (!( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) && tr.world && tr.world->globalFog != -1 && tr.sceneCount)//don't clear during menus, wait for real scene
-	{
-		const jk_fog_t		*fog = &tr.world->fogs[tr.world->globalFog];
-
-		qglClearColor(fog->parms.color[0],  fog->parms.color[1], fog->parms.color[2], 1.0f );
-		qglClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	}
-	else if ( r_clear->integer )
-	{	// clear screen for debugging
-		int i = r_clear->integer;
-		if (i == 42) {
-			i = Q_irand(0,8);
-		}
-		switch (i)
-		{
-		default:
-			qglClearColor( 1, 0, 0.5, 1 );
-			break;
-		case 1:
-			qglClearColor( 1.0, 0.0, 0.0, 1.0); //red
-			break;
-		case 2:
-			qglClearColor( 0.0, 1.0, 0.0, 1.0); //green
-			break;
-		case 3:
-			qglClearColor( 1.0, 1.0, 0.0, 1.0); //yellow
-			break;
-		case 4:
-			qglClearColor( 0.0, 0.0, 1.0, 1.0); //blue
-			break;
-		case 5:
-			qglClearColor( 0.0, 1.0, 1.0, 1.0); //cyan
-			break;
-		case 6:
-			qglClearColor( 1.0, 0.0, 1.0, 1.0); //magenta
-			break;
-		case 7:
-			qglClearColor( 1.0, 1.0, 1.0, 1.0); //white
-			break;
-		case 8:
-			qglClearColor( 0.0, 0.0, 0.0, 1.0); //black
-			break;
-		}
+	// clear screen for debugging
+	if ( r_clear->integer ) {
+		qglClearColor( 0, 0, 0, 1 );
 		qglClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	}
 
-	return (const void *)(cmd + 1);
+	return (const void *)( cmd + 1 );
 }
 
 /*
@@ -1570,6 +1525,32 @@ void RB_ShowImages( void ) {
 //	ri->Printf( PRINT_ALL, "%i msec to draw all images\n", end - start );
 }
 
+
+/*
+=============
+RB_Flush
+
+=============
+*/
+const void  *RB_Flush( const void *data ) {
+	const swapBuffersCommand_t *cmd;
+
+	// finish any 2D drawing if needed
+	if ( tess.numIndexes ) {
+		RB_EndSurface();
+	}
+
+	// texture swapping test
+	if ( r_showImages->integer ) {
+		RB_ShowImages();
+	}
+
+	cmd = (const swapBuffersCommand_t *)data;
+
+	backEnd.projection2D = qfalse;
+
+	return (const void *)( cmd + 1 );
+}
 
 /*
 =============
@@ -1687,6 +1668,9 @@ void RB_ExecuteRenderCommands( const void *data ) {
 			break;
 		case RC_WORLD_EFFECTS:
 			data = RB_WorldEffects( data );
+			break;
+		case RC_FLUSH:
+			data = RB_Flush( data );
 			break;
 		case RC_END_OF_LIST:
 		default:

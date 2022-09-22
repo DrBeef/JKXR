@@ -40,7 +40,7 @@ import static android.system.Os.setenv;
 	// Load the gles3jni library right away to make sure JNI_OnLoad() gets called as the very first thing.
 	static
 	{
-		System.loadLibrary( "jk2_client" );
+		System.loadLibrary( "openjk_sp" );
 	}
 
 	private static final String TAG = "JKQuest";
@@ -186,7 +186,7 @@ import static android.system.Os.setenv;
 //		copy_asset("/sdcard/JKQuest/Main", "sp_vpak8.pk3", false);
 
 		//Read these from a file and pass through
-		commandLineParams = new String("jk3");
+		commandLineParams = new String("ja");
 
 		//See if user is trying to use command line params
 		if (new File("/sdcard/JKQuest/commandline.txt").exists()) // should exist!
@@ -211,7 +211,7 @@ import static android.system.Os.setenv;
 		}
 
 		try {
-			setenv("JK_GAMELIBDIR", getApplicationInfo().nativeLibraryDir, true);
+			setenv("JK_LIBDIR", getApplicationInfo().nativeLibraryDir, true);
 		}
 		catch (Exception e)
 		{

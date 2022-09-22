@@ -1784,6 +1784,7 @@ typedef enum {
 	RC_DRAW_BUFFER,
 	RC_SWAP_BUFFERS,
 	RC_WORLD_EFFECTS,
+	RC_FLUSH
 } renderCommand_t;
 
 
@@ -1824,6 +1825,7 @@ void RE_LAGoggles( void );
 void RE_Scissor ( float x, float y, float w, float h);
 void RE_BeginFrame( stereoFrame_t stereoFrame );
 void RE_EndFrame( int *frontEndMsec, int *backEndMsec );
+void RE_SubmitStereoFrame(  );
 qboolean	RE_ProcessDissolve(void);
 qboolean	RE_InitDissolve(qboolean bForceCircularExtroWipe);
 

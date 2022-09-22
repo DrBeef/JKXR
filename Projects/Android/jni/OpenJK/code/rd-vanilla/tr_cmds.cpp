@@ -383,6 +383,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 	//
 	// do overdraw measurement
 	//
+#ifndef HAVE_GLES
 	if ( r_measureOverdraw->integer )
 	{
 		if ( glConfig.stencilBits < 4 )
@@ -417,6 +418,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 			r_measureOverdraw->modified = qfalse;
 		}
 	}
+#endif
 
 	//
 	// texturemode stuff
@@ -457,23 +459,13 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 	}
 	cmd->commandId = RC_DRAW_BUFFER;
 
-	if ( glConfig.stereoEnabled ) {
+	{
 		if ( stereoFrame == STEREO_LEFT ) {
 			cmd->buffer = (int)0;
 		} else if ( stereoFrame == STEREO_RIGHT ) {
 			cmd->buffer = (int)1;
 		} else {
-			Com_Error( ERR_FATAL, "RE_BeginFrame: Stereo is enabled, but stereoFrame was %i", stereoFrame );
-		}
-	} else {
-		if ( stereoFrame != STEREO_CENTER ) {
-			Com_Error( ERR_FATAL, "RE_BeginFrame: Stereo is disabled, but stereoFrame was %i", stereoFrame );
-		}
-//		if ( !Q_stricmp( r_drawBuffer->string, "GL_FRONT" ) ) {
-//			cmd->buffer = (int)GL_FRONT;
-//		} else
-		{
-			cmd->buffer = (int)GL_BACK;
+			ri.Error( ERR_FATAL, "RE_BeginFrame: Stereo is enabled, but stereoFrame was %i", stereoFrame );
 		}
 	}
 }
@@ -487,26 +479,26 @@ Returns the number of msec spent in the back end
 =============
 */
 void RE_EndFrame( int *frontEndMsec, int *backEndMsec ) {
-	swapBuffersCommand_t	*cmd;
+	swapBuffersCommand_t    *cmd;
 
 	if ( !tr.registered ) {
 		return;
 	}
-	cmd = (swapBuffersCommand_t *) R_GetCommandBufferReserved( sizeof( *cmd ), 0 );
-	if ( !cmd ) {
+
+	cmd = (swapBuffersCommand_t*)R_GetCommandBuffer(sizeof(*cmd));
+	if (!cmd) {
 		return;
 	}
-	cmd->commandId = RC_SWAP_BUFFERS;
 
-	R_IssueRenderCommands( qtrue );
+	cmd->commandId = RC_FLUSH;
 
-	R_InitNextFrame();
+	R_IssueRenderCommands( qfalse );
 
-	if ( frontEndMsec ) {
+	if (frontEndMsec) {
 		*frontEndMsec = tr.frontEndMsec;
 	}
 	tr.frontEndMsec = 0;
-	if ( backEndMsec ) {
+	if (backEndMsec) {
 		*backEndMsec = backEnd.pc.msec;
 	}
 	backEnd.pc.msec = 0;
@@ -515,4 +507,21 @@ void RE_EndFrame( int *frontEndMsec, int *backEndMsec ) {
 	{
 		styleUpdated[i] = false;
 	}
+}
+
+void RE_SubmitStereoFrame( ) {
+	swapBuffersCommand_t    *cmd;
+
+	if ( !tr.registered ) {
+		return;
+	}
+
+	cmd = (swapBuffersCommand_t*)R_GetCommandBuffer(sizeof(*cmd));
+	if (!cmd) {
+		return;
+	}
+
+	cmd->commandId = RC_SWAP_BUFFERS;
+
+	R_IssueRenderCommands( qtrue );
 }

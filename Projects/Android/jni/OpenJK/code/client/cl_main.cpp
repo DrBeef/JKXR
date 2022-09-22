@@ -33,6 +33,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "qcommon/stringed_ingame.h"
 #include "sys/sys_loadlib.h"
 #include "qcommon/ojk_saved_game.h"
+#include <JKVR/VrCommon.h>
 
 #define	RETRANSMIT_TIMEOUT	3000	// time between connection packet retransmits
 
@@ -1072,12 +1073,7 @@ static CMiniHeap *GetG2VertSpaceServer( void ) {
 	return G2VertSpaceServer;
 }
 
-// NOTENOTE: If you change the output name of rd-vanilla, change this define too!
-#ifdef JK2_MODE
-#define DEFAULT_RENDER_LIBRARY	"rdjosp-vanilla"
-#else
-#define DEFAULT_RENDER_LIBRARY	"rdsp-vanilla"
-#endif
+#define DEFAULT_RENDER_LIBRARY	"rd-gles"
 
 void CL_InitRef( void ) {
 	refexport_t	*ret;
@@ -1186,6 +1182,8 @@ void CL_InitRef( void ) {
 	rit.SV_PointContents = SV_PointContents;
 
 	rit.saved_game = &ojk::SavedGame::get_instance();
+
+	rit.JKVR_prepareEyeBuffer = JKVR_prepareEyeBuffer;
 
 	ret = GetRefAPI( REF_API_VERSION, &rit );
 

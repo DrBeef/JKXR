@@ -127,6 +127,9 @@ typedef struct {
 	qboolean			*(*gbAlreadyDoingLoad)				( void );
 	int					(*com_frameTime)					( void );
 
+	//JKVR Functions
+	void 				(*JKVR_prepareEyeBuffer)			(int eye );
+
 } refimport_t;
 
 extern refimport_t ri;
@@ -201,6 +204,8 @@ typedef struct {
 
 	// if the pointers are not NULL, timing info will be returned
 	void	(*EndFrame)( int *frontEndMsec, int *backEndMsec );
+
+	void ( *SubmitStereoFrame )( );
 
 	qboolean (*ProcessDissolve)(void);
 	qboolean (*InitDissolve)(qboolean bForceCircularExtroWipe);

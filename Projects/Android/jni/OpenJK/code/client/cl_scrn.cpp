@@ -28,6 +28,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "client.h"
 #include "client_ui.h"
+#include <JKVR/VrCommon.h>
 
 extern console_t con;
 
@@ -498,19 +499,45 @@ void SCR_UpdateScreen( void ) {
 	// that case.
 	if ( cls.uiStarted )
 	{
-		// if running in stereo, we need to draw the frame twice
-		if ( cls.glconfig.stereoEnabled ) {
-			SCR_DrawScreenField( STEREO_LEFT );
-			SCR_DrawScreenField( STEREO_RIGHT );
-		} else {
-			SCR_DrawScreenField( STEREO_CENTER );
+		JKVR_FrameSetup();
+
+		JKVR_processMessageQueue();
+
+		//Get controller state here
+		JKVR_getHMDOrientation();
+		JKVR_getTrackedRemotesOrientation();
+
+		JKVR_processHaptics();
+
+		//Draw twice for Quest
+		SCR_DrawScreenField( STEREO_LEFT );
+
+		//This won't perform the submit eye buffers
+		{
+			if (com_speeds->integer) {
+				re.EndFrame(&time_frontend, &time_backend);
+			} else {
+				re.EndFrame(NULL, NULL);
+			}
 		}
 
+		JKVR_finishEyeBuffer(0);
+
+		SCR_DrawScreenField( STEREO_RIGHT );
+
+		//This will perform the submit eye buffers
 		if ( com_speeds->integer ) {
 			re.EndFrame( &time_frontend, &time_backend );
 		} else {
 			re.EndFrame( NULL, NULL );
 		}
+
+		JKVR_finishEyeBuffer(1);
+
+		//And we're done
+		re.SubmitStereoFrame();
+
+		recursive = 0;
 	}
 
 	recursive = 0;

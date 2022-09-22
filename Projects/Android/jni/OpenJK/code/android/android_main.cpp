@@ -297,10 +297,20 @@ void Sys_In_Restart_f( void )
 #endif
 }
 
-void	Sys_Init (void) {
+void Sys_Init( void ) {
 	Cmd_AddCommand ("in_restart", Sys_In_Restart_f);
-	Cvar_Set( "arch", "arm" );
-	Cvar_Set( "username", Sys_GetCurrentUser( ) );
+	Cvar_Get( "arch", OS_STRING " " ARCH_STRING, CVAR_ROM );
+	Cvar_Get( "username", Sys_GetCurrentUser(), CVAR_ROM );
+
+	com_unfocused = Cvar_Get( "com_unfocused", "0", CVAR_ROM );
+	com_minimized = Cvar_Get( "com_minimized", "0", CVAR_ROM );
+#ifdef _JK2EXE
+	com_maxfps = Cvar_Get ("com_maxfps", "125", CVAR_ARCHIVE );
+#else
+	com_maxfps = Cvar_Get( "com_maxfps", "125", CVAR_ARCHIVE, "Maximum frames per second" );
+#endif
+	com_maxfpsUnfocused = Cvar_Get( "com_maxfpsUnfocused", "0", CVAR_ARCHIVE_ND );
+	com_maxfpsMinimized = Cvar_Get( "com_maxfpsMinimized", "50", CVAR_ARCHIVE_ND );
 }
 
 void Sys_Exit( int ex ) __attribute__((noreturn));
@@ -699,9 +709,13 @@ void *Sys_LoadDll( const char *name, qboolean useSystemLib )
 	if ( !*binarypath )
 		binarypath = ".";
 
+	char  lib_path[512];
+	char *libdir = (char*)getenv("JK_LIBDIR");
+
 	const char *searchPaths[] = {
+			libdir,
 			binarypath,
-			basepath,
+			basepath
 	};
 	const size_t numPaths = ARRAY_LEN( searchPaths );
 
@@ -712,7 +726,7 @@ void *Sys_LoadDll( const char *name, qboolean useSystemLib )
 			continue;
 
 		Com_Printf( "Trying to load \"%s\" from \"%s\"...\n", name, libDir );
-		char *fn = va( "%s%c%s", libDir, PATH_SEP, name );
+		char *fn = va( "%s%clib%s", libDir, PATH_SEP, name );
 		dllhandle = Sys_LoadLibrary( fn );
 		if ( dllhandle )
 			return dllhandle;
@@ -749,7 +763,7 @@ void *Sys_LoadGameDll( const char *name, void *(QDECL **moduleAPI)(int, ...) )
 
 
 	char  lib_path[512];
-	char *libdir = (char*)getenv("JK_GAMELIBDIR");
+	char *libdir = (char*)getenv("JK_LIBDIR");
 	sprintf(lib_path,"%s/lib%s", libdir,filename);
 	libHandle = dlopen (lib_path, RTLD_LAZY );
 
