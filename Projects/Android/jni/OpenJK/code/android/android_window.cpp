@@ -34,9 +34,6 @@ enum rserr_t
 	RSERR_UNKNOWN
 };
 
-static float displayAspect;
-
-cvar_t *r_sdlDriver;
 cvar_t *r_allowSoftwareGL;
 
 // Window cvars
@@ -155,7 +152,6 @@ window_t WIN_Init( const windowDesc_t *windowDesc, glconfig_t *glConfig )
 	Cmd_AddCommand("modelist", R_ModeList_f);
 	Cmd_AddCommand("minimize", GLimp_Minimize);
 
-	r_sdlDriver			= Cvar_Get( "r_sdlDriver",			"",			CVAR_ROM );
 	r_allowSoftwareGL	= Cvar_Get( "r_allowSoftwareGL",	"0",		CVAR_ARCHIVE_ND|CVAR_LATCH );
 
 	// Window cvars
@@ -190,22 +186,14 @@ window_t WIN_Init( const windowDesc_t *windowDesc, glconfig_t *glConfig )
 
 	window.api = windowDesc->api;
 
-#if defined(_WIN32)
-	SDL_SysWMinfo info;
-	SDL_VERSION(&info.version);
-
-	if ( SDL_GetWindowWMInfo(screen, &info) )
-	{
-		switch(info.subsystem) {
-			case SDL_SYSWM_WINDOWS:
-				window.handle = info.info.win.window;
-				break;
-
-			default:
-				break;
-		}
-	}
-#endif
+	int android_screen_width;
+	int android_screen_height;
+	JKVR_GetScreenRes(&android_screen_width, &android_screen_height);
+	glConfig->vidWidth = android_screen_width;
+	glConfig->vidHeight = android_screen_height;
+	glConfig->colorBits = 32;
+	glConfig->depthBits = 16;
+	glConfig->stencilBits = 8;
 
 	return window;
 }
