@@ -16,7 +16,7 @@ LOCAL_LDLIBS := $(JK3_BASE_LDLIBS)
 
 LOCAL_LDLIBS +=  -lGLESv3 -landroid -lEGL -ldl -llog
 LOCAL_STATIC_LIBRARIES := libpng libjpeg 
-# LOCAL_SHARED_LIBRARIES := gl4es
+LOCAL_SHARED_LIBRARIES := gl4es
 
 LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES) $(SUPPORT_LIBS)/libpng $(TOP_DIR) $(SPDir)/rd-vanilla $(SPDir)/rd-common
 

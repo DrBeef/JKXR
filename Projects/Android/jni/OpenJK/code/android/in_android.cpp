@@ -221,7 +221,6 @@ void PortableMouse(float dx,float dy)
 	mdx += dx;
 	mdy += dy;
 
-
 	//Sys_QueEvent( t, SE_MOUSE, mx, my, 0, NULL );
 }
 
@@ -229,11 +228,13 @@ int absx=0,absy=0;
 void JKVR_GetScreenRes(int *width, int *height);
 void PortableMouseAbs(float x,float y)
 {
-    int width;
-    int height;
-	JKVR_GetScreenRes(&width, &height);
-	absx = x * width;
-	absy = y * height;
+    //int width;
+    //int height;
+	//JKVR_GetScreenRes(&width, &height);
+	absx = x * 640;
+	absy = y * 480;
+
+	CL_MouseEvent(absx, absy, 0);
 }
 
 

@@ -4039,6 +4039,44 @@ void _UI_MouseEvent( int dx, int dy )
 
 /*
 =================
+UI_MouseEventAbs
+=================
+*/
+//JLFMOUSE  CALLED EACH FRAME IN UI
+void _UI_MouseEventAbs( int x, int y )
+{
+	// update mouse screen position
+	uiInfo.uiDC.cursorx = x;
+	if (uiInfo.uiDC.cursorx < 0)
+	{
+		uiInfo.uiDC.cursorx = 0;
+	}
+	else if (uiInfo.uiDC.cursorx > SCREEN_WIDTH)
+	{
+		uiInfo.uiDC.cursorx = SCREEN_WIDTH;
+	}
+
+	uiInfo.uiDC.cursory = y;
+	if (uiInfo.uiDC.cursory < 0)
+	{
+		uiInfo.uiDC.cursory = 0;
+	}
+	else if (uiInfo.uiDC.cursory > SCREEN_HEIGHT)
+	{
+		uiInfo.uiDC.cursory = SCREEN_HEIGHT;
+	}
+
+	if (Menu_Count() > 0)
+	{
+    //menuDef_t *menu = Menu_GetFocused();
+    //Menu_HandleMouseMove(menu, uiInfo.uiDC.cursorx, uiInfo.uiDC.cursory);
+		Display_MouseMove(NULL, uiInfo.uiDC.cursorx, uiInfo.uiDC.cursory);
+	}
+
+}
+
+/*
+=================
 UI_KeyEvent
 =================
 */

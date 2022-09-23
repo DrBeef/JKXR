@@ -749,7 +749,6 @@ void *Sys_LoadGameDll( const char *name, void *(QDECL **moduleAPI)(int, ...) )
 	char	*fn;
 	char	filename[MAX_OSPATH];
 
-	//Com_sprintf (filename, sizeof(filename), "%s" ARCH_STRING DLL_EXT, name);
 
 #if 0
 	libHandle = Sys_LoadLibrary( filename );
@@ -762,6 +761,7 @@ void *Sys_LoadGameDll( const char *name, void *(QDECL **moduleAPI)(int, ...) )
 #endif
 
 
+	Com_sprintf (filename, sizeof(filename), "%s" ARCH_STRING DLL_EXT, name);
 	char  lib_path[512];
 	char *libdir = (char*)getenv("JK_LIBDIR");
 	sprintf(lib_path,"%s/lib%s", libdir,filename);
@@ -864,12 +864,11 @@ void *Sys_LoadSPGameDll( const char *name, GetGameAPIProc **GetGameAPI )
 	assert( GetGameAPI );
 
 	Com_sprintf (filename, sizeof(filename), "%s" ARCH_STRING DLL_EXT, name);
+	char  lib_path[512];
+	char *libdir = (char*)getenv("JK_LIBDIR");
+	sprintf(lib_path,"%s/lib%s", libdir,filename);
+	libHandle = dlopen (lib_path, RTLD_LAZY );
 
-#if defined(MACOS_X) && !defined(_JK2EXE)
-	//First, look for the old-style mac .bundle that's inside a pk3
-    //It's actually zipped, and the zipfile has the same name as 'name'
-    libHandle = Sys_LoadMachOBundle( filename );
-#endif
 
 	if (!libHandle) {
 		char *basepath = Cvar_VariableString( "fs_basepath" );
@@ -881,10 +880,8 @@ void *Sys_LoadSPGameDll( const char *name, GetGameAPIProc **GetGameAPI )
 #endif
 
 		const char *searchPaths[] = {
+				libdir,
 				homepath,
-#ifdef MACOS_X
-				apppath,
-#endif
 				basepath,
 				cdpath,
 		};

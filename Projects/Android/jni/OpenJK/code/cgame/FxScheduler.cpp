@@ -1378,7 +1378,7 @@ void CFxScheduler::AddScheduledEffects( bool portal )
 				CreateEffect( effect->mpTemplate, effect->mClientID,
 								theFxHelper.mTime - effect->mStartTime );
 			}
-			else if (effect->mBoltNum == -1)
+			else if (effect->mBoltNum == (char)-1)
 			{// normal effect
 				if ( effect->mEntNum != -1 ) // -1
 				{
@@ -1397,7 +1397,7 @@ void CFxScheduler::AddScheduledEffects( bool portal )
 			else
 			{	//bolted on effect
 				// do we need to go and re-get the bolt matrix again? Since it takes time lets try to do it only once
-				if ((effect->mModelNum != oldModelNum) || (effect->mEntNum != oldEntNum) || (effect->mBoltNum != oldBoltIndex))
+				if ((effect->mModelNum != oldModelNum) || (effect->mEntNum != oldEntNum) || (effect->mBoltNum != (char)oldBoltIndex))
 				{
 					const centity_t &cent = cg_entities[effect->mEntNum];
 					if (cent.gent->ghoul2.IsValid())

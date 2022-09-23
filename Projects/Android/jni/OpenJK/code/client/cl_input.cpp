@@ -438,14 +438,19 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	cmd->upmove = ClampChar( up );
 }
 
-void _UI_MouseEvent( int dx, int dy );
+void _UI_MouseEventAbs( int x, int y );
 
 /*
 =================
 CL_MouseEvent
 =================
 */
-void CL_MouseEvent( int dx, int dy, int time ) {
+void CL_MouseEvent( int x, int y, int time ) {
+	if ( Key_GetCatcher( ) & KEYCATCH_UI ) {
+		_UI_MouseEventAbs( x, y );
+	}
+
+	/*
 	if ( Key_GetCatcher( ) & KEYCATCH_UI ) {
 		_UI_MouseEvent( dx, dy );
 	}
@@ -453,6 +458,7 @@ void CL_MouseEvent( int dx, int dy, int time ) {
 		cl.mouseDx[cl.mouseIndex] += dx;
 		cl.mouseDy[cl.mouseIndex] += dy;
 	}
+	 */
 }
 
 /*
