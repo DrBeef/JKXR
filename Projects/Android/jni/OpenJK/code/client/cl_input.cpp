@@ -70,6 +70,27 @@ qboolean	in_mlooking;
 
 extern cvar_t	*in_joystick;
 
+#ifdef __ANDROID__
+
+void JKVR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side, float *up,
+                    float *yaw, float *pitch, float *roll);
+
+typedef struct {
+    float forward;
+    float pos_forward;
+    float side;
+    float pos_side;
+    float up;
+    float yaw;
+    float pitch;
+    float roll;
+} vr_move;
+
+vr_move new_move;
+vr_move old_move;
+
+#endif
+
 static void IN_UseGivenForce(void)
 {
 	const char *c = Cmd_Argv(1);
@@ -358,7 +379,7 @@ Moves the local angle positions
 ================
 */
 void CL_AdjustAngles( void ) {
-	float	speed;
+/*	float	speed;
 
 	if ( in_speed.active ) {
 		speed = 0.001 * cls.frametime * cl_anglespeedkey->value;
@@ -389,6 +410,20 @@ void CL_AdjustAngles( void ) {
 		cl.viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&in_lookup);
 		cl.viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&in_lookdown);
 	}
+ */
+
+    cl.viewangles[YAW] -= old_move.yaw;
+    cl.viewangles[YAW] += new_move.yaw;
+
+    //Make angles good
+    while (cl.viewangles[YAW] > 180.0f)
+        cl.viewangles[YAW] -= 360.0f;
+    while (cl.viewangles[YAW] < -180.0f)
+        cl.viewangles[YAW] += 360.0f;
+
+    cl.viewangles[PITCH] = new_move.pitch;
+
+    cl.viewangles[ROLL] = new_move.roll;
 }
 
 /*
@@ -488,7 +523,7 @@ void CL_JoystickMove( usercmd_t *cmd ) {
 		return;
 	}*/
 
-	if ( !(in_speed.active ^ cl_run->integer) ) {
+/*	if ( !(in_speed.active ^ cl_run->integer) ) {
 		cmd->buttons |= BUTTON_WALKING;
 	}
 
@@ -527,6 +562,10 @@ void CL_JoystickMove( usercmd_t *cmd ) {
 	}
 
 	cmd->upmove = ClampChar( cmd->upmove + cl.joystickAxis[AXIS_UP] );
+ */
+
+    cmd->forwardmove = ClampChar( cmd->forwardmove + (new_move.forward * 127) + (new_move.pos_forward * 127));
+    cmd->rightmove = ClampChar( cmd->rightmove + (new_move.side * 127) + (new_move.pos_side * 127));
 }
 
 /*
@@ -671,6 +710,9 @@ void CL_FinishMove( usercmd_t *cmd ) {
 	for (i=0 ; i<3 ; i++) {
 		cmd->angles[i] = ANGLE2SHORT(cl.viewangles[i]);
 	}
+
+    //retain the move from this
+    old_move = new_move;
 }
 
 /*
@@ -685,6 +727,14 @@ usercmd_t CL_CreateCmd( void ) {
 	vec3_t		oldAngles;
 
 	VectorCopy( cl.viewangles, oldAngles );
+
+
+#ifdef __ANDROID__
+
+    JKVR_GetMove(&new_move.forward, &new_move.side, &new_move.pos_forward, &new_move.pos_side,
+                   &new_move.up, &new_move.yaw, &new_move.pitch, &new_move.roll);
+
+#endif
 
 	// keyboard angle adjustment
 	CL_AdjustAngles ();

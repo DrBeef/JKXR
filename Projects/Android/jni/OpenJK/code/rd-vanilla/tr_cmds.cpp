@@ -494,6 +494,10 @@ void RE_EndFrame( int *frontEndMsec, int *backEndMsec ) {
 
 	R_IssueRenderCommands( qfalse );
 
+    // use the other buffers next frame, because another CPU
+    // may still be rendering into the current ones
+    R_InitNextFrame();
+
 	if (frontEndMsec) {
 		*frontEndMsec = tr.frontEndMsec;
 	}
