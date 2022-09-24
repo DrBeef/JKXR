@@ -182,12 +182,21 @@ Ghoul2 Insert End
 #define	MAX_RENDER_STRINGS			8
 #define	MAX_RENDER_STRING_LENGTH	32
 
+
+typedef enum {
+	STEREO_CENTER,
+	STEREO_LEFT,
+	STEREO_RIGHT
+} stereoFrame_t;
+
+
 typedef struct {
 	int			x, y, width, height;
 	float		fov_x, fov_y;
 	vec3_t		vieworg;
 	vec3_t		viewaxis[3];		// transformation matrix
 	int			viewContents;		// world contents at vieworg
+	vec3_t 		viewangles;
 
 	// time in milliseconds for shader effects and other time dependent rendering issues
 	int			time;
@@ -199,14 +208,10 @@ typedef struct {
 
 	// text messages for deform text shaders
 //	char		text[MAX_RENDER_STRINGS][MAX_RENDER_STRING_LENGTH];
+    stereoFrame_t stereoView;
+	float worldscale;
 } refdef_t;
 
-
-typedef enum {
-	STEREO_CENTER,
-	STEREO_LEFT,
-	STEREO_RIGHT
-} stereoFrame_t;
 
 
 /*

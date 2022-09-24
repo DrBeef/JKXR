@@ -30,6 +30,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../qcommon/sstring.h"
 #include "qcommon/ojk_saved_game_helper.h"
 
+#include <JKVR/VrClientInfo.h>
+
 //NOTENOTE: Be sure to change the mirrored code in g_shared.h
 typedef	std::map< sstring_t, unsigned char  >	namePrecache_m;
 extern namePrecache_m	*as_preCacheMap;
@@ -86,6 +88,8 @@ const char *inv_names[] =
 
 int	force_icons[NUM_FORCE_POWERS];
 
+extern vr_client_info_t *vr;
+
 
 void CG_DrawDataPadHUD( centity_t *cent );
 void CG_DrawDataPadObjectives(const centity_t *cent );
@@ -105,8 +109,10 @@ extern "C" Q_EXPORT intptr_t QDECL vmMain( intptr_t command, intptr_t arg0, intp
 	centity_t		*cent;
 
 	switch ( command ) {
-	case CG_INIT:
-		CG_Init( arg0 );
+	case CG_INIT: {
+			vr = (vr_client_info_t *) (arg1);
+			CG_Init(arg0);
+		}
 		return 0;
 	case CG_SHUTDOWN:
 		CG_Shutdown();
@@ -227,6 +233,8 @@ int					cg_numpermanents = 0;
 weaponInfo_t		cg_weapons[MAX_WEAPONS];
 itemInfo_t			cg_items[MAX_ITEMS];
 
+vr_client_info_t 	*vr;
+
 typedef struct {
 	qboolean		registered;		// Has the player picked it up
 	qboolean		active;			// Is it the chosen inventory item
@@ -306,6 +314,8 @@ vmCvar_t	cg_thirdPersonAutoAlpha;
 vmCvar_t	cg_thirdPersonHorzOffset;
 
 vmCvar_t	cg_stereoSeparation;
+vmCvar_t	cg_worldScale;
+vmCvar_t	cg_heightAdjust;
 vmCvar_t 	cg_developer;
 vmCvar_t 	cg_timescale;
 vmCvar_t	cg_skippingcin;
@@ -353,7 +363,9 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE },
 	{ &cg_fov, "cg_fov", "80", CVAR_ARCHIVE },
 	{ &cg_fovAspectAdjust, "cg_fovAspectAdjust", "0", CVAR_ARCHIVE },
-	{ &cg_stereoSeparation, "cg_stereoSeparation", "0.4", CVAR_ARCHIVE  },
+	{ &cg_stereoSeparation, "cg_stereoSeparation", "0.065", CVAR_ARCHIVE  },
+	{ &cg_worldScale, "cg_worldScale", "37.5", CVAR_ARCHIVE  },
+	{ &cg_heightAdjust, "cg_heightAdjust", "0.0", CVAR_ARCHIVE  },
 	{ &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE  },
 	{ &cg_renderToTextureFX, "cg_renderToTextureFX", "1", CVAR_ARCHIVE  },
 	{ &cg_shadowCullDistance, "r_shadowRange", "1000", CVAR_ARCHIVE },
@@ -367,7 +379,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_drawFPS, "cg_drawFPS", "0", CVAR_ARCHIVE  },
 	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
 	{ &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE  },
-	{ &cg_drawCrosshair, "cg_drawCrosshair", "1", CVAR_ARCHIVE },
+	{ &cg_drawCrosshair, "cg_drawCrosshair", "0", CVAR_ARCHIVE },
 	{ &cg_dynamicCrosshair, "cg_dynamicCrosshair", "1", CVAR_ARCHIVE },
 	// NOTE : I also create this in UI_Init()
 	{ &cg_crosshairIdentifyTarget, "cg_crosshairIdentifyTarget", "1", CVAR_ARCHIVE },

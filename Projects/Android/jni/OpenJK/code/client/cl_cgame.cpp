@@ -25,6 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 // leave this as first line for PCH reasons...
 //
+#include <JKVR/VrCommon.h>
 #include "../server/exe_headers.h"
 #include "../ui/ui_shared.h"
 
@@ -1404,7 +1405,7 @@ void CL_InitCGame( void ) {
 	cls.state = CA_LOADING;
 
 	// init for this gamestate
-	VM_Call( CG_INIT, clc.serverCommandSequence );
+	VM_Call( CG_INIT, clc.serverCommandSequence, (intptr_t)&vr );
 
 	// reset any CVAR_CHEAT cvars registered by cgame
 	if ( !cl_connectedToCheatServer )

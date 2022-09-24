@@ -29,10 +29,13 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "cg_media.h"
 #include "../game/objectives.h"
 #include "../game/g_vehicles.h"
+#include <JKVR/VrClientInfo.h>
 
 extern vmCvar_t	cg_debugHealthBars;
 
 extern Vehicle_t *G_IsRidingVehicle( gentity_t *ent );
+
+extern vr_client_info_t *vr;
 
 void CG_DrawIconBackground(void);
 void CG_DrawMissionInformation( void );
@@ -4247,21 +4250,24 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	VectorNormalize( vright_n );
 	VectorNormalize( vup_n );
 
+	cg.refdef.stereoView = stereoView;
 	switch ( stereoView ) {
 	case STEREO_CENTER:
 		separation = 0;
 		break;
 	case STEREO_LEFT:
-		separation = -cg_stereoSeparation.value / 2;
+		separation = cg_worldScale.value * (-cg_stereoSeparation.value / 2);
 		break;
 	case STEREO_RIGHT:
-		separation = cg_stereoSeparation.value / 2;
+		separation = cg_worldScale.value * (cg_stereoSeparation.value / 2);
 		break;
 	default:
 		separation = 0;
 		CG_Error( "CG_DrawActive: Undefined stereoView" );
 	}
 
+	cg.refdef.worldscale = cg_worldScale.value;
+	VectorCopy(cg.refdefViewAngles, cg.refdef.viewangles);
 
 	// clear around the rendered view if sized down
 	CG_TileClear();
@@ -4276,6 +4282,10 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	{
 		cgi_R_LAGoggles();
 	}
+
+	//Vertical Positional Movement
+	cg.refdef.vieworg[2] -= 64;
+	cg.refdef.vieworg[2] += (vr->hmdposition[1] + cg_heightAdjust.value) * cg_worldScale.value;
 
 	if ( (cg.snap->ps.forcePowersActive&(1<<FP_SEE)) )
 	{

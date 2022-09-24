@@ -31,11 +31,15 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "FxScheduler.h"
 #include "../game/wp_saber.h"
 #include "../game/g_vehicles.h"
+#include <JKVR/VrClientInfo.h>
 
 #define MASK_CAMERACLIP (MASK_SOLID)
 #define CAMERA_SIZE	4
 
 float cg_zoomFov;
+
+extern vr_client_info_t *vr;
+
 
 //#define CG_CAM_ABOVE	2
 extern qboolean CG_OnMovingPlat( playerState_t *ps );
@@ -1362,7 +1366,8 @@ static qboolean	CG_CalcFov( void ) {
 		if ( &g_entities[cg.snap->ps.viewEntity] &&
 			g_entities[cg.snap->ps.viewEntity].NPC )
 		{//FIXME: looks bad when take over a jedi... but never really do that, do we?
-			fov_x = g_entities[cg.snap->ps.viewEntity].NPC->stats.hfov;
+			//fov_x = g_entities[cg.snap->ps.viewEntity].NPC->stats.hfov;
+			fov_x = vr ? vr->fov : 90.0f;
 			//sanity-cap?
 			if ( fov_x > 120 )
 			{
@@ -1381,14 +1386,17 @@ static qboolean	CG_CalcFov( void ) {
 			}
 			else
 			{
-				fov_x = 120;//FIXME: read from the NPC's fov stats?
+				//fov_x = 120;//FIXME: read from the NPC's fov stats?
+				fov_x = vr ? vr->fov : 90.0f;
 			}
 		}
 	}
 	else if ( (!cg.zoomMode || cg.zoomMode > 2) && (cg.snap->ps.forcePowersActive&(1<<FP_SPEED)) && player->client->ps.forcePowerDuration[FP_SPEED] )//cg.renderingThirdPerson &&
 	{
-		fov_x = CG_ForceSpeedFOV();
+		//fov_x = CG_ForceSpeedFOV();
+		fov_x = vr ? vr->fov : 90.0f;
 	} else {
+		/*
 		// user selectable
 		if ( cg.overrides.active & CG_OVERRIDE_FOV )
 		{
@@ -1402,7 +1410,9 @@ static qboolean	CG_CalcFov( void ) {
 			fov_x = 1;
 		} else if ( fov_x > 160 ) {
 			fov_x = 160;
-		}
+		}*/
+
+		fov_x = vr ? vr->fov : 90.0f;
 
 		// Disable zooming when in third person
 		if ( cg.zoomMode && cg.zoomMode < 3 )//&& !cg.renderingThirdPerson ) // light amp goggles do none of the zoom silliness

@@ -627,6 +627,8 @@ extern	vmCvar_t		cg_thirdPersonTargetDamp;
 extern	vmCvar_t		cg_gunAutoFirst;
 
 extern	vmCvar_t		cg_stereoSeparation;
+extern  vmCvar_t		cg_worldScale;
+extern  vmCvar_t 		cg_heightAdjust;
 extern	vmCvar_t		cg_developer;
 extern	vmCvar_t		cg_timescale;
 extern	vmCvar_t		cg_skippingcin;
