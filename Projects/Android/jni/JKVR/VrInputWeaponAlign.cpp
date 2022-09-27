@@ -80,16 +80,23 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
 
         //dominant hand stuff first
         {
+            vr.weaponposition[0] = pDominantTracking->HeadPose.Pose.Position.x;
+            vr.weaponposition[1] = pDominantTracking->HeadPose.Pose.Position.y;
+            vr.weaponposition[2] = pDominantTracking->HeadPose.Pose.Position.z;
 			///Weapon location relative to view
-            vr.current_weaponoffset[0] = pDominantTracking->HeadPose.Pose.Position.x - vr.hmdposition[0];
-            vr.current_weaponoffset[1] = pDominantTracking->HeadPose.Pose.Position.y - vr.hmdposition[1];
-            vr.current_weaponoffset[2] = pDominantTracking->HeadPose.Pose.Position.z - vr.hmdposition[2];
-            vr.current_weaponoffset_timestamp = Sys_Milliseconds( );
+            vr.weaponoffset[0] = pDominantTracking->HeadPose.Pose.Position.x - vr.hmdposition[0];
+            vr.weaponoffset[1] = pDominantTracking->HeadPose.Pose.Position.y - vr.hmdposition[1];
+            vr.weaponoffset[2] = pDominantTracking->HeadPose.Pose.Position.z - vr.hmdposition[2];
+            vr.weaponoffset_timestamp = Sys_Milliseconds( );
         }
 
         float controllerYawHeading = 0.0f;
         //off-hand stuff
         {
+            vr.offhandposition[0] = pOffTracking->HeadPose.Pose.Position.x;
+            vr.offhandposition[1] = pOffTracking->HeadPose.Pose.Position.y;
+            vr.offhandposition[2] = pOffTracking->HeadPose.Pose.Position.z;
+
             vr.offhandoffset[0] = pOffTracking->HeadPose.Pose.Position.x - vr.hmdposition[0];
             vr.offhandoffset[1] = pOffTracking->HeadPose.Pose.Position.y - vr.hmdposition[1];
             vr.offhandoffset[2] = pOffTracking->HeadPose.Pose.Position.z - vr.hmdposition[2];

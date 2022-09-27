@@ -1393,8 +1393,8 @@ static qboolean	CG_CalcFov( void ) {
 	}
 	else if ( (!cg.zoomMode || cg.zoomMode > 2) && (cg.snap->ps.forcePowersActive&(1<<FP_SPEED)) && player->client->ps.forcePowerDuration[FP_SPEED] )//cg.renderingThirdPerson &&
 	{
-		//fov_x = CG_ForceSpeedFOV();
-		fov_x = vr ? vr->fov : 90.0f;
+		fov_x = CG_ForceSpeedFOV();
+		//fov_x = vr ? vr->fov : 90.0f;
 	} else {
 		/*
 		// user selectable
@@ -1941,6 +1941,10 @@ static void CG_DrawSkyBoxPortal(void)
 	cg.refdef.rdflags |= RDF_DRAWSKYBOX;	//drawk portal skies
 
 	cgi_CM_SnapPVS( cg.refdef.vieworg, cg.refdef.areamask );	//fill in my areamask for this view origin
+
+	//Don't need any special adjustment for the sky box afaik
+	VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
+
 	// draw the skybox
 	cgi_R_RenderScene( &cg.refdef );
 
@@ -2086,11 +2090,13 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 	}
 	cgi_SetUserCmdValue( cg.weaponSelect, speed, mPitchOverride, mYawOverride );
 
-	// this counter will be bumped for every valid scene we generate
-	cg.clientFrame++;
+	if ( stereoView == STEREO_LEFT ) {
+		// this counter will be bumped for every valid scene we generate
+		cg.clientFrame++;
 
-	// update cg.predicted_player_state
-	CG_PredictPlayerState();
+		// update cg.predicted_player_state
+		CG_PredictPlayerState();
+	}
 
 	if (cg.snap->ps.eFlags&EF_HELD_BY_SAND_CREATURE)
 	{
@@ -2101,8 +2107,11 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		cg_thirdPerson.integer
 		|| (cg.snap->ps.stats[STAT_HEALTH] <= 0)
 		|| (cg.snap->ps.eFlags&EF_HELD_BY_SAND_CREATURE)
-		|| ((g_entities[0].client&&g_entities[0].client->NPC_class==CLASS_ATST)
-		|| (cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE) ));
+		|| (
+				(g_entities[0].client&&g_entities[0].client->NPC_class==CLASS_ATST)
+				|| (cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE)
+										 )
+	);
 
 	if ( cg.zoomMode )
 	{
@@ -2110,6 +2119,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		cg.renderingThirdPerson = qfalse;
 	}
 
+	vr->in_camera = in_camera;
 	if ( in_camera )
 	{
 		// The camera takes over the view

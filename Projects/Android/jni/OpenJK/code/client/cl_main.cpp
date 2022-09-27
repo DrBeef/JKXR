@@ -931,7 +931,7 @@ CL_InitRenderer
 */
 void CL_InitRenderer( void ) {
 	// this sets up the renderer and calls R_Init
-	re.BeginRegistration( &cls.glconfig );
+	re.BeginRegistration( &cls.glconfig, (intptr_t )&vr );
 
 	// load character sets
 	cls.charSetShader = re.RegisterShaderNoMip("gfx/2d/charsgrid_med");
@@ -1184,6 +1184,7 @@ void CL_InitRef( void ) {
 	rit.saved_game = &ojk::SavedGame::get_instance();
 
 	rit.JKVR_prepareEyeBuffer = JKVR_prepareEyeBuffer;
+	rit.JKVR_useScreenLayer = JKVR_useScreenLayer;
 
 	ret = GetRefAPI( REF_API_VERSION, &rit );
 

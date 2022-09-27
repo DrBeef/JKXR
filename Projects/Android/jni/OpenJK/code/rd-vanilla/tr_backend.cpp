@@ -1403,8 +1403,6 @@ const void	*RB_DrawSurfs( const void *data ) {
 	return (const void *)(cmd + 1);
 }
 
-void JKVR_prepareEyeBuffer(int eye );
-
 /*
 =============
 RB_DrawBuffer

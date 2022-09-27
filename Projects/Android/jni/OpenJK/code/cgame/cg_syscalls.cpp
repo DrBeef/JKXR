@@ -68,6 +68,10 @@ void	cgi_Cvar_Set( const char *var_name, const char *value ) {
 	Q_syscall( CG_CVAR_SET, var_name, value );
 }
 
+char*	cgi_Cvar_Get( const char *var_name ) {
+	return (char*)Q_syscall( CG_CVAR_GET, var_name );
+}
+
 int		cgi_Argc( void ) {
 	return Q_syscall( CG_ARGC );
 }

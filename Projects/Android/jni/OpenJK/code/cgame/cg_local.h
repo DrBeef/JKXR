@@ -657,6 +657,28 @@ extern	vmCvar_t		cg_fovViewmodelAdjust;
 
 extern	vmCvar_t		cg_scaleVehicleSensitivity;
 
+
+//VR Weapon Offsets
+extern vmCvar_t vr_weapon_adjustment_1;
+extern vmCvar_t vr_weapon_adjustment_2;
+extern vmCvar_t vr_weapon_adjustment_3;
+extern vmCvar_t vr_weapon_adjustment_4;
+extern vmCvar_t vr_weapon_adjustment_5;
+extern vmCvar_t vr_weapon_adjustment_6;
+extern vmCvar_t vr_weapon_adjustment_7;
+extern vmCvar_t vr_weapon_adjustment_8;
+extern vmCvar_t vr_weapon_adjustment_9;
+extern vmCvar_t vr_weapon_adjustment_10;
+extern vmCvar_t vr_weapon_adjustment_11;
+extern vmCvar_t vr_weapon_adjustment_12;
+extern vmCvar_t vr_weapon_adjustment_13;
+extern vmCvar_t vr_weapon_adjustment_14;
+extern vmCvar_t vr_weapon_adjustment_18;
+extern vmCvar_t vr_weapon_adjustment_19;
+extern vmCvar_t vr_weapon_adjustment_20;
+extern vmCvar_t vr_weapon_adjustment_22;
+
+
 void CG_NewClientinfo( int clientNum );
 //
 // cg_main.c
@@ -822,7 +844,6 @@ void CG_DPPrevInventory_f( void );
 void CG_DPNextForcePower_f( void );
 void CG_DPPrevForcePower_f( void );
 
-
 void CG_RegisterWeapon( int weaponNum );
 void CG_RegisterItemVisuals( int itemNum );
 void CG_RegisterItemSounds( int itemNum );
@@ -931,6 +952,7 @@ int		cgi_Milliseconds( void );
 void	cgi_Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
 void	cgi_Cvar_Update( vmCvar_t *vmCvar );
 void	cgi_Cvar_Set( const char *var_name, const char *value );
+char*	cgi_Cvar_Get( const char *var_name );
 
 
 // ServerCommand and ConsoleCommand parameter access

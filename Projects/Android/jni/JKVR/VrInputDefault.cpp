@@ -199,21 +199,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         if (scopeEngaged != vr.scopeengaged)
         {
             scopeEngaged = vr.scopeengaged;
-
-            //Resync on either transition
-            JKVR_ResyncClientYawWithGameYaw();
-        }
-
-
-        static bool binocularstate = qfalse;
-        bool binocularsactive = (vr.hasbinoculars && vr.backpackitemactive == 3 &&
-                (distanceToHMD < BINOCULAR_ENGAGE_DISTANCE) &&
-                (pDominantTracking->Status & (VRAPI_TRACKING_STATUS_POSITION_TRACKED | VRAPI_TRACKING_STATUS_POSITION_VALID)));
-        if (binocularstate != binocularsactive)
-        {
-            //Engage scope if conditions are right
-            binocularstate = binocularsactive;
-            sendButtonAction("+zoom", binocularstate);
         }
 
         //dominant hand stuff first
@@ -224,17 +209,18 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 VectorCopy(vr.weaponoffset_history[i-1], vr.weaponoffset_history[i]);
                 vr.weaponoffset_history_timestamp[i] = vr.weaponoffset_history_timestamp[i-1];
             }
-            VectorCopy(vr.current_weaponoffset, vr.weaponoffset_history[0]);
-            vr.weaponoffset_history_timestamp[0] = vr.current_weaponoffset_timestamp;
+            VectorCopy(vr.weaponoffset, vr.weaponoffset_history[0]);
+            vr.weaponoffset_history_timestamp[0] = vr.weaponoffset_timestamp;
+
+            vr.weaponposition[0] = pWeapon->HeadPose.Pose.Position.x;
+            vr.weaponposition[1] = pWeapon->HeadPose.Pose.Position.y;
+            vr.weaponposition[2] = pWeapon->HeadPose.Pose.Position.z;
 
 			///Weapon location relative to view
-            vr.current_weaponoffset[0] = pWeapon->HeadPose.Pose.Position.x - vr.hmdposition[0];
-            vr.current_weaponoffset[1] = pWeapon->HeadPose.Pose.Position.y - vr.hmdposition[1];
-            vr.current_weaponoffset[2] = pWeapon->HeadPose.Pose.Position.z - vr.hmdposition[2];
-            vr.current_weaponoffset_timestamp = Sys_Milliseconds( );
-
-            //Just copy to calculated offset, used to use this in case we wanted to apply any modifiers, but don't any more
-            VectorCopy(vr.current_weaponoffset, vr.calculated_weaponoffset);
+            vr.weaponoffset[0] = pWeapon->HeadPose.Pose.Position.x - vr.hmdposition[0];
+            vr.weaponoffset[1] = pWeapon->HeadPose.Pose.Position.y - vr.hmdposition[1];
+            vr.weaponoffset[2] = pWeapon->HeadPose.Pose.Position.z - vr.hmdposition[2];
+            vr.weaponoffset_timestamp = Sys_Milliseconds( );
 
             //Does weapon velocity trigger attack (knife) and is it fast enough
             static bool velocityTriggeredAttack = false;
@@ -261,10 +247,9 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 sendButtonAction("+attack", velocityTriggeredAttack);
             }
 
-            if (vr.weapon_stabilised || vr.dualwield)
+            if (vr.weapon_stabilised)
             {
-                if (vr.scopeengaged || (vr_virtual_stock->integer == 1 &&  // Classic Virtual Stock
-                                        !vr.dualwield))
+                if (vr.scopeengaged || vr_virtual_stock->integer == 1)
                 {
                     //offset to the appropriate eye a little bit
                     vec2_t xy;
@@ -287,16 +272,8 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     float zxDist = length(x, z);
 
                     if (zxDist != 0.0f && z != 0.0f) {
-                        if (vr.dualwield) {
-                            //SUPER FUDGE
-                            VectorSet(vr.weaponangles, vr.weaponangles[PITCH],
-                                      -90.0f-degrees(atan2f(x, -z)), degrees(atanf(y / zxDist)));
-                        }
-                        else
-                        {
-                            VectorSet(vr.weaponangles, -degrees(atanf(y / zxDist)),
-                                      -degrees(atan2f(x, -z)), vr.weaponangles[ROLL] / 2.0f); //Dampen roll on stabilised weapon
-                        }
+                        VectorSet(vr.weaponangles, -degrees(atanf(y / zxDist)),
+                                  -degrees(atan2f(x, -z)), vr.weaponangles[ROLL] / 2.0f); //Dampen roll on stabilised weapon
                     }
                 }
             }
@@ -318,7 +295,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
             bool bpTrackOk = pOffTracking->Status & VRAPI_TRACKING_STATUS_POSITION_TRACKED;                        // 1) Position must be tracked
             if (bpTrackOk && (bpDistToHMDOk = distanceToHMD >= 0.2 && distanceToHMD <= 0.35)                       // 2) Weapon-to-HMD distance must be within <0.2-0.35> range
-                && (bpWeaponHeightOk = vr.current_weaponoffset[1] >= -0.10 && vr.current_weaponoffset[1] <= 0.10)) // 3) Weapon height in relation to HMD must be within <-0.10, 0.10> range
+                && (bpWeaponHeightOk = vr.weaponoffset[1] >= -0.10 && vr.weaponoffset[1] <= 0.10)) // 3) Weapon height in relation to HMD must be within <-0.10, 0.10> range
             {
                 AngleVectors(vr.hmdorientation, hmdForwardXY, NULL, NULL);
                 AngleVectors(vr.weaponangles, weaponForwardXY, NULL, NULL);
@@ -339,17 +316,12 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 }
             }
 
-            // Uncomment to debug backpack reaching
-            /*
-            ALOGV("Backpack> Dist: %f | WpnToDownAngle: %f | WpnOffs: %f %f %f\nHmdWpnDot: %f | HmdFwdXY: %f %f | WpnFwdXY: %f %f\nTrackOk: %i, DistOk: %i, HeightOk: %i, WpnAngleOk: %i, HmdWpnDotOk: %i",
-                  distanceToHMD, weaponToDownAngle, vr.current_weaponoffset[0], vr.current_weaponoffset[1], vr.current_weaponoffset[2],
-                  hmdToWeaponDotProduct, hmdForwardXY[0], hmdForwardXY[1], weaponForwardXY[0], weaponForwardXY[1],
-                  bpTrackOk, bpDistToHMDOk, bpWeaponHeightOk, bpWeaponAngleOk, bpHmdToWeaponAngleOk);
-            */
-
-
             //off-hand stuff (done here as I reference it in the save state thing
             {
+                vr.offhandposition[0] = pOff->HeadPose.Pose.Position.x;
+                vr.offhandposition[1] = pOff->HeadPose.Pose.Position.y;
+                vr.offhandposition[2] = pOff->HeadPose.Pose.Position.z;
+
                 vr.offhandoffset[0] = pOff->HeadPose.Pose.Position.x - vr.hmdposition[0];
                 vr.offhandoffset[1] = pOff->HeadPose.Pose.Position.y - vr.hmdposition[1];
                 vr.offhandoffset[2] = pOff->HeadPose.Pose.Position.z - vr.hmdposition[2];
@@ -422,16 +394,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 }
             }
 
-            if (!handInBackpack) {
-                canUseBackpack = false;
-            }
-            else if (!canUseBackpack && vr.backpackitemactive == 0) {
-                int channel = (vr_control_scheme->integer >= 10) ? 0 : 1;
-                    JKVR_Vibrate(40, channel, 0.5); // vibrate to let user know they can switch
-
-                canUseBackpack = true;
-            }
-
             dominantGripPushed = (pDominantTrackedRemoteNew->Buttons &
                                   ovrButton_GripTrigger) != 0;
             bool dominantButton1Pushed = (pDominantTrackedRemoteNew->Buttons &
@@ -439,7 +401,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             bool dominantButton2Pushed = (pDominantTrackedRemoteNew->Buttons &
                                           domButton2) != 0;
 
-            if (!canUseBackpack)
             {
                 if (dominantGripPushed) {
                     if (dominantGripPushTime == 0) {
@@ -448,58 +409,12 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 }
                 else
                 {
-                    if (vr.backpackitemactive == 1) {
-                        //Restores last used weapon if possible
-                        char buffer[32];
-                        sprintf(buffer, "weapon %i", vr.lastweaponid);
-                        sendButtonActionSimple(buffer);
-                        vr.backpackitemactive = 0;
-                    }
-                    else if ((GetTimeInMilliSeconds() - dominantGripPushTime) <
+                    if ((GetTimeInMilliSeconds() - dominantGripPushTime) <
                         vr_reloadtimeoutms->integer) {
                         sendButtonActionSimple("+reload");
                         finishReloadNextFrame = true;
                     }
                     dominantGripPushTime = 0;
-                }
-
-                if (!dominantButton1Pushed && vr.backpackitemactive == 2)
-                {
-                    char buffer[32];
-                    sprintf(buffer, "weapon %i", vr.lastweaponid);
-                    sendButtonActionSimple(buffer);
-                    vr.backpackitemactive = 0;
-                }
-
-                if (!dominantButton2Pushed && vr.backpackitemactive == 3)
-                {
-                    vr.backpackitemactive = 0;
-                }
-            } else {
-                if (vr.backpackitemactive == 0) {
-                    if (dominantGripPushed) {
-                        vr.lastweaponid = vr.weaponid;
-                        //Initiate grenade from backpack mode
-                        sendButtonActionSimple("weaponbank 6");
-                        int channel = (vr_control_scheme->integer >= 10) ? 0 : 1;
-                        JKVR_Vibrate(80, channel, 0.8); // vibrate to let user know they switched
-                        vr.backpackitemactive = 1;
-                    }
-                    else if (dominantButton1Pushed)
-                    {
-                        vr.lastweaponid = vr.weaponid;
-                        //Initiate knife from backpack mode
-                        sendButtonActionSimple("weapon 1");
-                        int channel = (vr_control_scheme->integer >= 10) ? 0 : 1;
-                        JKVR_Vibrate(80, channel, 0.8); // vibrate to let user know they switched
-                        vr.backpackitemactive = 2;
-                    }
-                    else if (dominantButton2Pushed && vr.hasbinoculars)
-                    {
-                        int channel = (vr_control_scheme->integer >= 10) ? 0 : 1;
-                        JKVR_Vibrate(80, channel, 0.8); // vibrate to let user know they switched
-                        vr.backpackitemactive = 3;
-                    }
                 }
             }
         }
@@ -530,60 +445,17 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                   positional_movementForward);
 
             //Jump (B Button)
-            if (vr.backpackitemactive != 2 && !canUseBackpack) {
-
-                if ((primaryButtonsNew & primaryButton2) != (primaryButtonsOld & primaryButton2))
-                {
-                    //Sys_QueEvent( 0, SE_KEY, A_SPACE, (primaryButtonsNew & primaryButton2) != 0, 0, NULL );
-                }
-            }
-
-
-
-
-            //We need to record if we have started firing primary so that releasing trigger will stop firing, if user has pushed grip
-            //in meantime, then it wouldn't stop the gun firing and it would get stuck
-            static bool firing = false;
-            if (dominantGripPushed && vr.backpackitemactive == 0)
+            if ((primaryButtonsNew & primaryButton2) != (primaryButtonsOld & primaryButton2))
             {
-                if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
-                    (pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger))
-                {
-                    if (!vr.scopedweapon) {
-                        if (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) {
-                            ALOGV("**WEAPON EVENT**  weapalt");
-                            sendButtonActionSimple("weapalt");
-                        }
-                        else if (firing)
-                        {
-                            //no longer firing
-                            firing = qfalse;
-                            ALOGV("**WEAPON EVENT**  Grip Pushed %sattack", (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) ? "+" : "-");
-                            sendButtonAction("+attack", firing);
-                        }
-                    }
-                    else if (vr.detachablescope)
-                    {
-                        if (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) {
-                            //See if we are able to detach the scope
-                            ALOGV("**WEAPON EVENT**  weapdetachscope");
-                            sendButtonActionSimple("weapdetachscope");
-                        }
-                    }
-                    else
-                    {
-                        //Just ignore grip and fire
-                        firing = (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger);
-                        ALOGV("**WEAPON EVENT**  Grip Pushed %sattack", (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) ? "+" : "-");
-                        sendButtonAction("+attack", firing);
-                    }
-                }
+                sendButtonAction("+moveup", (primaryButtonsNew & primaryButton2));
             }
-            else
+
+
+            static bool firing = false;
+
             {
                 //Fire Primary
-                if (vr.backpackitemactive != 3 && // Can't fire while holding binoculars
-                    !vr.velocitytriggered && // Don't fire velocity triggered weapons
+                if (!vr.velocitytriggered && // Don't fire velocity triggered weapons
                     (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
                     (pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger)) {
 
@@ -591,22 +463,10 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     firing = (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger);
                     sendButtonAction("+attack", firing);
                 }
-                else if (binocularsactive) // trigger can zoom-in binoculars, remove from face to reset
-                {
-                    static bool zoomin = true;
-                    if (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) {
-                        sendButtonActionSimple(zoomin ? "weapnext" : "weapprev");
-                    } else if (pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger)
-                    {
-                        zoomin = !zoomin;
-                    }
-                }
             }
 
             //Duck
-            if (vr.backpackitemactive != 2 &&
-                !canUseBackpack &&
-                (primaryButtonsNew & primaryButton1) !=
+            if ((primaryButtonsNew & primaryButton1) !=
                 (primaryButtonsOld & primaryButton1)) {
 
                 sendButtonAction("+movedown", (primaryButtonsNew & primaryButton1));
@@ -732,7 +592,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             static int usingMountedGun = false;
             if (vr.mountedgun != usingMountedGun)
             {
-                resyncClientYawWithGameYaw = 10; // HACK
                 usingMountedGun = vr.mountedgun;
             }
 
@@ -743,17 +602,15 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 if (pPrimaryJoystick->x > 0.7f) {
                     if (increaseSnap) {
                         float turnAngle = vr_turn_mode->integer ? (vr_turn_angle->value / 9.0f) : vr_turn_angle->value;
-                        snapTurn -= turnAngle;
+                        vr.snapTurn -= turnAngle;
 
                         if (vr_turn_mode->integer == 0) {
                             increaseSnap = false;
                         }
 
-                        if (snapTurn < -180.0f) {
-                            snapTurn += 360.f;
+                        if (vr.snapTurn < -180.0f) {
+                            vr.snapTurn += 360.f;
                         }
-
-                        JKVR_ResyncClientYawWithGameYaw();
                     }
                 } else if (pPrimaryJoystick->x < 0.3f) {
                     increaseSnap = true;
@@ -764,18 +621,16 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     if (decreaseSnap) {
 
                         float turnAngle = vr_turn_mode->integer ? (vr_turn_angle->value / 9.0f) : vr_turn_angle->value;
-                        snapTurn += turnAngle;
+                        vr.snapTurn += turnAngle;
 
                         //If snap turn configured for less than 10 degrees
                         if (vr_turn_mode->integer == 0) {
                             decreaseSnap = false;
                         }
 
-                        if (snapTurn > 180.0f) {
-                            snapTurn -= 360.f;
+                        if (vr.snapTurn > 180.0f) {
+                            vr.snapTurn -= 360.f;
                         }
-
-                        JKVR_ResyncClientYawWithGameYaw();
                     }
                 } else if (pPrimaryJoystick->x > -0.3f) {
                     decreaseSnap = true;
@@ -783,10 +638,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             }
             else {
                 if (fabs(pPrimaryJoystick->x) > 0.5f) {
-                    if (increaseSnap)
-                    {
-                        JKVR_ResyncClientYawWithGameYaw();
-                    }
                     increaseSnap = false;
                 }
                 else

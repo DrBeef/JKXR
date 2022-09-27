@@ -26,6 +26,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 
+#include "bg_local.h"
+
 
 //---------------
 //	Blaster
@@ -117,7 +119,13 @@ void WP_FireBlaster( gentity_t *ent, qboolean alt_fire )
 {
 	vec3_t	dir, angs;
 
-	vectoangles( forwardVec, angs );
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(muzzle, angs);
+	}
+	else {
+		vectoangles(forwardVec, angs);
+	}
 
 	if ( ent->client && ent->client->NPC_class == CLASS_VEHICLE )
 	{//no inherent aim screw up

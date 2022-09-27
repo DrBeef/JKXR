@@ -1431,3 +1431,195 @@ void VectorClear4( vec4_t vec )
 void VectorSet5( vec5_t vec, float x, float y, float z, float w, float u ) {
 	vec[0]=x; vec[1]=y; vec[2]=z; vec[3]=w; vec[4]=u;
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+//      Matrix 4x4
+//
+///////////////////////////////////////////////////////////////////////////
+
+#define M_PI2		(float)6.28318530717958647692
+
+/*
+=================
+SinCos
+=================
+*/
+void SinCos( float radians, float *sine, float *cosine )
+{
+#if _MSC_VER == 1200
+	_asm
+	{
+		fld	dword ptr [radians]
+		fsincos
+
+		mov edx, dword ptr [cosine]
+		mov eax, dword ptr [sine]
+
+		fstp dword ptr [edx]
+		fstp dword ptr [eax]
+	}
+#else
+	// I think, better use math.h function, instead of ^
+#if defined (__linux__) && !defined (__ANDROID__)
+	sincosf(radians, sine, cosine);
+#else
+	*sine = sinf(radians);
+	*cosine = cosf(radians);
+#endif
+#endif
+}
+
+void Matrix4x4_Concat (matrix4x4 out, const matrix4x4 in1, const matrix4x4 in2)
+{
+	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] + in1[0][2] * in2[2][0] + in1[0][3] * in2[3][0];
+	out[0][1] = in1[0][0] * in2[0][1] + in1[0][1] * in2[1][1] + in1[0][2] * in2[2][1] + in1[0][3] * in2[3][1];
+	out[0][2] = in1[0][0] * in2[0][2] + in1[0][1] * in2[1][2] + in1[0][2] * in2[2][2] + in1[0][3] * in2[3][2];
+	out[0][3] = in1[0][0] * in2[0][3] + in1[0][1] * in2[1][3] + in1[0][2] * in2[2][3] + in1[0][3] * in2[3][3];
+	out[1][0] = in1[1][0] * in2[0][0] + in1[1][1] * in2[1][0] + in1[1][2] * in2[2][0] + in1[1][3] * in2[3][0];
+	out[1][1] = in1[1][0] * in2[0][1] + in1[1][1] * in2[1][1] + in1[1][2] * in2[2][1] + in1[1][3] * in2[3][1];
+	out[1][2] = in1[1][0] * in2[0][2] + in1[1][1] * in2[1][2] + in1[1][2] * in2[2][2] + in1[1][3] * in2[3][2];
+	out[1][3] = in1[1][0] * in2[0][3] + in1[1][1] * in2[1][3] + in1[1][2] * in2[2][3] + in1[1][3] * in2[3][3];
+	out[2][0] = in1[2][0] * in2[0][0] + in1[2][1] * in2[1][0] + in1[2][2] * in2[2][0] + in1[2][3] * in2[3][0];
+	out[2][1] = in1[2][0] * in2[0][1] + in1[2][1] * in2[1][1] + in1[2][2] * in2[2][1] + in1[2][3] * in2[3][1];
+	out[2][2] = in1[2][0] * in2[0][2] + in1[2][1] * in2[1][2] + in1[2][2] * in2[2][2] + in1[2][3] * in2[3][2];
+	out[2][3] = in1[2][0] * in2[0][3] + in1[2][1] * in2[1][3] + in1[2][2] * in2[2][3] + in1[2][3] * in2[3][3];
+	out[3][0] = in1[3][0] * in2[0][0] + in1[3][1] * in2[1][0] + in1[3][2] * in2[2][0] + in1[3][3] * in2[3][0];
+	out[3][1] = in1[3][0] * in2[0][1] + in1[3][1] * in2[1][1] + in1[3][2] * in2[2][1] + in1[3][3] * in2[3][1];
+	out[3][2] = in1[3][0] * in2[0][2] + in1[3][1] * in2[1][2] + in1[3][2] * in2[2][2] + in1[3][3] * in2[3][2];
+	out[3][3] = in1[3][0] * in2[0][3] + in1[3][1] * in2[1][3] + in1[3][2] * in2[2][3] + in1[3][3] * in2[3][3];
+}
+
+void Matrix4x4_CreateFromEntity( matrix4x4 out, const vec3_t angles, const vec3_t origin, float scale )
+{
+	float	angle, sr, sp, sy, cr, cp, cy;
+
+	if( angles[ROLL] )
+	{
+#ifdef XASH_VECTORIZE_SINCOS
+		SinCosFastVector3( DEG2RAD(angles[YAW]), DEG2RAD(angles[PITCH]), DEG2RAD(angles[ROLL]),
+			&sy, &sp, &sr,
+			&cy, &cp, &cr);
+#else
+		angle = angles[YAW] * (M_PI2 / 360.0f);
+		SinCos( angle, &sy, &cy );
+		angle = angles[PITCH] * (M_PI2 / 360.0f);
+		SinCos( angle, &sp, &cp );
+		angle = angles[ROLL] * (M_PI2 / 360.0f);
+		SinCos( angle, &sr, &cr );
+#endif
+
+		out[0][0] = (cp*cy) * scale;
+		out[0][1] = (sr*sp*cy+cr*-sy) * scale;
+		out[0][2] = (cr*sp*cy+-sr*-sy) * scale;
+		out[0][3] = origin[0];
+		out[1][0] = (cp*sy) * scale;
+		out[1][1] = (sr*sp*sy+cr*cy) * scale;
+		out[1][2] = (cr*sp*sy+-sr*cy) * scale;
+		out[1][3] = origin[1];
+		out[2][0] = (-sp) * scale;
+		out[2][1] = (sr*cp) * scale;
+		out[2][2] = (cr*cp) * scale;
+		out[2][3] = origin[2];
+		out[3][0] = 0.0f;
+		out[3][1] = 0.0f;
+		out[3][2] = 0.0f;
+		out[3][3] = 1.0f;
+	}
+	else if( angles[PITCH] )
+	{
+#ifdef XASH_VECTORIZE_SINCOS
+		SinCosFastVector2( DEG2RAD(angles[YAW]), DEG2RAD(angles[PITCH]),
+						  &sy, &sp,
+						  &cy, &cp);
+#else
+		angle = angles[YAW] * (M_PI2 / 360.0f);
+		SinCos( angle, &sy, &cy );
+		angle = angles[PITCH] * (M_PI2 / 360.0f);
+		SinCos( angle, &sp, &cp );
+#endif
+
+		out[0][0] = (cp*cy) * scale;
+		out[0][1] = (-sy) * scale;
+		out[0][2] = (sp*cy) * scale;
+		out[0][3] = origin[0];
+		out[1][0] = (cp*sy) * scale;
+		out[1][1] = (cy) * scale;
+		out[1][2] = (sp*sy) * scale;
+		out[1][3] = origin[1];
+		out[2][0] = (-sp) * scale;
+		out[2][1] = 0.0f;
+		out[2][2] = (cp) * scale;
+		out[2][3] = origin[2];
+		out[3][0] = 0.0f;
+		out[3][1] = 0.0f;
+		out[3][2] = 0.0f;
+		out[3][3] = 1.0f;
+	}
+	else if( angles[YAW] )
+	{
+		angle = angles[YAW] * (M_PI2 / 360.0f);
+		SinCos( angle, &sy, &cy );
+
+		out[0][0] = (cy) * scale;
+		out[0][1] = (-sy) * scale;
+		out[0][2] = 0.0f;
+		out[0][3] = origin[0];
+		out[1][0] = (sy) * scale;
+		out[1][1] = (cy) * scale;
+		out[1][2] = 0.0f;
+		out[1][3] = origin[1];
+		out[2][0] = 0.0f;
+		out[2][1] = 0.0f;
+		out[2][2] = scale;
+		out[2][3] = origin[2];
+		out[3][0] = 0.0f;
+		out[3][1] = 0.0f;
+		out[3][2] = 0.0f;
+		out[3][3] = 1.0f;
+	}
+	else
+	{
+		out[0][0] = scale;
+		out[0][1] = 0.0f;
+		out[0][2] = 0.0f;
+		out[0][3] = origin[0];
+		out[1][0] = 0.0f;
+		out[1][1] = scale;
+		out[1][2] = 0.0f;
+		out[1][3] = origin[1];
+		out[2][0] = 0.0f;
+		out[2][1] = 0.0f;
+		out[2][2] = scale;
+		out[2][3] = origin[2];
+		out[3][0] = 0.0f;
+		out[3][1] = 0.0f;
+		out[3][2] = 0.0f;
+		out[3][3] = 1.0f;
+	}
+}
+
+void Matrix4x4_ConvertToEntity( vec4_t *in, vec3_t angles, vec3_t origin )
+{
+	float xyDist = sqrt( in[0][0] * in[0][0] + in[1][0] * in[1][0] );
+
+	// enough here to get angles?
+	if( xyDist > 0.001f )
+	{
+		angles[0] = RAD2DEG( atan2( -in[2][0], xyDist ));
+		angles[1] = RAD2DEG( atan2( in[1][0], in[0][0] ));
+		angles[2] = RAD2DEG( atan2( in[2][1], in[2][2] ));
+	}
+	else	// forward is mostly Z, gimbal lock
+	{
+		angles[0] = RAD2DEG( atan2( -in[2][0], xyDist ));
+		angles[1] = RAD2DEG( atan2( -in[0][1], in[1][1] ));
+		angles[2] = 0.0f;
+	}
+
+	origin[0] = in[0][3];
+	origin[1] = in[1][3];
+	origin[2] = in[2][3];
+}

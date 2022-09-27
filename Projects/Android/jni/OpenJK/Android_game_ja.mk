@@ -18,7 +18,7 @@ LOCAL_LDLIBS +=  -llog -lz
 #LOCAL_STATIC_LIBRARIES := s-setup  lz
 LOCAL_SHARED_LIBRARIES :=
 
-LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES) $(TOP_DIR) $(GL4ES_PATH) $(GL4ES_PATH)/include $(TOP_DIR)/SupportLibs/openal/include $(SPDir)/rd-vanilla $(SPDir)/rd-common
+LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES) $(TOP_DIR) $(GL4ES_PATH) $(GL4ES_PATH)/include $(JK3_CODE_PATH)/game $(TOP_DIR)/SupportLibs/openal/include $(JK3_CODE_PATH)/rd-vanilla $(JK3_CODE_PATH)/rd-common
 
 JK3_SRC = \
 	code/game/AI_Animal.cpp \

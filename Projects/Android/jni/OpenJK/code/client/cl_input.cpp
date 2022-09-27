@@ -27,6 +27,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "client.h"
 #include "client_ui.h"
+#include <JKVR/VrCommon.h>
 
 #ifndef _WIN32
 #include <cmath>
@@ -424,6 +425,8 @@ void CL_AdjustAngles( void ) {
     cl.viewangles[PITCH] = new_move.pitch;
 
     cl.viewangles[ROLL] = new_move.roll;
+
+	VectorCopy(cl.viewangles, vr.clientviewangles);
 }
 
 /*

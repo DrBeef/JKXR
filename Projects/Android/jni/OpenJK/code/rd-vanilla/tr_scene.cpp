@@ -25,6 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../server/exe_headers.h"
 
 #include "tr_local.h"
+#include <JKVR/VrClientInfo.h>
 
 int			r_firstSceneDrawSurf;
 
@@ -41,6 +42,8 @@ int			r_numpolyverts;
 
 int			skyboxportal;
 int			drawskyboxportal;
+
+extern vr_client_info_t *vr;
 
 /*
 ====================
@@ -296,6 +299,11 @@ void RE_RenderScene( const refdef_t *fd ) {
 	tr.refdef.fov_x = fd->fov_x;
 	tr.refdef.fov_y = fd->fov_y;
 
+	memset( &parms, 0, sizeof( parms ) );
+	VectorCopy( fd->viewaxis[0], parms.ori.axis[0] );
+	VectorCopy( fd->viewaxis[1], parms.ori.axis[1] );
+	VectorCopy( fd->viewaxis[2], parms.ori.axis[2] );
+
 	VectorCopy( fd->vieworg, tr.refdef.vieworg );
 	VectorCopy( fd->viewaxis[0], tr.refdef.viewaxis[0] );
 	VectorCopy( fd->viewaxis[1], tr.refdef.viewaxis[1] );
@@ -384,7 +392,6 @@ void RE_RenderScene( const refdef_t *fd ) {
 	// The refdef takes 0-at-the-top y coordinates, so
 	// convert to GL's 0-at-the-bottom space
 	//
-	memset( &parms, 0, sizeof( parms ) );
 	parms.viewportX = tr.refdef.x;
 	parms.viewportY = glConfig.vidHeight - ( tr.refdef.y + tr.refdef.height );
 	parms.viewportWidth = tr.refdef.width;
@@ -395,9 +402,9 @@ void RE_RenderScene( const refdef_t *fd ) {
 	parms.fovY = tr.refdef.fov_y;
 
 	VectorCopy( fd->vieworg, parms.ori.origin );
-	VectorCopy( fd->viewaxis[0], parms.ori.axis[0] );
-	VectorCopy( fd->viewaxis[1], parms.ori.axis[1] );
-	VectorCopy( fd->viewaxis[2], parms.ori.axis[2] );
+//	VectorCopy( fd->viewaxis[0], parms.ori.axis[0] );
+//	VectorCopy( fd->viewaxis[1], parms.ori.axis[1] );
+//	VectorCopy( fd->viewaxis[2], parms.ori.axis[2] );
 
 	VectorCopy( fd->vieworg, parms.pvsOrigin );
 

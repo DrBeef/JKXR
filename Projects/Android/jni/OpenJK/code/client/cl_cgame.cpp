@@ -25,7 +25,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 // leave this as first line for PCH reasons...
 //
-#include <JKVR/VrCommon.h>
 #include "../server/exe_headers.h"
 #include "../ui/ui_shared.h"
 
@@ -33,6 +32,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "vmachine.h"
 #include "qcommon/stringed_ingame.h"
 #include "sys/sys_loadlib.h"
+#include <JKVR/VrCommon.h>
 
 vm_t	cgvm;
 /*
@@ -69,7 +69,7 @@ qboolean CL_InitCGameVM( void *gameLibrary )
 
 	if ( !cgvm.entryPoint || !dllEntry ) {
 #ifdef JK2_MODE
-		const char *gamename = "jospgame";
+		const char *gamename = "jogame";
 #else
 		const char *gamename = "jagame";
 #endif
@@ -827,6 +827,8 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_CVAR_SET:
 		Cvar_Set( (const char *) VMA(1), (const char *) VMA(2) );
 		return 0;
+	case CG_CVAR_GET:
+		return (intptr_t)Cvar_VariableString( (const char *) VMA(1));
 	case CG_ARGC:
 		return Cmd_Argc();
 	case CG_ARGV:
@@ -1465,12 +1467,16 @@ void CL_CGameRendering( stereoFrame_t stereo ) {
 		}
 	}
 #endif
-	int timei=cl.serverTime;
-	if (timei>60)
-	{
-		timei-=0;
+	//Only update server time if we are starting a new pair of frames
+	static int timei=0;
+	if (stereo == STEREO_LEFT) {
+		timei = cl.serverTime;
+		if (timei > 60) {
+			timei -= 0;
+		}
+		re.G2API_SetTime(cl.serverTime, G2T_CG_TIME);
 	}
-	re.G2API_SetTime(cl.serverTime,G2T_CG_TIME);
+
 	VM_Call( CG_DRAW_ACTIVE_FRAME,timei, stereo, qfalse );
 //	VM_Debug( 0 );
 }

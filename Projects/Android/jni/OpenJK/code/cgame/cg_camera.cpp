@@ -27,6 +27,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "cg_media.h"
 
 #include "../game/g_roff.h"
+#include <JKVR/VrClientInfo.h>
 
 bool		in_camera = false;
 camera_t	client_camera={};
@@ -40,6 +41,8 @@ void CGCam_Distance( float distance, qboolean initLerp );
 void CGCam_DistanceDisable( void );
 extern qboolean CG_CalcFOVFromX( float fov_x );
 extern void WP_SaberCatch( gentity_t *self, gentity_t *saber, qboolean switchToSaber );
+
+extern vr_client_info_t *vr;
 
 /*
 TODO:
@@ -1179,7 +1182,8 @@ void CGCam_Update( void )
 	}
 	else
 	{
-		CG_CalcFOVFromX( client_camera.FOV );
+		float fov = vr && vr->immersive_cinematics ? vr->fov : client_camera.FOV;
+		CG_CalcFOVFromX( fov );
 	}
 
 	//Check for roffing angles
@@ -1300,6 +1304,13 @@ void CGCam_Update( void )
 
 	//Normal fading - separate call because can finish after camera is disabled
 	CGCam_UpdateFade();
+
+	if (vr->immersive_cinematics)
+	{
+		float yaw = cg.refdefViewAngles[YAW] + vr->hmdorientation[YAW];
+		VectorCopy(vr->hmdorientation, cg.refdefViewAngles);
+		cg.refdefViewAngles[YAW] = yaw;
+	}
 
 	//Update shaking if there's any
 	//CGCam_UpdateSmooth( cg.refdef.vieworg, cg.refdefViewAngles );

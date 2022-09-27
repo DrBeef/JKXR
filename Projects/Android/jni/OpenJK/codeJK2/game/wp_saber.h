@@ -118,6 +118,10 @@ typedef enum
 	NUM_EVASION_TYPES
 } evasionType_t;
 
+#ifdef LS_NONE
+#undef LS_NONE
+#endif
+
 // Okay, here lies the much-dreaded Pat-created FSM movement chart...  Heretic II strikes again!
 // Why am I inflicting this on you?  Well, it's better than hardcoded states.
 // Ideally this will be replaced with an external file or more sophisticated move-picker

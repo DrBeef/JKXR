@@ -288,7 +288,7 @@ itemDef
 		group grpControls
 		text "Cinematic:"
         type ITEM_TYPE_MULTI
-        cvar "vr_cinematic_stereo"
+        cvar "vr_immersive_cinematics"
         cvarFloatList {"2D" 0 "3D" 1  }
 		rect 82 195 290 12
       	textalign ITEM_ALIGN_RIGHT

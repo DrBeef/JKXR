@@ -135,7 +135,7 @@ typedef struct {
 
 	vec3_t		axis[3];			// rotation vectors
 	qboolean	nonNormalizedAxes;	// axis are not normalized, i.e. they have scale
-	float		origin[3];			// also used as MODEL_BEAM's "from"
+	vec3_t		origin;			// also used as MODEL_BEAM's "from"
 	int			frame;				// also used as MODEL_BEAM's diameter
 
 	// previous data for frame interpolation
@@ -196,7 +196,7 @@ typedef struct {
 	vec3_t		vieworg;
 	vec3_t		viewaxis[3];		// transformation matrix
 	int			viewContents;		// world contents at vieworg
-	vec3_t 		viewangles;
+	vec3_t		viewangles; 		//adjusted viewangles for rendering
 
 	// time in milliseconds for shader effects and other time dependent rendering issues
 	int			time;

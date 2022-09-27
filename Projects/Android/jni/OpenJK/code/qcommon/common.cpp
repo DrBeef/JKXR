@@ -990,6 +990,8 @@ void Com_ExecuteCfg(void)
 		Cbuf_ExecuteText(EXEC_NOW, "exec " Q3CONFIG_NAME "\n");
 		Cbuf_Execute();
 		Cbuf_ExecuteText(EXEC_NOW, "exec autoexec_sp.cfg\n");
+		//Execute to overwrite weapon locations with our desired adjustments
+		Cbuf_AddText( "exec weapons_vr.cfg\n" );
 		Cbuf_Execute();
 	}
 }

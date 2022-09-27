@@ -313,6 +313,25 @@ vmCvar_t	cg_missionInfoCentered;
 vmCvar_t	cg_missionInfoFlashTime;
 vmCvar_t	cg_hudFiles;
 
+vmCvar_t vr_weapon_adjustment_1;
+vmCvar_t vr_weapon_adjustment_2;
+vmCvar_t vr_weapon_adjustment_3;
+vmCvar_t vr_weapon_adjustment_4;
+vmCvar_t vr_weapon_adjustment_5;
+vmCvar_t vr_weapon_adjustment_6;
+vmCvar_t vr_weapon_adjustment_7;
+vmCvar_t vr_weapon_adjustment_8;
+vmCvar_t vr_weapon_adjustment_9;
+vmCvar_t vr_weapon_adjustment_10;
+vmCvar_t vr_weapon_adjustment_11;
+vmCvar_t vr_weapon_adjustment_12;
+vmCvar_t vr_weapon_adjustment_13;
+vmCvar_t vr_weapon_adjustment_14;
+vmCvar_t vr_weapon_adjustment_18;
+vmCvar_t vr_weapon_adjustment_19;
+vmCvar_t vr_weapon_adjustment_20;
+vmCvar_t vr_weapon_adjustment_22;
+
 /*
 Ghoul2 Insert Start
 */
@@ -424,6 +443,28 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_missionInfoCentered, "cg_missionInfoCentered", "1", CVAR_ARCHIVE },
 	{ &cg_missionInfoFlashTime, "cg_missionInfoFlashTime", "10000", 0  },
 	{ &cg_hudFiles, "cg_hudFiles", "ui/jk2hud.txt", CVAR_ARCHIVE},
+
+	//Default Weapon adjustments - these WILL be overridden
+	//  scale,right,up,forward,pitch,yaw,roll
+	{ &vr_weapon_adjustment_1,  "vr_weapon_adjustment_1",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_2,  "vr_weapon_adjustment_2",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_3,  "vr_weapon_adjustment_3",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_4,  "vr_weapon_adjustment_4",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_5,  "vr_weapon_adjustment_5",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_6,  "vr_weapon_adjustment_6",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_7,  "vr_weapon_adjustment_7",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_8,  "vr_weapon_adjustment_8",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_9,  "vr_weapon_adjustment_9",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_10, "vr_weapon_adjustment_10", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_11, "vr_weapon_adjustment_11", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_12, "vr_weapon_adjustment_12", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_13, "vr_weapon_adjustment_13", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_14, "vr_weapon_adjustment_14", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_18, "vr_weapon_adjustment_18", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_19, "vr_weapon_adjustment_19", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_20, "vr_weapon_adjustment_20", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_22, "vr_weapon_adjustment_22", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+
 /*
 Ghoul2 Insert Start
 */

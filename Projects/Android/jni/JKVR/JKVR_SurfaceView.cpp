@@ -138,13 +138,14 @@ LAMBDA1VR Stuff
 
 bool JKVR_useScreenLayer()
 {
-	vr.screen = (bool)(showingScreenLayer ||
+	vr.using_screen_layer = (bool)((vr.in_camera && !vr.immersive_cinematics) ||
+			(CL_IsRunningInGameCinematic() || CL_InGameCinematicOnStandBy()) ||
             (cls.state == CA_CINEMATIC) ||
             (cls.state == CA_LOADING) ||
             ( Key_GetCatcher( ) & KEYCATCH_UI ) ||
             ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ));
 
-	return vr.screen;
+	return vr.using_screen_layer;
 }
 
 int runStatus = -1;
@@ -822,9 +823,6 @@ void setHMDPosition( float x, float y, float z )
 
 		//Record player height on transition
         playerHeight = y;
-
-        //Resync yaw on transition
-        JKVR_ResyncClientYawWithGameYaw();
     }
 
 	if (!JKVR_useScreenLayer())
@@ -869,7 +867,7 @@ void JKVR_GetMove(float *forward, float *side, float *pos_forward, float *pos_si
     *up = remote_movementUp;
     *side = remote_movementSideways;
     *pos_side = positional_movementSideways;
-	*yaw = vr.hmdorientation[YAW] + snapTurn;
+	*yaw = vr.hmdorientation[YAW] + vr.snapTurn;
 	*pitch = vr.hmdorientation[PITCH];
 	*roll = vr.hmdorientation[ROLL];
 }
@@ -1256,27 +1254,18 @@ extern "C" {
 void initialize_gl4es();
 }
 
-void JKVR_ResyncClientYawWithGameYaw()
-{
-	//Allow several frames for the yaw to sync, first is this frame which is the old yaw
-	//second is the next frame which _should_ be the new yaw, but just in case it isn't
-	//we resync on the 3rd frame as well
-	resyncClientYawWithGameYaw = 2;
-}
-
 void JKVR_Init()
 {
 	//Initialise all our variables
 	playerYaw = 0.0f;
-	showingScreenLayer = qfalse;
 	remote_movementSideways = 0.0f;
 	remote_movementForward = 0.0f;
 	remote_movementUp = 0.0f;
 	positional_movementSideways = 0.0f;
 	positional_movementForward = 0.0f;
-	snapTurn = 0.0f;
+	vr.snapTurn = 0.0f;
+	vr.immersive_cinematics = true;
 	ducked = DUCK_NOTDUCKED;
-	JKVR_ResyncClientYawWithGameYaw();
 
 	//init randomiser
 	srand(time(NULL));
@@ -1297,13 +1286,11 @@ void JKVR_Init()
 	vr_control_scheme = Cvar_Get( "vr_control_scheme", "0", CVAR_ARCHIVE);
 	vr_switch_sticks = Cvar_Get( "vr_switch_sticks", "0", CVAR_ARCHIVE);
 
-	vr_cinematic_stereo = Cvar_Get( "vr_cinematic_stereo", "0", CVAR_ARCHIVE); // Default to 2D
-	vr_screen_dist = Cvar_Get( "vr_screen_dist", "3.5", CVAR_ARCHIVE);
+	vr_immersive_cinematics = Cvar_Get("vr_immersive_cinematics", "1", CVAR_ARCHIVE);
+	vr_screen_dist = Cvar_Get( "vr_screen_dist", "2.5", CVAR_ARCHIVE);
 
     //Set up vr client info
-	vr.backpackitemactive = 0;
 	vr.visible_hud = qtrue;
-	vr.dualwield = qfalse;
     vr.weapon_recoil = 0.0f;
 
 	//Clear teleport stuff
@@ -1473,7 +1460,7 @@ void * AppThreadFunction(void * parm ) {
         if (SS_MULTIPLIER == 0.0f)
         {
             //GB Override as refresh is now 72 by default as we decided a higher res is better as 90hz has stutters
-            SS_MULTIPLIER = 1.35f;
+            SS_MULTIPLIER = 1.1f;
         }
         else if (SS_MULTIPLIER > 1.5f)
 		{
@@ -1569,6 +1556,9 @@ void JKVR_FrameSetup()
     vrapi_SetDisplayRefreshRate(gAppState.Ovr, REFRESH);
 
 	vrapi_SetExtraLatencyMode(gAppState.Ovr, VRAPI_EXTRA_LATENCY_MODE_ON);
+
+	//get any cvar values required here
+	vr.immersive_cinematics = (vr_immersive_cinematics->value != 0.0f);
 }
 
 void JKVR_processHaptics() {

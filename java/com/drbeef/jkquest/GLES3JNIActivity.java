@@ -40,7 +40,7 @@ import static android.system.Os.setenv;
 	// Load the gles3jni library right away to make sure JNI_OnLoad() gets called as the very first thing.
 	static
 	{
-		System.loadLibrary( "openjk_sp" );
+		System.loadLibrary( "openjk_ja" );
 	}
 
 	private static final String TAG = "JKQuest";
@@ -165,22 +165,16 @@ import static android.system.Os.setenv;
 
 	public void create() {
 		//Make the directories
-		new File("/sdcard/JKQuest/Main").mkdirs();
+		new File("/sdcard/JKQuest/base").mkdirs();
 
 		//Copy the command line params file
 		copy_asset("/sdcard/JKQuest", "commandline.txt", false);
 
 		//Copy the weapon adjustment config
-//		copy_asset("/sdcard/JKQuest/Main", "weapons_vr.cfg", false);
+		copy_asset("/sdcard/JKQuest/base", "weapons_vr.cfg", false);
 
-		//and the demo version - if required
-//		copy_asset("/sdcard/JKQuest/Main", "pak0.pk3", false);
-
-		//and the vr weapons
-//		copy_asset("/sdcard/JKQuest/Main", "z_zvr_weapons.pk3", true);
-
-		//and the vr menu pk3
-//		copy_asset("/sdcard/JKQuest/Main", "z_jkquest_vrmenu.pk3", true);
+		//and the cheat menu pk3 for testing
+		copy_asset("/sdcard/JKQuest/base", "Z_BetaV0.2_NewMenus.pk3", true);
 
 		//and the venom scripting improvements pak (thank-you _HELLBARON_ !!)
 //		copy_asset("/sdcard/JKQuest/Main", "sp_vpak8.pk3", false);

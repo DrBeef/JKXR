@@ -30,6 +30,9 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "tr_local.h"
 #include "qcommon/matcomp.h"
 #include "../qcommon/sstring.h"
+#include <JKVR/VrClientInfo.h>
+
+extern vr_client_info_t *vr;
 
 #define	LL(x) x=LittleLong(x)
 #define	LS(x) x=LittleShort(x)
@@ -977,12 +980,13 @@ void CM_SetupShaderProperties(void);
 /*
 ** RE_BeginRegistration
 */
-void RE_BeginRegistration( glconfig_t *glconfigOut ) {
+void RE_BeginRegistration( glconfig_t *glconfigOut,  intptr_t pVrClientInfo ) {
 	ri.Hunk_ClearToMark();
 
 	R_Init();
 
 	*glconfigOut = glConfig;
+	vr = (vr_client_info_t*)pVrClientInfo;
 
 	R_IssuePendingRenderCommands();
 

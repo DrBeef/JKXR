@@ -129,6 +129,7 @@ typedef struct {
 
 	//JKVR Functions
 	void 				(*JKVR_prepareEyeBuffer)			(int eye );
+	bool 				(*JKVR_useScreenLayer)				( void );
 
 } refimport_t;
 
@@ -152,7 +153,7 @@ typedef struct {
 	// and returns the current gl configuration, including screen width
 	// and height, which can be used by the client to intelligently
 	// size display elements
-	void	(*BeginRegistration)( glconfig_t *config );
+	void	(*BeginRegistration)( glconfig_t *config, intptr_t pVrClientInfo );
 	qhandle_t (*RegisterModel)( const char *name );
 	qhandle_t (*RegisterSkin)( const char *name );
 	int		  (*GetAnimationCFG)(const char *psCFGFilename, char *psDest, int iDestSize);

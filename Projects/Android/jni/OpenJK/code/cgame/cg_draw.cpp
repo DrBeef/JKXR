@@ -4267,14 +4267,19 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	}
 
 	cg.refdef.worldscale = cg_worldScale.value;
-	VectorCopy(cg.refdefViewAngles, cg.refdef.viewangles);
+	if (!in_camera) {
+		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
+		cg.refdef.viewangles[YAW] =
+				SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]) + vr->hmdorientation[YAW] + vr->snapTurn;
+		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+	}
 
 	// clear around the rendered view if sized down
 	CG_TileClear();
 
 	// offset vieworg appropriately if we're doing stereo separation
 	VectorCopy( cg.refdef.vieworg, baseOrg );
-	if ( separation != 0 ) {
+	if ( separation != 0 && (!in_camera || vr->immersive_cinematics)) {
 		VectorMA( cg.refdef.vieworg, -separation, cg.refdef.viewaxis[1], cg.refdef.vieworg );
 	}
 
@@ -4283,9 +4288,11 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		cgi_R_LAGoggles();
 	}
 
-	//Vertical Positional Movement
-	cg.refdef.vieworg[2] -= 64;
-	cg.refdef.vieworg[2] += (vr->hmdposition[1] + cg_heightAdjust.value) * cg_worldScale.value;
+	if (!in_camera) {
+		//Vertical Positional Movement
+		cg.refdef.vieworg[2] -= (float)g_entities[cg.snap->ps.viewEntity].client->ps.viewheight;
+		cg.refdef.vieworg[2] += (vr->hmdposition[1] + cg_heightAdjust.value) * cg_worldScale.value;
+	}
 
 	if ( (cg.snap->ps.forcePowersActive&(1<<FP_SEE)) )
 	{

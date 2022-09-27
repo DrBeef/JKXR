@@ -154,7 +154,7 @@ ovrLayerCylinder2 BuildCylinderLayer( ovrRenderer * cylinderRenderer,
 
 	const float density = 4500.0f;
 	const float rotateYaw = 0.0f;
-	const float radius = 4.0f;
+	const float radius = 2.0f;
 	//GB Hacky Override
 	float screen_offset = 0;
 	if(textureWidth > 1900)

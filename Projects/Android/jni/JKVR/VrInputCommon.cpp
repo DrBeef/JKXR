@@ -30,7 +30,7 @@ cvar_t	*vr_control_scheme;
 cvar_t	*vr_teleport;
 cvar_t	*vr_virtual_stock;
 cvar_t	*vr_switch_sticks;
-cvar_t	*vr_cinematic_stereo;
+cvar_t	*vr_immersive_cinematics;
 cvar_t	*vr_screen_dist;
 
 ovrInputStateTrackedRemote leftTrackedRemoteState_old;
@@ -48,15 +48,12 @@ float remote_movementForward;
 float remote_movementUp;
 float positional_movementSideways;
 float positional_movementForward;
-float snapTurn;
 bool jk2_initialised;
 long long global_time;
 float playerHeight;
 float playerYaw;
-bool showingScreenLayer;
 ovrTracking2 tracking;
 int ducked;
-int resyncClientYawWithGameYaw;
 vr_client_info_t vr;
 
 //keys.h
@@ -189,9 +186,6 @@ void updateScopeAngles()
     static vec3_t lastScopeAngles;
     if (vr.scopeengaged)
     {
-        //Clear weapon offset
-        VectorSet(vr.calculated_weaponoffset, 0, 0, 0);
-
         VectorSet(currentScopeAngles, vr.weaponangles[PITCH], vr.weaponangles[YAW], vr.hmdorientation[ROLL]);
 
         //Set "view" Angles

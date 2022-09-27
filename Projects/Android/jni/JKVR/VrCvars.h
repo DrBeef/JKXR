@@ -10,6 +10,6 @@ extern cvar_t	*vr_control_scheme;
 extern cvar_t	*vr_teleport;
 extern cvar_t	*vr_virtual_stock;
 extern cvar_t	*vr_switch_sticks;
-extern cvar_t	*vr_cinematic_stereo;
+extern cvar_t	*vr_immersive_cinematics;
 extern cvar_t	*vr_screen_dist;
 

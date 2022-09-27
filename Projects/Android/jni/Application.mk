@@ -15,11 +15,12 @@ SUPPORT_LIBS	:= $(TOP_DIR)/SupportLibs
 GL4ES_PATH		:= $(SUPPORT_LIBS)/gl4es
 OPENJK_PATH		:= $(TOP_DIR)/OpenJK
 SHARED_PATH		:= $(OPENJK_PATH)/shared
-SPDir			:= $(OPENJK_PATH)/code
+JK3_CODE_PATH	:= $(OPENJK_PATH)/code
+JK2_CODE_PATH	:= $(OPENJK_PATH)/codeJK2
 
 APP_ALLOW_MISSING_DEPS=true
 
-APP_MODULES := gl4es rd-gles_arm jagamearm openjk_sp
+APP_MODULES := gl4es rd-gles_arm jogamearm openjk_jo jagamearm openjk_ja
 APP_STL := c++_shared
 
 

@@ -5,16 +5,16 @@
 #define WEAPON_RECOIL           15.0f;
 
 typedef struct {
-    bool screen;
+    bool in_camera; // cinematic camera taken over
+    bool using_screen_layer;
     float  fov;
+    bool immersive_cinematics;
     bool weapon_stabilised;
     bool right_handed;
     bool player_moving;
     bool visible_hud;
-    bool dualwield;
     int weaponid;
     int lastweaponid;
-    int backpackitemactive; //0 - nothing, 1 - grenades, 2 - knife, 3 - Binoculars
     bool mountedgun;
 
     vec3_t hmdposition;
@@ -30,11 +30,14 @@ typedef struct {
     vec3_t weaponangles_last; // Don't use this, it is just for calculating delta!
     vec3_t weaponangles_delta;
 
+    vec3_t clientviewangles; //orientation in the client - we use this in the cgame
+    float snapTurn; // how much turn has been applied to the yaw by joystick
+
     float weapon_recoil;            // recoil effect to improve the default
 
-    vec3_t current_weaponoffset;
-    vec3_t calculated_weaponoffset;
-    float current_weaponoffset_timestamp;
+    vec3_t weaponposition;
+    vec3_t weaponoffset;
+    float weaponoffset_timestamp;
     vec3_t weaponoffset_history[NUM_WEAPON_SAMPLES];
     float weaponoffset_history_timestamp[NUM_WEAPON_SAMPLES];
 
@@ -54,6 +57,7 @@ typedef struct {
     vec3_t offhandangles_last; // Don't use this, it is just for calculating delta!
     vec3_t offhandangles_delta;
 
+    vec3_t offhandposition;
     vec3_t offhandoffset;
 
     //

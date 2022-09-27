@@ -27,12 +27,15 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../server/exe_headers.h"
 
 #include "tr_local.h"
+#include <JKVR/VrClientInfo.h>
 
 #if !defined(G2_H_INC)
 	#include "../ghoul2/G2.h"
 #endif
 
 trGlobals_t		tr;
+
+vr_client_info_t *vr;
 
 static float	s_flipMatrix[16] = {
 	// convert from our coordinate system (looking down X)

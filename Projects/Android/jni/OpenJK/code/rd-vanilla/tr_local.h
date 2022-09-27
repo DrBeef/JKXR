@@ -1314,7 +1314,7 @@ void	RE_GetScreenShot(byte *data, int w, int h);
 byte*	RE_TempRawImage_ReadFromFile(const char *psLocalFilename, int *piWidth, int *piHeight, byte *pbReSampleBuffer, qboolean qbVertFlip);
 void	RE_TempRawImage_CleanUp();
 
-void		RE_BeginRegistration( glconfig_t *glconfig );
+void		RE_BeginRegistration( glconfig_t *glconfig, intptr_t pVrClientInfo );
 void		RE_LoadWorldMap( const char *mapname );
 void		RE_SetWorldVisData( const byte *vis );
 qhandle_t	RE_RegisterModel( const char *name );

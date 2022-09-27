@@ -33,6 +33,7 @@ typedef float vec_t;
 typedef float vec2_t[2], vec3_t[3], vec4_t[4], vec5_t[5];
 typedef int	  ivec2_t[2], ivec3_t[3], ivec4_t[4], ivec5_t[5];
 typedef vec3_t vec3pair_t[2], matrix3_t[3];
+typedef vec_t matrix4x4[4][4];
 
 typedef	int	fixed4_t, fixed8_t, fixed16_t;
 
@@ -298,6 +299,17 @@ void VectorClear4( vec4_t vec );
 //
 ///////////////////////////////////////////////////////////////////////////
 void VectorSet5( vec5_t vec, float x, float y, float z, float w, float u );
+
+
+///////////////////////////////////////////////////////////////////////////
+//
+//      Matrix 4x4
+//
+///////////////////////////////////////////////////////////////////////////
+
+void Matrix4x4_Concat (matrix4x4 out, const matrix4x4 in1, const matrix4x4 in2);
+void Matrix4x4_CreateFromEntity( matrix4x4 out, const vec3_t angles, const vec3_t origin, float scale );
+void Matrix4x4_ConvertToEntity( vec4_t *in, vec3_t angles, vec3_t origin );
 
 
 #if defined(__cplusplus)

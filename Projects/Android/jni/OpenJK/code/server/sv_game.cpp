@@ -1049,7 +1049,7 @@ void SV_InitGameProgs (void) {
 	import.WE_SetTempGlobalFogColor = SV_WE_SetTempGlobalFogColor;
 
 #ifdef JK2_MODE
-	const char *gamename = "jospgame";
+	const char *gamename = "jogame";
 #else
 	const char *gamename = "jagame";
 #endif
