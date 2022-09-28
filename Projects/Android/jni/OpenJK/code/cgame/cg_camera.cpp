@@ -42,8 +42,6 @@ void CGCam_DistanceDisable( void );
 extern qboolean CG_CalcFOVFromX( float fov_x );
 extern void WP_SaberCatch( gentity_t *self, gentity_t *saber, qboolean switchToSaber );
 
-extern vr_client_info_t *vr;
-
 /*
 TODO:
 CloseUp, FullShot & Longshot commands:

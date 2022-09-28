@@ -35,8 +35,6 @@ extern vmCvar_t	cg_debugHealthBars;
 
 extern Vehicle_t *G_IsRidingVehicle( gentity_t *ent );
 
-extern vr_client_info_t *vr;
-
 void CG_DrawIconBackground(void);
 void CG_DrawMissionInformation( void );
 void CG_DrawInventorySelect( void );
@@ -4288,7 +4286,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		cgi_R_LAGoggles();
 	}
 
-	if (!in_camera) {
+	if (!in_camera || vr->immersive_cinematics) {
 		//Vertical Positional Movement
 		cg.refdef.vieworg[2] -= (float)g_entities[cg.snap->ps.viewEntity].client->ps.viewheight;
 		cg.refdef.vieworg[2] += (vr->hmdposition[1] + cg_heightAdjust.value) * cg_worldScale.value;

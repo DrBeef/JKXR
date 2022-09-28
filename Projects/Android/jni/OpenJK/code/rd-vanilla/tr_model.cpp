@@ -32,8 +32,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../qcommon/sstring.h"
 #include <JKVR/VrClientInfo.h>
 
-extern vr_client_info_t *vr;
-
 #define	LL(x) x=LittleLong(x)
 #define	LS(x) x=LittleShort(x)
 #define	LF(x) x=LittleFloat(x)

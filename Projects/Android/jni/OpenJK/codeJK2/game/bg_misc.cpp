@@ -21,11 +21,13 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 ===========================================================================
 */
 
-// included in both game dll and client
+#define GAME_INCLUDE
+#include "../cgame/cg_local.h"
 
 #include "g_local.h"
 #include "bg_public.h"
 #include "g_items.h"
+#include <JKVR/VrClientInfo.h>
 
 
 extern weaponData_t weaponData[WP_NUM_WEAPONS];
@@ -644,6 +646,56 @@ void PlayerStateToEntityState( playerState_t *ps, entityState_t *s ) {
 #endif
 }
 
+
+void rotateAboutOrigin(float x, float y, float rotation, vec2_t out)
+{
+	out[0] = cosf(DEG2RAD(-rotation)) * x  +  sinf(DEG2RAD(-rotation)) * y;
+	out[1] = cosf(DEG2RAD(-rotation)) * y  -  sinf(DEG2RAD(-rotation)) * x;
+}
+
+void BG_ConvertFromVR(vec3_t in, vec3_t offset, vec3_t out)
+{
+	vec3_t vrSpace;
+	VectorSet(vrSpace, in[2], in[0], in[1] );
+
+	vec2_t r;
+	rotateAboutOrigin(vrSpace[0], vrSpace[1], cg.refdefViewAngles[YAW] - vr->hmdorientation[YAW], r);
+
+	vrSpace[0] = -r[0];
+	vrSpace[1] = -r[1];
+
+	vec3_t temp;
+	VectorScale(vrSpace, cg_worldScale.value, temp);
+
+	if (offset) {
+		VectorAdd(temp, offset, out);
+	} else {
+		VectorCopy(temp, out);
+	}
+}
+
+static void BG_CalculateVRPositionInWorld( vec3_t in_position,  vec3_t in_offset, vec3_t in_orientation, vec3_t origin, vec3_t angles )
+{
+	vec3_t offset;
+	VectorCopy(in_offset, offset);
+	offset[1] = 0; // up/down is index 1 in this case
+	BG_ConvertFromVR(offset, cg.refdef.vieworg, origin);
+	origin[2] -= (float)g_entities[cg.snap->ps.viewEntity].client->ps.viewheight;
+	origin[2] += in_position[1] * cg_worldScale.value;
+
+	VectorCopy(in_orientation, angles);
+	angles[YAW] += (cg.refdefViewAngles[YAW] - vr->hmdorientation[YAW]);
+}
+
+void BG_CalculateVROffHandPosition( vec3_t origin, vec3_t angles )
+{
+	BG_CalculateVRPositionInWorld(vr->offhandposition, vr->offhandoffset, vr->offhandangles, origin, angles);
+}
+
+void BG_CalculateVRWeaponPosition( vec3_t origin, vec3_t angles )
+{
+	BG_CalculateVRPositionInWorld(vr->weaponposition, vr->weaponoffset, vr->weaponangles, origin, angles);
+}
 
 /*
 ============

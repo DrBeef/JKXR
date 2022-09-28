@@ -26,8 +26,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "cg_media.h"
 #include <JKVR/VrClientInfo.h>
 
-extern vr_client_info_t *vr;
-
 
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	if (!vr->in_camera && !vr->using_screen_layer && !vr->scopeengaged)

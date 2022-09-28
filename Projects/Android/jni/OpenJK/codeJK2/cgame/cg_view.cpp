@@ -30,11 +30,13 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../game/wp_saber.h"
 #include "../game/anims.h"
 #include "../game/g_functions.h"
+#include <JKVR/VrClientInfo.h>
 
 #define MASK_CAMERACLIP (MASK_SOLID)
 #define CAMERA_SIZE	4
 
 float cg_zoomFov;
+
 
 //#define CG_CAM_ABOVE	2
 extern qboolean CG_OnMovingPlat( playerState_t *ps );
@@ -1353,7 +1355,8 @@ static qboolean	CG_CalcFov( void ) {
 		if ( &g_entities[cg.snap->ps.viewEntity] &&
 			g_entities[cg.snap->ps.viewEntity].NPC )
 		{//FIXME: looks bad when take over a jedi... but never really do that, do we?
-			fov_x = g_entities[cg.snap->ps.viewEntity].NPC->stats.hfov;
+			//fov_x = g_entities[cg.snap->ps.viewEntity].NPC->stats.hfov;
+			fov_x = vr ? vr->fov : 90.0f;
 			//sanity-cap?
 			if ( fov_x > 120 )
 			{
@@ -1372,7 +1375,8 @@ static qboolean	CG_CalcFov( void ) {
 			}
 			else
 			{
-				fov_x = 120;//FIXME: read from the NPC's fov stats?
+				//fov_x = 120;//FIXME: read from the NPC's fov stats?
+				fov_x = vr ? vr->fov : 90.0f;
 			}
 		}
 	} 
@@ -1380,6 +1384,7 @@ static qboolean	CG_CalcFov( void ) {
 	{
 		fov_x = CG_ForceSpeedFOV();
 	} else {
+		/*
 		// user selectable
 		if ( cg.overrides.active & CG_OVERRIDE_FOV )
 		{
@@ -1393,7 +1398,9 @@ static qboolean	CG_CalcFov( void ) {
 			fov_x = 1;
 		} else if ( fov_x > 160 ) {
 			fov_x = 160;
-		}
+		}*/
+
+		fov_x = vr ? vr->fov : 90.0f;
 
 		// Disable zooming when in third person
 		if ( cg.zoomMode && cg.zoomMode < 3 )//&& !cg.renderingThirdPerson ) // light amp goggles do none of the zoom silliness
@@ -1891,11 +1898,13 @@ wasForceSpeed=isForceSpeed;
 	}
 	cgi_SetUserCmdValue( cg.weaponSelect, speed, mPitchOverride, mYawOverride );
 
-	// this counter will be bumped for every valid scene we generate
-	cg.clientFrame++;
+	if ( stereoView == STEREO_LEFT ) {
+		// this counter will be bumped for every valid scene we generate
+		cg.clientFrame++;
 
-	// update cg.predicted_player_state
-	CG_PredictPlayerState();
+		// update cg.predicted_player_state
+		CG_PredictPlayerState();
+	}
 
 	// decide on third person view
 	cg.renderingThirdPerson = (qboolean)(
@@ -1910,6 +1919,7 @@ wasForceSpeed=isForceSpeed;
 		cg.renderingThirdPerson = qfalse;
 	}
 
+	vr->in_camera = in_camera;
 	if ( in_camera )
 	{
 		// The camera takes over the view

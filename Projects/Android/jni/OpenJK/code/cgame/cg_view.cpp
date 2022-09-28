@@ -38,8 +38,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 float cg_zoomFov;
 
-extern vr_client_info_t *vr;
-
 
 //#define CG_CAM_ABOVE	2
 extern qboolean CG_OnMovingPlat( playerState_t *ps );

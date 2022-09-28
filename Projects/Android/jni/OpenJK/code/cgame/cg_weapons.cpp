@@ -32,8 +32,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include <bg_local.h>
 #include <JKVR/VrClientInfo.h>
 
-extern vr_client_info_t *vr;
-
 extern void CG_LightningBolt( centity_t *cent, vec3_t origin );
 
 #define	PHASER_HOLDFRAME	2

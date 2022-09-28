@@ -43,8 +43,6 @@ int			r_numpolyverts;
 int			skyboxportal;
 int			drawskyboxportal;
 
-extern vr_client_info_t *vr;
-
 /*
 ====================
 R_InitNextFrame

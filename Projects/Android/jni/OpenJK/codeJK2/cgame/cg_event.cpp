@@ -463,9 +463,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			index = es->eventParm;		// player predicted
 
-			if ( (char)index < 0 )
+			if ( index < 0 )
 			{
-				index = -(char)index;
+				index = -index;
 				bHadItem = qtrue;
 			}
 

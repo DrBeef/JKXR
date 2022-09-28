@@ -32,6 +32,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "vmachine.h"
 #include "qcommon/stringed_ingame.h"
 #include "sys/sys_loadlib.h"
+
 #include <JKVR/VrCommon.h>
 
 vm_t	cgvm;
@@ -462,6 +463,9 @@ cgameImport_t CL_ConvertJK2SysCall( cgameJK2Import_t import )
 			break;
 		case CG_CVAR_SET_JK2:
 			return CG_CVAR_SET;
+			break;
+		case CG_CVAR_GET_JK2:
+			return CG_CVAR_GET;
 			break;
 		case CG_ARGC_JK2:
 			return CG_ARGC;

@@ -30,6 +30,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../game/ghoul2_shared.h"
 #include "../game/anims.h"
 #include "../game/wp_saber.h"
+#include "bg_local.h"
 
 #define	LOOK_SWING_SCALE	0.5
 
@@ -5787,7 +5788,14 @@ Ghoul2 Insert End
 			//FIXME: allow it to be put anywhere and move this out of if(torso.hModel)
 			//Will have to call CG_PositionRotatedEntityOnTag
 
-			CG_PositionEntityOnTag( &gun, &torso, torso.hModel, "tag_weapon");
+			//CG_PositionEntityOnTag( &gun, &torso, torso.hModel, "tag_weapon");
+
+			vec3_t angs;
+			BG_CalculateVRWeaponPosition(gun.origin, angs);
+			AnglesToAxis(angs, gun.axis);
+			//Gotta move this forward but test for now
+			VectorCopy( gun.origin, gun.lightingOrigin );
+
 
 //--------------------- start saber hacks
 

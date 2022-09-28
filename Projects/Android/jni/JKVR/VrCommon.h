@@ -8,7 +8,6 @@
 #include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
 
-
 #include "VrClientInfo.h"
 
 #define LOG_TAG "JKVR"

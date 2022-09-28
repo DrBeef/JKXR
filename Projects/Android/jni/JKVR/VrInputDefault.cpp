@@ -472,6 +472,13 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 sendButtonAction("+movedown", (primaryButtonsNew & primaryButton1));
             }
 
+            //Use
+            if ((pDominantTrackedRemoteNew->Buttons & ovrButton_RThumb) !=
+                (pDominantTrackedRemoteOld->Buttons & ovrButton_RThumb)) {
+
+                sendButtonAction("+use", (pDominantTrackedRemoteNew->Buttons & ovrButton_RThumb));
+            }
+
 			//Weapon Chooser
 			static bool itemSwitched = false;
 			if (between(-0.2f, pPrimaryJoystick->x, 0.2f) &&

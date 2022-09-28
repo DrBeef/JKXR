@@ -82,4 +82,8 @@ typedef struct {
 
 } vr_client_info_t;
 
+#ifndef JKVR_CLIENT
+extern vr_client_info_t *vr;
+#endif
+
 #endif //vr_client_info_h

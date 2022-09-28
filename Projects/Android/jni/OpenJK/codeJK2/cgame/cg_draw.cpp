@@ -28,6 +28,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "cg_local.h"
 #include "cg_media.h"
 #include "../game/objectives.h"
+#include <JKVR/VrClientInfo.h>
 
 void CG_DrawIconBackground(void);
 void CG_DrawMissionInformation( void );
@@ -2466,34 +2467,48 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	VectorNormalize( vright_n );
 	VectorNormalize( vup_n );
 
+	cg.refdef.stereoView = stereoView;
 	switch ( stereoView ) {
 	case STEREO_CENTER:
 		separation = 0;
 		break;
 	case STEREO_LEFT:
-		separation = -cg_stereoSeparation.value / 2;
+		separation = cg_worldScale.value * (-cg_stereoSeparation.value / 2);
 		break;
 	case STEREO_RIGHT:
-		separation = cg_stereoSeparation.value / 2;
+		separation = cg_worldScale.value * (cg_stereoSeparation.value / 2);
 		break;
 	default:
 		separation = 0;
 		CG_Error( "CG_DrawActive: Undefined stereoView" );
 	}
 
+	cg.refdef.worldscale = cg_worldScale.value;
+	if (!in_camera) {
+		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
+		cg.refdef.viewangles[YAW] =
+				SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]) + vr->hmdorientation[YAW] + vr->snapTurn;
+		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+	}
 
 	// clear around the rendered view if sized down
 	CG_TileClear();
 
 	// offset vieworg appropriately if we're doing stereo separation
 	VectorCopy( cg.refdef.vieworg, baseOrg );
-	if ( separation != 0 ) {
+	if ( separation != 0 && (!in_camera || vr->immersive_cinematics)) {
 		VectorMA( cg.refdef.vieworg, -separation, cg.refdef.viewaxis[1], cg.refdef.vieworg );
 	}
 
 	if ( cg.zoomMode == 3 && cg.snap->ps.batteryCharge ) // doing the Light amp goggles thing
 	{
 		cgi_R_LAGoggles();
+	}
+
+	if (!in_camera || vr->immersive_cinematics) {
+		//Vertical Positional Movement
+		cg.refdef.vieworg[2] -= (float)g_entities[cg.snap->ps.viewEntity].client->ps.viewheight;
+		cg.refdef.vieworg[2] += (vr->hmdposition[1] + cg_heightAdjust.value) * cg_worldScale.value;
 	}
 
 	// draw 3D view

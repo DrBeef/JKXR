@@ -40,7 +40,7 @@ import static android.system.Os.setenv;
 	// Load the gles3jni library right away to make sure JNI_OnLoad() gets called as the very first thing.
 	static
 	{
-		System.loadLibrary( "openjk_ja" );
+		System.loadLibrary( "openjk_jo" );
 	}
 
 	private static final String TAG = "JKQuest";
@@ -59,16 +59,11 @@ import static android.system.Os.setenv;
 	// Main components
 	protected static GLES3JNIActivity mSingleton;
 
-	// Audio
-	protected static AudioTrack mAudioTrack;
-	protected static AudioRecord mAudioRecord;
 
 	public static void initialize() {
 		// The static nature of the singleton and Android quirkyness force us to initialize everything here
 		// Otherwise, when exiting the app and returning to it, these variables *keep* their pre exit values
 		mSingleton = null;
-		mAudioTrack = null;
-		mAudioRecord = null;
 	}
 
 	public void shutdown() {

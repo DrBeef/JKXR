@@ -88,8 +88,6 @@ const char *inv_names[] =
 
 int	force_icons[NUM_FORCE_POWERS];
 
-extern vr_client_info_t *vr;
-
 
 void CG_DrawDataPadHUD( centity_t *cent );
 void CG_DrawDataPadObjectives(const centity_t *cent );
@@ -331,6 +329,25 @@ vmCvar_t	cg_hudFiles;
 
 vmCvar_t	cg_neverHearThatDumbBeepingSoundAgain;
 
+vmCvar_t vr_weapon_adjustment_1;
+vmCvar_t vr_weapon_adjustment_2;
+vmCvar_t vr_weapon_adjustment_3;
+vmCvar_t vr_weapon_adjustment_4;
+vmCvar_t vr_weapon_adjustment_5;
+vmCvar_t vr_weapon_adjustment_6;
+vmCvar_t vr_weapon_adjustment_7;
+vmCvar_t vr_weapon_adjustment_8;
+vmCvar_t vr_weapon_adjustment_9;
+vmCvar_t vr_weapon_adjustment_10;
+vmCvar_t vr_weapon_adjustment_11;
+vmCvar_t vr_weapon_adjustment_12;
+vmCvar_t vr_weapon_adjustment_13;
+vmCvar_t vr_weapon_adjustment_14;
+vmCvar_t vr_weapon_adjustment_18;
+vmCvar_t vr_weapon_adjustment_19;
+vmCvar_t vr_weapon_adjustment_20;
+vmCvar_t vr_weapon_adjustment_22;
+
 vmCvar_t	cg_VariantSoundCap;	// 0 = no capping, else cap to (n) max (typically just 1, but allows more)
 vmCvar_t	cg_turnAnims;
 vmCvar_t	cg_motionBoneComp;
@@ -452,6 +469,27 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_skippingcin, "skippingCinematic", "0", CVAR_ROM},
 	{ &cg_missionInfoFlashTime, "cg_missionInfoFlashTime", "10000", 0  },
 	{ &cg_hudFiles, "cg_hudFiles", "ui/jahud.txt", CVAR_ARCHIVE},
+
+	//Default Weapon adjustments - these WILL be overridden
+	//  scale,right,up,forward,pitch,yaw,roll
+	{ &vr_weapon_adjustment_1,  "vr_weapon_adjustment_1",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_2,  "vr_weapon_adjustment_2",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_3,  "vr_weapon_adjustment_3",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_4,  "vr_weapon_adjustment_4",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_5,  "vr_weapon_adjustment_5",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_6,  "vr_weapon_adjustment_6",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_7,  "vr_weapon_adjustment_7",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_8,  "vr_weapon_adjustment_8",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_9,  "vr_weapon_adjustment_9",  "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_10, "vr_weapon_adjustment_10", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_11, "vr_weapon_adjustment_11", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_12, "vr_weapon_adjustment_12", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_13, "vr_weapon_adjustment_13", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_14, "vr_weapon_adjustment_14", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_18, "vr_weapon_adjustment_18", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_19, "vr_weapon_adjustment_19", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_20, "vr_weapon_adjustment_20", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
+	{ &vr_weapon_adjustment_22, "vr_weapon_adjustment_22", "0.62,-9.8,11.3,-16.1,0.0,0.0,0.0", CVAR_ARCHIVE},
 
 	{ &cg_VariantSoundCap, "cg_VariantSoundCap", "0", 0 },
 	{ &cg_turnAnims, "cg_turnAnims", "0", 0 },

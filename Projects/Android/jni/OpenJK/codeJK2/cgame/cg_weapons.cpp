@@ -27,6 +27,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../game/wp_saber.h"
 #include "../game/g_local.h"
 #include "../game/anims.h"
+#include <bg_local.h>
+#include <JKVR/VrClientInfo.h>
 
 extern void CG_LightningBolt( centity_t *cent, vec3_t origin );
 
@@ -779,6 +781,82 @@ void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles )
 	angles[PITCH] += (scale * 0.5f ) * fracsin * 0.01;
 }
 
+static float CG_CalculateWeaponPositionAndScale( playerState_t *ps, vec3_t origin, vec3_t angles ) {
+
+	BG_CalculateVRWeaponPosition(origin, angles);
+
+	vec3_t offset;
+
+	//Weapon offset debugging
+	float scale=1.0f;
+	if (strcmp(cgi_Cvar_Get("vr_control_scheme"), "99") == 0) {
+		vr->weaponid = ps->weapon;
+		scale = vr->test_scale;
+
+		//Adjust angles for weapon models that aren't aligned very well
+		matrix4x4 m1, m2, m3;
+		vec3_t zero;
+		VectorClear(zero);
+		Matrix4x4_CreateFromEntity(m1, angles, zero, 1.0);
+		Matrix4x4_CreateFromEntity(m2, vr->test_angles, zero, 1.0);
+		Matrix4x4_Concat(m3, m1, m2);
+		Matrix4x4_ConvertToEntity(m3, angles, zero);
+
+		VectorCopy(vr->test_offset, offset);
+
+		CG_CenterPrint( vr->test_name, SMALLCHAR_WIDTH );
+	} else {
+		if (ps->weapon != 0)
+		{
+			char cvar_name[64];
+			Com_sprintf(cvar_name, sizeof(cvar_name), "vr_weapon_adjustment_%i", ps->weapon);
+
+			char* weapon_adjustment = cgi_Cvar_Get(cvar_name);
+
+			if (strlen(weapon_adjustment) > 0) {
+				vec3_t adjust;
+				vec3_t temp_offset;
+				VectorClear(temp_offset);
+				VectorClear(adjust);
+
+				sscanf(weapon_adjustment, "%f,%f,%f,%f,%f,%f,%f", &scale,
+					   &(temp_offset[0]), &(temp_offset[1]), &(temp_offset[2]),
+					   &(adjust[PITCH]), &(adjust[YAW]), &(adjust[ROLL]));
+				VectorScale(temp_offset, scale, offset);
+
+				if (!vr->right_handed)
+				{
+					//yaw needs to go in the other direction as left handed model is reversed
+					adjust[YAW] *= -1.0f;
+				}
+
+				//Adjust angles for weapon models that aren't aligned very well
+				matrix4x4 m1, m2, m3;
+				vec3_t zero;
+				VectorClear(zero);
+				Matrix4x4_CreateFromEntity(m1, angles, zero, 1.0);
+				Matrix4x4_CreateFromEntity(m2, adjust, zero, 1.0);
+				Matrix4x4_Concat(m3, m1, m2);
+				Matrix4x4_ConvertToEntity(m3, angles, zero);
+			}
+		}
+	}
+
+
+	//Now move weapon closer to proper origin
+	vec3_t forward, right, up;
+	AngleVectors( angles, forward, right, up );
+	VectorMA( origin, offset[2], forward, origin );
+	VectorMA( origin, offset[1], up, origin );
+	if (vr->right_handed) {
+		VectorMA(origin, offset[0], right, origin);
+	} else {
+		VectorMA(origin, -offset[0], right, origin);
+	}
+
+	return scale;
+}
+
 /*
 ======================
 CG_MachinegunSpinAngle
@@ -1028,22 +1106,54 @@ void CG_AddViewWeapon( playerState_t *ps )
 		return;
 	}
 
-	// set up gun position
-	CG_CalculateWeaponPosition( hand.origin, angles );
+	if (strcmp(cgi_Cvar_Get("vr_control_scheme"), "99") == 0) {
+		vec3_t origin;
+		vec3_t endForward, endRight, endUp;
+		vec3_t angles;
+		clientInfo_t ci;
+		BG_CalculateVRWeaponPosition(   origin,        angles );
 
+		vec3_t forward, right, up;
+		AngleVectors(angles, forward, right, up);
+
+		trace_t trace;
+		VectorMA(origin, 256, forward, endForward);
+		CG_TestLine(origin, endForward, FRAMETIME, 0xFF0000, 0.5 );
+
+		VectorMA(origin, 20, right, endRight);
+		CG_TestLine(origin, endRight, FRAMETIME, 0x00FF00, 0.5 );
+
+		VectorMA(origin, 20, up, endUp);
+		CG_TestLine(origin, endUp, FRAMETIME, 0x0000FF, 0.5 );
+
+		CG_CenterPrint(vr->test_name, 240);
+
+	}
+
+		// set up gun position
+	float scale = CG_CalculateWeaponPositionAndScale( ps, hand.origin, angles );
+	
 	VectorMA( hand.origin, cg_gun_x.value, cg.refdef.viewaxis[0], hand.origin );
 	VectorMA( hand.origin, (cg_gun_y.value+leanOffset), cg.refdef.viewaxis[1], hand.origin );
 	VectorMA( hand.origin, (cg_gun_z.value+fovOffset), cg.refdef.viewaxis[2], hand.origin );
 
 	AnglesToAxis( angles, hand.axis );
 
-	if ( cg_fovViewmodel.integer )
+	//scale the whole model (hand and weapon)
+	for ( int i = 0; i < 3; i++ ) {
+		VectorScale( hand.axis[i], (vr->right_handed || i != 1 ) ? scale : -scale, hand.axis[i] );
+	}
+
+	//Gotta move this forward but test for now
+	VectorCopy( hand.origin, hand.lightingOrigin );
+
+/*	if ( cg_fovViewmodel.integer )
 	{
 		float fracDistFOV = tanf( cg.refdef.fov_x * ( M_PI/180 ) * 0.5f );
 		float fracWeapFOV = ( 1.0f / fracDistFOV ) * tanf( cgFov * ( M_PI/180 ) * 0.5f );
 		VectorScale( hand.axis[0], fracWeapFOV, hand.axis[0] );
 	}
-
+*/
 	// map torso animations to weapon animations
 	if ( cg_gun_frame.integer )
 	{
