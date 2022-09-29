@@ -1282,16 +1282,6 @@ void JKVR_Init()
 
 	vr_immersive_cinematics = Cvar_Get("vr_immersive_cinematics", "1", CVAR_ARCHIVE);
 	vr_screen_dist = Cvar_Get( "vr_screen_dist", "2.5", CVAR_ARCHIVE);
-
-    //Set up vr client info
-	vr.visible_hud = qtrue;
-    vr.weapon_recoil = 0.0f;
-
-	//Clear teleport stuff
-	vr.teleportexecute = qfalse;
-	vr.teleportseek = qfalse;
-	vr.teleportenabled = qfalse;
-	vr.teleportready = qfalse;
 }
 
 
@@ -1353,23 +1343,7 @@ void JKVR_processMessageQueue() {
 			}
 			case MESSAGE_ON_START:
 			{
-				if (!jk2_initialised)
-				{
-					ALOGV( "    Initialising jk2 Engine" );
-
-					//Set command line arguments here
-					if (argc != 0)
-					{
-						//TODO
-					}
-					else
-					{
-						int argc = 1; char *argv[] = { "jk2" };
-
-					}
-
-					jk2_initialised = qtrue;
-				}
+				openjk_initialised = qtrue;
 				break;
 			}
 			case MESSAGE_ON_RESUME:
@@ -1425,7 +1399,7 @@ void * AppThreadFunction(void * parm ) {
 	// Note that AttachCurrentThread will reset the thread name.
 	prctl(PR_SET_NAME, (long) "OVR::Main", 0, 0, 0);
 
-	jk2_initialised = false;
+	openjk_initialised = false;
 	vr_screen_dist = NULL;
 
 	const ovrInitParms initParms = vrapi_DefaultInitParms(&java);
@@ -1491,16 +1465,15 @@ void * AppThreadFunction(void * parm ) {
 	// Create the scene if not yet created.
 	ovrScene_Create( m_width, m_height, &gAppState.Scene, &java );
 
-	char *game = (char*)getenv("JK_GAME");
-	if (strcmp(game, "jo") == 0) {
+#ifdef JK2_MODE
 		chdir("/sdcard/JKQuest/JK2");
-	} else {
+#else
 		chdir("/sdcard/JKQuest/JK3");
-	}
+#endif
 
 
 	//Run loading loop until we are ready to start JKVR
-	while (!destroyed && !jk2_initialised) {
+	while (!destroyed && !openjk_initialised) {
 		JKVR_processMessageQueue();
 		JKVR_incrementFrameIndex();
 		showLoadingIcon();

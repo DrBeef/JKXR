@@ -25,6 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_functions.h"
 #include "wp_saber.h"
 #include "w_local.h"
+#include "bg_local.h"
 
 //-------------------
 //	Wookiee Bowcaster
@@ -88,7 +89,14 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 		// create a range of different velocities
 		vel = BOWCASTER_VELOCITY * ( Q_flrand(-1.0f, 1.0f) * BOWCASTER_VEL_RANGE + 1.0f );
 
-		vectoangles( forwardVec, angs );
+		vec3_t	angs;
+		if ( ent->client && !ent->NPC)
+		{
+			BG_CalculateVRWeaponPosition(muzzle, angs);
+		}
+		else {
+			vectoangles(forwardVec, angs);
+		}
 
 		if ( !(ent->client->ps.forcePowersActive&(1<<FP_SEE))
 			|| ent->client->ps.forcePowerLevel[FP_SEE] < FORCE_LEVEL_2 )

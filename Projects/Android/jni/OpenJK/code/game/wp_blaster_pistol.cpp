@@ -25,6 +25,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 
+#include "bg_local.h"
+
 
 //---------------
 //	Bryar Pistol
@@ -37,6 +39,15 @@ void WP_FireBryarPistol( gentity_t *ent, qboolean alt_fire )
 	vec3_t	start;
 	int		damage = !alt_fire ? weaponData[WP_BRYAR_PISTOL].damage : weaponData[WP_BRYAR_PISTOL].altDamage;
 
+	vec3_t	angs;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(muzzle, angs);
+	}
+	else {
+		vectoangles(forwardVec, angs);
+	}
+
 	VectorCopy( muzzle, start );
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
@@ -46,10 +57,6 @@ void WP_FireBryarPistol( gentity_t *ent, qboolean alt_fire )
 		//FIXME: maybe force sight level 3 autoaims some?
 		if ( ent->NPC && ent->NPC->currentAim < 5 )
 		{
-			vec3_t	angs;
-
-			vectoangles( forwardVec, angs );
-
 			if ( ent->client->NPC_class == CLASS_IMPWORKER )
 			{//*sigh*, hack to make impworkers less accurate without affecteing imperial officer accuracy
 				angs[PITCH] += ( Q_flrand(-1.0f, 1.0f) * (BLASTER_NPC_SPREAD+(6-ent->NPC->currentAim)*0.25f));//was 0.5f

@@ -991,7 +991,11 @@ void Com_ExecuteCfg(void)
 		Cbuf_Execute();
 		Cbuf_ExecuteText(EXEC_NOW, "exec autoexec_sp.cfg\n");
 		//Execute to overwrite weapon locations with our desired adjustments
-		Cbuf_AddText( "exec weapons_vr.cfg\n" );
+#ifdef JK2_MODE
+		Cbuf_AddText( "exec weapons_vr_jo.cfg\n" );
+#else
+		Cbuf_AddText( "exec weapons_vr_ja.cfg\n" );
+#endif
 		Cbuf_Execute();
 	}
 }

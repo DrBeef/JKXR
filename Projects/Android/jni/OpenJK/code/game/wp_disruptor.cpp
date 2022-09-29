@@ -25,6 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_functions.h"
 #include "wp_saber.h"
 #include "w_local.h"
+#include "bg_local.h"
 
 //---------------------
 //	Tenloss Disruptor
@@ -67,8 +68,20 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 //		damage *= 2;
 //	}
 
-	WP_MissileTargetHint(ent, start, forwardVec);
-	VectorMA( start, shotRange, forwardVec, end );
+
+	vec3_t	angs, forward;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(muzzle, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy(forwardVec, forward);
+	}
+
+
+	WP_MissileTargetHint(ent, start, forward);
+	VectorMA( start, shotRange, forward, end );
 
 	int ignore = ent->s.number;
 	int traces = 0;

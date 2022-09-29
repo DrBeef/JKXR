@@ -48,7 +48,7 @@ float remote_movementForward;
 float remote_movementUp;
 float positional_movementSideways;
 float positional_movementForward;
-bool jk2_initialised;
+bool openjk_initialised;
 long long global_time;
 float playerHeight;
 float playerYaw;

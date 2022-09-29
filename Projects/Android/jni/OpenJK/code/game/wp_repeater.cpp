@@ -25,6 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_functions.h"
 #include "wp_saber.h"
 #include "w_local.h"
+#include "bg_local.h"
 
 //-------------------
 //	Heavy Repeater
@@ -97,8 +98,18 @@ static void WP_RepeaterAltFire( gentity_t *ent )
 	}
 	else
 	{
-		WP_MissileTargetHint(ent, start, forwardVec);
-		missile = CreateMissile( start, forwardVec, REPEATER_ALT_VELOCITY, 10000, ent, qtrue );
+		vec3_t	angs, forward;
+		if ( ent->client && !ent->NPC)
+		{
+			BG_CalculateVRWeaponPosition(muzzle, angs);
+			AngleVectors(angs, forward, NULL, NULL);
+		}
+		else {
+			VectorCopy(forwardVec, forward);
+		}
+
+		WP_MissileTargetHint(ent, start, forward);
+		missile = CreateMissile( start, forward, REPEATER_ALT_VELOCITY, 10000, ent, qtrue );
 	}
 
 	missile->classname = "repeater_alt_proj";
@@ -151,8 +162,13 @@ void WP_FireRepeater( gentity_t *ent, qboolean alt_fire )
 //---------------------------------------------------------
 {
 	vec3_t	dir, angs;
-
-	vectoangles( forwardVec, angs );
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(muzzle, angs);
+	}
+	else {
+		vectoangles( forwardVec, angs );
+	}
 
 	if ( alt_fire )
 	{

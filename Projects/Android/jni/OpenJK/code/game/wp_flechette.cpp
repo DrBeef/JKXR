@@ -25,6 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_functions.h"
 #include "wp_saber.h"
 #include "w_local.h"
+#include "bg_local.h"
 
 //-----------------------
 //	Golan Arms Flechette
@@ -56,7 +57,14 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 
 	for ( int i = 0; i < FLECHETTE_SHOTS; i++ )
 	{
-		vectoangles( forwardVec, angs );
+		vec3_t	angs;
+		if ( ent->client && !ent->NPC)
+		{
+			BG_CalculateVRWeaponPosition(muzzle, angs);
+		}
+		else {
+			vectoangles(forwardVec, angs);
+		}
 
 		if ( i == 0 && ent->s.number == 0 )
 		{

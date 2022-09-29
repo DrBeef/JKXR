@@ -26,6 +26,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 #include "../cgame/cg_local.h"
+#include "bg_local.h"
 
 static void WP_FireConcussionAlt( gentity_t *ent )
 {//a rail-gun-like beam
@@ -256,13 +257,23 @@ static void WP_FireConcussion( gentity_t *ent )
 	int		damage	= weaponData[WP_CONCUSSION].damage;
 	float	vel = CONC_VELOCITY;
 
+	vec3_t	angs, forward;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(muzzle, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy(forwardVec, forward);
+	}
+
 	if (ent->s.number >= MAX_CLIENTS)
 	{
 		vec3_t angles;
-		vectoangles(forwardVec, angles);
+		vectoangles(forward, angles);
 		angles[PITCH] += ( Q_flrand(-1.0f, 1.0f) * (CONC_NPC_SPREAD+(6-ent->NPC->currentAim)*0.25f));//was 0.5f
 		angles[YAW]	  += ( Q_flrand(-1.0f, 1.0f) * (CONC_NPC_SPREAD+(6-ent->NPC->currentAim)*0.25f));//was 0.5f
-		AngleVectors(angles, forwardVec, vrightVec, up);
+		AngleVectors(angles, forward, vrightVec, up);
 	}
 
 	//hold us still for a bit
@@ -279,7 +290,7 @@ static void WP_FireConcussion( gentity_t *ent )
 	VectorCopy( muzzle, start );
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
-	gentity_t *missile = CreateMissile( start, forwardVec, vel, 10000, ent, qfalse );
+	gentity_t *missile = CreateMissile( start, forward, vel, 10000, ent, qfalse );
 
 	missile->classname = "conc_proj";
 	missile->s.weapon = WP_CONCUSSION;

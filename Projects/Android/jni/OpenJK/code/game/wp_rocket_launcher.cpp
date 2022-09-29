@@ -25,6 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_functions.h"
 #include "wp_saber.h"
 #include "w_local.h"
+#include "bg_local.h"
 
 //-----------------------
 //	Rocket Launcher
@@ -182,10 +183,20 @@ void WP_FireRocket( gentity_t *ent, qboolean alt_fire )
 		vel *= 0.5f;
 	}
 
+	vec3_t	angs, forward;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(muzzle, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy(forwardVec, forward);
+	}
+
 	VectorCopy( muzzle, start );
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
-	gentity_t *missile = CreateMissile( start, forwardVec, vel, 10000, ent, alt_fire );
+	gentity_t *missile = CreateMissile( start, forward, vel, 10000, ent, alt_fire );
 
 	missile->classname = "rocket_proj";
 	missile->s.weapon = WP_ROCKET_LAUNCHER;

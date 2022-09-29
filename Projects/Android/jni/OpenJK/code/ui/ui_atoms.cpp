@@ -270,7 +270,7 @@ void UI_Init( int apiVersion, uiimport_t *uiimport, qboolean inGameLoad )
 
 	Menu_Cache( );
 
-	ui.Cvar_Create( "cg_drawCrosshair", "1", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_drawCrosshair", "0", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_marks", "1", CVAR_ARCHIVE );
 	ui.Cvar_Create ("s_language",			"english",	CVAR_ARCHIVE | CVAR_NORESTART);
 #ifndef JK2_MODE

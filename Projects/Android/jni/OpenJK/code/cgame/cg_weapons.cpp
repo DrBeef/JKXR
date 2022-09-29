@@ -887,7 +887,9 @@ static float CG_CalculateWeaponPositionAndScale( playerState_t *ps, vec3_t origi
 
 		VectorCopy(vr->test_offset, offset);
 
-		CG_CenterPrint( vr->test_name, SMALLCHAR_WIDTH );
+		int w = cgi_R_Font_StrLenPixels(vr->test_name, cgs.media.qhFontSmall, 1.0f);
+		int x = ( SCREEN_WIDTH - w ) / 2;
+		cgi_R_Font_DrawString(x, (SCREEN_HEIGHT / 2), vr->test_name, colorTable[CT_ICON_BLUE], cgs.media.qhFontSmall, -1, 1.0f);
 	} else {
 		if (ps->weapon != 0)
 		{
@@ -1184,12 +1186,11 @@ void CG_AddViewWeapon( playerState_t *ps )
 	if (strcmp(cgi_Cvar_Get("vr_control_scheme"), "99") == 0) {
 		vec3_t origin;
 		vec3_t endForward, endRight, endUp;
-		vec3_t angles;
-		clientInfo_t ci;
-		BG_CalculateVRWeaponPosition(   origin,        angles );
+		vec3_t _angles;
+		BG_CalculateVRWeaponPosition(   origin,        _angles );
 
 		vec3_t forward, right, up;
-		AngleVectors(angles, forward, right, up);
+		AngleVectors(_angles, forward, right, up);
 
 		trace_t trace;
 		VectorMA(origin, 256, forward, endForward);

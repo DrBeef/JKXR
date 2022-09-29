@@ -3522,7 +3522,7 @@ void CG_DrawForceSelect( void )
 	{
 			int w = cgi_R_Font_StrLenPixels(text, cgs.media.qhFontSmall, 1.0f);
 			int x = ( SCREEN_WIDTH - w ) / 2;
-			cgi_R_Font_DrawString(x, (SCREEN_HEIGHT - 24), text, colorTable[CT_ICON_BLUE], cgs.media.qhFontSmall, -1, 1.0f);
+			cgi_R_Font_DrawString(x, (SCREEN_HEIGHT / 2 + 50), text, colorTable[CT_ICON_BLUE], cgs.media.qhFontSmall, -1, 1.0f);
 	}
 }
 

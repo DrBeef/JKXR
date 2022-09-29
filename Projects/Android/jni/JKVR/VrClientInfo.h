@@ -2,7 +2,6 @@
 #define vr_client_info_h
 
 #define NUM_WEAPON_SAMPLES      10
-#define WEAPON_RECOIL           15.0f;
 
 typedef struct {
     bool in_camera; // cinematic camera taken over
@@ -12,7 +11,6 @@ typedef struct {
     bool weapon_stabilised;
     bool right_handed;
     bool player_moving;
-    bool visible_hud;
     int weaponid;
     int lastweaponid;
     bool mountedgun;
@@ -32,8 +30,6 @@ typedef struct {
 
     vec3_t clientviewangles; //orientation in the client - we use this in the cgame
     float snapTurn; // how much turn has been applied to the yaw by joystick
-
-    float weapon_recoil;            // recoil effect to improve the default
 
     vec3_t weaponposition;
     vec3_t weaponoffset;
@@ -59,17 +55,6 @@ typedef struct {
 
     vec3_t offhandposition;
     vec3_t offhandoffset;
-
-    //
-    // Teleport Stuff
-    //
-    bool teleportenabled;
-    bool teleportseek; // player looking to teleport
-    bool teleportready; // player pointing to a valid teleport location
-    vec3_t   teleportdest; // teleport destination
-    bool teleportexecute; // execute the teleport
-
-
 
     //////////////////////////////////////
     //    Test stuff for weapon alignment

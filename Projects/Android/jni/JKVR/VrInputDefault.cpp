@@ -43,8 +43,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 	vr.right_handed = vr_control_scheme->value < 10 ||
             vr_control_scheme->value == 99; // Always right-handed for weapon calibration
 
-	vr.teleportenabled = vr_teleport->integer != 0;
-
     static bool dominantGripPushed = false;
 	static float dominantGripPushTime = 0.0f;
     static bool canUseBackpack = false;
@@ -112,9 +110,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         vec3_t rotation = {0};
         rotation[PITCH] = 30;
         QuatToYawPitchRoll(pWeapon->HeadPose.Pose.Orientation, rotation, vr.weaponangles_knife);
-        rotation[PITCH] = vr_weapon_pitchadjust->value +
-                (vr.pistol ? vr.weapon_recoil : 0.0f); // Our hacked recoil effect
-        vr.weapon_recoil *= 0.8f; // quick reduction on synthetic recoil
+        rotation[PITCH] = vr_weapon_pitchadjust->value;
         QuatToYawPitchRoll(pWeapon->HeadPose.Pose.Orientation, rotation, vr.weaponangles);
 
         VectorSubtract(vr.weaponangles_last, vr.weaponangles, vr.weaponangles_delta);
@@ -281,14 +277,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 }
             }
 
-            static bool finishReloadNextFrame = false;
-            if (finishReloadNextFrame)
-            {
-                ALOGV("**WEAPON EVENT**  -reload");
-                sendButtonActionSimple("-reload");
-                finishReloadNextFrame = false;
-            }
-
             // Calculate if player tries to reach backpack
             bool handInBackpack = false;
             bool bpDistToHMDOk = false, bpWeaponHeightOk = false, bpWeaponAngleOk = false, bpHmdToWeaponAngleOk = false;
@@ -412,11 +400,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 }
                 else
                 {
-                    if ((GetTimeInMilliSeconds() - dominantGripPushTime) <
-                        vr_reloadtimeoutms->integer) {
-                        sendButtonActionSimple("+reload");
-                        finishReloadNextFrame = true;
-                    }
                     dominantGripPushTime = 0;
                 }
             }
@@ -447,10 +430,16 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                   positional_movementSideways,
                   positional_movementForward);
 
-            //Jump (B Button)
+            //Jump (A Button)
+            if ((primaryButtonsNew & primaryButton1) != (primaryButtonsOld & primaryButton1))
+            {
+                sendButtonAction("+moveup", (primaryButtonsNew & primaryButton1));
+            }
+
+            //Alt Fire (B Button)
             if ((primaryButtonsNew & primaryButton2) != (primaryButtonsOld & primaryButton2))
             {
-                sendButtonAction("+moveup", (primaryButtonsNew & primaryButton2));
+                sendButtonAction("+altattack", (primaryButtonsNew & primaryButton2));
             }
 
 
@@ -470,10 +459,10 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
 
             //Duck - off hand joystick
-            if ((secondaryButtonsNew & ovrButton_Joystick) !=
-                (secondaryButtonsNew & ovrButton_Joystick)) {
+            if ((secondaryButtonsNew & secondaryThumb) !=
+                (secondaryButtonsNew & secondaryThumb)) {
 
-                sendButtonAction("+movedown", (primaryButtonsNew & primaryButton1));
+                sendButtonAction("+movedown", (secondaryButtonsNew & secondaryThumb));
             }
 
             //Use
@@ -526,61 +515,29 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                   remote_movementForward);
 
 
-            static bool stopUseItemNextFrame = false;
-            if (stopUseItemNextFrame)
-            {
-                Cbuf_AddText("-useitem\n");
-                stopUseItemNextFrame = false;
-            }
-
+            //Use Force (X button)
             if (!canUseQuickSave) {
-                if (((secondaryButtonsNew & secondaryButton1) !=
-                     (secondaryButtonsOld & secondaryButton1)) &&
-                    (secondaryButtonsNew & secondaryButton1)) {
-
-                    if (dominantGripPushed) {
-                        Cbuf_AddText("+useitem\n");
-                        stopUseItemNextFrame = qtrue;
-                    } else {
-                        vr.visible_hud = !vr.visible_hud;
-                    }
+                if ((secondaryButtonsNew & secondaryButton1) !=
+                     (secondaryButtonsOld & secondaryButton1)) {
+                    sendButtonAction("+useforce", (secondaryButtonsNew & secondaryButton1));
                 }
             }
 
-            //notebook or select "item"
             if (!canUseQuickSave) {
                 if (((secondaryButtonsNew & secondaryButton2) !=
                      (secondaryButtonsOld & secondaryButton2)) &&
                     (secondaryButtonsNew & secondaryButton2)) {
-
-                    if (dominantGripPushed) {
-                        sendButtonActionSimple("itemprev");
-                    } else {
-                        sendButtonActionSimple("notebook");
-                    }
+                    sendButtonActionSimple("forcenext");
                 }
             }
 
             //We need to record if we have started firing primary so that releasing trigger will stop definitely firing, if user has pushed grip
             //in meantime, then it wouldn't stop the gun firing and it would get stuck
-            if (!vr.teleportenabled)
             {
                 //Run
                 handleTrackedControllerButton(pOffTrackedRemoteNew,
                                               pOffTrackedRemoteOld,
                                               ovrButton_Trigger, A_SHIFT);
-
-            } else {
-                if (pOffTrackedRemoteNew->Buttons & ovrButton_Trigger)
-                {
-                    vr.teleportseek = qtrue;
-                }
-                else if (vr.teleportseek)
-                {
-                    vr.teleportseek = qfalse;
-                    vr.teleportexecute = vr.teleportready;
-                    vr.teleportready = qfalse;
-                }
             }
 
 
