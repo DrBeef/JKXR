@@ -1074,7 +1074,12 @@ static CMiniHeap *GetG2VertSpaceServer( void ) {
 	return G2VertSpaceServer;
 }
 
-#define DEFAULT_RENDER_LIBRARY	"rd-gles"
+#ifdef JK2_MODE
+#define DEFAULT_RENDER_LIBRARY	"rd-gles-jo"
+#else
+#define DEFAULT_RENDER_LIBRARY	"rd-gles-ja"
+#endif
+
 
 void CL_InitRef( void ) {
 	refexport_t	*ret;

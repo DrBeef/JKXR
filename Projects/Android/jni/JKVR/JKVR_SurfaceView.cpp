@@ -107,12 +107,6 @@ int argc=0;
 extern cvar_t	*r_lefthand;
 extern cvar_t   *cl_paused;
 
-enum control_scheme {
-	RIGHT_HANDED_DEFAULT = 0,
-	LEFT_HANDED_DEFAULT = 10,
-	WEAPON_ALIGN = 99
-};
-
 /*
 ================================================================================
 
@@ -1497,7 +1491,13 @@ void * AppThreadFunction(void * parm ) {
 	// Create the scene if not yet created.
 	ovrScene_Create( m_width, m_height, &gAppState.Scene, &java );
 
-	chdir("/sdcard/JKQuest");
+	char *game = (char*)getenv("JK_GAME");
+	if (strcmp(game, "jo") == 0) {
+		chdir("/sdcard/JKQuest/JK2");
+	} else {
+		chdir("/sdcard/JKQuest/JK3");
+	}
+
 
 	//Run loading loop until we are ready to start JKVR
 	while (!destroyed && !jk2_initialised) {

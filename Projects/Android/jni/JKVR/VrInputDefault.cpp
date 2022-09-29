@@ -16,6 +16,7 @@ Authors		:	Simon Brown
 
 #include "VrInput.h"
 #include "VrCvars.h"
+#include "../OpenJK/code/qcommon/q_shared.h"
 
 #include <qcommon/qcommon.h>
 #include <client/client.h>
@@ -72,6 +73,8 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
     int primaryButton2;
     int secondaryButton1;
     int secondaryButton2;
+    int primaryThumb = vr_control_scheme->value == RIGHT_HANDED_DEFAULT ? ovrButton_RThumb : ovrButton_LThumb;
+    int secondaryThumb = vr_control_scheme->value == RIGHT_HANDED_DEFAULT ? ovrButton_LThumb : ovrButton_RThumb;
     if (vr_switch_sticks->integer)
     {
         //
@@ -465,18 +468,19 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 }
             }
 
-            //Duck
-            if ((primaryButtonsNew & primaryButton1) !=
-                (primaryButtonsOld & primaryButton1)) {
+
+            //Duck - off hand joystick
+            if ((secondaryButtonsNew & ovrButton_Joystick) !=
+                (secondaryButtonsNew & ovrButton_Joystick)) {
 
                 sendButtonAction("+movedown", (primaryButtonsNew & primaryButton1));
             }
 
             //Use
-            if ((pDominantTrackedRemoteNew->Buttons & ovrButton_RThumb) !=
-                (pDominantTrackedRemoteOld->Buttons & ovrButton_RThumb)) {
+            if ((pDominantTrackedRemoteNew->Buttons & primaryThumb) !=
+                (pDominantTrackedRemoteOld->Buttons & primaryThumb)) {
 
-                sendButtonAction("+use", (pDominantTrackedRemoteNew->Buttons & ovrButton_RThumb));
+                sendButtonAction("+use", (pDominantTrackedRemoteNew->Buttons & primaryThumb));
             }
 
 			//Weapon Chooser
@@ -502,14 +506,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         }
 
         {
-            //"Use" (open doors etc)
-            if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick) !=
-                (pDominantTrackedRemoteOld->Buttons & ovrButton_Joystick)) {
-
-                sendButtonAction("+activate",
-                                 (pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick) ? 1 : 0);
-            }
-
             //Apply a filter and quadratic scaler so small movements are easier to make
             float dist = length(pSecondaryJoystick->x, pSecondaryJoystick->y);
             float nlf = nonLinearFilter(dist);
@@ -563,13 +559,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                         sendButtonActionSimple("notebook");
                     }
                 }
-            }
-
-
-            //Kick!
-            if ((pOffTrackedRemoteNew->Buttons & ovrButton_Joystick) !=
-                (pOffTrackedRemoteOld->Buttons & ovrButton_Joystick)) {
-                sendButtonAction("+kick", (pOffTrackedRemoteNew->Buttons & ovrButton_Joystick));
             }
 
             //We need to record if we have started firing primary so that releasing trigger will stop definitely firing, if user has pushed grip

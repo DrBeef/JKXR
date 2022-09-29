@@ -37,14 +37,40 @@ import static android.system.Os.setenv;
 
 @SuppressLint("SdCardPath") public class GLES3JNIActivity extends Activity implements SurfaceHolder.Callback
 {
+	private static String game = "";
+
 	// Load the gles3jni library right away to make sure JNI_OnLoad() gets called as the very first thing.
 	static
 	{
-		System.loadLibrary( "openjk_jo" );
+		game = "jo";
+
+		BufferedReader br;
+		try {
+			br = new BufferedReader(new FileReader("/sdcard/JKQuest/commandline.txt"));
+			String s;
+			StringBuilder sb = new StringBuilder(0);
+			while ((s = br.readLine()) != null)
+				sb.append(s + " ");
+			br.close();
+
+			if (sb.toString().contains("ja"))
+			{
+				game = "ja";
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.loadLibrary( "openjk_" + game );
 	}
 
 	private static final String TAG = "JKQuest";
 	private static final String APPLICATION = "JKQuest";
+
 
 	private int permissionCount = 0;
 	private static final int READ_EXTERNAL_STORAGE_PERMISSION_ID = 1;
@@ -160,22 +186,22 @@ import static android.system.Os.setenv;
 
 	public void create() {
 		//Make the directories
-		new File("/sdcard/JKQuest/base").mkdirs();
+		new File("/sdcard/JKQuest/jo/base").mkdirs();
+		new File("/sdcard/JKQuest/ja/base").mkdirs();
 
 		//Copy the command line params file
 		copy_asset("/sdcard/JKQuest", "commandline.txt", false);
 
 		//Copy the weapon adjustment config
-		copy_asset("/sdcard/JKQuest/base", "weapons_vr.cfg", false);
+		copy_asset("/sdcard/JKQuest/jo/base", "weapons_vr.cfg", false);
+		copy_asset("/sdcard/JKQuest/ja/base", "weapons_vr.cfg", false);
 
 		//and the cheat menu pk3 for testing
-		copy_asset("/sdcard/JKQuest/base", "Z_BetaV0.2_NewMenus.pk3", true);
-
-		//and the venom scripting improvements pak (thank-you _HELLBARON_ !!)
-//		copy_asset("/sdcard/JKQuest/Main", "sp_vpak8.pk3", false);
+		copy_asset("/sdcard/JKQuest/jo/base", "Expanded_Menu.pk3", true);
+		copy_asset("/sdcard/JKQuest/ja/base", "Z_BetaV0.2_NewMenus.pk3", true);
 
 		//Read these from a file and pass through
-		commandLineParams = new String("ja");
+		commandLineParams = new String("jo");
 
 		//See if user is trying to use command line params
 		if (new File("/sdcard/JKQuest/commandline.txt").exists()) // should exist!
@@ -200,6 +226,7 @@ import static android.system.Os.setenv;
 		}
 
 		try {
+			setenv("JK_GAME", game, true);
 			setenv("JK_LIBDIR", getApplicationInfo().nativeLibraryDir, true);
 		}
 		catch (Exception e)

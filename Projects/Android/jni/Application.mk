@@ -20,7 +20,7 @@ JK2_CODE_PATH	:= $(OPENJK_PATH)/codeJK2
 
 APP_ALLOW_MISSING_DEPS=true
 
-APP_MODULES := gl4es rd-gles_arm jogamearm openjk_jo jagamearm openjk_ja
+APP_MODULES := gl4es rd-gles-jo_arm jogamearm openjk_jo  rd-gles-ja_arm jagamearm openjk_ja
 APP_STL := c++_shared
 
 

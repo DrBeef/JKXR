@@ -24,6 +24,13 @@
 #define ALOGV(...)
 #endif
 
+
+typedef enum control_scheme {
+    RIGHT_HANDED_DEFAULT = 0,
+    LEFT_HANDED_DEFAULT = 10,
+    WEAPON_ALIGN = 99
+} control_scheme_t;
+
 extern bool jk2_initialised;
 extern long long global_time;
 extern float playerHeight;
