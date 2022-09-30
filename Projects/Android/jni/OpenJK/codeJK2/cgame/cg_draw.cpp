@@ -2507,7 +2507,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	if (!in_camera || vr->immersive_cinematics) {
 		//Vertical Positional Movement
-		cg.refdef.vieworg[2] -= (float)g_entities[cg.snap->ps.viewEntity].client->ps.viewheight;
+		cg.refdef.vieworg[2] -= 48;
 		cg.refdef.vieworg[2] += (vr->hmdposition[1] + cg_heightAdjust.value) * cg_worldScale.value;
 	}
 

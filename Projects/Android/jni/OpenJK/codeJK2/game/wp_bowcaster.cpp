@@ -26,6 +26,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 #include "g_functions.h"
+#include "bg_local.h"
 
 //-------------------
 //	Wookiee Bowcaster
@@ -37,8 +38,17 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 {
 	int			damage	= weaponData[WP_BOWCASTER].damage, count;
 	float		vel;
-	vec3_t		angs, dir, start;
+	vec3_t		angs, forward, dir, start;
 	gentity_t	*missile;
+
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(wpMuzzle, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy(wpFwd, forward);
+	}
 
 	VectorCopy( wpMuzzle, start );
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
@@ -88,7 +98,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 		// create a range of different velocities
 		vel = BOWCASTER_VELOCITY * ( Q_flrand(-1.0f, 1.0f) * BOWCASTER_VEL_RANGE + 1.0f );
 
-		vectoangles( wpFwd, angs );
+		vectoangles( forward, angs );
 
 		// add some slop to the fire direction
 		angs[PITCH] += Q_flrand(-1.0f, 1.0f) * BOWCASTER_ALT_SPREAD * 0.2f;

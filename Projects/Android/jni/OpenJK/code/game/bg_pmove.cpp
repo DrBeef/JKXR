@@ -165,7 +165,7 @@ const float	pm_swimScale = 0.50f;
 float	pm_ladderScale = 0.7f;
 
 const float	pm_vehicleaccelerate = 36.0f;
-const float	pm_accelerate = 12.0f;
+const float	pm_accelerate = 1200.0f;
 const float	pm_airaccelerate = 4.0f;
 const float	pm_wateraccelerate = 4.0f;
 const float	pm_flyaccelerate = 8.0f;

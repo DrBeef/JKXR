@@ -27,6 +27,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 #include "g_functions.h"
+#include "bg_local.h"
 
 //---------------
 //	Bryar Pistol
@@ -39,15 +40,21 @@ void WP_FireBryarPistol( gentity_t *ent, qboolean alt_fire )
 	vec3_t	start;
 	int		damage = !alt_fire ? weaponData[ent->s.weapon].damage : weaponData[ent->s.weapon].altDamage;
 
+	vec3_t	angs, forward;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(wpMuzzle, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		vectoangles(wpFwd, angs);
+	}
+
 	VectorCopy( wpMuzzle, start );
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
 	if ( ent->NPC && ent->NPC->currentAim < 5 )
 	{
-		vec3_t	angs;
-
-		vectoangles( wpFwd, angs );
-
 		if ( ent->client->NPC_class == CLASS_IMPWORKER )
 		{//*sigh*, hack to make impworkers less accurate without affecteing imperial officer accuracy
 			angs[PITCH] += ( Q_flrand(-1.0f, 1.0f) * (BLASTER_NPC_SPREAD+(6-ent->NPC->currentAim)*0.25f));//was 0.5f
@@ -59,10 +66,10 @@ void WP_FireBryarPistol( gentity_t *ent, qboolean alt_fire )
 			angs[YAW]	+= ( Q_flrand(-1.0f, 1.0f) * ((5-ent->NPC->currentAim)*0.25f) );
 		}
 
-		AngleVectors( angs, wpFwd, NULL, NULL );
+		AngleVectors( angs, forward, NULL, NULL );
 	}
 
-	gentity_t	*missile = CreateMissile( start, wpFwd, BRYAR_PISTOL_VEL, 10000, ent, alt_fire );
+	gentity_t	*missile = CreateMissile( start, forward, BRYAR_PISTOL_VEL, 10000, ent, alt_fire );
 
 	missile->classname = "bryar_proj";
 	missile->s.weapon = WP_BRYAR_PISTOL;

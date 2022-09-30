@@ -59,16 +59,6 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 		}
 	}
 
-	VectorCopy( muzzle, start );
-	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );
-
-//	if ( ent->client && ent->client->ps.powerups[PW_WEAPON_OVERCHARGE] > 0 && ent->client->ps.powerups[PW_WEAPON_OVERCHARGE] > cg.time )
-//	{
-//		// in overcharge mode, so doing double damage
-//		damage *= 2;
-//	}
-
-
 	vec3_t	angs, forward;
 	if ( ent->client && !ent->NPC)
 	{
@@ -78,6 +68,15 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 	else {
 		VectorCopy(forwardVec, forward);
 	}
+
+	VectorCopy( muzzle, start );
+	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );
+
+//	if ( ent->client && ent->client->ps.powerups[PW_WEAPON_OVERCHARGE] > 0 && ent->client->ps.powerups[PW_WEAPON_OVERCHARGE] > cg.time )
+//	{
+//		// in overcharge mode, so doing double damage
+//		damage *= 2;
+//	}
 
 
 	WP_MissileTargetHint(ent, start, forward);
@@ -130,11 +129,11 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 			int hitLoc = G_GetHitLocFromTrace( &tr, MOD_DISRUPTOR );
 			if ( traceEnt && traceEnt->client && traceEnt->client->NPC_class == CLASS_GALAKMECH )
 			{//hehe
-				G_Damage( traceEnt, ent, ent, forwardVec, tr.endpos, 3, DAMAGE_DEATH_KNOCKBACK, MOD_DISRUPTOR, hitLoc );
+				G_Damage( traceEnt, ent, ent, forward, tr.endpos, 3, DAMAGE_DEATH_KNOCKBACK, MOD_DISRUPTOR, hitLoc );
 			}
 			else
 			{
-				G_Damage( traceEnt, ent, ent, forwardVec, tr.endpos, damage, DAMAGE_DEATH_KNOCKBACK, MOD_DISRUPTOR, hitLoc );
+				G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage, DAMAGE_DEATH_KNOCKBACK, MOD_DISRUPTOR, hitLoc );
 			}
 		}
 		else
@@ -148,10 +147,10 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 	for ( dist = 0; dist < shotDist; dist += 64 )
 	{
 		//FIXME: on a really long shot, this could make a LOT of alerts in one frame...
-		VectorMA( start, dist, forwardVec, spot );
+		VectorMA( start, dist, forward, spot );
 		AddSightEvent( ent, spot, 256, AEL_DISCOVERED, 50 );
 	}
-	VectorMA( start, shotDist-4, forwardVec, spot );
+	VectorMA( start, shotDist-4, forward, spot );
 	AddSightEvent( ent, spot, 256, AEL_DISCOVERED, 50 );
 }
 
@@ -167,6 +166,16 @@ void WP_DisruptorAltFire( gentity_t *ent )
 	gentity_t	*traceEnt, *tent;
 	float		dist, shotDist, shotRange = 8192;
 	qboolean	hitDodged = qfalse, fullCharge = qfalse;
+
+	vec3_t	angs, forward;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(muzzle, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy(forwardVec, forward);
+	}
 
 	VectorCopy( muzzle, muzzle2 ); // making a backup copy
 
@@ -192,8 +201,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 	}
 	else
 	{
-		VectorCopy( ent->client->renderInfo.eyePoint, start );
-		AngleVectors( ent->client->renderInfo.eyeAngles, forwardVec, NULL, NULL );
+		VectorCopy( muzzle, start );
 
 		// don't let NPC's do charging
 		int count = ( level.time - ent->client->ps.weaponChargeTime - 50 ) / DISRUPTOR_CHARGE_UNIT;
@@ -232,7 +240,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 
 	for ( int i = 0; i < traces; i++ )
 	{
-		VectorMA( start, shotRange, forwardVec, end );
+		VectorMA( start, shotRange, forward, end );
 
 		//NOTE: if you want to be able to hit guys in emplaced guns, use "G2_COLLIDE, 10" instead of "G2_RETURNONHIT, 0"
 		//alternately, if you end up hitting an emplaced_gun that has a sitter, just redo this one trace with the "G2_COLLIDE, 10" to see if we it the sitter
@@ -297,10 +305,10 @@ void WP_DisruptorAltFire( gentity_t *ent )
 					int hitLoc = G_GetHitLocFromTrace( &tr, MOD_DISRUPTOR );
 					if ( traceEnt && traceEnt->client && traceEnt->client->NPC_class == CLASS_GALAKMECH )
 					{//hehe
-						G_Damage( traceEnt, ent, ent, forwardVec, tr.endpos, 10, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, fullCharge ? MOD_SNIPER : MOD_DISRUPTOR, hitLoc );
+						G_Damage( traceEnt, ent, ent, forward, tr.endpos, 10, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, fullCharge ? MOD_SNIPER : MOD_DISRUPTOR, hitLoc );
 						break;
 					}
-					G_Damage( traceEnt, ent, ent, forwardVec, tr.endpos, damage, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, fullCharge ? MOD_SNIPER : MOD_DISRUPTOR, hitLoc );
+					G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, fullCharge ? MOD_SNIPER : MOD_DISRUPTOR, hitLoc );
 					if ( traceEnt->s.eType == ET_MOVER )
 					{//stop the traces on any mover
 						break;
@@ -345,7 +353,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 		AddSightEvent( ent, spot, 256, AEL_DISCOVERED, 50 );
 	}
 	//FIXME: spawn a temp ent that continuously spawns sight alerts here?  And 1 sound alert to draw their attention?
-	VectorMA( start, shotDist-4, forwardVec, spot );
+	VectorMA( start, shotDist-4, forward, spot );
 	AddSightEvent( ent, spot, 256, AEL_DISCOVERED, 50 );
 }
 
@@ -362,5 +370,15 @@ void WP_FireDisruptor( gentity_t *ent, qboolean alt_fire )
 		WP_DisruptorMainFire( ent );
 	}
 
-	G_PlayEffect( G_EffectIndex( "disruptor/line_cap" ), muzzle, forwardVec );
+	vec3_t	angs, forward;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(muzzle, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy(forwardVec, forward);
+	}
+
+	G_PlayEffect( G_EffectIndex( "disruptor/line_cap" ), muzzle, forward );
 }

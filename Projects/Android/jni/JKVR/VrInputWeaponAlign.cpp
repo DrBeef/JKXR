@@ -149,6 +149,19 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
             }
         }
 
+        bool offhandGripPushed = (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger);
+        if ( (offhandGripPushed != (pOffTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) &&
+             offhandGripPushed)
+#ifndef DEBUG
+        {
+        }
+#else
+        {
+            Cvar_Set("vr_control_scheme", "0");
+        }
+#endif
+
+
         //Next Weapon with A
         if (((pDominantTrackedRemoteNew->Buttons & domButton1) !=
             (pDominantTrackedRemoteOld->Buttons & domButton1)) &&
@@ -169,14 +182,25 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
         char*  item_names[7] = {"scale", "right", "up", "forward", "pitch", "yaw", "roll"};
         float  item_inc[7] = {0.002, 0.02, 0.02, 0.02, 0.1, 0.1, 0.1};
 
+#define JOYX_SAMPLE_COUNT   4
+        static float joyx[JOYX_SAMPLE_COUNT] = {0};
+        for (int j = JOYX_SAMPLE_COUNT-1; j > 0; --j)
+            joyx[j] = joyx[j-1];
+        joyx[0] = pDominantTrackedRemoteNew->Joystick.x;
+        float sum = 0.0f;
+        for (int j = 0; j < JOYX_SAMPLE_COUNT; ++j)
+            sum += joyx[j];
+        float primaryJoystickX = sum / 4.0f;
+
+
         //Weapon/Inventory Chooser
         static bool itemSwitched = false;
         if (between(-0.2f, pDominantTrackedRemoteNew->Joystick.y, 0.2f) &&
-            (between(0.8f, pDominantTrackedRemoteNew->Joystick.x, 1.0f) ||
-             between(-1.0f, pDominantTrackedRemoteNew->Joystick.x, -0.8f)))
+            (between(0.8f, primaryJoystickX, 1.0f) ||
+             between(-1.0f, primaryJoystickX, -0.8f)))
         {
             if (!itemSwitched) {
-                if (between(0.8f, pDominantTrackedRemoteNew->Joystick.x, 1.0f))
+                if (between(0.8f, primaryJoystickX, 1.0f))
                 {
                     item_index++;
                     if (item_index == 7)
@@ -211,7 +235,7 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
             }
 
 
-            if (between(-0.2f, pDominantTrackedRemoteNew->Joystick.x, 0.2f))
+            if (between(-0.2f, primaryJoystickX, 0.2f))
             {
                 if (pDominantTrackedRemoteNew->Joystick.y > 0.6f) {
                     *(items[item_index]) += item_inc[item_index];

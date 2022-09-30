@@ -27,6 +27,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 #include "g_functions.h"
+#include "bg_local.h"
 
 //---------------------
 //	Tenloss Disruptor
@@ -90,7 +91,18 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 //		damage *= 2;
 //	}
 
-	VectorMA( start, shotRange, wpFwd, end );
+
+	vec3_t	angs, forward;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(wpMuzzle, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy(wpFwd, forward);
+	}
+
+	VectorMA( start, shotRange, forward, end );
 
 	int ignore = ent->s.number;
 	int traces = 0;
@@ -176,6 +188,16 @@ void WP_DisruptorAltFire( gentity_t *ent )
 	float		dist, shotDist, shotRange = 8192;
 	qboolean	hitDodged = qfalse, fullCharge = qfalse;
 
+	vec3_t	angs, forward;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(wpMuzzle, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy(wpFwd, forward);
+	}
+
 	VectorCopy( wpMuzzle, muzzle2 ); // making a backup copy
 
 	// The trace start will originate at the eye so we can ensure that it hits the crosshair.
@@ -200,8 +222,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 	}
 	else
 	{
-		VectorCopy( ent->client->renderInfo.eyePoint, start );
-		AngleVectors( ent->client->renderInfo.eyeAngles, wpFwd, NULL, NULL );
+		VectorCopy( wpMuzzle, start );
 
 		// don't let NPC's do charging
 		int count = ( level.time - ent->client->ps.weaponChargeTime - 50 ) / DISRUPTOR_CHARGE_UNIT;
@@ -240,7 +261,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 
 	for ( int i = 0; i < traces; i++ )
 	{
-		VectorMA( start, shotRange, wpFwd, end );
+		VectorMA( start, shotRange, forward, end );
 
 		//NOTE: if you want to be able to hit guys in emplaced guns, use "G2_COLLIDE, 10" instead of "G2_RETURNONHIT, 0"
 		//alternately, if you end up hitting an emplaced_gun that has a sitter, just redo this one trace with the "G2_COLLIDE, 10" to see if we it the sitter
@@ -302,10 +323,10 @@ void WP_DisruptorAltFire( gentity_t *ent )
 					int hitLoc = G_GetHitLocFromTrace( &tr, MOD_DISRUPTOR );
 					if ( traceEnt && traceEnt->client && traceEnt->client->NPC_class == CLASS_GALAKMECH )
 					{//hehe
-						G_Damage( traceEnt, ent, ent, wpFwd, tr.endpos, 10, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, fullCharge ? MOD_SNIPER : MOD_DISRUPTOR, hitLoc );			
+						G_Damage( traceEnt, ent, ent, forward, tr.endpos, 10, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, fullCharge ? MOD_SNIPER : MOD_DISRUPTOR, hitLoc );
 						break;
 					}
-					G_Damage( traceEnt, ent, ent, wpFwd, tr.endpos, damage, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, fullCharge ? MOD_SNIPER : MOD_DISRUPTOR, hitLoc );
+					G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, fullCharge ? MOD_SNIPER : MOD_DISRUPTOR, hitLoc );
 				}
 				else 
 				{
@@ -341,7 +362,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 		AddSightEvent( ent, spot, 256, AEL_DISCOVERED, 50 );
 	}
 	//FIXME: spawn a temp ent that continuously spawns sight alerts here?  And 1 sound alert to draw their attention?
-	VectorMA( start, shotDist-4, wpFwd, spot );
+	VectorMA( start, shotDist-4, forward, spot );
 	AddSightEvent( ent, spot, 256, AEL_DISCOVERED, 50 );
 }
 
@@ -358,5 +379,15 @@ void WP_FireDisruptor( gentity_t *ent, qboolean alt_fire )
 		WP_DisruptorMainFire( ent );
 	}
 
-	G_PlayEffect( G_EffectIndex( "disruptor/line_cap" ), wpMuzzle, wpFwd );
+	vec3_t	angs, forward;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(wpMuzzle, angs);
+		AngleVectors(wpMuzzle, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy(wpFwd, forward);
+	}
+
+	G_PlayEffect( G_EffectIndex( "disruptor/line_cap" ), wpMuzzle, forward );
 }

@@ -160,11 +160,18 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         float controllerYawHeading = 0.0f;
         //Turn on weapon stabilisation?
         bool stabilised = qfalse;
-        if (!vr.pistol && // Don't stabilise pistols
-            (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger) && (distance < STABILISATION_DISTANCE))
+        bool offhandGripPushed = (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger);
+        if ( (offhandGripPushed != (pOffTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) &&
+                offhandGripPushed && (distance < STABILISATION_DISTANCE))
+#ifndef DEBUG
         {
             stabilised = qtrue;
         }
+#else
+        {
+            Cvar_Set("vr_control_scheme", "99");
+        }
+#endif
 
         vr.weapon_stabilised = stabilised;
 
@@ -397,14 +404,25 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     if (dominantGripPushTime == 0) {
                         dominantGripPushTime = GetTimeInMilliSeconds();
                     }
+                    Cvar_Set("timescale", "0.1");
                 }
                 else
                 {
                     dominantGripPushTime = 0;
+                    Cvar_Set("timescale", "1.0");
                 }
             }
         }
 
+#define JOYX_SAMPLE_COUNT   4
+        static float joyx[JOYX_SAMPLE_COUNT] = {0};
+        for (int j = JOYX_SAMPLE_COUNT-1; j > 0; --j)
+            joyx[j] = joyx[j-1];
+        joyx[0] = pPrimaryJoystick->x;
+        float sum = 0.0f;
+        for (int j = 0; j < JOYX_SAMPLE_COUNT; ++j)
+            sum += joyx[j];
+        float primaryJoystickX = sum / 4.0f;
 
 
         //Right-hand specific stuff
@@ -429,6 +447,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             ALOGV("        positional_movementSideways: %f, positional_movementForward: %f",
                   positional_movementSideways,
                   positional_movementForward);
+
 
             //Jump (A Button)
             if ((primaryButtonsNew & primaryButton1) != (primaryButtonsOld & primaryButton1))
@@ -460,7 +479,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
             //Duck - off hand joystick
             if ((secondaryButtonsNew & secondaryThumb) !=
-                (secondaryButtonsNew & secondaryThumb)) {
+                (secondaryButtonsOld & secondaryThumb)) {
 
                 sendButtonAction("+movedown", (secondaryButtonsNew & secondaryThumb));
             }
@@ -474,7 +493,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
 			//Weapon Chooser
 			static bool itemSwitched = false;
-			if (between(-0.2f, pPrimaryJoystick->x, 0.2f) &&
+			if (between(-0.2f, primaryJoystickX, 0.2f) &&
 				(between(0.8f, pPrimaryJoystick->y, 1.0f) ||
 				 between(-1.0f, pPrimaryJoystick->y, -0.8f)))
 			{
@@ -552,7 +571,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             static int syncCount = 0;
             static int increaseSnap = true;
             if (!vr.mountedgun && !vr.scopeengaged) {
-                if (pPrimaryJoystick->x > 0.7f) {
+                if (primaryJoystickX > 0.7f) {
                     if (increaseSnap) {
                         float turnAngle = vr_turn_mode->integer ? (vr_turn_angle->value / 9.0f) : vr_turn_angle->value;
                         vr.snapTurn -= turnAngle;
@@ -565,12 +584,12 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                             vr.snapTurn += 360.f;
                         }
                     }
-                } else if (pPrimaryJoystick->x < 0.3f) {
+                } else if (primaryJoystickX < 0.3f) {
                     increaseSnap = true;
                 }
 
                 static int decreaseSnap = true;
-                if (pPrimaryJoystick->x < -0.7f) {
+                if (primaryJoystickX < -0.7f) {
                     if (decreaseSnap) {
 
                         float turnAngle = vr_turn_mode->integer ? (vr_turn_angle->value / 9.0f) : vr_turn_angle->value;
@@ -585,12 +604,12 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                             vr.snapTurn -= 360.f;
                         }
                     }
-                } else if (pPrimaryJoystick->x > -0.3f) {
+                } else if (primaryJoystickX > -0.3f) {
                     decreaseSnap = true;
                 }
             }
             else {
-                if (fabs(pPrimaryJoystick->x) > 0.5f) {
+                if (fabs(primaryJoystickX) > 0.5f) {
                     increaseSnap = false;
                 }
                 else

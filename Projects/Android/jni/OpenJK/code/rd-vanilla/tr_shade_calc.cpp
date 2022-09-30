@@ -1057,6 +1057,12 @@ void RB_CalcSpecularAlpha( unsigned char *alphas ) {
 
 	alphas += 3;
 
+	//What the hell is this doing as a NaN?!?
+	if (Q_isnan(backEnd.ori.viewOrigin[0]))
+	{
+		return;
+	}
+
 	numVertexes = tess.numVertexes;
 	for (i = 0 ; i < numVertexes ; i++, v += 4, normal += 4, alphas += 4) {
 		float ilength;

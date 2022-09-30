@@ -1055,7 +1055,7 @@ static void CG_OffsetFirstPersonView( qboolean firstPersonSaber ) {
 	}
 
 	// add angles based on weapon kick
-	VectorAdd (angles, cg.kick_angles, angles);
+	//VectorAdd (angles, cg.kick_angles, angles);
 
 	// add angles based on damage kick
 	if ( cg.damageTime ) {

@@ -1108,7 +1108,7 @@ static void CG_OffsetFirstPersonView( qboolean firstPersonSaber ) {
 		angles[PITCH] = perc*-15;
 	}
 
-	// add angles based on weapon kick
+/*	// add angles based on weapon kick
 	int kickTime = (cg.time - cg.kick_time);
 	if ( kickTime < 800 )
 	{//kicks are always 1 second long.  Deal with it.
@@ -1123,7 +1123,7 @@ static void CG_OffsetFirstPersonView( qboolean firstPersonSaber ) {
 			kickPerc = kickTime/600.0f;
 		}
 		VectorMA( angles, kickPerc, cg.kick_angles, angles );
-	}
+	}*/
 
 	// add angles based on damage kick
 	if ( cg.damageTime ) {

@@ -37,8 +37,17 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 {
 	int			damage	= weaponData[WP_BOWCASTER].damage, count;
 	float		vel;
-	vec3_t		angs, dir, start;
+	vec3_t		angs, forward, dir, start;
 	gentity_t	*missile;
+
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(muzzle, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy(forwardVec, forward);
+	}
 
 	VectorCopy( muzzle, start );
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
@@ -89,14 +98,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 		// create a range of different velocities
 		vel = BOWCASTER_VELOCITY * ( Q_flrand(-1.0f, 1.0f) * BOWCASTER_VEL_RANGE + 1.0f );
 
-		vec3_t	angs;
-		if ( ent->client && !ent->NPC)
-		{
-			BG_CalculateVRWeaponPosition(muzzle, angs);
-		}
-		else {
-			vectoangles(forwardVec, angs);
-		}
+		vectoangles( forward, angs );
 
 		if ( !(ent->client->ps.forcePowersActive&(1<<FP_SEE))
 			|| ent->client->ps.forcePowerLevel[FP_SEE] < FORCE_LEVEL_2 )

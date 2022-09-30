@@ -39,10 +39,11 @@ void WP_FireBryarPistol( gentity_t *ent, qboolean alt_fire )
 	vec3_t	start;
 	int		damage = !alt_fire ? weaponData[WP_BRYAR_PISTOL].damage : weaponData[WP_BRYAR_PISTOL].altDamage;
 
-	vec3_t	angs;
+	vec3_t	angs, forward;
 	if ( ent->client && !ent->NPC)
 	{
 		BG_CalculateVRWeaponPosition(muzzle, angs);
+		AngleVectors(angs, forward, NULL, NULL);
 	}
 	else {
 		vectoangles(forwardVec, angs);
@@ -68,13 +69,13 @@ void WP_FireBryarPistol( gentity_t *ent, qboolean alt_fire )
 				angs[YAW]	+= ( Q_flrand(-1.0f, 1.0f) * ((5-ent->NPC->currentAim)*0.25f) );
 			}
 
-			AngleVectors( angs, forwardVec, NULL, NULL );
+			AngleVectors( angs, forward, NULL, NULL );
 		}
 	}
 
-	WP_MissileTargetHint(ent, start, forwardVec);
+	WP_MissileTargetHint(ent, start, forward);
 
-	gentity_t	*missile = CreateMissile( start, forwardVec, BRYAR_PISTOL_VEL, 10000, ent, alt_fire );
+	gentity_t	*missile = CreateMissile( start, forward, BRYAR_PISTOL_VEL, 10000, ent, alt_fire );
 
 	missile->classname = "bryar_proj";
 	if ( ent->s.weapon == WP_BLASTER_PISTOL

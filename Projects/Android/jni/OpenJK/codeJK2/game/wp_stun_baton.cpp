@@ -27,6 +27,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 #include "g_functions.h"
+#include "bg_local.h"
 
 //---------------------------------------------------------
 void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
@@ -37,10 +38,20 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 
 	G_Sound( ent, G_SoundIndex( "sound/weapons/baton/fire" ));
 
+	vec3_t	angs, forward;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(wpMuzzle, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy(wpFwd, forward);
+	}
+
 	VectorCopy( wpMuzzle, start );
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );
 
-	VectorMA( start, STUN_BATON_RANGE, wpFwd, end );
+	VectorMA( start, STUN_BATON_RANGE, forward, end );
 
 	VectorSet( maxs, 5, 5, 5 );
 	VectorScale( maxs, -1, mins );
@@ -62,10 +73,10 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 //		G_Sound( tr_ent, G_SoundIndex( va("sound/weapons/melee/punch%d", Q_irand(1, 4)) ) );
 		tr_ent->client->ps.powerups[PW_SHOCKED] = level.time + 1500;
 
-		G_Damage( tr_ent, ent, ent, wpFwd, tr.endpos, weaponData[WP_STUN_BATON].damage, DAMAGE_NO_KNOCKBACK, MOD_MELEE );
+		G_Damage( tr_ent, ent, ent, forward, tr.endpos, weaponData[WP_STUN_BATON].damage, DAMAGE_NO_KNOCKBACK, MOD_MELEE );
 	}
 	else if ( tr_ent->svFlags & SVF_GLASS_BRUSH || ( tr_ent->svFlags & SVF_BBRUSH && tr_ent->material == 12 )) // material grate...we are breaking a grate!
 	{
-		G_Damage( tr_ent, ent, ent, wpFwd, tr.endpos, 999, DAMAGE_NO_KNOCKBACK, MOD_MELEE ); // smash that puppy
+		G_Damage( tr_ent, ent, ent, forward, tr.endpos, 999, DAMAGE_NO_KNOCKBACK, MOD_MELEE ); // smash that puppy
 	}
 }

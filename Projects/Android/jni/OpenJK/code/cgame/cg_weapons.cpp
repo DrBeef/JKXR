@@ -1194,16 +1194,26 @@ void CG_AddViewWeapon( playerState_t *ps )
 
 		trace_t trace;
 		VectorMA(origin, 256, forward, endForward);
-		CG_TestLine(origin, endForward, FRAMETIME, 0xFF0000, 0.5 );
+		static vec3_t WHITE	={1.0f,1.0f,1.0f};
+		FX_AddLine( -1, origin, endForward, 0.1f, 4.0f, 0.0f,
+					1.0f, 0.0f, 0.0f,
+					WHITE, WHITE, 0.0f,
+					120, cgi_R_RegisterShader( "gfx/effects/redLine" ),
+					0, FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
 		VectorMA(origin, 20, right, endRight);
-		CG_TestLine(origin, endRight, FRAMETIME, 0x00FF00, 0.5 );
+		FX_AddLine( -1, origin, endRight, 0.1f, 4.0f, 0.0f,
+					1.0f, 0.0f, 0.0f,
+					WHITE, WHITE, 0.0f,
+					120, cgi_R_RegisterShader( "gfx/effects/blueLine" ),
+					0, FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
 		VectorMA(origin, 20, up, endUp);
-		CG_TestLine(origin, endUp, FRAMETIME, 0x0000FF, 0.5 );
-
-		CG_CenterPrint(vr->test_name, 240);
-
+		FX_AddLine( -1, origin, endUp, 0.1f, 4.0f, 0.0f,
+					1.0f, 0.0f, 0.0f,
+					WHITE, WHITE, 0.0f,
+					120, cgi_R_RegisterShader( "gfx/misc/whiteline2" ),
+					0, FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 	}
 
 		// set up gun position
