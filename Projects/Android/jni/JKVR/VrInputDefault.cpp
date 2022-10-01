@@ -559,6 +559,10 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                                               ovrButton_Trigger, A_SHIFT);
             }
 
+            //Open the datapad
+            handleTrackedControllerButton(pOffTrackedRemoteNew,
+                                          pOffTrackedRemoteOld,
+                                          ovrButton_Y, A_TAB);
 
             //Resync Yaw on mounted gun transition
             static int usingMountedGun = false;
