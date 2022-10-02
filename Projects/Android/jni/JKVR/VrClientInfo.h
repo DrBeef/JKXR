@@ -23,7 +23,7 @@ typedef struct {
     vec3_t hmdorientation_last; // Don't use this, it is just for calculating delta!
     vec3_t hmdorientation_delta;
 
-    vec3_t weaponangles_knife;
+    vec3_t weaponangles_saber;
     vec3_t weaponangles;
     vec3_t weaponangles_last; // Don't use this, it is just for calculating delta!
     vec3_t weaponangles_delta;
@@ -47,7 +47,8 @@ typedef struct {
 
     bool hasbinoculars;
 
-    bool velocitytriggered; // Weapon attack triggered by velocity (knife)
+    bool velocitytriggered;
+    float swingvelocity;
 
     vec3_t offhandangles;
     vec3_t offhandangles_last; // Don't use this, it is just for calculating delta!

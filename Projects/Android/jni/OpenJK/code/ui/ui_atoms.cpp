@@ -294,6 +294,7 @@ void UI_Init( int apiVersion, uiimport_t *uiimport, qboolean inGameLoad )
 	ui.Cvar_Create( "ui_prisonerobj_mintotal",  "0",	CVAR_ROM|CVAR_SAVEGAME|CVAR_NORESTART);
 
 	ui.Cvar_Create( "g_dismemberment", "3", CVAR_ARCHIVE );//0 = none, 1 = arms and hands, 2 = legs, 3 = waist and head
+	ui.Cvar_Create( "cg_saberAutoThird", "0", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_gunAutoFirst", "1", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_crosshairIdentifyTarget", "1", CVAR_ARCHIVE );
 	ui.Cvar_Create( "g_subtitles", "0", CVAR_ARCHIVE );

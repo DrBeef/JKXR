@@ -1041,7 +1041,7 @@ extern void CG_ChangeWeapon( int num );
 
 			if ( ent->s.number < MAX_CLIENTS )
 			{
-				if ( ent->client->ps.weapon == WP_SABER )
+				if ( ent->client->ps.weapon == WP_SABER && cg_saberAutoThird.value )
 				{
 					gi.cvar_set( "cg_thirdperson", "1" );
 				}

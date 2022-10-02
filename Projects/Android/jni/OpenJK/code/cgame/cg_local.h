@@ -624,6 +624,7 @@ extern	vmCvar_t		cg_thirdPersonPitchOffset;
 extern	vmCvar_t		cg_thirdPersonVertOffset;
 extern	vmCvar_t		cg_thirdPersonCameraDamp;
 extern	vmCvar_t		cg_thirdPersonTargetDamp;
+extern	vmCvar_t		cg_saberAutoThird;
 extern	vmCvar_t		cg_gunAutoFirst;
 
 extern	vmCvar_t		cg_stereoSeparation;

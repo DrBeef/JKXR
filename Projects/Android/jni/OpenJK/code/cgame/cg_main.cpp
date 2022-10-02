@@ -305,6 +305,7 @@ vmCvar_t	cg_thirdPersonPitchOffset;
 vmCvar_t	cg_thirdPersonVertOffset;
 vmCvar_t	cg_thirdPersonCameraDamp;
 vmCvar_t	cg_thirdPersonTargetDamp;
+vmCvar_t	cg_saberAutoThird;
 vmCvar_t	cg_gunAutoFirst;
 
 vmCvar_t	cg_thirdPersonAlpha;
@@ -453,6 +454,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_thirdPersonAlpha, "cg_thirdPersonAlpha", "1.0", CVAR_ARCHIVE },
 	{ &cg_thirdPersonAutoAlpha,	"cg_thirdPersonAutoAlpha",	"0", 0 },
 	// NOTE: also declare this in UI_Init
+	{ &cg_saberAutoThird, "cg_saberAutoThird", "1", CVAR_ARCHIVE },
 	{ &cg_gunAutoFirst, "cg_gunAutoFirst", "1", CVAR_ARCHIVE },
 
 	{ &cg_pano, "pano", "0", 0 },

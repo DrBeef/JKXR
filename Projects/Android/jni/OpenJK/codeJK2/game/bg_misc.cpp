@@ -697,6 +697,11 @@ void BG_CalculateVRWeaponPosition( vec3_t origin, vec3_t angles )
 	BG_CalculateVRPositionInWorld(vr->weaponposition, vr->weaponoffset, vr->weaponangles, origin, angles);
 }
 
+void BG_CalculateVRSaberPosition( vec3_t origin, vec3_t angles )
+{
+	BG_CalculateVRPositionInWorld(vr->weaponposition, vr->weaponoffset, vr->weaponangles_saber, origin, angles);
+}
+
 /*
 ============
 BG_PlayerTouchesItem

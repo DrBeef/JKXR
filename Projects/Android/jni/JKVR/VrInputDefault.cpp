@@ -108,8 +108,8 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
     {
         //Set gun angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
         vec3_t rotation = {0};
-        rotation[PITCH] = 30;
-        QuatToYawPitchRoll(pWeapon->HeadPose.Pose.Orientation, rotation, vr.weaponangles_knife);
+        rotation[PITCH] = 45;
+        QuatToYawPitchRoll(pWeapon->HeadPose.Pose.Orientation, rotation, vr.weaponangles_saber);
         rotation[PITCH] = vr_weapon_pitchadjust->value;
         QuatToYawPitchRoll(pWeapon->HeadPose.Pose.Orientation, rotation, vr.weaponangles);
 
@@ -228,16 +228,17 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             vr.weaponoffset[2] = pWeapon->HeadPose.Pose.Position.z - vr.hmdposition[2];
             vr.weaponoffset_timestamp = Sys_Milliseconds( );
 
+            vr.swingvelocity = sqrtf(powf(pWeapon->HeadPose.LinearVelocity.x, 2) +
+                                   powf(pWeapon->HeadPose.LinearVelocity.y, 2) +
+                                   powf(pWeapon->HeadPose.LinearVelocity.z, 2));
+
+
             //Does weapon velocity trigger attack (knife) and is it fast enough
             static bool velocityTriggeredAttack = false;
             if (vr.velocitytriggered)
             {
                 static bool fired = qfalse;
-                float velocity = sqrtf(powf(pWeapon->HeadPose.LinearVelocity.x, 2) +
-                                       powf(pWeapon->HeadPose.LinearVelocity.y, 2) +
-                                       powf(pWeapon->HeadPose.LinearVelocity.z, 2));
-
-                velocityTriggeredAttack = (velocity > VELOCITY_TRIGGER);
+                velocityTriggeredAttack = (vr.swingvelocity > VELOCITY_TRIGGER);
 
                 if (fired != velocityTriggeredAttack) {
                     ALOGV("**WEAPON EVENT**  veocity triggered %s", velocityTriggeredAttack ? "+attack" : "-attack");

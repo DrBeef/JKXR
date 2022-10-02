@@ -9034,9 +9034,9 @@ static void PM_FinishWeaponChange( void ) {
 		if ( pm->gent )
 		{
 			WP_SaberInitBladeData( pm->gent );
-			if ( (pm->ps->clientNum < MAX_CLIENTS||PM_ControlledByPlayer()) )
+			if ( (pm->ps->clientNum < MAX_CLIENTS||PM_ControlledByPlayer()) && cg_saberAutoThird.integer )
 			{
-				//gi.cvar_set( "cg_thirdperson", "1" );
+				gi.cvar_set( "cg_thirdperson", "1" );
 			}
 		}
 		if ( trueSwitch )

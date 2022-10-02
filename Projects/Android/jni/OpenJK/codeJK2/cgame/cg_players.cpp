@@ -31,6 +31,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../game/anims.h"
 #include "../game/wp_saber.h"
 #include "bg_local.h"
+#include <JKVR/VrClientInfo.h>
 
 #define	LOOK_SWING_SCALE	0.5
 
@@ -49,6 +50,7 @@ qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *headModelName
 									const char *legsModelName, const char *legsSkinName );
 
 void CG_PlayerAnimSounds( int animFileIndex, qboolean torso, int oldFrame, int frame, int entNum );
+extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
 extern void BG_G2SetBoneAngles( centity_t *cent, gentity_t *gent, int boneIndex, const vec3_t angles, const int flags,
 							 const Eorientations up, const Eorientations left, const Eorientations forward, qhandle_t *modelList );
 extern void FX_BorgDeathSparkParticles( vec3_t origin, vec3_t angles, vec3_t vel, vec3_t user );
@@ -3426,7 +3428,33 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		!gent->client->ps.powerups[PW_UNCLOAKING] &&
 		!gent->client->ps.powerups[PW_DISRUPTION] )
 	{
-		cgi_R_AddRefEntityToScene( ent );
+		//SB: Never render any player model if 1st person
+		if (cent->gent->NPC || cg.renderingThirdPerson ||
+				cent->gent->client->ps.weapon != WP_SABER) {
+			cgi_R_AddRefEntityToScene(ent);
+		}
+		else if (!cg.renderingThirdPerson && cent->gent->client->ps.weapon == WP_SABER)
+		{
+//#ifdef JK2_MODE
+			refEntity_t hiltEnt;
+			memset( &hiltEnt, 0, sizeof(refEntity_t) );
+			hiltEnt.renderfx = RF_DEPTHHACK | RF_FIRST_PERSON;
+			hiltEnt.hModel = cgi_R_RegisterModel( "models/weapons2/saber/saber_w.md3" );
+			vec3_t angles;
+			BG_CalculateVRSaberPosition(hiltEnt.origin, hiltEnt.angles);
+			vec3_t axis[3];
+			AnglesToAxis(hiltEnt.angles, axis);
+			VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
+			VectorCopy(axis[1], hiltEnt.axis[1]);
+			VectorCopy(axis[0], hiltEnt.axis[2]);
+			cgi_R_AddRefEntityToScene(&hiltEnt);
+			if (vr->swingvelocity > 1.2f)
+			{
+				G_SoundOnEnt( cent->gent, CHAN_WEAPON, va( "sound/weapons/saber/saberhup%d.wav", Q_irand( 1, 9 ) ) );
+			}
+//#else
+//#endif
+		}
 	}
 
 	// Disruptor Gun Alt-fire
@@ -4281,8 +4309,8 @@ void CG_DoSaber( vec3_t origin, vec3_t dir, float length, float lengthMax, saber
 	cgi_R_AddRefEntityToScene( &saber );
 }
 
-#define	MAX_MARK_FRAGMENTS	128
-#define	MAX_MARK_POINTS		384
+#define	MAX_MARK_FRAGMENTS	256
+#define	MAX_MARK_POINTS		768
 extern markPoly_t *CG_AllocMark();
 
 void CG_CreateSaberMarks( vec3_t start, vec3_t end, vec3_t normal )
@@ -4438,6 +4466,13 @@ Ghoul2 Insert Start
 		// work the matrix axis stuff into the original axis and origins used.
 		gi.G2API_GiveMeVectorFromMatrix(boltMatrix, ORIGIN, org_);
 		gi.G2API_GiveMeVectorFromMatrix(boltMatrix, NEGATIVE_X, axis_[0]);//was NEGATIVE_Y, but the md3->glm exporter screws up this tag somethin' awful
+		if (!cg.renderingThirdPerson && !cent->gent->client->ps.saberInFlight)
+		{
+			vec3_t angles;
+			BG_CalculateVRSaberPosition(org_, angles);
+			AnglesToAxis(angles, axis_);
+			VectorMA(org_, 4.0f, axis_[0], org_);
+		}
 
 		//Now figure out where this info will be next frame
 		/*
@@ -5147,6 +5182,13 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 			{
 				VectorCopy( ent.origin, cent->gent->client->renderInfo.muzzlePoint );
 				VectorCopy( ent.axis[0], cent->gent->client->renderInfo.muzzleDir );
+
+				if ( !cg.renderingThirdPerson && (cg.snap->ps.weapon == WP_SABER||cg.snap->ps.weapon == WP_MELEE))
+				{
+					vec3_t angles;
+					BG_CalculateVRSaberPosition(cent->gent->client->renderInfo.muzzlePoint, angles);
+					AngleVectors( angles, cent->gent->client->renderInfo.muzzleDir, NULL, NULL );
+				}
 			}
 		}
 		//now try to get the right data
@@ -5161,6 +5203,11 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 							&boltMatrix, G2Angles, ent.origin, cg.time,
 							cgs.model_draw, cent->currentState.modelScale );
 			gi.G2API_GiveMeVectorFromMatrix( boltMatrix, ORIGIN, cent->gent->client->renderInfo.handRPoint );
+			if (!cg.renderingThirdPerson && !cent->gent->client->ps.saberInFlight)
+			{
+				vec3_t angles;
+				BG_CalculateVRSaberPosition(cent->gent->client->renderInfo.handRPoint, angles);
+			}
 		}
 		if ( cent->gent->handLBolt != -1 )
 		{
@@ -5169,6 +5216,11 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 							&boltMatrix, G2Angles, ent.origin, cg.time,
 							cgs.model_draw, cent->currentState.modelScale );
 			gi.G2API_GiveMeVectorFromMatrix( boltMatrix, ORIGIN, cent->gent->client->renderInfo.handLPoint );
+			if (!cg.renderingThirdPerson && !cent->gent->client->ps.saberInFlight)
+			{
+				vec3_t angles;
+				BG_CalculateVROffHandPosition(cent->gent->client->renderInfo.handLPoint, angles);
+			}
 		}
 		if ( cent->gent->footLBolt != -1 )
 		{

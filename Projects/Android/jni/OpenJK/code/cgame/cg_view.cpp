@@ -2107,7 +2107,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		|| (cg.snap->ps.eFlags&EF_HELD_BY_SAND_CREATURE)
 		|| (
 				(g_entities[0].client&&g_entities[0].client->NPC_class==CLASS_ATST)
-				|| (cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE)
+//				|| (cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE)
 										 )
 	);
 
