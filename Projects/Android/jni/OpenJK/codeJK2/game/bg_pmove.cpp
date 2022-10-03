@@ -110,7 +110,7 @@ const float	pm_duckScale = 0.50f;
 const float	pm_swimScale = 0.50f;
 float	pm_ladderScale = 0.7f;
 
-const float	pm_accelerate = 12.0f;
+const float	pm_accelerate = 1200.0f;
 const float	pm_airaccelerate = 4.0f;
 const float	pm_wateraccelerate = 4.0f;
 const float	pm_flyaccelerate = 8.0f;
@@ -5825,7 +5825,8 @@ void PM_SetSaberMove(short newMove)
 		{
 			if ( PM_SaberInAttack( newMove ) || PM_SaberInSpecialAttack( anim ) )
 			{//playing an attack
-				if ( pm->ps->saberMove != newMove )
+				if ( pm->ps->saberMove != newMove &&
+					cg.renderingThirdPerson) // don't want these sounds being triggered in 1st person
 				{//wasn't playing that attack before
 					if ( PM_SaberInSpecialAttack( anim ) )
 					{

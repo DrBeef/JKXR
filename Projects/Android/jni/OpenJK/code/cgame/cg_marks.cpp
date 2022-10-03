@@ -127,7 +127,7 @@ temporary marks will not be stored or randomly oriented, but immediately
 passed to the renderer.
 =================
 */
-#define	MAX_MARK_FRAGMENTS	256
+#define	MAX_MARK_FRAGMENTS	512
 #define	MAX_MARK_POINTS		768
 
 void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir, float orientation, float red,

@@ -5841,7 +5841,7 @@ static void CG_DoSaber( vec3_t origin, vec3_t dir, float length, float lengthMax
 	cgi_R_AddRefEntityToScene( &saber );
 }
 
-#define	MAX_MARK_FRAGMENTS	256
+#define	MAX_MARK_FRAGMENTS	512
 #define	MAX_MARK_POINTS		768
 extern markPoly_t *CG_AllocMark();
 

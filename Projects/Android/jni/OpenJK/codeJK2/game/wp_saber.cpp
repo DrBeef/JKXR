@@ -266,7 +266,7 @@ void G_CreateG2AttachedWeaponModel( gentity_t *ent, const char *psWeaponModel )
 {
 	if (!psWeaponModel)
 	{
-		assert (psWeaponModel);
+//		assert (psWeaponModel);
 		return;
 	}
 	if ( ent && ent->client && ent->client->NPC_class == CLASS_GALAKMECH )
@@ -3973,7 +3973,14 @@ void WP_RunSaber( gentity_t *self, gentity_t *saber )
 		//figure out where saber should be
 		vec3_t	forward, saberHome, saberDest, fwdangles = {0};
 
-		VectorCopy( self->client->ps.viewangles, fwdangles );
+		if (self->client->ps.clientNum == 0)
+		{
+			BG_CalculateVRWeaponPosition(saberHome, fwdangles);
+		}
+		else {
+			VectorCopy(self->client->ps.viewangles, fwdangles);
+		}
+
 		if ( self->s.number )
 		{
 			fwdangles[0] -= 8;

@@ -832,6 +832,16 @@ void CL_Frame ( int msec,float fractionMsec ) {
 		SCR_DebugGraph ( cls.realFrametime * 0.25, 0 );
 	}
 
+	JKVR_FrameSetup();
+	JKVR_processMessageQueue();
+
+	//Get controller state here
+	JKVR_getHMDOrientation();
+	JKVR_getTrackedRemotesOrientation();
+
+	JKVR_processHaptics();
+
+
 	// see if we need to update any userinfo
 	CL_CheckUserinfo();
 

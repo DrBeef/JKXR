@@ -35,6 +35,9 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #define	LOOK_SWING_SCALE	0.5
 
+//How fast the saber needs to be physically swung in order to trigger sounds and trails
+#define SABER_ACTIVATE_VELOCITY 1.0f
+
 #include "animtable.h"
 
 
@@ -50,7 +53,6 @@ qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *headModelName
 									const char *legsModelName, const char *legsSkinName );
 
 void CG_PlayerAnimSounds( int animFileIndex, qboolean torso, int oldFrame, int frame, int entNum );
-extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
 extern void BG_G2SetBoneAngles( centity_t *cent, gentity_t *gent, int boneIndex, const vec3_t angles, const int flags,
 							 const Eorientations up, const Eorientations left, const Eorientations forward, qhandle_t *modelList );
 extern void FX_BorgDeathSparkParticles( vec3_t origin, vec3_t angles, vec3_t vel, vec3_t user );
@@ -262,6 +264,12 @@ static void CG_RegisterCustomSounds(clientInfo_t *ci, int iSoundEntryBase,
 	}
 }
 
+
+//SB: Never render any player model if 1st person and using the saber
+bool CG_getPlayer1stPersonSaber(const centity_t *cent) {
+	return (!cent->gent->NPC && !cg.renderingThirdPerson &&
+			cent->gent->client->ps.weapon == WP_SABER);
+}
 
 
 /*
@@ -3396,6 +3404,7 @@ Adds a piece with modifications or duplications for powerups
 */
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cent )
 {
+	refEntity_t hiltEnt;
 	if ( !cent )
 	{
 		cgi_R_AddRefEntityToScene( ent );
@@ -3417,44 +3426,52 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		}
 	}
 
+	bool player1stPersonSaber = CG_getPlayer1stPersonSaber(cent);
+
 //	if ( gent->client->ps.powerups[PW_WEAPON_OVERCHARGE] > 0 )
 //	{
 //		centity_t *cent = &cg_entities[gent->s.number];
 //		cgi_S_AddLoopingSound( 0, cent->lerpOrigin, vec3_origin, cgs.media.overchargeLoopSound );
 //	}
 
+	if (player1stPersonSaber) {
+		ent->renderfx = RF_THIRD_PERSON;
+	}
+
 	// If certain states are active, we don't want to add in the regular body
 	if ( !gent->client->ps.powerups[PW_CLOAKED] &&
 		!gent->client->ps.powerups[PW_UNCLOAKING] &&
 		!gent->client->ps.powerups[PW_DISRUPTION] )
 	{
-		//SB: Never render any player model if 1st person
-		if (cent->gent->NPC || cg.renderingThirdPerson ||
-				cent->gent->client->ps.weapon != WP_SABER) {
-			cgi_R_AddRefEntityToScene(ent);
-		}
-		else if (!cg.renderingThirdPerson && cent->gent->client->ps.weapon == WP_SABER)
-		{
+		cgi_R_AddRefEntityToScene(ent);
+	}
+
+	if (player1stPersonSaber && !cent->currentState.saberInFlight)
+	{
 //#ifdef JK2_MODE
-			refEntity_t hiltEnt;
-			memset( &hiltEnt, 0, sizeof(refEntity_t) );
-			hiltEnt.renderfx = RF_DEPTHHACK | RF_FIRST_PERSON;
-			hiltEnt.hModel = cgi_R_RegisterModel( "models/weapons2/saber/saber_w.md3" );
-			vec3_t angles;
-			BG_CalculateVRSaberPosition(hiltEnt.origin, hiltEnt.angles);
-			vec3_t axis[3];
-			AnglesToAxis(hiltEnt.angles, axis);
-			VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
-			VectorCopy(axis[1], hiltEnt.axis[1]);
-			VectorCopy(axis[0], hiltEnt.axis[2]);
-			cgi_R_AddRefEntityToScene(&hiltEnt);
-			if (vr->swingvelocity > 1.2f)
-			{
-				G_SoundOnEnt( cent->gent, CHAN_WEAPON, va( "sound/weapons/saber/saberhup%d.wav", Q_irand( 1, 9 ) ) );
-			}
+		memset( &hiltEnt, 0, sizeof(refEntity_t) );
+		hiltEnt.renderfx = RF_DEPTHHACK;
+		hiltEnt.hModel = cgi_R_RegisterModel( "models/weapons2/saber/saber_w.md3" );
+		vec3_t angles;
+		BG_CalculateVRSaberPosition(hiltEnt.origin, hiltEnt.angles);
+		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
+		vec3_t axis[3];
+		AnglesToAxis(hiltEnt.angles, axis);
+		VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
+		VectorCopy(axis[1], hiltEnt.axis[1]);
+		VectorCopy(axis[0], hiltEnt.axis[2]);
+		cgi_R_AddRefEntityToScene(&hiltEnt);
+		static int playingSaberSwingSound = 0;
+		if (vr->swingvelocity > SABER_ACTIVATE_VELOCITY && (cg.time - playingSaberSwingSound) > 750)
+		{
+			cgi_S_StartSound ( hiltEnt.origin, cent->gent->s.number, CHAN_AUTO, cgi_S_RegisterSound( va( "sound/weapons/saber/saberhup%d.wav", Q_irand( 0, 2 ) * 3 + 1 ) ) );
+			playingSaberSwingSound = cg.time;
+		}
+
+		//Try setting ent to be the hilt entity, then any subsequent effects below are applied to that instead
+		ent = &hiltEnt;
 //#else
 //#endif
-		}
 	}
 
 	// Disruptor Gun Alt-fire
@@ -4466,7 +4483,7 @@ Ghoul2 Insert Start
 		// work the matrix axis stuff into the original axis and origins used.
 		gi.G2API_GiveMeVectorFromMatrix(boltMatrix, ORIGIN, org_);
 		gi.G2API_GiveMeVectorFromMatrix(boltMatrix, NEGATIVE_X, axis_[0]);//was NEGATIVE_Y, but the md3->glm exporter screws up this tag somethin' awful
-		if (!cg.renderingThirdPerson && !cent->gent->client->ps.saberInFlight)
+		if (!cent->gent->client->ps.saberInFlight && CG_getPlayer1stPersonSaber(cent))
 		{
 			vec3_t angles;
 			BG_CalculateVRSaberPosition(org_, angles);
@@ -4657,7 +4674,7 @@ Ghoul2 Insert End
 
 	saberTrail_t	*saberTrail = &client->saberTrail;
 
-#define SABER_TRAIL_TIME	40.0f
+#define SABER_TRAIL_TIME	60.0f
 
 	// if we happen to be timescaled or running in a high framerate situation, we don't want to flood
 	//	the system with very small trail slices...but perhaps doing it by distance would yield better results?
@@ -4670,7 +4687,9 @@ Ghoul2 Insert End
 	}
 	if ( cg.time > saberTrail->lastTime + 2  && saberTrail->inAction ) // 2ms
 	{
-		if ( saberTrail->inAction && cg.time < saberTrail->lastTime + 300 ) // if we have a stale segment, don't draw until we have a fresh one
+		//Swinging the saber quick enough to trigger a sound should also invoke trails
+		if ( (saberTrail->inAction || (vr->swingvelocity > SABER_ACTIVATE_VELOCITY)) &&
+			cg.time < saberTrail->lastTime + 300 ) // if we have a stale segment, don't draw until we have a fresh one
 		{
 			vec3_t	rgb1={255,255,255};
 
@@ -4815,7 +4834,8 @@ CG_Player
 ===============
 */
 extern qboolean G_ControlledByPlayer( gentity_t *self );
-void CG_Player( centity_t *cent ) {
+
+void CG_Player(centity_t *cent ) {
 	clientInfo_t	*ci;
 	qboolean		shadow, staticScale = qfalse;
 	float			shadowPlane;
@@ -4858,6 +4878,9 @@ void CG_Player( centity_t *cent ) {
 	{
 		return;
 	}
+
+	//Before we go any further, default this to false, it can be updated later
+	vr->velocitytriggered = false;
 
 	if ( cent->currentState.vehicleModel != 0 )
 	{//Using an alternate (md3 for now) model
@@ -5136,7 +5159,7 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 		}
 
 		if ( !cg.renderingThirdPerson
-			&& ( cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE )
+			&& ( /*cg.snap->ps.weapon == WP_SABER || */cg.snap->ps.weapon == WP_MELEE )
 			&& !cent->gent->s.number )
 		{// Yeah um, this needs to not do this quite this way
 			ent.customSkin = cgi_R_RegisterSkin( "models/players/kyle/model_fpls2.skin" );	//precached in g_client.cpp
@@ -5188,6 +5211,7 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 					vec3_t angles;
 					BG_CalculateVRSaberPosition(cent->gent->client->renderInfo.muzzlePoint, angles);
 					AngleVectors( angles, cent->gent->client->renderInfo.muzzleDir, NULL, NULL );
+					vr->velocitytriggered = true;
 				}
 			}
 		}
@@ -5309,7 +5333,7 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 					//FIXME: use an actual surfaceIndex?
 					if ( !gi.G2API_GetSurfaceRenderStatus( &cent->gent->ghoul2[cent->gent->playerModel], "r_hand" ) )//surf is still on
 					{
-						CG_AddSaberBlade( cent, cent, NULL, ent.renderfx, cent->gent->weaponModel, ent.origin, tempAngles);
+						CG_AddSaberBlade( cent, cent, NULL, CG_getPlayer1stPersonSaber(cent) ? 0 : ent.renderfx, cent->gent->weaponModel, ent.origin, tempAngles);
 					}//else, the limb will draw the blade itself
 				}//in-flight saber draws it's own blade
 			}
@@ -5900,7 +5924,7 @@ Ghoul2 Insert End
 				{
 					if ( !cent->currentState.saberInFlight )
 					{//holding the saber in-hand
-						CG_AddSaberBlade( cent, cent, &gun, renderfx, 0, NULL, NULL );
+						CG_AddSaberBlade(cent, cent, &gun, CG_getPlayer1stPersonSaber(cent) ? 0 : renderfx, 0, NULL, NULL );
 						calcedMp = qtrue;
 					}
 				}

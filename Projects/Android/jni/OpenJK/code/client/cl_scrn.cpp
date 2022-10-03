@@ -499,16 +499,6 @@ void SCR_UpdateScreen( void ) {
 	// that case.
 	if ( cls.uiStarted )
 	{
-		JKVR_FrameSetup();
-
-		JKVR_processMessageQueue();
-
-		//Get controller state here
-		JKVR_getHMDOrientation();
-		JKVR_getTrackedRemotesOrientation();
-
-		JKVR_processHaptics();
-
 		//Draw twice for Quest
 		SCR_DrawScreenField( STEREO_LEFT );
 

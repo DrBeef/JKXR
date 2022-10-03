@@ -1420,7 +1420,7 @@ void * AppThreadFunction(void * parm ) {
     {
         if (SS_MULTIPLIER == 0.0f)
         {
-            SS_MULTIPLIER = 1.2f;
+            SS_MULTIPLIER = 1.0f;
         }
     }
     else if (vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_DEVICE_TYPE) == VRAPI_DEVICE_TYPE_OCULUSQUEST2)
@@ -1428,7 +1428,7 @@ void * AppThreadFunction(void * parm ) {
         if (SS_MULTIPLIER == 0.0f)
         {
             //GB Override as refresh is now 72 by default as we decided a higher res is better as 90hz has stutters
-            SS_MULTIPLIER = 1.1f;
+            SS_MULTIPLIER = 1.25f;
         }
         else if (SS_MULTIPLIER > 1.5f)
 		{

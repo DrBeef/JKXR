@@ -71,8 +71,6 @@ qboolean	in_mlooking;
 
 extern cvar_t	*in_joystick;
 
-#ifdef __ANDROID__
-
 void JKVR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side, float *up,
                     float *yaw, float *pitch, float *roll);
 
@@ -89,8 +87,6 @@ typedef struct {
 
 vr_move new_move;
 vr_move old_move;
-
-#endif
 
 static void IN_UseGivenForce(void)
 {
@@ -380,38 +376,8 @@ Moves the local angle positions
 ================
 */
 void CL_AdjustAngles( void ) {
-/*	float	speed;
-
-	if ( in_speed.active ) {
-		speed = 0.001 * cls.frametime * cl_anglespeedkey->value;
-	} else {
-		speed = 0.001 * cls.frametime;
-	}
-
-	if ( !in_strafe.active ) {
-		if ( cl_mYawOverride )
-		{
-			cl.viewangles[YAW] -= cl_mYawOverride*5.0f*speed*cl_yawspeed->value*CL_KeyState (&in_right);
-			cl.viewangles[YAW] += cl_mYawOverride*5.0f*speed*cl_yawspeed->value*CL_KeyState (&in_left);
-		}
-		else
-		{
-			cl.viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&in_right);
-			cl.viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&in_left);
-		}
-	}
-
-	if ( cl_mPitchOverride )
-	{
-		cl.viewangles[PITCH] -= cl_mPitchOverride*5.0f*speed*cl_pitchspeed->value * CL_KeyState (&in_lookup);
-		cl.viewangles[PITCH] += cl_mPitchOverride*5.0f*speed*cl_pitchspeed->value * CL_KeyState (&in_lookdown);
-	}
-	else
-	{
-		cl.viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&in_lookup);
-		cl.viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&in_lookdown);
-	}
- */
+	//Make sure Pitch is correct
+	IN_CenterView();
 
     cl.viewangles[YAW] -= old_move.yaw;
     cl.viewangles[YAW] += new_move.yaw;
@@ -423,7 +389,6 @@ void CL_AdjustAngles( void ) {
         cl.viewangles[YAW] += 360.0f;
 
     cl.viewangles[PITCH] = new_move.pitch;
-
     cl.viewangles[ROLL] = new_move.roll;
 
 	VectorCopy(cl.viewangles, vr.clientviewangles);
@@ -732,12 +697,8 @@ usercmd_t CL_CreateCmd( void ) {
 	VectorCopy( cl.viewangles, oldAngles );
 
 
-#ifdef __ANDROID__
-
     JKVR_GetMove(&new_move.forward, &new_move.side, &new_move.pos_forward, &new_move.pos_side,
                    &new_move.up, &new_move.yaw, &new_move.pitch, &new_move.roll);
-
-#endif
 
 	// keyboard angle adjustment
 	CL_AdjustAngles ();

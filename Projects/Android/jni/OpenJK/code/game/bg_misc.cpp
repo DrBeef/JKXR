@@ -739,7 +739,7 @@ static void BG_CalculateVRPositionInWorld( vec3_t in_position,  vec3_t in_offset
 	VectorCopy(in_offset, offset);
 	offset[1] = 0; // up/down is index 1 in this case
 	BG_ConvertFromVR(offset, cg.refdef.vieworg, origin);
-	origin[2] -= 48;
+	origin[2] -= DEFAULT_PLAYER_HEIGHT;
 	origin[2] += in_position[1] * cg_worldScale.value;
 
 	VectorCopy(in_orientation, angles);

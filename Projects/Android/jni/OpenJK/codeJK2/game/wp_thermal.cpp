@@ -27,6 +27,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 #include "g_functions.h"
+#include "bg_local.h"
 
 //---------------------
 //	Thermal Detonator
@@ -273,8 +274,17 @@ gentity_t *WP_FireThermalDetonator( gentity_t *ent, qboolean alt_fire )
 	vec3_t		dir, start;
 	float		damageScale = 1.0f;
 
-	VectorCopy( wpFwd, dir );
-	VectorCopy( wpMuzzle, start );
+	if ( ent->client && !ent->NPC)
+	{
+		vec3_t	angs;
+		BG_CalculateVRWeaponPosition(start, angs);
+		AngleVectors(angs, dir, NULL, NULL);
+	}
+	else {
+		VectorCopy( wpFwd, dir );
+		VectorCopy( wpMuzzle, start );
+	}
+
 
 	bolt = G_Spawn();
 

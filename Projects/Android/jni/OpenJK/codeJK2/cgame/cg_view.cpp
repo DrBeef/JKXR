@@ -1660,7 +1660,7 @@ static qboolean CG_CalcViewValues( void ) {
 		}
 	}
 
-	if ( (cg.renderingThirdPerson||cg.snap->ps.weapon == WP_SABER||cg.snap->ps.weapon == WP_MELEE) 
+	if ( (cg.renderingThirdPerson) //||cg.snap->ps.weapon == WP_SABER||cg.snap->ps.weapon == WP_MELEE)
 		&& !cg.zoomMode 
 		&& !viewEntIsCam )
 	{

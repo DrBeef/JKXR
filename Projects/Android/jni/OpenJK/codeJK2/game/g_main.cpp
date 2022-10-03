@@ -583,7 +583,7 @@ void G_InitCvars( void ) {
 	g_subtitles = gi.cvar( "g_subtitles", "0", CVAR_ARCHIVE );
 	com_buildScript = gi.cvar ("com_buildscript", "0", 0);
 
-	g_saberAutoBlocking = gi.cvar( "g_saberAutoBlocking", "1", CVAR_ARCHIVE|CVAR_CHEAT );//must press +block button to do any blocking
+	g_saberAutoBlocking = gi.cvar( "g_saberAutoBlocking", "0", CVAR_ARCHIVE|CVAR_CHEAT );//must press +block button to do any blocking
 	g_saberRealisticCombat = gi.cvar( "g_saberRealisticCombat", "1", CVAR_ARCHIVE );//makes collision more precise, increases damage
 	g_saberMoveSpeed = gi.cvar( "g_saberMoveSpeed", "1", CVAR_ARCHIVE|CVAR_CHEAT );//how fast you run while attacking with a saber
 	g_saberAnimSpeed = gi.cvar( "g_saberAnimSpeed", "1", CVAR_ARCHIVE|CVAR_CHEAT );//how fast saber animations run

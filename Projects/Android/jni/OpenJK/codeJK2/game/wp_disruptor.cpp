@@ -82,7 +82,17 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 		}
 	}
 
-	VectorCopy( wpMuzzle, start );
+	vec3_t	angs, forward;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(start, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy( wpMuzzle, start );
+		VectorCopy(wpFwd, forward);
+	}
+
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );
 
 //	if ( ent->client && ent->client->ps.powerups[PW_WEAPON_OVERCHARGE] > 0 && ent->client->ps.powerups[PW_WEAPON_OVERCHARGE] > cg.time )
@@ -91,16 +101,6 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 //		damage *= 2;
 //	}
 
-
-	vec3_t	angs, forward;
-	if ( ent->client && !ent->NPC)
-	{
-		BG_CalculateVRWeaponPosition(wpMuzzle, angs);
-		AngleVectors(angs, forward, NULL, NULL);
-	}
-	else {
-		VectorCopy(wpFwd, forward);
-	}
 
 	VectorMA( start, shotRange, forward, end );
 

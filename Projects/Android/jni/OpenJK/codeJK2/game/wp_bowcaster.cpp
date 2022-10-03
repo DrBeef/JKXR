@@ -141,13 +141,22 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 static void WP_BowcasterAltFire( gentity_t *ent )
 //---------------------------------------------------------
 {
-	vec3_t	start;
+	vec3_t	start, forward, angs;
 	int		damage	= weaponData[WP_BOWCASTER].altDamage;
 
-	VectorCopy( wpMuzzle, start );
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(start, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy( wpMuzzle, start );
+		VectorCopy(wpFwd, forward);
+	}
+
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
-	gentity_t *missile = CreateMissile( start, wpFwd, BOWCASTER_VELOCITY, 10000, ent, qtrue );
+	gentity_t *missile = CreateMissile( start, forward, BOWCASTER_VELOCITY, 10000, ent, qtrue );
 
 	missile->classname = "bowcaster_alt_proj";
 	missile->s.weapon = WP_BOWCASTER;

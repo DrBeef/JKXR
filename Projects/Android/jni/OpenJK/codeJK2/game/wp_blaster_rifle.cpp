@@ -107,13 +107,14 @@ static void WP_FireBlasterMissile( gentity_t *ent, vec3_t start, vec3_t dir, qbo
 void WP_FireBlaster( gentity_t *ent, qboolean alt_fire )
 //---------------------------------------------------------
 {
-	vec3_t	dir, angs;
+	vec3_t	dir, angs, start;
 
 	if ( ent->client && !ent->NPC)
 	{
-		BG_CalculateVRWeaponPosition(wpMuzzle, angs);
+		BG_CalculateVRWeaponPosition(start, angs);
 	}
 	else {
+		VectorCopy(wpMuzzle, start);
 		vectoangles(wpFwd, angs);
 	}
 
@@ -145,5 +146,5 @@ void WP_FireBlaster( gentity_t *ent, qboolean alt_fire )
 	AngleVectors( angs, dir, NULL, NULL );
 
 	// FIXME: if temp_org does not have clear trace to inside the bbox, don't shoot!
-	WP_FireBlasterMissile( ent, wpMuzzle, dir, alt_fire );
+	WP_FireBlasterMissile( ent, start, dir, alt_fire );
 }

@@ -95,6 +95,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define CS_COMBAT	1
 #define CS_EXTRA	2
 #define CS_JEDI		3
+
+#define DEFAULT_PLAYER_HEIGHT 58
 //=================================================
 
 // player entities need to track more information

@@ -27,19 +27,18 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 #include "g_functions.h"
+#include "bg_local.h"
 
 //-------------------
 //	Heavy Repeater
 //-------------------
 
 //---------------------------------------------------------
-static void WP_RepeaterMainFire( gentity_t *ent, vec3_t dir )
+static void WP_RepeaterMainFire( gentity_t *ent, vec3_t dir, vec3_t start )
 //---------------------------------------------------------
 {
-	vec3_t	start;
 	int		damage	= weaponData[WP_REPEATER].damage;
 
-	VectorCopy( wpMuzzle, start );
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
 	gentity_t *missile = CreateMissile( start, dir, REPEATER_VELOCITY, 10000, ent );
@@ -84,11 +83,20 @@ static void WP_RepeaterMainFire( gentity_t *ent, vec3_t dir )
 static void WP_RepeaterAltFire( gentity_t *ent )
 //---------------------------------------------------------
 {
-	vec3_t	start;
 	int		damage	= weaponData[WP_REPEATER].altDamage;
 	gentity_t *missile = NULL;
 
-	VectorCopy( wpMuzzle, start );
+	vec3_t	forward, start, angs;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(start, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy( wpFwd, forward );
+		VectorCopy( wpMuzzle, start );
+	}
+
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
 	if ( ent->client && ent->client->NPC_class == CLASS_GALAKMECH )
@@ -97,7 +105,7 @@ static void WP_RepeaterAltFire( gentity_t *ent )
 	}
 	else
 	{
-		missile = CreateMissile( start, wpFwd, REPEATER_ALT_VELOCITY, 10000, ent, qtrue );
+		missile = CreateMissile( start, forward, REPEATER_ALT_VELOCITY, 10000, ent, qtrue );
 	}
 
 	missile->classname = "repeater_alt_proj";
@@ -151,7 +159,15 @@ void WP_FireRepeater( gentity_t *ent, qboolean alt_fire )
 {
 	vec3_t	dir, angs;
 
-	vectoangles( wpFwd, angs );
+	vec3_t	forward, start;
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(start, angs);
+	}
+	else {
+		vectoangles( wpFwd, angs );
+		VectorCopy( wpMuzzle, start );
+	}
 
 	if ( alt_fire )
 	{
@@ -179,6 +195,6 @@ void WP_FireRepeater( gentity_t *ent, qboolean alt_fire )
 		AngleVectors( angs, dir, NULL, NULL );
 
 		// FIXME: if temp_org does not have clear trace to inside the bbox, don't shoot!
-		WP_RepeaterMainFire( ent, dir );
+		WP_RepeaterMainFire( ent, dir, start );
 	}
 }

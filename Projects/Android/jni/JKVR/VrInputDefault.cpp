@@ -7,22 +7,24 @@ Authors		:	Simon Brown
 
 *************************************************************************************/
 
-#include "../../../../../../VrApi/Include/VrApi.h"
-#include "../../../../../../VrApi/Include/VrApi_Helpers.h"
-#include "../../../../../../VrApi/Include/VrApi_SystemUtils.h"
-#include "../../../../../../VrApi/Include/VrApi_Input.h"
-#include "../../../../../../VrApi/Include/VrApi_Types.h"
+#include <VrApi.h>
+#include <VrApi_Helpers.h>
+#include <VrApi_SystemUtils.h>
+#include <VrApi_Input.h>
+#include <VrApi_Types.h>
+
 #include <android/keycodes.h>
 
 #include "VrInput.h"
 #include "VrCvars.h"
-#include "../OpenJK/code/qcommon/q_shared.h"
 
+#include "qcommon/q_shared.h"
 #include <qcommon/qcommon.h>
 #include <client/client.h>
+#include "android/sys_local.h"
 
 
-#define WP_AKIMBO           20
+#define WP_SABER           1
 
 void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, int capsule );
 
@@ -51,14 +53,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
     //Need this for the touch screen
     ovrTracking * pWeapon = pDominantTracking;
     ovrTracking * pOff = pOffTracking;
-    if (vr.weaponid == WP_AKIMBO &&
-            !vr.right_handed &&
-            !JKVR_useScreenLayer())
-    {
-        //Revert to same weapon controls as right-handed if using akimbo
-        pWeapon = pOffTracking;
-        pOff = pDominantTracking;
-    }
 
     //All this to allow stick and button switching!
     ovrVector2f *pPrimaryJoystick;
@@ -466,7 +460,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             static bool firing = false;
 
             {
-                //Fire Primary
+                //Fire Primary - Doesn't trigger the saber
                 if (!vr.velocitytriggered && // Don't fire velocity triggered weapons
                     (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
                     (pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger)) {
@@ -543,11 +537,12 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 }
             }
 
+            //Open the datapad
             if (!canUseQuickSave) {
                 if (((secondaryButtonsNew & secondaryButton2) !=
                      (secondaryButtonsOld & secondaryButton2)) &&
                     (secondaryButtonsNew & secondaryButton2)) {
-                    sendButtonActionSimple("forcenext");
+                    Sys_QueEvent( 0, SE_KEY, A_TAB, true, 0, NULL );
                 }
             }
 
@@ -559,11 +554,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                                               pOffTrackedRemoteOld,
                                               ovrButton_Trigger, A_SHIFT);
             }
-
-            //Open the datapad
-            handleTrackedControllerButton(pOffTrackedRemoteNew,
-                                          pOffTrackedRemoteOld,
-                                          ovrButton_Y, A_TAB);
 
             //Resync Yaw on mounted gun transition
             static int usingMountedGun = false;

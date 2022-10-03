@@ -2486,8 +2486,8 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	cg.refdef.worldscale = cg_worldScale.value;
 	if (!in_camera) {
 		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
-		cg.refdef.viewangles[YAW] =
-				SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]) + vr->hmdorientation[YAW] + vr->snapTurn;
+		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
+				SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}
 
@@ -2507,7 +2507,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	if (!in_camera || vr->immersive_cinematics) {
 		//Vertical Positional Movement
-		cg.refdef.vieworg[2] -= 48;
+		cg.refdef.vieworg[2] -= DEFAULT_PLAYER_HEIGHT;
 		cg.refdef.vieworg[2] += (vr->hmdposition[1] + cg_heightAdjust.value) * cg_worldScale.value;
 	}
 

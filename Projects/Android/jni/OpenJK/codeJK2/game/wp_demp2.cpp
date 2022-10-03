@@ -27,6 +27,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 #include "g_functions.h"
+#include "bg_local.h"
 
 //-------------------
 //	DEMP2
@@ -36,13 +37,22 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 static void WP_DEMP2_MainFire( gentity_t *ent )
 //---------------------------------------------------------
 {
-	vec3_t	start;
+	vec3_t	start, angs, forward;
 	int		damage	= weaponData[WP_DEMP2].damage;
 
-	VectorCopy( wpMuzzle, start );
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(start, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy( wpMuzzle, start );
+		VectorCopy(wpFwd, forward);
+	}
+
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
-	gentity_t *missile = CreateMissile( start, wpFwd, DEMP2_VELOCITY, 10000, ent );
+	gentity_t *missile = CreateMissile( start, forward, DEMP2_VELOCITY, 10000, ent );
 
 	missile->classname = "demp2_proj";
 	missile->s.weapon = WP_DEMP2;
@@ -198,10 +208,19 @@ static void WP_DEMP2_AltFire( gentity_t *ent )
 {
 	int		damage	= weaponData[WP_DEMP2].altDamage;
 	int		count;
-	vec3_t	start;
+	vec3_t	start, angs, forward;
 	trace_t	tr;
 
-	VectorCopy( wpMuzzle, start );
+	if ( ent->client && !ent->NPC)
+	{
+		BG_CalculateVRWeaponPosition(start, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy( wpMuzzle, start );
+		VectorCopy(wpFwd, forward);
+	}
+
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
 	count = ( level.time - ent->client->ps.weaponChargeTime ) / DEMP2_CHARGE_UNIT;
@@ -219,7 +238,7 @@ static void WP_DEMP2_AltFire( gentity_t *ent )
 
 	// the shot can travel a whopping 4096 units in 1 second. Note that the shot will auto-detonate at 4096 units...we'll see if this looks cool or not
 
-	gentity_t *missile = CreateMissile( start, wpFwd, DEMP2_ALT_RANGE, 1000, ent, qtrue );
+	gentity_t *missile = CreateMissile( start, forward, DEMP2_ALT_RANGE, 1000, ent, qtrue );
 
 	// letting it know what the charge size is.
 	missile->count = count;
