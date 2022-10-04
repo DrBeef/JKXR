@@ -100,7 +100,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define	WAVE_AMPLITUDE	1
 #define	WAVE_FREQUENCY	0.4
 
-#define DEFAULT_PLAYER_HEIGHT 58
+#define DEFAULT_PLAYER_HEIGHT 64
 
 //=================================================
 

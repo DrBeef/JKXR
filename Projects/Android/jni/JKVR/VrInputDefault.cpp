@@ -110,8 +110,8 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         VectorSubtract(vr.weaponangles_last, vr.weaponangles, vr.weaponangles_delta);
         VectorCopy(vr.weaponangles, vr.weaponangles_last);
 
-        ALOGV("        weaponangles_last: %f, %f, %f",
-              vr.weaponangles_last[0], vr.weaponangles_last[1], vr.weaponangles_last[2]);
+//        ALOGV("        weaponangles_last: %f, %f, %f",
+//              vr.weaponangles_last[0], vr.weaponangles_last[1], vr.weaponangles_last[2]);
 
         //GB Also set offhand angles just in case we want to use those.
         vec3_t rotation_off = {0};
@@ -222,30 +222,56 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             vr.weaponoffset[2] = pWeapon->HeadPose.Pose.Position.z - vr.hmdposition[2];
             vr.weaponoffset_timestamp = Sys_Milliseconds( );
 
-            vr.swingvelocity = sqrtf(powf(pWeapon->HeadPose.LinearVelocity.x, 2) +
+            vr.primaryswingvelocity = sqrtf(powf(pWeapon->HeadPose.LinearVelocity.x, 2) +
                                    powf(pWeapon->HeadPose.LinearVelocity.y, 2) +
                                    powf(pWeapon->HeadPose.LinearVelocity.z, 2));
 
+            vr.secondaryswingvelocity = sqrtf(powf(pOff->HeadPose.LinearVelocity.x, 2) +
+                                   powf(pOff->HeadPose.LinearVelocity.y, 2) +
+                                   powf(pOff->HeadPose.LinearVelocity.z, 2));
 
-            //Does weapon velocity trigger attack (knife) and is it fast enough
-            static bool velocityTriggeredAttack = false;
-            if (vr.velocitytriggered)
-            {
-                static bool fired = qfalse;
-                velocityTriggeredAttack = (vr.swingvelocity > VELOCITY_TRIGGER);
 
-                if (fired != velocityTriggeredAttack) {
-                    ALOGV("**WEAPON EVENT**  veocity triggered %s", velocityTriggeredAttack ? "+attack" : "-attack");
-                    sendButtonAction("+attack", velocityTriggeredAttack);
-                    fired = velocityTriggeredAttack;
+            //We don't allow the saber to be velocity triggered
+            if (vr.weaponid != WP_SABER) {
+                //Does weapon velocity trigger attack (melee) and is it fast enough
+                static bool primaryVelocityTriggeredAttack = false;
+                if (vr.velocitytriggered) {
+                    static bool fired = qfalse;
+                    primaryVelocityTriggeredAttack = (vr.primaryswingvelocity > VELOCITY_TRIGGER);
+
+                    if (fired != primaryVelocityTriggeredAttack) {
+                        ALOGV("**WEAPON EVENT**  veocity triggered %s",
+                              primaryVelocityTriggeredAttack ? "+altattack" : "-altattack");
+                        //normal attack is a punch with the left hand
+                        sendButtonAction("+altattack", primaryVelocityTriggeredAttack);
+                        fired = primaryVelocityTriggeredAttack;
+                    }
+                } else if (primaryVelocityTriggeredAttack) {
+                    //send a stop attack as we have an unfinished velocity attack
+                    primaryVelocityTriggeredAttack = qfalse;
+                    ALOGV("**WEAPON EVENT**  veocity triggered -altattack");
+                    sendButtonAction("+altattack", primaryVelocityTriggeredAttack);
                 }
-            }
-            else if (velocityTriggeredAttack)
-            {
-                //send a stop attack as we have an unfinished velocity attack
-                velocityTriggeredAttack = qfalse;
-                ALOGV("**WEAPON EVENT**  veocity triggered -attack");
-                sendButtonAction("+attack", velocityTriggeredAttack);
+
+                static bool secondaryVelocityTriggeredAttack = false;
+                if (vr.velocitytriggered) {
+                    static bool fired = qfalse;
+                    secondaryVelocityTriggeredAttack = (vr.secondaryswingvelocity >
+                                                        VELOCITY_TRIGGER);
+
+                    if (fired != secondaryVelocityTriggeredAttack) {
+                        ALOGV("**WEAPON EVENT**  veocity triggered %s",
+                              secondaryVelocityTriggeredAttack ? "+attack" : "-attack");
+                        //normal attack is a punch with the left hand
+                        sendButtonAction("+attack", secondaryVelocityTriggeredAttack);
+                        fired = secondaryVelocityTriggeredAttack;
+                    }
+                } else if (secondaryVelocityTriggeredAttack) {
+                    //send a stop attack as we have an unfinished velocity attack
+                    secondaryVelocityTriggeredAttack = qfalse;
+                    ALOGV("**WEAPON EVENT**  veocity triggered -attack");
+                    sendButtonAction("+attack", secondaryVelocityTriggeredAttack);
+                }
             }
 
             if (vr.weapon_stabilised)
@@ -399,7 +425,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     if (dominantGripPushTime == 0) {
                         dominantGripPushTime = GetTimeInMilliSeconds();
                     }
-                    Cvar_Set("timescale", "0.1");
+                    Cvar_Set("timescale", "0.25");
                 }
                 else
                 {

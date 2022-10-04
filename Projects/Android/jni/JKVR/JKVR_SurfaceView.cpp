@@ -1280,7 +1280,7 @@ void JKVR_Init()
 	vr_control_scheme = Cvar_Get( "vr_control_scheme", "0", CVAR_ARCHIVE);
 	vr_switch_sticks = Cvar_Get( "vr_switch_sticks", "0", CVAR_ARCHIVE);
 
-	vr_immersive_cinematics = Cvar_Get("vr_immersive_cinematics", "1", CVAR_ARCHIVE);
+	vr_immersive_cinematics = Cvar_Get("vr_immersive_cinematics", "0", CVAR_ARCHIVE);
 	vr_screen_dist = Cvar_Get( "vr_screen_dist", "2.5", CVAR_ARCHIVE);
 }
 
@@ -1607,7 +1607,7 @@ void JKVR_getHMDOrientation() {//Get orientation
 
 	updateHMDOrientation();
 
-	ALOGV("        HMD-Position: %f, %f, %f", positionHmd.x, positionHmd.y, positionHmd.z);
+	///ALOGV("        HMD-Position: %f, %f, %f", positionHmd.x, positionHmd.y, positionHmd.z);
 }
 
 void shutdownVR() {

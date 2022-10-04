@@ -3462,7 +3462,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		VectorCopy(axis[0], hiltEnt.axis[2]);
 		cgi_R_AddRefEntityToScene(&hiltEnt);
 		static int playingSaberSwingSound = 0;
-		if (vr->swingvelocity > SABER_ACTIVATE_VELOCITY && (cg.time - playingSaberSwingSound) > 750)
+		if (vr->primaryswingvelocity > SABER_ACTIVATE_VELOCITY && (cg.time - playingSaberSwingSound) > 750)
 		{
 			cgi_S_StartSound ( hiltEnt.origin, cent->gent->s.number, CHAN_AUTO, cgi_S_RegisterSound( va( "sound/weapons/saber/saberhup%d.wav", Q_irand( 0, 2 ) * 3 + 1 ) ) );
 			playingSaberSwingSound = cg.time;
@@ -4688,7 +4688,7 @@ Ghoul2 Insert End
 	if ( cg.time > saberTrail->lastTime + 2  && saberTrail->inAction ) // 2ms
 	{
 		//Swinging the saber quick enough to trigger a sound should also invoke trails
-		if ( (saberTrail->inAction || (vr->swingvelocity > SABER_ACTIVATE_VELOCITY)) &&
+		if ( (saberTrail->inAction || (vr->primaryswingvelocity > SABER_ACTIVATE_VELOCITY)) &&
 			cg.time < saberTrail->lastTime + 300 ) // if we have a stale segment, don't draw until we have a fresh one
 		{
 			vec3_t	rgb1={255,255,255};
@@ -4858,6 +4858,8 @@ void CG_Player(centity_t *cent ) {
 	{
 		return;
 	}
+
+	vr->weaponid = cg.snap->ps.weapon;
 
 	//Get the player's light level for stealth calculations
 	CG_GetPlayerLightLevel( cent );

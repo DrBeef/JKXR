@@ -29,8 +29,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	if (!vr->in_camera && !vr->using_screen_layer && !vr->scopeengaged)
 	{
-		float screenXScale = 1.0f / 3.5f;
-		float screenYScale = 1.0f / 3.5f;
+		float screenXScale = 1.0f / 2.5f;
+		float screenYScale = 1.0f / 2.5f;
 
 		float xoffset = -24;
 		if (cg.refdef.stereoView == 1) {

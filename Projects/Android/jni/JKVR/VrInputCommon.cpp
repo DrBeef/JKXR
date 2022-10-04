@@ -210,7 +210,12 @@ float clamp(float _min, float _val, float _max)
 
 void interactWithTouchScreen(bool reset, ovrInputStateTrackedRemote *newState, ovrInputStateTrackedRemote *oldState) {
 
-    float cursorX = (float)(-vr.weaponangles[YAW] / 90.0) + 0.5f;
+    static float centerYaw = 0;
+    if (reset || fabs(sinf(DEG2RAD(vr.weaponangles[YAW]-centerYaw))) > 0.5f)
+    {
+        centerYaw = vr.weaponangles[YAW];
+    }
+    float cursorX = -sinf(DEG2RAD(vr.weaponangles[YAW]-centerYaw)) + 0.5f;
     float cursorY = (float)(vr.weaponangles[PITCH] / 90.0) + 0.5f;
 
     PortableMouseAbs(cursorX, cursorY);

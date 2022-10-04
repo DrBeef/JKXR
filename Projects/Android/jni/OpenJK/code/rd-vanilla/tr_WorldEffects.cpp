@@ -2144,7 +2144,7 @@ void R_WorldEffectCommand(const char *command)
 			return;
 		}
 		CParticleCloud& nCloud = mParticleClouds.push_back();
-		nCloud.Initialize(1000, "gfx/effects/snowflake1.bmp");
+		nCloud.Initialize(1000, "gfx/effects/snowflake1.tga");
 		nCloud.mBlendMode			= 1;
 		nCloud.mRotationChangeNext	= 0;
 		nCloud.mColor		= 0.75f;

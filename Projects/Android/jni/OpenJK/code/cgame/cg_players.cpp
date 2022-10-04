@@ -6845,6 +6845,8 @@ void CG_Player( centity_t *cent ) {
 		return;
 	}
 
+	vr->weaponid = cg.snap->ps.weapon;
+
 	calcedMp = qfalse;
 
 	//Get the player's light level for stealth calculations

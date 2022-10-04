@@ -873,7 +873,6 @@ static float CG_CalculateWeaponPositionAndScale( playerState_t *ps, vec3_t origi
 	//Weapon offset debugging
 	float scale=1.0f;
 	if (strcmp(cgi_Cvar_Get("vr_control_scheme"), "99") == 0) {
-		vr->weaponid = ps->weapon;
 		scale = vr->test_scale;
 
 		//Adjust angles for weapon models that aren't aligned very well

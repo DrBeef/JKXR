@@ -48,7 +48,8 @@ typedef struct {
     bool hasbinoculars;
 
     bool velocitytriggered;
-    float swingvelocity;
+    float primaryswingvelocity;
+    float secondaryswingvelocity;
 
     vec3_t offhandangles;
     vec3_t offhandangles_last; // Don't use this, it is just for calculating delta!

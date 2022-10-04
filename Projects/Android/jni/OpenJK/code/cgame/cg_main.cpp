@@ -382,7 +382,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_fov, "cg_fov", "80", CVAR_ARCHIVE },
 	{ &cg_fovAspectAdjust, "cg_fovAspectAdjust", "0", CVAR_ARCHIVE },
 	{ &cg_stereoSeparation, "cg_stereoSeparation", "0.065", CVAR_ARCHIVE  },
-	{ &cg_worldScale, "cg_worldScale", "37.5", CVAR_ARCHIVE  },
+	{ &cg_worldScale, "cg_worldScale", "33.5", CVAR_ARCHIVE  },
 	{ &cg_heightAdjust, "cg_heightAdjust", "0.0", CVAR_ARCHIVE  },
 	{ &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE  },
 	{ &cg_renderToTextureFX, "cg_renderToTextureFX", "1", CVAR_ARCHIVE  },
@@ -454,7 +454,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_thirdPersonAlpha, "cg_thirdPersonAlpha", "1.0", CVAR_ARCHIVE },
 	{ &cg_thirdPersonAutoAlpha,	"cg_thirdPersonAutoAlpha",	"0", 0 },
 	// NOTE: also declare this in UI_Init
-	{ &cg_saberAutoThird, "cg_saberAutoThird", "1", CVAR_ARCHIVE },
+	{ &cg_saberAutoThird, "cg_saberAutoThird", "0", CVAR_ARCHIVE },
 	{ &cg_gunAutoFirst, "cg_gunAutoFirst", "1", CVAR_ARCHIVE },
 
 	{ &cg_pano, "pano", "0", 0 },
