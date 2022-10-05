@@ -771,7 +771,9 @@ static void CG_OffsetThirdPersonView( void )
 		}
 	}
 	else if ( cg.predicted_player_state.stats[STAT_HEALTH] <= 0 )
-	{// if dead, look at killer
+	{
+		//Do nothing
+		/*
 		if ( MatrixMode )
 		{
 			if ( cg.overrides.active & CG_OVERRIDE_3RD_PERSON_ANG )
@@ -788,6 +790,7 @@ static void CG_OffsetThirdPersonView( void )
 		{
 			cameraFocusAngles[YAW] = cg.predicted_player_state.stats[STAT_DEAD_YAW];
 		}
+		 */
 	}
 	else
 	{	// Add in the third Person Angle.

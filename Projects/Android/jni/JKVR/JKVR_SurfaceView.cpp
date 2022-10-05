@@ -1270,7 +1270,7 @@ void JKVR_Init()
 	vr_reloadtimeoutms = Cvar_Get( "vr_reloadtimeoutms", "200", CVAR_ARCHIVE);
 	vr_positional_factor = Cvar_Get( "vr_positional_factor", "12", CVAR_ARCHIVE);
     vr_walkdirection = Cvar_Get( "vr_walkdirection", "0", CVAR_ARCHIVE);
-	vr_movement_multiplier = Cvar_Get( "vr_movement_multiplier", "0.7", CVAR_ARCHIVE);
+	vr_movement_multiplier = Cvar_Get( "vr_movement_multiplier", "1.0", CVAR_ARCHIVE);
 	vr_weapon_pitchadjust = Cvar_Get( "vr_weapon_pitchadjust", "-20.0", CVAR_ARCHIVE);
 	vr_lasersight = Cvar_Get( "vr_lasersight", "0", CVAR_ARCHIVE);
 	vr_teleport = Cvar_Get( "vr_teleport", "0", CVAR_ARCHIVE);

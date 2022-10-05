@@ -211,7 +211,7 @@ float clamp(float _min, float _val, float _max)
 void interactWithTouchScreen(bool reset, ovrInputStateTrackedRemote *newState, ovrInputStateTrackedRemote *oldState) {
 
     static float centerYaw = 0;
-    if (reset || fabs(sinf(DEG2RAD(vr.weaponangles[YAW]-centerYaw))) > 0.5f)
+    if (reset || Q_isnan(centerYaw) || fabs(sinf(DEG2RAD(vr.weaponangles[YAW]-centerYaw))) > 0.9f)
     {
         centerYaw = vr.weaponangles[YAW];
     }
