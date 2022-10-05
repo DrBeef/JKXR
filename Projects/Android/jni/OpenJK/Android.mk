@@ -19,9 +19,9 @@ include $(OPENJK_PATH)/Android_client_jo.mk
 include $(OPENJK_PATH)/Android_game_jo.mk
 
 # Jedi Academy
-include $(OPENJK_PATH)/Android_gles_ja.mk
-include $(OPENJK_PATH)/Android_client_ja.mk
-include $(OPENJK_PATH)/Android_game_ja.mk
+# include $(OPENJK_PATH)/Android_gles_ja.mk
+# include $(OPENJK_PATH)/Android_client_ja.mk
+# include $(OPENJK_PATH)/Android_game_ja.mk
 
 
 

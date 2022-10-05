@@ -1060,11 +1060,7 @@ static qboolean UI_RunMenuScript ( const char **args )
 		else if (Q_stricmp(name, "startgame") == 0)
 		{
 			Menus_CloseAll();
-#ifdef JK2_MODE
-			ui.Cmd_ExecuteText( EXEC_APPEND, "map kejim_post\n" );
-#else
-			ui.Cmd_ExecuteText( EXEC_APPEND, "map yavin1\n");
-#endif
+			ui.Cmd_ExecuteText( EXEC_APPEND, "map demo\n" );
 		}
 		else if (Q_stricmp(name, "startmap") == 0)
 		{

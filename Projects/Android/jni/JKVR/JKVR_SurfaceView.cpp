@@ -1465,11 +1465,7 @@ void * AppThreadFunction(void * parm ) {
 	// Create the scene if not yet created.
 	ovrScene_Create( m_width, m_height, &gAppState.Scene, &java );
 
-#ifdef JK2_MODE
-		chdir("/sdcard/JKQuest/JK2");
-#else
-		chdir("/sdcard/JKQuest/JK3");
-#endif
+	chdir("/sdcard/JKQuest/Demo");
 
 
 	//Run loading loop until we are ready to start JKVR

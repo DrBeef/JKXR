@@ -186,18 +186,17 @@ import static android.system.Os.setenv;
 
 	public void create() {
 		//Make the directories
-		new File("/sdcard/JKQuest/JK2/base").mkdirs();
-		new File("/sdcard/JKQuest/JK3/base").mkdirs();
+		new File("/sdcard/JKQuest/Demo/base").mkdirs();
+//		new File("/sdcard/JKQuest/JK3/base").mkdirs();
+
+		//clear the contents of the base folder
+		for (File child : new File("/sdcard/JKQuest/Demo/base").listFiles())
+			child.delete();
 
 		//Copy the command line params file
 		copy_asset("/sdcard/JKQuest", "commandline.txt", false);
-
-		//Copy the weapon adjustment config
-		copy_asset("/sdcard/JKQuest/JK2/base", "weapons_vr_jo.cfg", false);
-		copy_asset("/sdcard/JKQuest/JK3/base", "weapons_vr_ja.cfg", false);
-
-		//and the cheat menu pk3 for testing
-		copy_asset("/sdcard/JKQuest/JK3/base", "Z_BetaV0.2_NewMenus.pk3", true);
+		copy_asset("/sdcard/JKQuest/Demo/base", "weapons_vr_jo.cfg", false);
+		copy_asset("/sdcard/JKQuest/Demo/base", "assets0.pk3", true);
 
 		//Read these from a file and pass through
 		commandLineParams = new String("jo");
