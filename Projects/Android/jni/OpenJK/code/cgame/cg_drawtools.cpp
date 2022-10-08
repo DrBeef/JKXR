@@ -28,7 +28,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
-	if (!vr->in_camera && !vr->using_screen_layer && !vr->scopeengaged)
+	if (cg.drawingHUD && !vr->in_camera && !vr->using_screen_layer && !vr->scopeengaged)
 	{
 		float screenXScale = 1.0f / 2.5f;
 		float screenYScale = 1.0f / 2.5f;
@@ -52,28 +52,30 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	}
 }
 void CG_AdjustFrom640Int( int *x, int *y, int *w, int *h ) {
-	if (!vr->in_camera && !vr->using_screen_layer && !vr->scopeengaged)
+	float fx = (float)*x;
+	float fy = (float)*y;
+	float fw = 0;
+	if (w != NULL)
 	{
-		float screenXScale = 1.0f / 3.5f;
-		float screenYScale = 1.0f / 3.5f;
-
-		float xoffset = -24;
-		if (cg.refdef.stereoView == 1) {
-			xoffset *= -1;
-		}
-
-		*x *= screenXScale;
-		*y *= screenYScale;
-		if (w != NULL) {
-			*w *= screenXScale;
-		}
-		if (h != NULL) {
-			*h *= screenYScale;
-		}
-
-		*x += (640 - (640 * screenXScale)) / 2.0f + xoffset;
-		*y += (480 - (480 * screenYScale)) / 2.0f;
+		fw = (float)*w;
 	}
+	float fh = 0;
+	if (h != NULL)
+	{
+		fh = (float)*h;
+	}
+	CG_AdjustFrom640(&fx, &fy, (w != NULL) ? &fw : NULL, (h != NULL) ? &fh : NULL);
+	*x = (int)fx;
+	*y = (int)fy;
+	if (w != NULL)
+	{
+		*w = (int)fw;
+	}
+	if (h != NULL)
+	{
+		*h = (int)fh;
+	}
+
 }
 
 /*

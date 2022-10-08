@@ -359,6 +359,8 @@ float Com_AbsClamp( float min, float max, float value )
 
 float Q_rsqrt( float number )
 {
+//	return sqrtf( number );
+
 	byteAlias_t t;
 	float x2, y;
 	const float threehalfs = 1.5F;
@@ -371,12 +373,15 @@ float Q_rsqrt( float number )
 	y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
 												//	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
 
-	assert( !Q_isnan(y) );
+	//assert( !Q_isnan(y) );
 	return y;
+
 }
 
 float Q_fabs( float f )
 {
+	//return fabs(f);
+
 	byteAlias_t fi;
 	fi.f = f;
 	fi.i &= 0x7FFFFFFF;
@@ -675,18 +680,19 @@ void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal )
 	float inv_denom;
 
 	inv_denom =  DotProduct( normal, normal );
-	assert( Q_fabs(inv_denom) != 0.0f );
-	inv_denom = 1.0f / inv_denom;
+	if ( Q_fabs(inv_denom) != 0.0f ) {
+		inv_denom = 1.0f / inv_denom;
 
-	d = DotProduct( normal, p ) * inv_denom;
+		d = DotProduct(normal, p) * inv_denom;
 
-	n[0] = normal[0] * inv_denom;
-	n[1] = normal[1] * inv_denom;
-	n[2] = normal[2] * inv_denom;
+		n[0] = normal[0] * inv_denom;
+		n[1] = normal[1] * inv_denom;
+		n[2] = normal[2] * inv_denom;
 
-	dst[0] = p[0] - d * n[0];
-	dst[1] = p[1] - d * n[1];
-	dst[2] = p[2] - d * n[2];
+		dst[0] = p[0] - d * n[0];
+		dst[1] = p[1] - d * n[1];
+		dst[2] = p[2] - d * n[2];
+	}
 }
 
 qboolean G_FindClosestPointOnLineSegment( const vec3_t start, const vec3_t end, const vec3_t from, vec3_t result )

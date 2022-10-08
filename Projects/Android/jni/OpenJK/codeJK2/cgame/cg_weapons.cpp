@@ -783,6 +783,12 @@ void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles )
 
 static float CG_CalculateWeaponPositionAndScale( playerState_t *ps, vec3_t origin, vec3_t angles ) {
 
+	if (cg.renderingThirdPerson)
+	{
+		CG_CalculateWeaponPosition(origin, angles);
+		return 1.0f;
+	}
+
 	BG_CalculateVRWeaponPosition(origin, angles);
 
 	vec3_t offset;

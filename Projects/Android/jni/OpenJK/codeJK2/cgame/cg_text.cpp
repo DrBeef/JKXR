@@ -188,7 +188,7 @@ void CG_CaptionTextStop(void)
 //
 // returns 0 if failed, else strlen...
 //
-static int cg_SP_GetStringTextStringWithRetry( const char *psReference, char *psDest, int iSizeofDest )
+static int cg_SP_GetStringTextStringWithRetry( const char *psReference, char *psDest, int iSizeofDest)
 {
 	int iReturn;
 
@@ -218,7 +218,7 @@ static int cg_SP_GetStringTextStringWithRetry( const char *psReference, char *ps
 //	the "filename" part of which should be the same as the StripEd reference we're looking for in the current
 //	level's string package...
 //
-void CG_CaptionText( const char *str, int sound )
+void CG_CaptionText( const char *str, int sound)
 {
 	const char	*s, *holds;
 	int i;
@@ -241,9 +241,9 @@ void CG_CaptionText( const char *str, int sound )
 	{
 #ifndef FINAL_BUILD
 		// we only care about some sound dirs...
-		if (!Q_strncmp(str,"sound/chars/",12))	// whichever language it is, it'll be pathed as english at this point
+		if (!Q_stricmpn(str,"sound/chars/",12))	// whichever language it is, it'll be pathed as english at this point
 		{
-			Com_Printf("WARNING: CG_CaptionText given invalid text key :'%s'\n",str);
+			Com_Printf("WARNING: CG_CaptionText given invalid text key: '%s'\n", str);
 		}
 		else
 		{
@@ -259,7 +259,7 @@ void CG_CaptionText( const char *str, int sound )
 	if (in_camera) {
 		cg.captionTextY = SCREEN_HEIGHT - (client_camera.bar_height_dest/2);	// ths is now a centre'd Y, not a start Y
 	} else {	//get above the hud
-		cg.captionTextY = (int) (0.88f * ((float)SCREEN_HEIGHT - (float)fontHeight * 1.5f));	// do NOT move this, it has to fit in between the weapon HUD and the datapad update.
+		cg.captionTextY = (int) (0.88f*((float)SCREEN_HEIGHT - (float)fontHeight * 1.5f));	// do NOT move this, it has to fit in between the weapon HUD and the datapad update.
 	}
 	cg.captionTextCurrentLine = 0;
 
@@ -429,7 +429,7 @@ void CG_DrawCaptionText(void)
 
 	// Give a color if one wasn't given
 	if((textcolor_caption[0] == 0) && (textcolor_caption[1] == 0) &&
-		(textcolor_caption[2] == 0) && (textcolor_caption[3] == 0))
+	   (textcolor_caption[2] == 0) && (textcolor_caption[3] == 0))
 	{
 		VectorCopy4( colorTable[CT_WHITE], textcolor_caption );
 	}
@@ -438,18 +438,22 @@ void CG_DrawCaptionText(void)
 
 	// Set Y of the first line (varies if only printing one line of text)
 	// (this all works, please don't mess with it)
-	const int fontHeight = (int) ((cgi_Language_IsAsian() ? 1.4f : 1.0f) * (float) cgi_R_Font_HeightPixels(cgs.media.qhFontMedium, fFontScale));
+	const int fontHeight = (int) ((cgi_Language_IsAsian() ? 1.4f : 1.0f) * (float) cgi_R_Font_HeightPixels(cgs.media.qhFontSmall, fFontScale * FONT_SCALE));
 	const bool bPrinting2Lines = !!(cg.captionText[ cg.captionTextCurrentLine+1 ][0]);
 	y = cg.captionTextY - ( (float)fontHeight * (bPrinting2Lines ? 1 : 0.5f));	// captionTextY was a centered Y pos, not a top one
 	y -= cgi_Language_IsAsian() ? 0 : 4;
 
 	for (i=	cg.captionTextCurrentLine;i< cg.captionTextCurrentLine + 2;++i)
 	{
-		w = cgi_R_Font_StrLenPixels(cg.captionText[i], cgs.media.qhFontMedium, fFontScale);
+		w = cgi_R_Font_StrLenPixels(cg.captionText[i], cgs.media.qhFontSmall, fFontScale * FONT_SCALE);
 		if (w)
 		{
 			x = (SCREEN_WIDTH-w) / 2;
-			cgi_R_Font_DrawString(x, y, cg.captionText[i], textcolor_caption, cgs.media.qhFontMedium, -1, fFontScale);
+
+			int tempX = x;
+			int tempY = y;
+			CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
+			cgi_R_Font_DrawString(tempX, tempY, cg.captionText[i], textcolor_caption, cgs.media.qhFontSmall, -1, fFontScale * FONT_SCALE);
 			y += fontHeight;
 		}
 	}
@@ -557,8 +561,8 @@ void CG_ScrollText( const char *str, int iPixelWidth )
 			//
 			cg.printText[i][ strlen(cg.printText[i])-1 ] = '\0';	// kill the CR
 			i++;
-			assert (i < (int)ARRAY_LEN( cg.printText ) );
-			if (i >= (int)ARRAY_LEN( cg.printText ) )
+			assert (i < (int)(sizeof(cg.printText)/sizeof(cg.printText[0])) );
+			if (i >= (int)(sizeof(cg.printText)/sizeof(cg.printText[0])) )
 			{
 				break;
 			}
@@ -585,7 +589,7 @@ void CG_ScrollText( const char *str, int iPixelWidth )
 			cg.printText[i][ psBestLineBreakSrcPos - holds ] = '\0';
 			holds = s = psBestLineBreakSrcPos;
 			i++;
-			assert( i < (int)ARRAY_LEN( cg.printText ) );
+			assert (i < (int)(sizeof(cg.printText)/sizeof(cg.printText[0])) );
 			cg.scrollTextLines++;
 		}
 	}
@@ -602,7 +606,7 @@ void CG_DrawScrollText(void)
 {
 	int		i;
 	int		x,y;
-	const int fontHeight = (int) (1.5f * (float) cgi_R_Font_HeightPixels(cgs.media.qhFontMedium, 1.0f));	// taiwanese & japanese need 1.5 fontheight spacing
+	const int fontHeight = (int) (1.5f * (float) cgi_R_Font_HeightPixels(cgs.media.qhFontSmall, FONT_SCALE));	// taiwanese & japanese need 1.5 fontheight spacing
 
 	if ( !cg.scrollTextTime )
 	{
@@ -631,7 +635,7 @@ void CG_DrawScrollText(void)
 			y += fontHeight;
 			continue;
 		}
-		// or past bottom of screen?
+			// or past bottom of screen?
 		else if (y > SCREEN_HEIGHT)
 		{
 			break;
@@ -641,7 +645,11 @@ void CG_DrawScrollText(void)
 //		if (w)
 		{
 			x = (SCREEN_WIDTH - giScrollTextPixelWidth) / 2;
-			cgi_R_Font_DrawString(x,y, cg.printText[i], textcolor_scroll, cgs.media.qhFontMedium, -1, 1.0f);
+
+			int tempX = x;
+			int tempY = y;
+			CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
+			cgi_R_Font_DrawString(tempX, tempY, cg.printText[i], textcolor_scroll, cgs.media.qhFontSmall, -1, FONT_SCALE);
 			y += fontHeight;
 		}
 	}
@@ -719,20 +727,20 @@ void CG_DrawCenterString( void )
 		return;
 	}
 
-	color = CG_FadeColor( cg.centerPrintTime, 1000 * cg_centertime.value );
+	color = CG_FadeColor( cg.centerPrintTime, 1000 * 3 );
 	if ( !color ) {
 		return;
 	}
 
 	if((textcolor_center[0] == 0) && (textcolor_center[1] == 0) &&
-		(textcolor_center[2] == 0) && (textcolor_center[3] == 0))
+	   (textcolor_center[2] == 0) && (textcolor_center[3] == 0))
 	{
 		VectorCopy4( colorTable[CT_WHITE], textcolor_center );
 	}
 
 	start = cg.centerPrint;
 
-	const int fontHeight = cgi_R_Font_HeightPixels(cgs.media.qhFontMedium, 1.0f);
+	const int fontHeight = cgi_R_Font_HeightPixels(cgs.media.qhFontSmall, FONT_SCALE);
 	y = cg.centerPrintY - (cg.centerPrintLines * fontHeight) / 2;
 
 	while ( 1 ) {
@@ -759,11 +767,14 @@ void CG_DrawCenterString( void )
 		}
 		linebuffer[iOutIndex++] = '\0';
 
-		w = cgi_R_Font_StrLenPixels(linebuffer, cgs.media.qhFontMedium, 1.0f);
+		w = cgi_R_Font_StrLenPixels(linebuffer, cgs.media.qhFontSmall, FONT_SCALE);
 
 		x = ( SCREEN_WIDTH - w ) / 2;
 
-		cgi_R_Font_DrawString(x,y,linebuffer, textcolor_center, cgs.media.qhFontMedium, -1, 1.0f);
+		int tempX = x;
+		int tempY = y;
+		CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
+		cgi_R_Font_DrawString(tempX, tempY,linebuffer, textcolor_center, cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 		y += fontHeight;
 

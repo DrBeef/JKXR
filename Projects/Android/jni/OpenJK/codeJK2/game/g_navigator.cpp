@@ -358,7 +358,7 @@ int	CNode::Save( int numNodes, fileHandle_t file )
 	int i;
 
 	//Write out the header
-	unsigned long header = NODE_HEADER_ID;
+	uint32_t header = NODE_HEADER_ID;
 	gi.FS_Write( &header, sizeof( header ), file );
 
 	//Write out the basic information
@@ -397,7 +397,7 @@ Load
 
 int CNode::Load( int numNodes, fileHandle_t file )
 {
-	unsigned long header;
+	uint32_t header;
 	int i;
 	gi.FS_Read( &header, sizeof(header), file );
 
@@ -522,9 +522,9 @@ GetLong
 -------------------------
 */
 
-long CNavigator::GetLong( fileHandle_t file )
+uint32_t CNavigator::GetLong( fileHandle_t file )
 {
-	long value;
+	uint32_t value;
 
 	gi.FS_Read( &value, sizeof( value ), file );
 
@@ -578,7 +578,7 @@ bool CNavigator::Load( const char *filename, int checksum )
 		return false;
 
 	//Check the header id
-	long navID = GetLong( file );
+	uint32_t navID = GetLong( file );
 
 	if ( navID != NAV_HEADER_ID )
 	{
@@ -640,7 +640,7 @@ bool CNavigator::Save( const char *filename, int checksum )
 		return false;
 
 	//Write out the header id
-	unsigned long id = NAV_HEADER_ID;
+	uint32_t id = NAV_HEADER_ID;
 
 	gi.FS_Write( &id, sizeof (id), file );
 
