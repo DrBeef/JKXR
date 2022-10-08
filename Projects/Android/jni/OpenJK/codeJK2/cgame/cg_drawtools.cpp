@@ -32,7 +32,7 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 		float screenXScale = 1.0f / 2.5f;
 		float screenYScale = 1.0f / 2.5f;
 
-		float xoffset = -24;
+		float xoffset = -20;
 		if (cg.refdef.stereoView == STEREO_LEFT) {
 			xoffset *= -1;
 		}
