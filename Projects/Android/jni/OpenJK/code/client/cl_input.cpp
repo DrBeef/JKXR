@@ -376,9 +376,6 @@ Moves the local angle positions
 ================
 */
 void CL_AdjustAngles( void ) {
-	//Make sure Pitch is correct
-	IN_CenterView();
-
     cl.viewangles[YAW] -= old_move.yaw;
     cl.viewangles[YAW] += new_move.yaw;
 
@@ -675,8 +672,13 @@ void CL_FinishMove( usercmd_t *cmd ) {
 	// can be determined without allowing cheating
 	cmd->serverTime = cl.serverTime;
 
+	//Adjust for difference in server angles
+	vec3_t angles;
+	VectorCopy(cl.viewangles, angles);
+	angles[PITCH] -= SHORT2ANGLE(cl.frame.ps.delta_angles[PITCH]);
+
 	for (i=0 ; i<3 ; i++) {
-		cmd->angles[i] = ANGLE2SHORT(cl.viewangles[i]);
+		cmd->angles[i] = ANGLE2SHORT(angles[i]);
 	}
 
     //retain the move from this

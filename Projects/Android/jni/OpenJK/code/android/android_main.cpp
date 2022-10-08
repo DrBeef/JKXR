@@ -215,7 +215,7 @@ void Sys_UnloadDll( void *dllHandle )
 		return;
 	}
 
-	//Sys_UnloadLibrary(dllHandle);
+	Sys_UnloadLibrary(dllHandle);
 }
 
 enum SearchPathFlag

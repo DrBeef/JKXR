@@ -517,7 +517,7 @@ Ghoul2 Insert Start
 Ghoul2 Insert End
 */
 
-#define MAX_G2_COLLISIONS 16
+#define MAX_G2_COLLISIONS 64
 // a trace is returned when a box is swept through the world
 typedef struct {
 	qboolean	allsolid;	// if true, plane is not valid

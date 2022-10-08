@@ -28,7 +28,10 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "cg_local.h"
 #include "cg_media.h"
 #include "../game/objectives.h"
+#include "bg_local.h"
 #include <JKVR/VrClientInfo.h>
+
+#include "FxUtil.h"
 
 void CG_DrawIconBackground(void);
 void CG_DrawMissionInformation( void );
@@ -1678,6 +1681,84 @@ static void CG_ScanForRocketLock( void )
 
 /*
 =================
+CG_DrawCrosshair3D
+=================
+*/
+static void CG_DrawCrosshair3D(void)
+{
+	float		w;
+	qhandle_t	hShader;
+	float		f;
+	int			ca;
+
+	trace_t trace;
+	vec3_t endpos;
+	refEntity_t ent;
+
+	if ( !cg_drawCrosshair.integer ) {
+		return;
+	}
+
+	if (cg.snap->ps.pm_type == PM_INTERMISSION)
+	{
+		return;
+	}
+
+	if ( cg.renderingThirdPerson || in_camera) {
+		return;
+	}
+
+	if ( cg.zoomMode > 0 && cg.zoomMode < 3 )
+	{
+		//not while scoped
+		return;
+	}
+
+	if ( cg.snap->ps.weapon == WP_NONE ||
+		 cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_STUN_BATON )
+	{
+		return;
+	}
+
+	w = cg_crosshairSize.value;
+
+	// pulse the size of the crosshair when picking up items
+	f = cg.time - cg.itemPickupBlendTime;
+	if ( f > 0 && f < ITEM_BLOB_TIME ) {
+		f /= ITEM_BLOB_TIME;
+		w *= ( 1 + f );
+	}
+
+	ca = cg_drawCrosshair.integer;
+	if (ca < 0) {
+		ca = 0;
+	}
+	hShader = cgs.media.crosshairShader[ ca % NUM_CROSSHAIRS ];
+
+	vec3_t forward, weaponangles, origin;
+	BG_CalculateVRWeaponPosition(origin, weaponangles);
+	AngleVectors(weaponangles, forward, NULL, NULL);
+	VectorMA(origin, 1024, forward, endpos);
+	CG_Trace(&trace, origin, NULL, NULL, endpos, 0, MASK_SHOT);
+
+	memset(&ent, 0, sizeof(ent));
+	ent.reType = RT_SPRITE;
+	ent.renderfx = RF_FIRST_PERSON;
+
+	VectorCopy(trace.endpos, ent.origin);
+
+	ent.radius = 2.0f;
+	ent.customShader = hShader;
+	ent.shaderRGBA[0] = 255;
+	ent.shaderRGBA[1] = 255;
+	ent.shaderRGBA[2] = 255;
+	ent.shaderRGBA[3] = 255;
+
+	cgi_R_AddRefEntityToScene(&ent);
+}
+
+/*
+=================
 CG_ScanForCrosshairEntity
 =================
 */
@@ -1853,7 +1934,7 @@ static void CG_ScanForCrosshairEntity( qboolean scanAll )
 	}
 */
 	//draw crosshair at endpoint
-	CG_DrawCrosshair( trace.endpos );
+	//CG_DrawCrosshair( trace.endpos );
 
 	g_crosshairEntNum = trace.entityNum;
 	g_crosshairEntDist = 4096*trace.fraction;
@@ -2096,11 +2177,15 @@ static float CG_DrawSnapshot( float y ) {
 	char		*s;
 	int			w;
 
-	s = va( "time:%i snap:%i cmd:%i", cg.snap->serverTime, 
-		cg.latestSnapshotNum, cgs.serverCommandSequence );
+	s = va( "time:%i snap:%i cmd:%i", cg.snap->serverTime,
+			cg.latestSnapshotNum, cgs.serverCommandSequence );
 
-	w = cgi_R_Font_StrLenPixels(s, cgs.media.qhFontMedium, 1.0f);	
-	cgi_R_Font_DrawString(635 - w, y+2, s, colorTable[CT_LTGOLD1], cgs.media.qhFontMedium, -1, 1.0f);
+	w = cgi_R_Font_StrLenPixels(s, cgs.media.qhFontSmall, FONT_SCALE);
+
+	int tempX = 635 - w;
+	int tempY = y+2;
+	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
+	cgi_R_Font_DrawString(tempX, tempY, s, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 	return y + BIGCHAR_HEIGHT + 10;
 }
@@ -2142,8 +2227,12 @@ static float CG_DrawFPS( float y ) {
 	fps = 1000 * FPS_FRAMES / total;
 
 	s = va( "%ifps", fps );
-	const int w = cgi_R_Font_StrLenPixels(s, cgs.media.qhFontMedium, 1.0f);	
-	cgi_R_Font_DrawString(635 - w, y+2, s, colorTable[CT_LTGOLD1], cgs.media.qhFontMedium, -1, 1.0f);
+	const int w = cgi_R_Font_StrLenPixels(s, cgs.media.qhFontSmall, FONT_SCALE);
+
+	int tempX = 635 - w;
+	int tempY = y+2;
+	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
+	cgi_R_Font_DrawString(tempX, tempY, s, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 	return y + BIGCHAR_HEIGHT + 10;
 }
@@ -2166,9 +2255,12 @@ static float CG_DrawTimer( float y ) {
 
 	s = va( "%i:%i%i", mins, tens, seconds );
 
-	w = cgi_R_Font_StrLenPixels(s, cgs.media.qhFontMedium, 1.0f);	
-	cgi_R_Font_DrawString(635 - w, y+2, s, colorTable[CT_LTGOLD1], cgs.media.qhFontMedium, -1, 1.0f);
+	w = cgi_R_Font_StrLenPixels(s, cgs.media.qhFontSmall, FONT_SCALE);
 
+	int tempX = 635 - w;
+	int tempY = y+2;
+	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
+	cgi_R_Font_DrawString(tempX, tempY, s, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 	return y + BIGCHAR_HEIGHT + 10;
 }
 
@@ -2202,8 +2294,10 @@ static void CG_DrawAmmoWarning( void ) {
 		//s = "LOW AMMO WARNING";
 	}
 
-	w = cgi_R_Font_StrLenPixels(text, cgs.media.qhFontSmall, 1.0f);	
-	cgi_R_Font_DrawString(320 - w/2, 64, text, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, 1.0f);
+	int tempX = 320 - w/2;
+	int tempY = 64;
+	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
+	cgi_R_Font_DrawString(tempX, tempY, text, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 }
 
 //---------------------------------------
@@ -2273,7 +2367,9 @@ static void CG_Draw2D( void )
 
 	if ( cg.snap->ps.pm_type == PM_INTERMISSION ) 
 	{
+		cg.drawingHUD = true;
 		CG_DrawIntermission();
+		cg.drawingHUD = false;
 		return;
 	}
 
@@ -2285,14 +2381,20 @@ static void CG_Draw2D( void )
 		}
 	}
 
-	CGCam_DrawWideScreen();
+	if (!vr->immersive_cinematics) {
+		CGCam_DrawWideScreen();
+	}
+
+	cg.drawingHUD = true;
 
 	CG_DrawBatteryCharge();
 
 	// Draw this before the text so that any text won't get clipped off
 	if ( !in_camera )
 	{
+		cg.drawingHUD = false;
 		CG_DrawZoomMask();
+		cg.drawingHUD = true;
 	}
 
 	CG_DrawScrollText();
@@ -2300,10 +2402,12 @@ static void CG_Draw2D( void )
 
 	if ( in_camera )
 	{//still draw the saber clash flare, but nothing else
+		cg.drawingHUD = false;
 		CG_SaberClashFlare();
 		return;
 	}
 
+	cg.drawingHUD = false;
 	if ( CG_RenderingFromMiscCamera())
 	{
 		// purposely doing an early out when in a misc_camera, change it if needed.
@@ -2312,6 +2416,7 @@ static void CG_Draw2D( void )
 		CG_DrawCenterString();
 		return;
 	}
+	cg.drawingHUD = true;
 
 	// don't draw any status if dead
 	if ( cg.snap->ps.stats[STAT_HEALTH] > 0 ) 
@@ -2402,10 +2507,14 @@ static void CG_Draw2D( void )
 			y_pos = (SCREEN_HEIGHT/2)+80;
 			if ( cg_missionInfoCentered.integer )
 			{
-				w = cgi_R_Font_StrLenPixels(text,cgs.media.qhFontSmall, 1.0f);
+				w = cgi_R_Font_StrLenPixels(text,cgs.media.qhFontSmall, FONT_SCALE);
 				x_pos = (SCREEN_WIDTH/2)-(w/2);
 			}
-			cgi_R_Font_DrawString(x_pos, y_pos, text,  colorTable[CT_LTRED1], cgs.media.qhFontMedium, -1, 1.0f);
+
+			int tempX = x_pos;
+			int tempY = y_pos;
+			CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
+			cgi_R_Font_DrawString(tempX, tempY, text,  colorTable[CT_LTRED1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 			if (cg_updatedDataPadForcePower1.integer) 
 			{
@@ -2413,10 +2522,14 @@ static void CG_Draw2D( void )
 				cgi_SP_GetStringTextString("INGAME_NEW_FORCE_POWER_INFO", text, sizeof(text) );
 				if ( cg_missionInfoCentered.integer )
 				{
-					w = cgi_R_Font_StrLenPixels(text,cgs.media.qhFontSmall, 1.0f);
+					w = cgi_R_Font_StrLenPixels(text,cgs.media.qhFontSmall, FONT_SCALE);
 					x_pos = (SCREEN_WIDTH/2)-(w/2);
 				}
-				cgi_R_Font_DrawString(x_pos, y_pos, text,  colorTable[CT_LTRED1], cgs.media.qhFontMedium, -1, 1.0f);
+
+				tempX = x_pos;
+				tempY = y_pos;
+				CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
+				cgi_R_Font_DrawString(tempX, tempY, text,  colorTable[CT_LTRED1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 			}
 
 			if (cg_updatedDataPadObjective.integer) 
@@ -2425,10 +2538,14 @@ static void CG_Draw2D( void )
 				cgi_SP_GetStringTextString( "INGAME_NEW_OBJECTIVE_INFO", text, sizeof(text) );
 				if ( cg_missionInfoCentered.integer )
 				{
-					w = cgi_R_Font_StrLenPixels(text,cgs.media.qhFontSmall, 1.0f);
+					w = cgi_R_Font_StrLenPixels(text,cgs.media.qhFontSmall, FONT_SCALE);
 					x_pos = (SCREEN_WIDTH/2)-(w/2);
 				}
-				cgi_R_Font_DrawString(x_pos, y_pos, text,  colorTable[CT_LTRED1], cgs.media.qhFontMedium, -1, 1.0f);
+
+				tempX = x_pos;
+				tempY = y_pos;
+				CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
+				cgi_R_Font_DrawString(tempX, tempY, text,  colorTable[CT_LTRED1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 			}
 
 	//		if (cent->gent->client->sess.missionObjectivesShown<3)
@@ -2438,6 +2555,9 @@ static void CG_Draw2D( void )
 	//		}
 		}
 	}
+
+	cg.drawingHUD = false;
+
 }
 
 
@@ -2504,6 +2624,8 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	{
 		cgi_R_LAGoggles();
 	}
+
+	CG_DrawCrosshair3D();
 
 	if (!in_camera || vr->immersive_cinematics) {
 		//Vertical Positional Movement

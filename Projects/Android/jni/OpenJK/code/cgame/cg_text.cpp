@@ -442,18 +442,22 @@ void CG_DrawCaptionText(void)
 
 	// Set Y of the first line (varies if only printing one line of text)
 	// (this all works, please don't mess with it)
-	const int fontHeight = (int) ((cgi_Language_IsAsian() ? 1.4f : 1.0f) * (float) cgi_R_Font_HeightPixels(cgs.media.qhFontMedium, fFontScale));
+	const int fontHeight = (int) ((cgi_Language_IsAsian() ? 1.4f : 1.0f) * (float) cgi_R_Font_HeightPixels(cgs.media.qhFontSmall, fFontScale * FONT_SCALE));
 	const bool bPrinting2Lines = !!(cg.captionText[ cg.captionTextCurrentLine+1 ][0]);
 	y = cg.captionTextY - ( (float)fontHeight * (bPrinting2Lines ? 1 : 0.5f));	// captionTextY was a centered Y pos, not a top one
 	y -= cgi_Language_IsAsian() ? 0 : 4;
 
 	for (i=	cg.captionTextCurrentLine;i< cg.captionTextCurrentLine + 2;++i)
 	{
-		w = cgi_R_Font_StrLenPixels(cg.captionText[i], cgs.media.qhFontMedium, fFontScale);
+		w = cgi_R_Font_StrLenPixels(cg.captionText[i], cgs.media.qhFontSmall, fFontScale * FONT_SCALE);
 		if (w)
 		{
 			x = (SCREEN_WIDTH-w) / 2;
-			cgi_R_Font_DrawString(x, y, cg.captionText[i], textcolor_caption, cgs.media.qhFontMedium, -1, fFontScale);
+
+			int tempX = x;
+			int tempY = y;
+			CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
+			cgi_R_Font_DrawString(tempX, tempY, cg.captionText[i], textcolor_caption, cgs.media.qhFontSmall, -1, fFontScale * FONT_SCALE);
 			y += fontHeight;
 		}
 	}
@@ -608,7 +612,7 @@ void CG_DrawScrollText(void)
 {
 	int		i;
 	int		x,y;
-	const int fontHeight = (int) (1.5f * (float) cgi_R_Font_HeightPixels(cgs.media.qhFontMedium, 1.0f));	// taiwanese & japanese need 1.5 fontheight spacing
+	const int fontHeight = (int) (1.5f * (float) cgi_R_Font_HeightPixels(cgs.media.qhFontSmall, FONT_SCALE));	// taiwanese & japanese need 1.5 fontheight spacing
 
 	if ( !cg.scrollTextTime )
 	{
@@ -647,7 +651,11 @@ void CG_DrawScrollText(void)
 //		if (w)
 		{
 			x = (SCREEN_WIDTH - giScrollTextPixelWidth) / 2;
-			cgi_R_Font_DrawString(x,y, cg.printText[i], textcolor_scroll, cgs.media.qhFontMedium, -1, 1.0f);
+
+			int tempX = x;
+			int tempY = y;
+			CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
+			cgi_R_Font_DrawString(tempX, tempY, cg.printText[i], textcolor_scroll, cgs.media.qhFontSmall, -1, FONT_SCALE);
 			y += fontHeight;
 		}
 	}
@@ -738,7 +746,7 @@ void CG_DrawCenterString( void )
 
 	start = cg.centerPrint;
 
-	const int fontHeight = cgi_R_Font_HeightPixels(cgs.media.qhFontMedium, 1.0f);
+	const int fontHeight = cgi_R_Font_HeightPixels(cgs.media.qhFontSmall, FONT_SCALE);
 	y = cg.centerPrintY - (cg.centerPrintLines * fontHeight) / 2;
 
 	while ( 1 ) {
@@ -767,11 +775,14 @@ void CG_DrawCenterString( void )
 		}
 		linebuffer[iOutIndex++] = '\0';
 
-		w = cgi_R_Font_StrLenPixels(linebuffer, cgs.media.qhFontMedium, 1.0f);
+		w = cgi_R_Font_StrLenPixels(linebuffer, cgs.media.qhFontSmall, FONT_SCALE);
 
 		x = ( SCREEN_WIDTH - w ) / 2;
 
-		cgi_R_Font_DrawString(x,y,linebuffer, textcolor_center, cgs.media.qhFontMedium, -1, 1.0f);
+		int tempX = x;
+		int tempY = y;
+		CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
+		cgi_R_Font_DrawString(tempX, tempY,linebuffer, textcolor_center, cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 		y += fontHeight;
 

@@ -432,6 +432,7 @@ typedef struct {
 	int			itemPickupTime;
 	int			itemPickupBlendTime;	// the pulse around the crosshair is timed seperately
 
+	bool 		drawingHUD;
 	float		iconHUDPercent;			// How far into opening sequence the icon HUD is
 	int			iconSelectTime;			// How long the Icon HUD has been active
 	qboolean	iconHUDActive;
@@ -629,6 +630,7 @@ extern	vmCvar_t		cg_thirdPersonTargetDamp;
 extern	vmCvar_t		cg_saberAutoThird;
 extern	vmCvar_t		cg_gunAutoFirst;
 
+extern	vmCvar_t		cg_zProj;
 extern	vmCvar_t		cg_stereoSeparation;
 extern  vmCvar_t		cg_worldScale;
 extern  vmCvar_t 		cg_heightAdjust;
@@ -745,6 +747,8 @@ Ghoul2 Insert End
 #define CG_PULSE		0x00004000
 
 
+#define FONT_SCALE	0.5f
+
 void CG_DrawRect( float x, float y, float width, float height, float size, const float *color );
 void CG_FillRect( float x, float y, float width, float height, const float *color );
 void CG_Scissor( float x, float y, float width, float height);
@@ -767,7 +771,8 @@ int CG_DrawStrlen( const char *str );
 
 float	*CG_FadeColor( int startMsec, int totalMsec );
 void CG_TileClear( void );
-
+void CG_AdjustFrom640( float *x, float *y, float *w, float *h );
+void CG_AdjustFrom640Int( int *x, int *y, int *w, int *h );
 
 //
 // cg_draw.c
