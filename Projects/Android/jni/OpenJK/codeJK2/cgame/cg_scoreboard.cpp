@@ -149,7 +149,7 @@ void CG_MissionFailed(void)
 	tempY = y+30;
 	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX, tempY, text, colorTable[CT_HUD_RED], cgs.media.qhFontSmall, -1, 1.2f * FONT_SCALE);
-
+/*
 	cgi_SP_GetStringTextString( "INGAME_RELOADMISSION", text, sizeof(text) );
 	w = cgi_R_Font_StrLenPixels(text, cgs.media.qhFontSmall, FONT_SCALE);
 
@@ -157,7 +157,7 @@ void CG_MissionFailed(void)
 	tempY = 450;
 	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX, tempY, text, colorTable[CT_CYAN], cgs.media.qhFontSmall, -1, FONT_SCALE);
-
+*/
 }
 
 

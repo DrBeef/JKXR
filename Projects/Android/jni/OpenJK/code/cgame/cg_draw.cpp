@@ -2972,26 +2972,31 @@ static void CG_DrawCrosshair3D(void)
 	}
 	hShader = cgs.media.crosshairShader[ ca % NUM_CROSSHAIRS ];
 
+	float xmax = 64.0f * tan(cg.refdef.fov_x * M_PI / 360.0f);
+	float maxdist = (cgs.glconfig.vidWidth * 64.0f / (2 * xmax)) * 1.5f;
+
 	vec3_t forward, weaponangles, origin;
 	BG_CalculateVRWeaponPosition(origin, weaponangles);
 	AngleVectors(weaponangles, forward, NULL, NULL);
-	VectorMA(origin, 1024, forward, endpos);
+	VectorMA(origin, maxdist, forward, endpos);
 	CG_Trace(&trace, origin, NULL, NULL, endpos, 0, MASK_SHOT);
 
-	memset(&ent, 0, sizeof(ent));
-	ent.reType = RT_SPRITE;
-	ent.renderfx = RF_FIRST_PERSON;
+	if (trace.fraction != 1.0f) {
+		memset(&ent, 0, sizeof(ent));
+		ent.reType = RT_SPRITE;
+		ent.renderfx = RF_FIRST_PERSON;
 
-	VectorCopy(trace.endpos, ent.origin);
+		VectorCopy(trace.endpos, ent.origin);
 
-	ent.radius = 2.0f;
-	ent.customShader = hShader;
-	ent.shaderRGBA[0] = 255;
-	ent.shaderRGBA[1] = 255;
-	ent.shaderRGBA[2] = 255;
-	ent.shaderRGBA[3] = 255;
+		ent.radius = w / 640 * xmax * trace.fraction * maxdist / 64.0f;
+		ent.customShader = hShader;
+		ent.shaderRGBA[0] = 255;
+		ent.shaderRGBA[1] = 255;
+		ent.shaderRGBA[2] = 255;
+		ent.shaderRGBA[3] = 255;
 
-	cgi_R_AddRefEntityToScene(&ent);
+		cgi_R_AddRefEntityToScene(&ent);
+	}
 }
 
 /*
@@ -4352,6 +4357,8 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		return;
 	}
 
+	CG_DrawCrosshair3D();
+
 	//FIXME: these globals done once at start of frame for various funcs
 	AngleVectors (cg.refdefViewAngles, vfwd, vright, vup);
 	VectorCopy( vfwd, vfwd_n );
@@ -4411,8 +4418,6 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	}
 
 	cg.refdef.rdflags |= RDF_DRAWSKYBOX;
-
-	CG_DrawCrosshair3D();
 
 	// draw 3D view
 	cgi_R_RenderScene( &cg.refdef );
