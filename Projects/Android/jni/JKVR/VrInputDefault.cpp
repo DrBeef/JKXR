@@ -425,7 +425,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     if (dominantGripPushTime == 0) {
                         dominantGripPushTime = GetTimeInMilliSeconds();
                     }
-                    Cvar_Set("timescale", "0.25");
+                    Cvar_Set("timescale", "0.22");
                 }
                 else
                 {

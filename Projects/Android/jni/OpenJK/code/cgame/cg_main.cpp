@@ -386,7 +386,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_stereoSeparation, "cg_stereoSeparation", "0.065", CVAR_ARCHIVE  },
 	{ &cg_worldScale, "cg_worldScale", "33.5", CVAR_ARCHIVE  },
 	{ &cg_heightAdjust, "cg_heightAdjust", "0.0", CVAR_ARCHIVE  },
-	{ &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE  },
+	{ &cg_shadows, "cg_shadows", "3", CVAR_ARCHIVE  },
 	{ &cg_renderToTextureFX, "cg_renderToTextureFX", "1", CVAR_ARCHIVE  },
 	{ &cg_shadowCullDistance, "r_shadowRange", "1000", CVAR_ARCHIVE },
 	{ &cg_footsteps, "cg_footsteps", "3", CVAR_ARCHIVE  },//1 = sounds, 2 = sounds & effects, 3 = sounds, effects & marks, 4 = always
@@ -417,11 +417,11 @@ static cvarTable_t cvarTable[] = {
 	// NOTE : I also create this in UI_Init()
 	{ &cg_addMarks, "cg_marks", "1", CVAR_ARCHIVE },
 	// NOTE : I also create these weapon sway cvars in UI_Init()
-	{ &cg_runpitch, "cg_runpitch", "0.002", CVAR_ARCHIVE},
-	{ &cg_runroll, "cg_runroll", "0.005", CVAR_ARCHIVE },
-	{ &cg_bobup , "cg_bobup", "0.005", CVAR_ARCHIVE },
-	{ &cg_bobpitch, "cg_bobpitch", "0.002", CVAR_ARCHIVE },
-	{ &cg_bobroll, "cg_bobroll", "0.002", CVAR_ARCHIVE },
+	{ &cg_runpitch, "cg_runpitch", "0.0", CVAR_ARCHIVE},
+	{ &cg_runroll, "cg_runroll", "0.0", CVAR_ARCHIVE },
+	{ &cg_bobup , "cg_bobup", "0.0", CVAR_ARCHIVE },
+	{ &cg_bobpitch, "cg_bobpitch", "0.0", CVAR_ARCHIVE },
+	{ &cg_bobroll, "cg_bobroll", "0.0", CVAR_ARCHIVE },
 
 	{ &cg_debugAnim, "cg_debuganim", "0", CVAR_CHEAT },
 #ifndef FINAL_BUILD

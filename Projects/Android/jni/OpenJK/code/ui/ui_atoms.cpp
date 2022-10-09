@@ -302,11 +302,11 @@ void UI_Init( int apiVersion, uiimport_t *uiimport, qboolean inGameLoad )
 	ui.Cvar_Create( "d_slowmodeath", "3", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_shadows", "1", CVAR_ARCHIVE );
 
-	ui.Cvar_Create( "cg_runpitch", "0.002", CVAR_ARCHIVE );
-	ui.Cvar_Create( "cg_runroll", "0.005", CVAR_ARCHIVE );
-	ui.Cvar_Create( "cg_bobup", "0.005", CVAR_ARCHIVE );
-	ui.Cvar_Create( "cg_bobpitch", "0.002", CVAR_ARCHIVE );
-	ui.Cvar_Create( "cg_bobroll", "0.002", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_runpitch", "0.0", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_runroll", "0.0", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_bobup", "0.0", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_bobpitch", "0.0", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_bobroll", "0.0", CVAR_ARCHIVE );
 
 	ui.Cvar_Create( "ui_disableWeaponSway", "0", CVAR_ARCHIVE );
 #endif
