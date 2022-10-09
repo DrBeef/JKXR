@@ -1883,12 +1883,15 @@ static void PlayCinematic(const char *arg, const char *s, qboolean qbInGame)
 		{
 			psAudioFile = "music/cinematic_1";
 #ifdef JK2_MODE
-			hCrawl = re.RegisterShaderNoMip( va("menu/video/tc_%d", sp_language->integer) );
+			hCrawl = re.RegisterShaderNoMip( "menu/video/tc_demo" );
+
+/*			hCrawl = re.RegisterShaderNoMip( va("menu/video/tc_%d", sp_language->integer) );
 			if(!hCrawl)
 			{
 				// failed, so go back to english
 				hCrawl = re.RegisterShaderNoMip( "menu/video/tc_0" );
 			}
+*/
 #else
 			hCrawl = re.RegisterShaderNoMip( va("menu/video/tc_%s",se_language->string) );
 			if (!hCrawl)

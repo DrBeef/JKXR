@@ -169,16 +169,28 @@ import static android.system.Os.setenv;
 
 		//clear the contents of the base folder
 		for (File child : new File("/sdcard/JKQuest/Demo/base").listFiles()) {
-			if (child.isFile() && child.getName().contains("pk3"))
+			if (child.isFile() &&
+					child.getName().contains("pk3") &&
+					!child.getName().contains("z_npc_vr") // don't delete our npc mod as this might be tweaked
+			)
 				child.delete();
 		}
 
-		//Copy the command line params file
+		//Weapon offsets
 		copy_asset("/sdcard/JKQuest/Demo/base", "weapons_vr_jo.cfg", true);
+
+		//Demo
 		copy_asset("/sdcard/JKQuest/Demo/base", "assets0.pk3", false);
+
+		//Bunch of cool mods just for this
 		copy_asset("/sdcard/JKQuest/Demo/base", "GGDynamicWeapons.pk3", false);
 		copy_asset("/sdcard/JKQuest/Demo/base", "Haps_Stormtrooper.pk3", false);
 		copy_asset("/sdcard/JKQuest/Demo/base", "Kyle's_lightsaber_hilt_hd.pk3", false);
+		copy_asset("/sdcard/JKQuest/Demo/base", "UltimateSounds_JK2.pk3", false);
+		copy_asset("/sdcard/JKQuest/Demo/base", "z_bryar_ashura.pk3", false);
+
+		//Bummser's NPC tweaks
+		copy_asset("/sdcard/JKQuest/Demo/base", "z_npc_vr.pk3", false);
 
 		commandLineParams = "jo";
 
