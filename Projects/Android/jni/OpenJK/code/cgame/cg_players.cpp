@@ -37,6 +37,9 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define	LOOK_SWING_SCALE	0.5f
 #define	CG_SWINGSPEED		0.3f
 
+//How fast the saber needs to be physically swung in order to trigger sounds and trails
+#define SABER_ACTIVATE_VELOCITY 0.6f
+
 #include "animtable.h"
 
 extern qboolean WP_SaberBladeUseSecondBladeStyle( saberInfo_t *saber, int bladeNum );
@@ -6578,6 +6581,8 @@ Ghoul2 Insert End
 
 #define SABER_TRAIL_TIME	40.0f
 
+		bool saberInAction = (saberTrail->inAction || (vr->primaryswingvelocity > SABER_ACTIVATE_VELOCITY));
+
 		// if we happen to be timescaled or running in a high framerate situation, we don't want to flood
 		//	the system with very small trail slices...but perhaps doing it by distance would yield better results?
 		if ( saberTrail->lastTime > cg.time )
@@ -6587,9 +6592,9 @@ Ghoul2 Insert End
 		//cap it to cg.time here
 			saberTrail->lastTime = cg.time;
 		}
-		if ( cg.time > saberTrail->lastTime + 2  && saberTrail->inAction ) // 2ms
+		if ( cg.time > saberTrail->lastTime + 2  && saberInAction ) // 2ms
 		{
-			if ( saberTrail->inAction && cg.time < saberTrail->lastTime + 300 ) // if we have a stale segment, don't draw until we have a fresh one
+			if ( saberInAction && cg.time < saberTrail->lastTime + 300 ) // if we have a stale segment, don't draw until we have a fresh one
 			{
 				vec3_t	rgb1={255,255,255};
 
