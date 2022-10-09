@@ -44,27 +44,6 @@ import static android.system.Os.setenv;
 	{
 		game = "jo";
 
-		BufferedReader br;
-		try {
-			br = new BufferedReader(new FileReader("/sdcard/JKQuest/commandline.txt"));
-			String s;
-			StringBuilder sb = new StringBuilder(0);
-			while ((s = br.readLine()) != null)
-				sb.append(s + " ");
-			br.close();
-
-			if (sb.toString().contains("ja"))
-			{
-				game = "ja";
-			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 		System.loadLibrary( "openjk_" + game );
 	}
 
@@ -187,41 +166,21 @@ import static android.system.Os.setenv;
 	public void create() {
 		//Make the directories
 		new File("/sdcard/JKQuest/Demo/base").mkdirs();
-//		new File("/sdcard/JKQuest/JK3/base").mkdirs();
 
 		//clear the contents of the base folder
-		for (File child : new File("/sdcard/JKQuest/Demo/base").listFiles())
-			child.delete();
+		for (File child : new File("/sdcard/JKQuest/Demo/base").listFiles()) {
+			if (child.isFile() && child.getName().contains("pk3"))
+				child.delete();
+		}
 
 		//Copy the command line params file
-		copy_asset("/sdcard/JKQuest", "commandline.txt", false);
-		copy_asset("/sdcard/JKQuest/Demo/base", "weapons_vr_jo.cfg", false);
-		copy_asset("/sdcard/JKQuest/Demo/base", "assets0.pk3", true);
+		copy_asset("/sdcard/JKQuest/Demo/base", "weapons_vr_jo.cfg", true);
+		copy_asset("/sdcard/JKQuest/Demo/base", "assets0.pk3", false);
+		copy_asset("/sdcard/JKQuest/Demo/base", "GGDynamicWeapons.pk3", false);
+		copy_asset("/sdcard/JKQuest/Demo/base", "Haps_Stormtrooper.pk3", false);
+		copy_asset("/sdcard/JKQuest/Demo/base", "Kyle's_lightsaber_hilt_hd.pk3", false);
 
-		//Read these from a file and pass through
-		commandLineParams = new String("jo");
-
-		//See if user is trying to use command line params
-		if (new File("/sdcard/JKQuest/commandline.txt").exists()) // should exist!
-		{
-			BufferedReader br;
-			try {
-				br = new BufferedReader(new FileReader("/sdcard/JKQuest/commandline.txt"));
-				String s;
-				StringBuilder sb = new StringBuilder(0);
-				while ((s = br.readLine()) != null)
-					sb.append(s + " ");
-				br.close();
-
-				commandLineParams = new String(sb.toString());
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		commandLineParams = "jo";
 
 		try {
 			setenv("JK_LIBDIR", getApplicationInfo().nativeLibraryDir, true);
