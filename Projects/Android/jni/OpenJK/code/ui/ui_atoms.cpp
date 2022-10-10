@@ -300,7 +300,7 @@ void UI_Init( int apiVersion, uiimport_t *uiimport, qboolean inGameLoad )
 	ui.Cvar_Create( "g_subtitles", "0", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_marks", "1", CVAR_ARCHIVE );
 	ui.Cvar_Create( "d_slowmodeath", "3", CVAR_ARCHIVE );
-	ui.Cvar_Create( "cg_shadows", "1", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_shadows", "3", CVAR_ARCHIVE );
 
 	ui.Cvar_Create( "cg_runpitch", "0.0", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_runroll", "0.0", CVAR_ARCHIVE );
