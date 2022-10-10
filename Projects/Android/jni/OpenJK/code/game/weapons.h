@@ -31,6 +31,9 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "../qcommon/q_shared.h"
 
+//How fast the saber/melee needs to be physically swung in order to trigger sounds and trails etc
+#define WEAPON_VELOCITY_TRIGGER 0.6f
+
 typedef enum //# weapon_e
 {
 	WP_NONE,

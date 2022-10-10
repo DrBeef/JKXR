@@ -35,9 +35,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #define	LOOK_SWING_SCALE	0.5
 
-//How fast the saber needs to be physically swung in order to trigger sounds and trails
-#define SABER_ACTIVATE_VELOCITY 0.6f
-
 #include "animtable.h"
 
 
@@ -3461,8 +3458,9 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		VectorCopy(axis[1], hiltEnt.axis[1]);
 		VectorCopy(axis[0], hiltEnt.axis[2]);
 		cgi_R_AddRefEntityToScene(&hiltEnt);
+
 		static int playingSaberSwingSound = 0;
-		if (vr->primaryswingvelocity > SABER_ACTIVATE_VELOCITY && (cg.time - playingSaberSwingSound) > 750)
+		if (vr->primaryswingvelocity > WEAPON_VELOCITY_TRIGGER && (cg.time - playingSaberSwingSound) > 750)
 		{
 			cgi_S_StartSound ( hiltEnt.origin, cent->gent->s.number, CHAN_AUTO, cgi_S_RegisterSound( va( "sound/weapons/saber/saberhup%d.wav", Q_irand( 0, 2 ) * 3 + 1 ) ) );
 			playingSaberSwingSound = cg.time;
@@ -4676,8 +4674,6 @@ Ghoul2 Insert End
 
 #define SABER_TRAIL_TIME	60.0f
 
-	bool saberInAction = (saberTrail->inAction || (vr->primaryswingvelocity > SABER_ACTIVATE_VELOCITY));
-
 	// if we happen to be timescaled or running in a high framerate situation, we don't want to flood
 	//	the system with very small trail slices...but perhaps doing it by distance would yield better results?
 	if ( saberTrail->lastTime > cg.time )
@@ -4687,10 +4683,10 @@ Ghoul2 Insert End
 	 //cap it to cg.time here
 		saberTrail->lastTime = cg.time;
 	}
-	if ( cg.time > saberTrail->lastTime + 2  && saberInAction) // 2ms
+	if ( cg.time > saberTrail->lastTime + 2  && saberTrail->inAction) // 2ms
 	{
 		//Swinging the saber quick enough to trigger a sound should also invoke trails
-		if ( saberInAction && cg.time < saberTrail->lastTime + 300 ) // if we have a stale segment, don't draw until we have a fresh one
+		if ( saberTrail->inAction && cg.time < saberTrail->lastTime + 300 ) // if we have a stale segment, don't draw until we have a fresh one
 		{
 			vec3_t	rgb1={255,255,255};
 

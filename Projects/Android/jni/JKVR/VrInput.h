@@ -8,7 +8,7 @@
 #define SCOPE_ENGAGE_DISTANCE   0.25
 #define VSTOCK_ENGAGE_DISTANCE   0.25
 #define BINOCULAR_ENGAGE_DISTANCE   0.25
-#define VELOCITY_TRIGGER        1.6
+#define VELOCITY_TRIGGER        1.0
 
 extern ovrInputStateTrackedRemote leftTrackedRemoteState_old;
 extern ovrInputStateTrackedRemote leftTrackedRemoteState_new;
