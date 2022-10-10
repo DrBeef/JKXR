@@ -1736,12 +1736,11 @@ static void CG_DrawCrosshair3D(void)
 	hShader = cgs.media.crosshairShader[ ca % NUM_CROSSHAIRS ];
 
 	float xmax = 64.0f * tan(cg.refdef.fov_x * M_PI / 360.0f);
-	float maxdist = (cgs.glconfig.vidWidth * 64.0f / (2 * xmax)) * 1.5f;
 
 	vec3_t forward, weaponangles, origin;
 	BG_CalculateVRWeaponPosition(origin, weaponangles);
 	AngleVectors(weaponangles, forward, NULL, NULL);
-	VectorMA(origin, maxdist, forward, endpos);
+	VectorMA(origin, 2048, forward, endpos);
 	CG_Trace(&trace, origin, NULL, NULL, endpos, 0, MASK_SHOT);
 
 	if (trace.fraction != 1.0f) {
@@ -1751,7 +1750,7 @@ static void CG_DrawCrosshair3D(void)
 
 		VectorCopy(trace.endpos, ent.origin);
 
-		ent.radius = w / 640 * xmax * trace.fraction * maxdist / 64.0f;
+		ent.radius = w / 640 * xmax * trace.fraction * 2048 / 64.0f;
         ent.customShader = hShader;
 		ent.shaderRGBA[0] = 255;
 		ent.shaderRGBA[1] = 255;

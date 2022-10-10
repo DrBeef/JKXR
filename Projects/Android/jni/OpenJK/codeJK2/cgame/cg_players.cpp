@@ -3445,7 +3445,6 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 
 	if (player1stPersonSaber && !cent->currentState.saberInFlight)
 	{
-//#ifdef JK2_MODE
 		memset( &hiltEnt, 0, sizeof(refEntity_t) );
 		hiltEnt.renderfx = RF_DEPTHHACK;
 		hiltEnt.hModel = cgi_R_RegisterModel( "models/weapons2/saber/saber_w.md3" );
@@ -3460,16 +3459,14 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		cgi_R_AddRefEntityToScene(&hiltEnt);
 
 		static int playingSaberSwingSound = 0;
-		if (vr->primaryswingvelocity > WEAPON_VELOCITY_TRIGGER && (cg.time - playingSaberSwingSound) > 750)
+		if (vr->primaryswingvelocity > WEAPON_VELOCITY_TRIGGER && ((cg.time - playingSaberSwingSound) > 800))
 		{
-			cgi_S_StartSound ( hiltEnt.origin, cent->gent->s.number, CHAN_AUTO, cgi_S_RegisterSound( va( "sound/weapons/saber/saberhup%d.wav", Q_irand( 0, 2 ) * 3 + 1 ) ) );
+			cgi_S_StartSound ( hiltEnt.origin, cent->gent->s.number, CHAN_AUTO, cgi_S_RegisterSound( va( "sound/weapons/saber/saberhup%d.wav", Q_irand( 1, 9 ) ) ) );
 			playingSaberSwingSound = cg.time;
 		}
 
 		//Try setting ent to be the hilt entity, then any subsequent effects below are applied to that instead
 		ent = &hiltEnt;
-//#else
-//#endif
 	}
 
 	// Disruptor Gun Alt-fire
