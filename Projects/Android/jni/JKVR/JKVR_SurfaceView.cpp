@@ -1268,7 +1268,7 @@ void JKVR_Init()
 	vr_turn_mode = Cvar_Get( "vr_turn_mode", "0", CVAR_ARCHIVE); // 0 = snap, 1 = smooth
 	vr_turn_angle = Cvar_Get( "vr_turn_angle", "45", CVAR_ARCHIVE);
 	vr_positional_factor = Cvar_Get( "vr_positional_factor", "12", CVAR_ARCHIVE);
-    vr_walkdirection = Cvar_Get( "vr_walkdirection", "0", CVAR_ARCHIVE);
+    vr_walkdirection = Cvar_Get( "vr_walkdirection", "1", CVAR_ARCHIVE);
 	vr_movement_multiplier = Cvar_Get( "vr_movement_multiplier", "0.8", CVAR_ARCHIVE);
 	vr_weapon_pitchadjust = Cvar_Get( "vr_weapon_pitchadjust", "-20.0", CVAR_ARCHIVE);
     vr_virtual_stock = Cvar_Get( "vr_virtual_stock", "0", CVAR_ARCHIVE);
@@ -1279,6 +1279,7 @@ void JKVR_Init()
 
 	vr_immersive_cinematics = Cvar_Get("vr_immersive_cinematics", "0", CVAR_ARCHIVE);
 	vr_screen_dist = Cvar_Get( "vr_screen_dist", "2.5", CVAR_ARCHIVE);
+	vr_weapon_velocity_trigger = Cvar_Get( "vr_weapon_velocity_trigger", "1.6", CVAR_ARCHIVE);
 }
 
 

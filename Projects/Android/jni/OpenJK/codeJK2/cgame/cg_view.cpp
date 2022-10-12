@@ -30,6 +30,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../game/wp_saber.h"
 #include "../game/anims.h"
 #include "../game/g_functions.h"
+#include "bg_local.h"
 #include <JKVR/VrClientInfo.h>
 
 #define MASK_CAMERACLIP (MASK_SOLID)
@@ -1309,7 +1310,7 @@ qboolean CG_CalcFOVFromX( float fov_x )
 	return (inwater);
 }
 
-float CG_ForceSpeedFOV( void )
+float CG_ForceSpeedFOV( float infov )
 {
 	gentity_t	*player = &g_entities[0];
 	float fov;
@@ -1318,15 +1319,15 @@ float CG_ForceSpeedFOV( void )
 	float amt = forceSpeedFOVMod[player->client->ps.forcePowerLevel[FP_SPEED]];
 	if ( timeLeft < 500 )
 	{//start going back
-		fov = cg_fov.value + (timeLeft)/500*amt;
+		fov = infov + (timeLeft)/500*amt;
 	}
 	else if ( length - timeLeft < 1000 )
 	{//start zooming in
-		fov = cg_fov.value + (length - timeLeft)/1000*amt;
+		fov = infov + (length - timeLeft)/1000*amt;
 	}
 	else
 	{//stay at this FOV
-		fov = cg_fov.value+amt;
+		fov = infov+amt;
 	}
 	return fov;
 }
@@ -1357,7 +1358,7 @@ static qboolean	CG_CalcFov( void ) {
 			g_entities[cg.snap->ps.viewEntity].NPC )
 		{//FIXME: looks bad when take over a jedi... but never really do that, do we?
 			//fov_x = g_entities[cg.snap->ps.viewEntity].NPC->stats.hfov;
-			fov_x = vr ? vr->fov : 90.0f;
+			fov_x = vr ? vr->fov : cg_fov.value;
 			//sanity-cap?
 			if ( fov_x > 120 )
 			{
@@ -1377,13 +1378,13 @@ static qboolean	CG_CalcFov( void ) {
 			else
 			{
 				//fov_x = 120;//FIXME: read from the NPC's fov stats?
-				fov_x = vr ? vr->fov : 90.0f;
+				fov_x = vr ? vr->fov : cg_fov.value;
 			}
 		}
 	} 
 	else if ( (!cg.zoomMode || cg.zoomMode > 2) && (cg.snap->ps.forcePowersActive&(1<<FP_SPEED)) && player->client->ps.forcePowerDuration[FP_SPEED] )//cg.renderingThirdPerson && 
 	{
-		fov_x = CG_ForceSpeedFOV();
+		fov_x = CG_ForceSpeedFOV(vr ? vr->fov : cg_fov.value);
 	} else {
 		/*
 		// user selectable
@@ -1401,7 +1402,7 @@ static qboolean	CG_CalcFov( void ) {
 			fov_x = 160;
 		}*/
 
-		fov_x = vr ? vr->fov : 90.0f;
+		fov_x = vr ? vr->fov : cg_fov.value;
 
 		// Disable zooming when in third person
 		if ( cg.zoomMode && cg.zoomMode < 3 )//&& !cg.renderingThirdPerson ) // light amp goggles do none of the zoom silliness
@@ -1987,18 +1988,55 @@ wasForceSpeed=isForceSpeed;
 		cgi_CM_SnapPVS( cg.refdef.vieworg, cg.snap->areamask );
 	}
 
-	// Don't draw the in-view weapon when in camera mode
-	if ( !in_camera 
-		&& !cg_pano.integer 
-		&& cg.snap->ps.weapon != WP_SABER
-		&& ( cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD ) )
+
+
+	if (vr->item_selector)
 	{
-		CG_AddViewWeapon( &cg.predicted_player_state );
+		CG_DrawItemSelector();
 	}
-	else if( cg.snap->ps.viewEntity != 0 && cg.snap->ps.viewEntity < ENTITYNUM_WORLD &&
-		g_entities[cg.snap->ps.viewEntity].client)
-	{
-		CG_AddViewWeapon( &g_entities[cg.snap->ps.viewEntity ].client->ps );	// HAX - because I wanted to --eez
+	else {
+		// Don't draw the in-view weapon when in camera mode
+		if (!in_camera
+			&& !cg_pano.integer
+			&& cg.snap->ps.weapon != WP_SABER
+			&& (cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD)) {
+			CG_AddViewWeapon(&cg.predicted_player_state);
+		} else if (cg.snap->ps.viewEntity != 0 && cg.snap->ps.viewEntity < ENTITYNUM_WORLD &&
+				   g_entities[cg.snap->ps.viewEntity].client) {
+			CG_AddViewWeapon(
+					&g_entities[cg.snap->ps.viewEntity].client->ps);    // HAX - because I wanted to --eez
+		}
+
+		if (!in_camera
+			&& !cg.renderingThirdPerson
+			&& cg.predicted_player_state.stats[STAT_HEALTH] > 0
+			&& !vr->weapon_stabilised
+			&& !cg_pano.integer
+			&& (cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD))
+		{
+			vec3_t end, forward;
+			refEntity_t handEnt;
+			memset( &handEnt, 0, sizeof(refEntity_t) );
+			BG_CalculateVROffHandPosition(handEnt.origin, handEnt.angles);
+			AngleVectors(handEnt.angles, forward, NULL, NULL);
+			VectorMA( handEnt.origin, 8.0f, forward, end );
+
+			//If the current force power is directional, show the nav arrow from off-hand for now
+			if (showPowers[cg.forcepowerSelect] >= FP_PUSH) {
+				vec3_t color = {0.0f, 1.0f, 0.0f};
+				FX_AddLine(handEnt.origin, end, 0.1f, 1.0f, 0.0f,
+						   1.0f, 0.0f, 0.0f,
+						   color, color, 0.0f,
+						   60, cgi_R_RegisterShader("gfx/misc/nav_line"),
+						   FX_SIZE_LINEAR | FX_ALPHA_LINEAR);
+			}
+
+			handEnt.renderfx = RF_DEPTHHACK;
+			handEnt.hModel = cgi_R_RegisterModel( "models/weapons2/thermal/thermal_hand.md3" );
+			VectorCopy(handEnt.origin, handEnt.oldorigin);
+			AnglesToAxis(handEnt.angles, handEnt.axis);
+			cgi_R_AddRefEntityToScene(&handEnt);
+		}
 	}
 
 	if ( !cg.hyperspace ) 

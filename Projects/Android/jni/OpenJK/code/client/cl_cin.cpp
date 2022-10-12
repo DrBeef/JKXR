@@ -2015,6 +2015,76 @@ void CL_PlayInGameCinematic_f(void)
 }
 
 
+// Text crawl defines
+#define TC_PLANE_WIDTH	250
+#define TC_PLANE_NEAR	90
+#define TC_PLANE_FAR	715
+#define TC_PLANE_TOP	0
+#define TC_PLANE_BOTTOM	1100
+
+#define TC_DELAY 9000
+#define TC_STOPTIME 81000
+void SCR_AddCreditTextCrawl()
+{
+	static int startTime = cls.realtime;
+	refdef_t	refdef;
+	polyVert_t	verts[4];
+
+	// Set up refdef
+	memset( &refdef, 0, sizeof( refdef ));
+
+	refdef.rdflags = RDF_NOWORLDMODEL;
+	AxisClear( refdef.viewaxis );
+
+	refdef.fov_x = 150;
+	refdef.fov_y = 150;
+
+	refdef.x = 0;
+	refdef.y = -50;
+	refdef.width = cls.glconfig.vidWidth;
+	refdef.height = cls.glconfig.vidHeight * 2; // deliberately extend off the bottom of the screen
+
+	// use to set shaderTime for scrolling shaders
+	refdef.time = 0;
+
+	// Set up the poly verts
+	float fadeDown = 1.0;
+	for ( int i = 0; i < 4; i++ )
+	{
+		verts[i].modulate[0] = 255*fadeDown; // gold color?
+		verts[i].modulate[1] = 235*fadeDown;
+		verts[i].modulate[2] = 127*fadeDown;
+		verts[i].modulate[3] = 255*fadeDown;
+	}
+
+	VectorScaleM( verts[2].modulate, 0.1f, verts[2].modulate ); // darken at the top??
+	VectorScaleM( verts[3].modulate, 0.1f, verts[3].modulate );
+
+	float timeoffset = (cls.realtime-startTime)*0.000015f -1;
+	VectorSet( verts[0].xyz, TC_PLANE_NEAR, -TC_PLANE_WIDTH, TC_PLANE_TOP );
+	verts[0].st[0] = 1;
+	verts[0].st[1] = 1 +timeoffset;
+
+	VectorSet( verts[1].xyz, TC_PLANE_NEAR, TC_PLANE_WIDTH, TC_PLANE_TOP );
+	verts[1].st[0] = 0;
+	verts[1].st[1] = 1 +timeoffset;
+
+	VectorSet( verts[2].xyz, TC_PLANE_FAR, TC_PLANE_WIDTH, TC_PLANE_BOTTOM );
+	verts[2].st[0] = 0;
+	verts[2].st[1] = 0 +timeoffset;
+
+	VectorSet( verts[3].xyz, TC_PLANE_FAR, -TC_PLANE_WIDTH, TC_PLANE_BOTTOM );
+	verts[3].st[0] = 1;
+	verts[3].st[1] = 0 +timeoffset;
+
+	// render it out
+	re.ClearScene();
+	re.AddPolyToScene(  re.RegisterShaderNoMip( "menu/video/tc_demo" ), 4, verts );
+	re.RenderScene( &refdef );
+}
+
+
+
 // Externally-called only, and only if cls.state == CA_CINEMATIC (or CL_IsRunningInGameCinematic() == true now)
 //
 void SCR_DrawCinematic (void)
