@@ -6741,7 +6741,17 @@ void ForceTelepathy( gentity_t *self )
 		return;
 	}
 
-	AngleVectors( self->client->ps.viewangles, forward, NULL, NULL );
+	vec3_t origin, angles;
+	if (self->client->ps.clientNum == 0)
+	{
+		BG_CalculateVROffHandPosition(origin, angles);
+		AngleVectors(angles, forward, NULL, NULL);
+	}
+	else
+	{
+		AngleVectors(self->client->ps.viewangles, forward, NULL, NULL);
+		VectorCopy(self->client->ps.viewangles, angles);
+	}
 	VectorNormalize( forward );
 	VectorMA( self->client->renderInfo.eyePoint, 2048, forward, end );
 
@@ -6954,20 +6964,21 @@ void ForceGrip( gentity_t *self )
 		self->client->ps.weaponTime = floor( self->client->ps.weaponTime * g_timescale->value );
 	}
 
+	vec3_t origin, angles;
 	if (self->client->ps.clientNum == 0)
 	{
-		vec3_t origin, angles;
 		BG_CalculateVROffHandPosition(origin, angles);
 		AngleVectors(angles, forward, NULL, NULL);
 	}
 	else
 	{
 		AngleVectors(self->client->ps.viewangles, forward, NULL, NULL);
+		VectorCopy(self->client->ps.viewangles, angles);
 	}
 	VectorNormalize( forward );
 	VectorMA( self->client->renderInfo.handLPoint, FORCE_GRIP_DIST, forward, end );
 
-	if ( self->enemy && (self->s.number || InFront( self->enemy->currentOrigin, self->client->renderInfo.eyePoint, self->client->ps.viewangles, 0.2f ) ) )
+	if ( self->enemy && (self->s.number || InFront( self->enemy->currentOrigin, self->client->renderInfo.eyePoint, angles, 0.2f ) ) )
 	{//NPCs can always lift enemy since we assume they're looking at them, players need to be facing the enemy
 		if ( gi.inPVS( self->enemy->currentOrigin, self->client->renderInfo.eyePoint ) )
 		{//must be in PVS
@@ -8131,7 +8142,16 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 					NPC_SetAnim( self, SETANIM_TORSO, BOTH_FORCEGRIP_HOLD, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 				}
 				//get their org
-				VectorCopy( self->client->ps.viewangles, angles );
+				if (self->client->ps.clientNum == 0)
+				{
+					vec3_t origin;
+					BG_CalculateVROffHandPosition(origin, angles);
+				}
+				else
+				{
+					VectorCopy( self->client->ps.viewangles, angles );
+				}
+
 				angles[0] -= 10;
 				AngleVectors( angles, dir, NULL, NULL );
 				if ( gripEnt->client )
@@ -8146,7 +8166,7 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 				//how far are they
 				dist = Distance( self->client->renderInfo.handLPoint, gripEntOrg );
 				if ( self->client->ps.forcePowerLevel[FP_GRIP] == FORCE_LEVEL_2 &&
-					(!InFront( gripEntOrg, self->client->renderInfo.handLPoint, self->client->ps.viewangles, 0.3f ) ||
+					(!InFront( gripEntOrg, self->client->renderInfo.handLPoint, angles, 0.3f ) ||
 						DistanceSquared( gripEntOrg, self->client->renderInfo.handLPoint ) > FORCE_GRIP_DIST_SQUARED))
 				{//must face them
 					WP_ForcePowerStop( self, FP_GRIP );

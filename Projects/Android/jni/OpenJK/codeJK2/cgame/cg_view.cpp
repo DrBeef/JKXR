@@ -2032,7 +2032,7 @@ wasForceSpeed=isForceSpeed;
 			}
 
 			handEnt.renderfx = RF_DEPTHHACK;
-			handEnt.hModel = cgi_R_RegisterModel( "models/weapons2/thermal/thermal_hand.md3" );
+			handEnt.hModel = cgi_R_RegisterModel( "models/hands/left_hand_relaxed.md3" );
 			VectorCopy(handEnt.origin, handEnt.oldorigin);
 			AnglesToAxis(handEnt.angles, handEnt.axis);
 			cgi_R_AddRefEntityToScene(&handEnt);

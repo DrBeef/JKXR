@@ -189,8 +189,8 @@ import static android.system.Os.setenv;
 		copy_asset("/sdcard/JKQuest/Demo/base", "UltimateSounds_JK2.pk3", false);
 		copy_asset("/sdcard/JKQuest/Demo/base", "z_bryar_ashura.pk3", false);
 
-		//Bummser's NPC tweaks
-		copy_asset("/sdcard/JKQuest/Demo/base", "z_npc_vr.pk3", false);
+		//Our assets
+		copy_asset("/sdcard/JKQuest/JK2/base", "z_vr_assets.pk3", true);
 
 		commandLineParams = "jo";
 
