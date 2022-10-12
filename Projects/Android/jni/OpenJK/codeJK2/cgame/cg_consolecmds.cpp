@@ -210,6 +210,7 @@ int cmdcmp( const void *a, const void *b ) {
 void CG_ItemSelectorSelect_f( void );
 void CG_ItemSelectorNext_f( void );
 void CG_ItemSelectorPrev_f( void );
+void CG_ToggleSaber_f( void );
 
 /* This array MUST be sorted correctly by alphabetical name field */
 static consoleCommand_t	commands[] = {
@@ -251,6 +252,7 @@ static consoleCommand_t	commands[] = {
 	{ "itemselectorselect", CG_ItemSelectorSelect_f },
 	{ "itemselectornext", CG_ItemSelectorNext_f },
 	{ "itemselectorprev", CG_ItemSelectorPrev_f },
+	{ "togglesaber", CG_ToggleSaber_f },
 };
 
 static const size_t numCommands = ARRAY_LEN( commands );

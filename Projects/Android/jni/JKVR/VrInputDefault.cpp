@@ -156,15 +156,15 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         bool offhandGripPushed = (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger);
         if ( (offhandGripPushed != (pOffTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) &&
                 offhandGripPushed && (distance < STABILISATION_DISTANCE))
-//#ifndef DEBUG
+#ifndef DEBUG
         {
             stabilised = qtrue;
         }
-//#else
-//        {
-//            Cvar_Set("vr_control_scheme", "99");
-//        }
-//#endif
+#else
+        {
+            Cvar_Set("vr_control_scheme", "99");
+        }
+#endif
 
         dominantGripPushed = (pDominantTrackedRemoteNew->Buttons &
                               ovrButton_GripTrigger) != 0;
@@ -559,16 +559,25 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
                 static bool firing = false;
 
+                if (!vr.velocitytriggered) // Don't fire velocity triggered weapons
                 {
                     //Fire Primary - Doesn't trigger the saber
-                    if (!vr.velocitytriggered && // Don't fire velocity triggered weapons
-                        (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
+                    if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
                         (pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger)) {
 
                         ALOGV("**WEAPON EVENT**  Not Grip Pushed %sattack",
                               (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) ? "+" : "-");
                         firing = (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger);
                         sendButtonAction("+attack", firing);
+                    }
+                }
+                else if (vr.weaponid == WP_SABER)
+                {
+                    if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
+                        (pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger)) {
+                        if (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) {
+                            sendButtonActionSimple("togglesaber");
+                        }
                     }
                 }
 

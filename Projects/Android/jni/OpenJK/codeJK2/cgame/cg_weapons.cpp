@@ -2650,6 +2650,15 @@ void CG_Weapon_f( void )
 
 void Cmd_UseInventory_f(gentity_t *ent);
 
+void CG_ToggleSaber_f( )
+{
+	player->client->ps.saberActive = (qboolean)!player->client->ps.saberActive;
+	if (!player->client->ps.saberActive)
+	{
+		G_SoundOnEnt( player, CHAN_WEAPON, "sound/weapons/saber/saberoff.wav" );
+	}
+}
+
 //Selects the currently selected thing (if one _is_ selected)
 void CG_ItemSelectorSelect_f( void )
 {
