@@ -26,6 +26,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "cg_local.h"
 #include "cg_media.h"	//just for cgs....
+#include <JKVR/VrClientInfo.h>
 
 void CG_TargetCommand_f( void );
 extern qboolean	player_locked;
@@ -140,6 +141,8 @@ void CG_ToggleBinoculars( void )
 		cg.zoomTime = cg.time;
 		cgi_S_StartSound( NULL, cg.snap->ps.clientNum, CHAN_AUTO, cgs.media.zoomEnd );
 	}
+
+	vr->cgzoommode = cg.zoomMode;
 }
 
 void CG_ToggleLAGoggles( void )
@@ -182,6 +185,8 @@ void CG_ToggleLAGoggles( void )
 		cg.zoomTime = cg.time;
 		cgi_S_StartSound( NULL, cg.snap->ps.clientNum, CHAN_AUTO, cgs.media.zoomEnd );
 	}
+
+	vr->cgzoommode = cg.zoomMode;
 }
 
 void CG_LoadHud_f( void) 

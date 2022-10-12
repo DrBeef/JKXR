@@ -224,6 +224,31 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             }
         }
 
+        if (vr.cgzoommode > 1)
+        {
+            if (between(-0.2f, primaryJoystickX, 0.2f)) {
+                sendButtonAction("+attack", between(0.8f, pPrimaryJoystick->y, 1.0f));
+                sendButtonAction("+altattack", between(-1.0f, pPrimaryJoystick->y, -0.8f));
+            }
+        } else if (vr.weaponid == WP_SABER)
+        {
+            static bool switched = false;
+            if (between(-0.2f, primaryJoystickX, 0.2f) &&
+                (between(0.8f, pPrimaryJoystick->y, 1.0f) ||
+                 between(-1.0f, pPrimaryJoystick->y, -0.8f))) {
+                if (!switched) {
+                    if (between(0.8f, pPrimaryJoystick->y, 1.0f)) {
+                        sendButtonActionSimple("cg_thirdPerson 1");
+                    } else {
+                        sendButtonActionSimple("cg_thirdPerson 0");
+                    }
+                    switched = true;
+                }
+            } else {
+                switched = false;
+            }
+        }
+
         vr.weapon_stabilised = stabilised;
 
         //if (!vr.item_selector)
@@ -242,13 +267,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     }
                     lastScopeReady = scopeready;
                 }
-            }
-
-            //ALOGV("**GB WEAPON ACTIVE** %i",vr.weaponid);
-            if (!scopeready && vr.weaponid >= 15 && vr.weaponid <= 17) {
-                lastScopeReady = false;
-                ALOGV("**WEAPON EVENT**  disable scope mode forced");
-                sendButtonActionSimple("weapalt");
             }
 
             //Engage scope / virtual stock (iron sight lock) if conditions are right
@@ -468,14 +486,14 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
                 // Uncomment to debug offhand reaching
 
-                ALOGV("Quick Save> Dist: %f | OffHandToDownAngle: %f | HandOffs: %f %f %f\nHmdHandDot: %f | HmdFwdXY: %f %f | WpnFwdXY: %f %f\nTrackOk: %i, DistOk: %i, HeightOk: %i, HnadAngleOk: %i, HmdHandDotOk: %i",
+/*                ALOGV("Quick Save> Dist: %f | OffHandToDownAngle: %f | HandOffs: %f %f %f\nHmdHandDot: %f | HmdFwdXY: %f %f | WpnFwdXY: %f %f\nTrackOk: %i, DistOk: %i, HeightOk: %i, HnadAngleOk: %i, HmdHandDotOk: %i",
                       distanceToHMDOff, offhandToDownAngle, vr.offhandoffset[0],
                       vr.offhandoffset[1], vr.offhandoffset[2],
                       hmdToOffhandDotProduct, hmdForwardXY[0], hmdForwardXY[1], offhandForwardXY[0],
                       offhandForwardXY[1],
                       bpTrackOk, bpOffhandDistToHMDOk, bpOffhandHeightOk, bpOffhandAngleOk,
                       bpHmdToOffhandAngleOk);
-
+*/
 
                 // Check quicksave
                 if (canUseQuickSave) {
@@ -529,7 +547,13 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
                 //Alt Fire (B Button)
                 if ((primaryButtonsNew & primaryButton2) != (primaryButtonsOld & primaryButton2)) {
-                    sendButtonAction("+altattack", (primaryButtonsNew & primaryButton2));
+                    if (vr.cgzoommode > 0)
+                    {
+                        sendButtonActionSimple("invuse");
+                    }
+                    else {
+                        sendButtonAction("+altattack", (primaryButtonsNew & primaryButton2));
+                    }
                 }
 
 

@@ -192,12 +192,12 @@ import static android.system.Os.setenv;
 		//Copy the command line params file
 		copy_asset("/sdcard/JKQuest", "commandline.txt", false);
 
-		//Copy the weapon adjustment config
-		copy_asset("/sdcard/JKQuest/JK2/base", "weapons_vr_jo.cfg", false);
-		copy_asset("/sdcard/JKQuest/JK3/base", "weapons_vr_ja.cfg", false);
+		//Copy the weapon adjustment config - should we force overwrite?
+		copy_asset("/sdcard/JKQuest/JK2/base", "weapons_vr_jo.cfg", true);
+		copy_asset("/sdcard/JKQuest/JK3/base", "weapons_vr_ja.cfg", true);
 
-		//and the cheat menu pk3 for testing
-		copy_asset("/sdcard/JKQuest/JK3/base", "Z_BetaV0.2_NewMenus.pk3", true);
+		//Our assets
+		copy_asset("/sdcard/JKQuest/JK2/base", "z_vr_assets.pk3", true);
 
 		//Read these from a file and pass through
 		commandLineParams = new String("jo");
