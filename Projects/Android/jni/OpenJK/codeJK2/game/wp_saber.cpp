@@ -5706,7 +5706,15 @@ void ForceThrow( gentity_t *self, qboolean pull )
 
 	G_Sound( self, soundIndex );
 
-	VectorCopy( self->client->ps.viewangles, fwdangles );
+	if (self->client->ps.clientNum == 0)
+	{
+		vec3_t origin, angles;
+		BG_CalculateVROffHandPosition(origin, fwdangles);
+	}
+	else
+	{
+		VectorCopy( self->client->ps.viewangles, fwdangles );
+	}
 	//fwdangles[1] = self->client->ps.viewangles[1];
 	AngleVectors( fwdangles, forward, right, NULL );
 	VectorCopy( self->currentOrigin, center );
@@ -6226,7 +6234,16 @@ void ForceThrow( gentity_t *self, qboolean pull )
 				vec3_t	pushDir;
 				float	damage = 800;
 
-				AngleVectors( self->client->ps.viewangles, forward, NULL, NULL );
+				if (self->client->ps.clientNum == 0)
+				{
+					vec3_t origin, angles;
+					BG_CalculateVROffHandPosition(origin, angles);
+					AngleVectors(angles, forward, right, NULL);
+				}
+				else
+				{
+					AngleVectors(self->client->ps.viewangles, forward, right, NULL);
+				}
 				VectorNormalize( forward );
 				VectorMA( self->client->renderInfo.eyePoint, radius, forward, end );
 				gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT, G2_NOCOLLIDE, 0 );
@@ -6937,7 +6954,16 @@ void ForceGrip( gentity_t *self )
 		self->client->ps.weaponTime = floor( self->client->ps.weaponTime * g_timescale->value );
 	}
 
-	AngleVectors( self->client->ps.viewangles, forward, NULL, NULL );
+	if (self->client->ps.clientNum == 0)
+	{
+		vec3_t origin, angles;
+		BG_CalculateVROffHandPosition(origin, angles);
+		AngleVectors(angles, forward, NULL, NULL);
+	}
+	else
+	{
+		AngleVectors(self->client->ps.viewangles, forward, NULL, NULL);
+	}
 	VectorNormalize( forward );
 	VectorMA( self->client->renderInfo.handLPoint, FORCE_GRIP_DIST, forward, end );
 
@@ -7259,7 +7285,17 @@ void ForceShootLightning( gentity_t *self )
 		return;
 	}
 
-	AngleVectors( self->client->ps.viewangles, forward, NULL, NULL );
+	if (self->client->ps.clientNum == 0)
+	{
+		vec3_t origin, angles;
+		BG_CalculateVROffHandPosition(origin, angles);
+		AngleVectors(angles, forward, NULL, NULL);
+	}
+	else
+	{
+		AngleVectors(self->client->ps.viewangles, forward, NULL, NULL);
+	}
+
 	VectorNormalize( forward );
 
 	//FIXME: if lightning hits water, do water-only-flagged radius damage from that point

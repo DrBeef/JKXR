@@ -444,6 +444,13 @@ typedef struct {
 	int			weaponAnimation;
 	int			weaponAnimationTime;
 
+	int 		itemSelectorType; // 0 - weapons, 1 - force powers, 2 - gadgets
+	int			itemSelectorSelection;
+	int 		itemSelectorTime;
+	vec3_t		itemSelectorAngles;
+	vec3_t		itemSelectorOrigin;
+	vec3_t		itemSelectorOffset;
+
 	int			inventorySelect;		// Current inventory item chosen
 	int			inventorySelectTime;
 
@@ -844,6 +851,8 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire );
 
 void CG_AddViewWeapon (playerState_t *ps);
 void CG_DrawWeaponSelect( void );
+
+void CG_DrawItemSelector( void );
 
 void CG_OutOfAmmoChange( void );	// should this be in pmove?
 void CG_Chunks( int owner, vec3_t origin, const vec3_t normal, const vec3_t min, const vec3_t maxs, 

@@ -29,6 +29,7 @@ cvar_t	*vr_virtual_stock;
 cvar_t	*vr_switch_sticks;
 cvar_t	*vr_immersive_cinematics;
 cvar_t	*vr_screen_dist;
+cvar_t	*vr_weapon_velocity_trigger;
 
 ovrInputStateTrackedRemote leftTrackedRemoteState_old;
 ovrInputStateTrackedRemote leftTrackedRemoteState_new;

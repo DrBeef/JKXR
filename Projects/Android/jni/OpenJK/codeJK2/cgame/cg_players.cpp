@@ -3443,7 +3443,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		cgi_R_AddRefEntityToScene(ent);
 	}
 
-	if (player1stPersonSaber && !cent->currentState.saberInFlight)
+	if (player1stPersonSaber && !cent->currentState.saberInFlight && !vr->item_selector)
 	{
 		memset( &hiltEnt, 0, sizeof(refEntity_t) );
 		hiltEnt.renderfx = RF_DEPTHHACK;
@@ -3459,14 +3459,11 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		cgi_R_AddRefEntityToScene(&hiltEnt);
 
 		static int playingSaberSwingSound = 0;
-		if (vr->primaryswingvelocity > WEAPON_VELOCITY_TRIGGER && ((cg.time - playingSaberSwingSound) > 800))
+		if (vr->primaryVelocityTriggeredAttack && ((cg.time - playingSaberSwingSound) > 800))
 		{
 			cgi_S_StartSound ( hiltEnt.origin, cent->gent->s.number, CHAN_AUTO, cgi_S_RegisterSound( va( "sound/weapons/saber/saberhup%d.wav", Q_irand( 1, 9 ) ) ) );
 			playingSaberSwingSound = cg.time;
 		}
-
-		//Try setting ent to be the hilt entity, then any subsequent effects below are applied to that instead
-		ent = &hiltEnt;
 	}
 
 	// Disruptor Gun Alt-fire
@@ -4453,6 +4450,11 @@ void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, in
 	gclient_t *client = cent->gent->client;
 
 	if ( !client )
+	{
+		return;
+	}
+
+	if (vr->item_selector)
 	{
 		return;
 	}
@@ -5549,60 +5551,70 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 					}
 				}
 			}
+		}
 
-			//play special force effects
-			if ( cent->gent->NPC && ( cent->gent->NPC->confusionTime > cg.time || cent->gent->NPC->charmedTime > cg.time || cent->gent->NPC->controlledTime > cg.time) )
-			{// we are currently confused, so play an effect at the headBolt position
-				theFxScheduler.PlayEffect( cgs.effects.forceConfusion, cent->gent->client->renderInfo.eyePoint );
+		//play special force effects
+		if ( cent->gent->NPC && ( cent->gent->NPC->confusionTime > cg.time || cent->gent->NPC->charmedTime > cg.time || cent->gent->NPC->controlledTime > cg.time) )
+		{// we are currently confused, so play an effect at the headBolt position
+			theFxScheduler.PlayEffect( cgs.effects.forceConfusion, cent->gent->client->renderInfo.eyePoint );
+		}
+
+		if ( cent->gent->client && cent->gent->forcePushTime > cg.time )
+		{//being pushed
+			CG_ForcePushBodyBlur( cent, ent.origin, tempAngles );
+		}
+
+		if ( cent->gent->client->ps.powerups[PW_FORCE_PUSH] > cg.time || (cent->gent->client->ps.forcePowersActive & (1<<FP_GRIP)) )
+		{//doing the pushing/gripping
+			CG_ForcePushBlur( cent->gent->client->renderInfo.handLPoint );
+		}
+
+		if ( cent->gent->client->ps.eFlags & EF_FORCE_GRIPPED )
+		{//being gripped
+			CG_ForcePushBlur( cent->gent->client->renderInfo.headPoint );
+		}
+
+		if ( cent->gent->client && cent->gent->client->ps.powerups[PW_SHOCKED] > cg.time )
+		{//being electrocuted
+			CG_ForceElectrocution( cent, ent.origin, tempAngles );
+		}
+
+		if ( cent->gent->client->ps.forcePowersActive&(1<<FP_LIGHTNING) )
+		{//doing the electrocuting
+			vec3_t tAng, fxDir;
+			if (cent->gent->client->ps.clientNum == 0)
+			{
+				vec3_t origin, angles;
+				BG_CalculateVROffHandPosition(origin, tAng);
 			}
-
-			if ( cent->gent->client && cent->gent->forcePushTime > cg.time )
-			{//being pushed
-				CG_ForcePushBodyBlur( cent, ent.origin, tempAngles );
-			}
-
-			if ( cent->gent->client->ps.powerups[PW_FORCE_PUSH] > cg.time || (cent->gent->client->ps.forcePowersActive & (1<<FP_GRIP)) )
-			{//doing the pushing/gripping
-				CG_ForcePushBlur( cent->gent->client->renderInfo.handLPoint );
-			}
-
-			if ( cent->gent->client->ps.eFlags & EF_FORCE_GRIPPED )
-			{//being gripped
-				CG_ForcePushBlur( cent->gent->client->renderInfo.headPoint );
-			}
-
-			if ( cent->gent->client && cent->gent->client->ps.powerups[PW_SHOCKED] > cg.time )
-			{//being electrocuted
-				CG_ForceElectrocution( cent, ent.origin, tempAngles );
-			}
-
-			if ( cent->gent->client->ps.forcePowersActive&(1<<FP_LIGHTNING) )
-			{//doing the electrocuting
-				vec3_t tAng, fxDir;
+			else
+			{
 				VectorCopy( cent->lerpAngles, tAng );
-				/*
-				if ( cent->currentState.number )
-				{
-					VectorSet( tAng, cent->pe.torso.pitchAngle, cent->pe.torso.yawAngle, 0 );
-				}
-				else
-				{//FIXME: this dir looks right on players, but not on NPCs, NPCs pe angles are absolute, not relative?
-					VectorSet( tAng, tempAngles[0]+cent->pe.torso.pitchAngle, tempAngles[1]+cent->pe.torso.yawAngle, 0 );
-				}
-				*/
-				if ( cent->gent->client->ps.forcePowerLevel[FP_LIGHTNING] > FORCE_LEVEL_2 )
-				{//arc
-					vec3_t	fxAxis[3];
-					AnglesToAxis( tAng, fxAxis );
-					theFxScheduler.PlayEffect( cgs.effects.forceLightningWide, cent->gent->client->renderInfo.handLPoint, fxAxis );
-				}
-				else
-				{//line
-					AngleVectors( tAng, fxDir, NULL, NULL );
-					theFxScheduler.PlayEffect( cgs.effects.forceLightning, cent->gent->client->renderInfo.handLPoint, fxDir );
-				}
+			}
+
+			/*
+            if ( cent->currentState.number )
+            {
+                VectorSet( tAng, cent->pe.torso.pitchAngle, cent->pe.torso.yawAngle, 0 );
+            }
+            else
+            {//FIXME: this dir looks right on players, but not on NPCs, NPCs pe angles are absolute, not relative?
+                VectorSet( tAng, tempAngles[0]+cent->pe.torso.pitchAngle, tempAngles[1]+cent->pe.torso.yawAngle, 0 );
+            }
+            */
+			if ( cent->gent->client->ps.forcePowerLevel[FP_LIGHTNING] > FORCE_LEVEL_2 )
+			{//arc
+				vec3_t	fxAxis[3];
+				AnglesToAxis( tAng, fxAxis );
+				theFxScheduler.PlayEffect( cgs.effects.forceLightningWide, cent->gent->client->renderInfo.handLPoint, fxAxis );
+			}
+			else
+			{//line
+				AngleVectors( tAng, fxDir, NULL, NULL );
+				theFxScheduler.PlayEffect( cgs.effects.forceLightning, cent->gent->client->renderInfo.handLPoint, fxDir );
 			}
 		}
+
 		//As good a place as any, I suppose, to do this keyframed sound thing
 		CGG2_AnimSounds( cent );
 		//setup old system for gun to look at

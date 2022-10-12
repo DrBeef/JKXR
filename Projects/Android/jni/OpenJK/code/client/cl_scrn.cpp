@@ -404,6 +404,7 @@ void SCR_Init( void ) {
 void UI_SetActiveMenu( const char* menuname,const char *menuID );
 void _UI_Refresh( int realtime );
 void UI_DrawConnect( const char *servername, const char * updateInfoString );
+void SCR_AddCreditTextCrawl( void );
 
 /*
 ==================
@@ -412,6 +413,7 @@ SCR_DrawScreenField
 This will be called twice if rendering in stereo mode
 ==================
 */
+
 void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 
 	re.BeginFrame( stereoFrame );
@@ -455,7 +457,6 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 			break;
 		}
 	}
-
 	re.ProcessDissolve();
 
 	// draw downloading progress bar
@@ -469,6 +470,11 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	// debug graph can be drawn on top of anything
 	if ( cl_debuggraph->integer || cl_timegraph->integer ) {
 		SCR_DrawDebugGraph ();
+	}
+
+	if ( uiFullscreen )
+	{
+		SCR_AddCreditTextCrawl();
 	}
 }
 

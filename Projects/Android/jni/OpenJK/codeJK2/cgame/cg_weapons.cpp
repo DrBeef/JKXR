@@ -975,7 +975,7 @@ Add the weapon, and flash for the player's view
 ==============
 */
 extern int PM_TorsoAnimForFrame( gentity_t *ent, int torsoFrame );
-extern float CG_ForceSpeedFOV( void );
+extern float CG_ForceSpeedFOV( float infov );
 
 void CG_AddViewWeapon( playerState_t *ps )
 {
@@ -1066,7 +1066,7 @@ void CG_AddViewWeapon( playerState_t *ps )
 		gentity_t	*player = &g_entities[0];
 	if ( (cg.snap->ps.forcePowersActive&(1<<FP_SPEED)) && player->client->ps.forcePowerDuration[FP_SPEED] )//cg.renderingThirdPerson &&
 	{
-		actualFOV = CG_ForceSpeedFOV();
+		actualFOV = CG_ForceSpeedFOV(cg_fov.value);
 		actualFOV = (cg_fovViewmodel.integer) ? actualFOV + (cg_fovViewmodel.integer - cg_fov.integer) : actualFOV;
 	}
 	else
@@ -1124,25 +1124,26 @@ void CG_AddViewWeapon( playerState_t *ps )
 
 		trace_t trace;
 		VectorMA(origin, 256, forward, endForward);
-		static vec3_t WHITE	={1.0f,1.0f,1.0f};
+		static vec3_t RED	= {1.0f,0.0f,0.0f};
 		FX_AddLine( origin, endForward, 0.1f, 4.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
-					WHITE, WHITE, 0.0f,
-					120, cgi_R_RegisterShader( "gfx/effects/redLine" ),
+					RED, RED, 0.0f,
+					120, cgi_R_RegisterShader( "gfx/effects/whiteline2" ),
 					FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
 		VectorMA(origin, 20, right, endRight);
-		vec3_t	color = { 0, 0, 255 };
+		vec3_t	BLUE = {0.0f,0.0f,1.0f};
 		FX_AddLine( origin, endRight, 0.1f, 4.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
-					color, color, 0.0f,
-					120, cgi_R_RegisterShader( "gfx/misc/nav_line" ),
+					BLUE, BLUE, 0.0f,
+					120, cgi_R_RegisterShader( "gfx/misc/whiteline2" ),
 					FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
 		VectorMA(origin, 20, up, endUp);
+		vec3_t	GREEN = {0.0f,1.0f,0.0f};
 		FX_AddLine( origin, endUp, 0.1f, 4.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
-					WHITE, WHITE, 0.0f,
+					GREEN, GREEN, 0.0f,
 					120, cgi_R_RegisterShader( "gfx/misc/whiteline2" ),
 					FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
@@ -2141,7 +2142,9 @@ void CG_DrawWeaponSelect( void )
 		{
 			int w = cgi_R_Font_StrLenPixels(text, cgs.media.qhFontSmall, 1.0f);
 			int x = ( SCREEN_WIDTH - w ) / 2;
-			cgi_R_Font_DrawString(x, (SCREEN_HEIGHT - 24), text, textColor, cgs.media.qhFontSmall, -1, 1.0f);
+			int y = (SCREEN_HEIGHT - 24);
+			CG_AdjustFrom640Int(&x, &y, NULL, NULL);
+			cgi_R_Font_DrawString(x, y, text, textColor, cgs.media.qhFontSmall, -1, 1.0f);
 		}
 	}
 
@@ -2642,6 +2645,276 @@ void CG_Weapon_f( void )
 	SetWeaponSelectTime();
 //	cg.weaponSelectTime = cg.time;
 	cg.weaponSelect = num;
+}
+
+
+void Cmd_UseInventory_f(gentity_t *ent);
+
+//Selects the currently selected thing (if one _is_ selected)
+void CG_ItemSelectorSelect_f( void )
+{
+	cg.itemSelectorTime = 0;
+	cgi_Cvar_Set("timescale", "1.0");
+
+	if (cg.itemSelectorSelection == -1)
+	{
+		cg.itemSelectorType = 0;
+		return;
+	}
+
+	if (cg.itemSelectorType == 0)
+	{
+		if (cg.weaponSelect == cg.itemSelectorSelection)
+		{
+			return;
+		}
+
+		cg.weaponSelectTime = cg.time;
+		cg.weaponSelect = cg.itemSelectorSelection;
+	}
+	else if (cg.itemSelectorType == 1)
+	{
+		if (cg.forcepowerSelect == cg.itemSelectorSelection)
+		{
+			return;
+		}
+
+		cg.forcepowerSelectTime = cg.time;
+		cg.forcepowerSelect = cg.itemSelectorSelection;
+	}
+	else if (cg.itemSelectorType == 2)
+	{
+		cg.inventorySelectTime = cg.time;
+		cg.inventorySelect = cg.itemSelectorSelection;
+
+		//Immediately use the selected inventory item
+		if (player)
+		{
+			Cmd_UseInventory_f(player);
+		}
+	}
+
+	//reset ready for next time
+	cg.itemSelectorType = 0;
+	cg.itemSelectorSelection = -1;
+}
+
+void CG_ItemSelectorNext_f( void )
+{
+	cg.itemSelectorType = (cg.itemSelectorType+1) % 3;
+	cg.itemSelectorTime = cg.time;
+}
+
+void CG_ItemSelectorPrev_f( void )
+{
+	if (--cg.itemSelectorType < 0)
+		cg.itemSelectorType = 2;
+	cg.itemSelectorTime = cg.time;
+}
+
+extern int	force_icons[NUM_FORCE_POWERS];
+extern int inv_icons[INV_MAX];
+qboolean CG_InventorySelectable( int index);
+qboolean ForcePower_Valid(int index);
+
+void CG_DrawItemSelector( void )
+{
+	if (cg.itemSelectorTime == 0)
+	{
+		cg.itemSelectorTime = cg.time;
+		VectorCopy(vr->weaponangles, cg.itemSelectorAngles);
+		VectorCopy(vr->weaponposition, cg.itemSelectorOrigin);
+		VectorCopy(vr->weaponoffset, cg.itemSelectorOffset);
+	}
+
+	float dist = 10.0f;
+	float radius = 4.4f;
+	float scale = 0.05f;
+
+	float frac = (cg.time - cg.itemSelectorTime) / 20.0f;
+	if (frac > 1.0f)
+	{
+		frac = 1.0f;
+	}
+	cgi_Cvar_Set("timescale", "0.22");
+
+	vec3_t controllerOrigin, controllerAngles, controllerOffset, selectorOrigin;
+	BG_CalculateVRWeaponPosition(controllerOrigin, controllerAngles);
+	VectorSubtract(vr->weaponposition, cg.itemSelectorOrigin, controllerOffset);
+
+	vec3_t wheelAngles, wheelOrigin, beamOrigin, wheelForward, wheelRight, wheelUp;
+	BG_CalculateVRPositionInWorld(cg.itemSelectorOrigin, cg.itemSelectorOffset, cg.itemSelectorAngles, wheelOrigin, wheelAngles);
+
+	AngleVectors(wheelAngles, wheelForward, wheelRight, wheelUp);
+	VectorCopy(controllerOrigin, wheelOrigin);
+
+	VectorCopy(wheelOrigin, beamOrigin);
+	VectorMA(wheelOrigin, (dist * frac), wheelForward, wheelOrigin);
+	VectorCopy(wheelOrigin, selectorOrigin);
+
+	vec3_t pos;
+	memset(&pos, 0, sizeof pos);
+	{
+		pos[0] = (sinf(DEG2RAD(wheelAngles[YAW] - controllerAngles[YAW])) / sinf(DEG2RAD(22.5f)));
+		pos[1] = ((wheelAngles[PITCH] - controllerAngles[PITCH]) / 22.5f);
+
+		float len = VectorLength(pos);
+		if (len > 1.0f)
+		{
+			pos[0] *= (1.0f / len);
+			pos[1] *= (1.0f / len);
+		}
+	}
+
+	VectorMA(selectorOrigin, radius * pos[0], wheelRight, selectorOrigin);
+	VectorMA(selectorOrigin, radius * pos[1], wheelUp, selectorOrigin);
+
+	{
+		vec3_t	color = { 0, 0, 255 };
+		FX_AddLine( beamOrigin, selectorOrigin, 0.1f, 1.0f, 0.0f,
+					1.0f, 0.0f, 0.0f,
+					color, color, 0.0f,
+					60, cgi_R_RegisterShader( "gfx/misc/nav_line" ),
+					FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
+
+	}
+
+	int count;
+	switch (cg.itemSelectorType)
+	{
+		case 0: //weapons
+			count = WP_EMPLACED_GUN;
+			break;
+		case 1: // force powers
+			count = MAX_SHOWPOWERS;
+			break;
+		case 2: //gadgets
+			count = INV_GOODIE_KEY;
+			break;
+	}
+
+	qboolean selected = qfalse;
+	for (int index = 0; index < count; ++index)
+	{
+		int itemId = index;
+		if (cg.itemSelectorType == 0) {
+			itemId = index+1; // We need to ignore WP_NONE for weapons
+			if (itemId == count)
+			{
+				break;
+			}
+
+			if (itemId == WP_SABER ||
+				itemId == WP_BRYAR_PISTOL ||
+				itemId == WP_BLASTER ||
+				itemId == WP_FLECHETTE ||
+				itemId == WP_REPEATER ||
+				itemId == WP_THERMAL) {
+				CG_RegisterWeapon(itemId);
+			} else {
+				continue;
+			}
+		}
+
+		{
+			bool selectable;
+			switch (cg.itemSelectorType)
+			{
+				case 0: //weapons
+					selectable = CG_WeaponSelectable(itemId, cg.weaponSelect, qfalse) && cg.snap->ps.ammo[weaponData[itemId].ammoIndex];
+					break;
+				case 1: // force powers
+					selectable = ForcePower_Valid(itemId);
+					break;
+				case 2: //gadgets
+					selectable = CG_InventorySelectable(itemId) && inv_icons[itemId];
+					break;
+			}
+
+			if (selectable) {
+				//first calculate wheel slot position
+				vec3_t angles, iconOrigin, iconBackground, iconForeground;
+				VectorClear(angles);
+				angles[YAW] = wheelAngles[YAW];
+				angles[PITCH] = wheelAngles[PITCH];
+				angles[ROLL] =
+						(360 / count) * (itemId - 1);
+				vec3_t forward, up;
+				AngleVectors(angles, forward, NULL, up);
+
+				VectorMA(wheelOrigin, (radius * frac), up, iconOrigin);
+				VectorMA(iconOrigin, 0.2f, forward, iconBackground);
+				VectorMA(iconOrigin, -0.2f, forward, iconForeground);
+
+				{
+					vec3_t diff;
+					VectorSubtract(selectorOrigin, iconOrigin, diff);
+					float length = VectorLength(diff);
+					if (length <= 1.0f &&
+						frac == 1.0f &&
+						selectable) {
+						if (cg.itemSelectorSelection != itemId) {
+							cg.itemSelectorSelection = itemId;
+							//trap_HapticEvent("selector_icon", 0, 0, 100, 0, 0);
+						}
+
+						selected = qtrue;
+					}
+				}
+
+				if (cg.itemSelectorSelection == itemId) {
+					refEntity_t sprite;
+					memset(&sprite, 0, sizeof(sprite));
+					VectorCopy(iconOrigin, sprite.origin);
+					sprite.origin[2] += 2.5f + (0.5f * sinf(DEG2RAD(
+							AngleNormalize360(cg.time - cg.itemSelectorTime))));
+					sprite.reType = RT_SPRITE;
+					sprite.customShader = cgs.media.binocularArrow;
+					sprite.radius = 0.6f;
+					sprite.shaderRGBA[0] = 255;
+					sprite.shaderRGBA[1] = 255;
+					sprite.shaderRGBA[2] = 255;
+					sprite.shaderRGBA[3] = 255;
+					cgi_R_AddRefEntityToScene(&sprite);
+				}
+
+				{
+					refEntity_t sprite;
+					memset(&sprite, 0, sizeof(sprite));
+
+					float sRadius = 1.3f;
+
+					VectorCopy(iconOrigin, sprite.origin);
+					sprite.reType = RT_SPRITE;
+					switch (cg.itemSelectorType)
+					{
+						case 0: //weapons
+							sprite.customShader = cg_weapons[itemId].weaponIcon;
+							break;
+						case 1: // force powers
+							sprite.customShader = force_icons[showPowers[itemId]];
+							break;
+						case 2: //gadgets
+							sprite.customShader = inv_icons[itemId];
+							break;
+					}
+
+					sprite.radius =
+							sRadius * (cg.itemSelectorSelection == itemId ? 1.3f : 0.6f);
+					sprite.shaderRGBA[0] = 255;
+					sprite.shaderRGBA[1] = 255;
+					sprite.shaderRGBA[2] = 255;
+					sprite.shaderRGBA[3] = 255;
+					cgi_R_AddRefEntityToScene(&sprite);
+				}
+			}
+		}
+	}
+
+	if (!selected)
+	{
+		cg.itemSelectorSelection = -1;
+	}
 }
 
 /*

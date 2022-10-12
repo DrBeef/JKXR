@@ -2582,7 +2582,9 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		return;
 	}
 
-    CG_DrawCrosshair3D();
+	if (!vr->item_selector) {
+		CG_DrawCrosshair3D();
+	}
 
 	//FIXME: these globals done once at start of frame for various funcs
 	AngleVectors (cg.refdefViewAngles, vfwd, vright, vup);

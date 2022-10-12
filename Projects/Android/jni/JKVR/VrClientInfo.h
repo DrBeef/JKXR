@@ -37,6 +37,8 @@ typedef struct {
     vec3_t weaponoffset_history[NUM_WEAPON_SAMPLES];
     float weaponoffset_history_timestamp[NUM_WEAPON_SAMPLES];
 
+    bool item_selector;
+
     bool pistol;                // True if the weapon is a pistol
 
     //Lots of scope weapon stuff
@@ -49,7 +51,9 @@ typedef struct {
 
     bool velocitytriggered;
     float primaryswingvelocity;
+    bool primaryVelocityTriggeredAttack;
     float secondaryswingvelocity;
+    bool secondaryVelocityTriggeredAttack;
 
     vec3_t offhandangles;
     vec3_t offhandangles_last; // Don't use this, it is just for calculating delta!

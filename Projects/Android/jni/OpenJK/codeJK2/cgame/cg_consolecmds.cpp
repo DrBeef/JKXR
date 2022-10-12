@@ -202,6 +202,10 @@ int cmdcmp( const void *a, const void *b ) {
 	return Q_stricmp( (const char *)a, ((consoleCommand_t*)b)->cmd );
 }
 
+void CG_ItemSelectorSelect_f( void );
+void CG_ItemSelectorNext_f( void );
+void CG_ItemSelectorPrev_f( void );
+
 /* This array MUST be sorted correctly by alphabetical name field */
 static consoleCommand_t	commands[] = {
 	{ "cam_disable", CMD_CGCam_Disable },	//gets out of camera mode for debuggin
@@ -239,6 +243,9 @@ static consoleCommand_t	commands[] = {
 	{ "weapprev", CG_PrevWeapon_f },
 	{ "writecam", CG_WriteCam_f },
 	{ "zoom", CG_ToggleBinoculars },
+	{ "itemselectorselect", CG_ItemSelectorSelect_f },
+	{ "itemselectornext", CG_ItemSelectorNext_f },
+	{ "itemselectorprev", CG_ItemSelectorPrev_f },
 };
 
 static const size_t numCommands = ARRAY_LEN( commands );
