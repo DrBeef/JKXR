@@ -133,6 +133,12 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton1, A_MOUSE1);
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, ovrButton_Trigger, A_MOUSE1);
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, A_ESCAPE);
+
+        //To skip flatscreen cinematic
+        if ((pDominantTrackedRemoteNew->Buttons & primaryThumb) !=
+            (pDominantTrackedRemoteOld->Buttons & primaryThumb)) {
+            sendButtonAction("+use", (pDominantTrackedRemoteNew->Buttons & primaryThumb));
+        }
     }
     else
     {

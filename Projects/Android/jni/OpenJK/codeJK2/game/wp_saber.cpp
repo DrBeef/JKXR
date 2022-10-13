@@ -116,6 +116,7 @@ void ForceThrow( gentity_t *self, qboolean pull );
 qboolean WP_ForcePowerAvailable( gentity_t *self, forcePowers_t forcePower, int overrideAmt );
 void WP_ForcePowerDrain( gentity_t *self, forcePowers_t forcePower, int overrideAmt );
 
+extern cvar_t	*g_saberAutoDeflect1stPerson;
 extern cvar_t	*g_saberAutoBlocking;
 extern cvar_t	*g_saberRealisticCombat;
 extern int g_crosshairEntNum;
@@ -4624,6 +4625,12 @@ void WP_SaberBlockNonRandom( gentity_t *self, vec3_t hitloc, qboolean missileBlo
 		return;
 	}
 
+	if (self->client->ps.clientNum == 0 && missileBlock && !cg_thirdPerson.integer &&
+        !g_saberAutoDeflect1stPerson->integer)
+	{
+		return;
+	}
+
 	VectorSubtract( hitloc, self->client->renderInfo.eyePoint, diff );
 	diff[2] = 0;
 	VectorNormalize( diff );
@@ -4901,10 +4908,18 @@ void WP_SaberStartMissileBlockCheck( gentity_t *self, usercmd_t *ucmd  )
 		return;
 	}
 
-	if ( !self->s.number && !g_saberAutoBlocking->integer && self->client->ps.saberBlockingTime<level.time )
-	{
-		return;
-	}
+    if (cg_thirdPerson.integer) {
+        if (!self->s.number && !g_saberAutoBlocking->integer &&
+            self->client->ps.saberBlockingTime < level.time) {
+            return;
+        }
+    } else // first person
+    {
+        if (!self->s.number && !g_saberAutoDeflect1stPerson->integer &&
+            self->client->ps.saberBlockingTime < level.time) {
+            return;
+        }
+    }
 
 	fwdangles[1] = self->client->ps.viewangles[1];
 	AngleVectors( fwdangles, forward, NULL, NULL );
@@ -5197,8 +5212,11 @@ void WP_SaberUpdate( gentity_t *self, usercmd_t *ucmd )
 		}
 		else if ( self->client->ps.saberBlocking == BLK_TIGHT || self->client->ps.saberBlocking == BLK_WIDE )
 		{//FIXME: keep bbox in front of player, even when wide?
+			bool autoBlocking = (cg_thirdPerson.integer && g_saberAutoBlocking->integer) ||
+					(!cg_thirdPerson.integer && g_saberAutoDeflect1stPerson->integer);
 			vec3_t	saberOrg;
-			if ( ( (self->s.number&&!Jedi_SaberBusy(self)&&!g_saberRealisticCombat->integer) || (self->s.number == 0 && self->client->ps.saberBlocking == BLK_WIDE && (g_saberAutoBlocking->integer||self->client->ps.saberBlockingTime>level.time)) )
+			if ( ( (self->s.number&&!Jedi_SaberBusy(self)&&!g_saberRealisticCombat->integer) || (self->s.number == 0 && self->client->ps.saberBlocking == BLK_WIDE &&
+				(autoBlocking||self->client->ps.saberBlockingTime>level.time)) )
 				&& self->client->ps.weaponTime <= 0 )
 			{//full-size blocking for non-attacking player with g_saberAutoBlocking on
 				vec3_t saberang={0,0,0}, fwd, sabermins={-8,-8,-8}, sabermaxs={8,8,8};

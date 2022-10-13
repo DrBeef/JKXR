@@ -419,6 +419,7 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	re.BeginFrame( stereoFrame );
 
 	qboolean uiFullscreen = _UI_IsFullscreen();
+	static bool drawCreditsCrawl = true;
 
 	// if the menu is going to cover the entire screen, we
 	// don't need to render anything under it
@@ -446,6 +447,7 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 			CL_CGameRendering( stereoFrame );
 			break;
 		case CA_ACTIVE:
+			drawCreditsCrawl = false;
 			if (CL_IsRunningInGameCinematic() || CL_InGameCinematicOnStandBy())
 			{
 				SCR_DrawCinematic();
@@ -472,7 +474,7 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 		SCR_DrawDebugGraph ();
 	}
 
-	if ( uiFullscreen )
+	if ( uiFullscreen && drawCreditsCrawl)
 	{
 		SCR_AddCreditTextCrawl();
 	}
