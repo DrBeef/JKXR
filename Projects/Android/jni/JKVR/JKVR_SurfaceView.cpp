@@ -1279,7 +1279,7 @@ void JKVR_Init()
 
 	vr_immersive_cinematics = Cvar_Get("vr_immersive_cinematics", "0", CVAR_ARCHIVE);
 	vr_screen_dist = Cvar_Get( "vr_screen_dist", "2.5", CVAR_ARCHIVE);
-	vr_weapon_velocity_trigger = Cvar_Get( "vr_weapon_velocity_trigger", "1.6", CVAR_ARCHIVE);
+	vr_weapon_velocity_trigger = Cvar_Get( "vr_weapon_velocity_trigger", "2.3", CVAR_ARCHIVE);
 }
 
 
