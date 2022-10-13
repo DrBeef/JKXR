@@ -186,6 +186,7 @@ cvar_t	*g_AIsurrender;
 cvar_t	*g_numEntities;
 //cvar_t	*g_iscensored;
 
+cvar_t	*g_saberAutoDeflect1stPerson;
 cvar_t	*g_saberAutoBlocking;
 cvar_t	*g_saberRealisticCombat;
 cvar_t	*debug_subdivision;
@@ -659,6 +660,7 @@ void G_InitCvars( void ) {
 	g_subtitles = gi.cvar( "g_subtitles", "0", CVAR_ARCHIVE );
 	com_buildScript = gi.cvar ("com_buildscript", "0", 0);
 
+	g_saberAutoDeflect1stPerson = gi.cvar( "g_saberAutoDeflect1stPerson", "0", CVAR_CHEAT );//Whether the saber will auto deflect missiles in first person
 	g_saberAutoBlocking = gi.cvar( "g_saberAutoBlocking", "0", CVAR_CHEAT );//must press +block button to do any blocking
 	g_saberRealisticCombat = gi.cvar( "g_saberMoreRealistic", "1", CVAR_ARCHIVE );//makes collision more precise, increases damage
 	debug_subdivision = gi.cvar( "debug_subdivision", "0", CVAR_ARCHIVE );//debug for dismemberment

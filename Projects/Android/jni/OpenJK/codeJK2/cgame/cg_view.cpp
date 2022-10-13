@@ -2010,6 +2010,7 @@ wasForceSpeed=isForceSpeed;
 		if (!in_camera
 			&& !cg.renderingThirdPerson
 			&& cg.predicted_player_state.stats[STAT_HEALTH] > 0
+			&& cg.snap->ps.weapon != WP_MELEE
 			&& !vr->weapon_stabilised
 			&& !cg_pano.integer
 			&& (cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD))
@@ -2018,23 +2019,17 @@ wasForceSpeed=isForceSpeed;
 			refEntity_t handEnt;
 			memset( &handEnt, 0, sizeof(refEntity_t) );
 			BG_CalculateVROffHandPosition(handEnt.origin, handEnt.angles);
-			AngleVectors(handEnt.angles, forward, NULL, NULL);
-			VectorMA( handEnt.origin, 8.0f, forward, end );
 
-			//If the current force power is directional, show the nav arrow from off-hand for now
-			if (showPowers[cg.forcepowerSelect] >= FP_PUSH) {
-				vec3_t color = {0.0f, 1.0f, 0.0f};
-				FX_AddLine(handEnt.origin, end, 0.1f, 1.0f, 0.0f,
-						   1.0f, 0.0f, 0.0f,
-						   color, color, 0.0f,
-						   60, cgi_R_RegisterShader("gfx/misc/nav_line"),
-						   FX_SIZE_LINEAR | FX_ALPHA_LINEAR);
-			}
+			//Move it back a bit?
+			AngleVectors(handEnt.angles, forward, NULL, NULL);
+			VectorMA( handEnt.origin, -1.0f, forward, handEnt.origin );
+
 
 			handEnt.renderfx = RF_DEPTHHACK;
-			handEnt.hModel = cgi_R_RegisterModel( "models/hands/left_hand_relaxed.md3" );
+			handEnt.hModel = cgi_R_RegisterModel( "models/players/kyle/lhand_r.md3" );
 			VectorCopy(handEnt.origin, handEnt.oldorigin);
 			AnglesToAxis(handEnt.angles, handEnt.axis);
+
 			cgi_R_AddRefEntityToScene(&handEnt);
 		}
 	}

@@ -2025,7 +2025,6 @@ void CL_PlayInGameCinematic_f(void)
 #define TC_PLANE_TOP	0
 #define TC_PLANE_BOTTOM	1100
 
-#define TC_DELAY 9000
 #define TC_STOPTIME 81000
 void SCR_AddCreditTextCrawl()
 {
@@ -2063,7 +2062,7 @@ void SCR_AddCreditTextCrawl()
 	VectorScaleM( verts[2].modulate, 0.1f, verts[2].modulate ); // darken at the top??
 	VectorScaleM( verts[3].modulate, 0.1f, verts[3].modulate );
 
-	float timeoffset = (cls.realtime-startTime)*0.000015f -1;
+	float timeoffset = (cls.realtime-startTime)*0.00003f -1;
 	VectorSet( verts[0].xyz, TC_PLANE_NEAR, -TC_PLANE_WIDTH, TC_PLANE_TOP );
 	verts[0].st[0] = 1;
 	verts[0].st[1] = 1 +timeoffset;
@@ -2082,7 +2081,7 @@ void SCR_AddCreditTextCrawl()
 
 	// render it out
 	re.ClearScene();
-	re.AddPolyToScene(  re.RegisterShaderNoMip( "menu/video/tc_demo" ), 4, verts );
+	re.AddPolyToScene(  re.RegisterShaderNoMip( "menu/video/beef_crawl" ), 4, verts );
 	re.RenderScene( &refdef );
 }
 

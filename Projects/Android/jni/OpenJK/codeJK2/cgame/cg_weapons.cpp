@@ -2704,7 +2704,6 @@ void CG_ItemSelectorSelect_f( void )
 	}
 
 	//reset ready for next time
-	cg.itemSelectorType = 0;
 	cg.itemSelectorSelection = -1;
 }
 
@@ -2752,6 +2751,7 @@ void CG_DrawItemSelector( void )
 	VectorSubtract(vr->weaponposition, cg.itemSelectorOrigin, controllerOffset);
 
 	vec3_t wheelAngles, wheelOrigin, beamOrigin, wheelForward, wheelRight, wheelUp;
+    cg.itemSelectorAngles[YAW] = vr->hmdorientation[YAW];
 	BG_CalculateVRPositionInWorld(cg.itemSelectorOrigin, cg.itemSelectorOffset, cg.itemSelectorAngles, wheelOrigin, wheelAngles);
 
 	AngleVectors(wheelAngles, wheelForward, wheelRight, wheelUp);
@@ -2884,6 +2884,7 @@ void CG_DrawItemSelector( void )
 					sprite.reType = RT_SPRITE;
 					sprite.customShader = cgs.media.binocularArrow;
 					sprite.radius = 0.6f;
+					sprite.rotation = -90.0f;
 					sprite.shaderRGBA[0] = 255;
 					sprite.shaderRGBA[1] = 255;
 					sprite.shaderRGBA[2] = 255;

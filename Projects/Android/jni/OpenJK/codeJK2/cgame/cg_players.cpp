@@ -3456,6 +3456,9 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
 		VectorCopy(axis[1], hiltEnt.axis[1]);
 		VectorCopy(axis[0], hiltEnt.axis[2]);
+		for (int i = 0; i < 3; ++i)
+			VectorScale(hiltEnt.axis[i], 0.85f, hiltEnt.axis[i]);
+
 		cgi_R_AddRefEntityToScene(&hiltEnt);
 
 		static int playingSaberSwingSound = 0;
