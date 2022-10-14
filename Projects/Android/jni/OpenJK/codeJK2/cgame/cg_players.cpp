@@ -3450,6 +3450,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		hiltEnt.hModel = cgi_R_RegisterModel( "models/weapons2/saber/saber_w.md3" );
 		vec3_t angles;
 		BG_CalculateVRSaberPosition(hiltEnt.origin, hiltEnt.angles);
+		hiltEnt.angles[ROLL] += 180;
 		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
 		vec3_t axis[3];
 		AnglesToAxis(hiltEnt.angles, axis);
@@ -4457,7 +4458,7 @@ void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, in
 		return;
 	}
 
-	if (vr->item_selector)
+	if (vr->item_selector && !cg.renderingThirdPerson)
 	{
 		return;
 	}
@@ -4858,7 +4859,11 @@ void CG_Player(centity_t *cent ) {
 		return;
 	}
 
-	vr->weaponid = cg.snap->ps.weapon;
+	if (cg.snap->ps.stats[STAT_HEALTH] > 0) {
+		vr->weaponid = cg.snap->ps.weapon;
+	} else {
+		vr->weaponid = WP_NONE;
+	}
 
 	//Get the player's light level for stealth calculations
 	CG_GetPlayerLightLevel( cent );

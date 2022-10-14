@@ -2026,7 +2026,17 @@ wasForceSpeed=isForceSpeed;
 
 
 			handEnt.renderfx = RF_DEPTHHACK;
-			handEnt.hModel = cgi_R_RegisterModel( "models/players/kyle/lhand_r.md3" );
+
+			if (cg.snap->ps.powerups[PW_FORCE_PUSH] > cg.time ||
+				(cg.snap->ps.forcePowersActive & (1<<FP_GRIP)) ||
+				(cg.snap->ps.forcePowersActive & (1<<FP_LIGHTNING)))
+			{
+				handEnt.hModel = cgs.media.handModel_force;
+			}
+			else
+			{
+				handEnt.hModel = cgs.media.handModel_relaxed;
+			}
 			VectorCopy(handEnt.origin, handEnt.oldorigin);
 			AnglesToAxis(handEnt.angles, handEnt.axis);
 
