@@ -587,8 +587,8 @@ void G_InitCvars( void ) {
 	g_saberAutoDeflect1stPerson = gi.cvar( "g_saberAutoDeflect1stPerson", "0", CVAR_ARCHIVE|CVAR_CHEAT );//Whether the saber will auto deflect missiles in first person
 	g_saberAutoBlocking = gi.cvar( "g_saberAutoBlocking", "0", CVAR_ARCHIVE|CVAR_CHEAT );//must press +block button to do any blocking
 	g_saberRealisticCombat = gi.cvar( "g_saberRealisticCombat", "1", CVAR_ARCHIVE );//makes collision more precise, increases damage
-	g_saberMoveSpeed = gi.cvar( "g_saberMoveSpeed", "2", CVAR_ARCHIVE|CVAR_CHEAT );//how fast you run while attacking with a saber
-	g_saberAnimSpeed = gi.cvar( "g_saberAnimSpeed", "1", CVAR_ARCHIVE|CVAR_CHEAT );//how fast saber animations run
+	g_saberMoveSpeed = gi.cvar( "g_saberMoveSpeed", "1", CVAR_ARCHIVE|CVAR_CHEAT );//how fast you run while attacking with a saber
+	g_saberAnimSpeed = gi.cvar( "g_saberAnimSpeed", "1.2", CVAR_ARCHIVE|CVAR_CHEAT );//how fast saber animations run
 	g_saberAutoAim = gi.cvar( "g_saberAutoAim", "1", CVAR_ARCHIVE|CVAR_CHEAT );//auto-aims at enemies when not moving or when just running forward
 
 	g_AIsurrender = gi.cvar( "g_AIsurrender", "0", CVAR_CHEAT );
