@@ -137,6 +137,11 @@ typedef struct {
 	qhandle_t	explosionModel;
 	qhandle_t	surfaceExplosionShader;
 
+	//Hand models
+	qhandle_t	handModel_relaxed;
+	qhandle_t	handModel_force;
+
+
 	qhandle_t	solidWhiteShader;
 	qhandle_t	electricBodyShader;
 	qhandle_t	electricBody2Shader;

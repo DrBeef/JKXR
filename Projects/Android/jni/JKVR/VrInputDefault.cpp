@@ -162,16 +162,16 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         bool offhandGripPushed = (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger);
         if ( (offhandGripPushed != (pOffTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) &&
                 offhandGripPushed && (distance < STABILISATION_DISTANCE))
-#ifndef DEBUG
+//#ifndef DEBUG
         {
             stabilised = qtrue;
-        }
+        }/*
 #else
         {
             Cvar_Set("vr_control_scheme", "99");
         }
 #endif
-
+*/
         dominantGripPushed = (pDominantTrackedRemoteNew->Buttons &
                               ovrButton_GripTrigger) != 0;
         bool dominantButton1Pushed = (pDominantTrackedRemoteNew->Buttons &
@@ -230,7 +230,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             }
         }
 
-        if (vr.cgzoommode > 1)
+        if (vr.cgzoommode > 0)
         {
             if (between(-0.2f, primaryJoystickX, 0.2f)) {
                 sendButtonAction("+attack", between(0.8f, pPrimaryJoystick->y, 1.0f));
@@ -557,15 +557,45 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     {
                         sendButtonActionSimple("invuse");
                     }
-                    else {
+                    else if (vr.weaponid == WP_SABER && vr.velocitytriggered)
+                    {
+                        //B button toggles saber on/off in first person
+                        if (primaryButtonsNew & primaryButton2) {
+                            sendButtonActionSimple("togglesaber");
+                        }
+                    }
+                    else
+                    {
                         sendButtonAction("+altattack", (primaryButtonsNew & primaryButton2));
                     }
                 }
 
 
                 static bool firing = false;
+                static bool throwing = false;
 
-                if (!vr.velocitytriggered) // Don't fire velocity triggered weapons
+                int thirdPerson = Cvar_VariableIntegerValue("cg_thirdPerson");
+
+                if (vr.weaponid == WP_SABER && !thirdPerson && vr.cgzoommode == 0)
+                {
+                    static bool previous_throwing = false;
+                    previous_throwing = throwing;
+                    if (!throwing &&
+                        vr.primaryVelocityTriggeredAttack &&
+                        (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger))
+                    {
+                        throwing = true;
+                    }
+                    else if (throwing && !(pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger))
+                    {
+                        throwing = false;
+                    }
+
+                    if (previous_throwing != throwing) {
+                        sendButtonAction("+altattack", throwing);
+                    }
+                }
+                else if (!vr.velocitytriggered) // Don't fire velocity triggered weapons
                 {
                     //Fire Primary - Doesn't trigger the saber
                     if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
@@ -576,14 +606,12 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                         firing = (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger);
                         sendButtonAction("+attack", firing);
                     }
-                }
-                else if (vr.weaponid == WP_SABER)
-                {
-                    if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
-                        (pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger)) {
-                        if (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) {
-                            sendButtonActionSimple("togglesaber");
-                        }
+
+                    if (throwing)
+                    {
+                        //if throwing is still activated here, just disable
+                        throwing = false;
+                        sendButtonAction("+altattack", throwing);
                     }
                 }
 

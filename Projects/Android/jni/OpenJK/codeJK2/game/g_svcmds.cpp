@@ -259,11 +259,11 @@ static void Svcmd_ForceSetLevel_f( int forcePower )
 	{
 		return;
 	}
-	if ( !g_cheats->integer ) 
+/*	if ( !g_cheats->integer )
 	{
 		gi.SendServerCommand( 0, "print \"Cheats are not enabled on this server.\n\"");
 		return;
-	}
+	}*/
 	const char *newVal = gi.argv(1);
 	if ( !VALIDSTRING( newVal ) )
 	{
@@ -371,6 +371,36 @@ void Svcmd_SaberAttackCycle_f( void )
 	}
 	//gi.Printf("\n");
 #endif
+}
+
+void Svcmd_SaberSetLevel_f( void )
+{
+	if ( !&g_entities[0] || !g_entities[0].client )
+	{
+		return;
+	}
+
+	gentity_t *self = G_GetSelfForPlayerCmd();
+	if ( self->s.weapon != WP_SABER )
+	{
+		return;
+	}
+
+	const char *newVal = gi.argv(1);
+	int saberAnimLevel = atoi(newVal);
+	if ( saberAnimLevel > self->client->ps.forcePowerLevel[FP_SABER_OFFENSE] )
+	{//wrap around
+		saberAnimLevel = FORCE_LEVEL_1;
+	}
+
+	if ( !self->s.number )
+	{
+		cg.saberAnimLevelPending = saberAnimLevel;
+	}
+	else
+	{
+		self->client->ps.saberAnimLevel = saberAnimLevel;
+	}
 }
 
 template <int32_t power>
@@ -573,13 +603,14 @@ static svcmd_t svcmds[] = {
 	{ "setForceGrip",				Svcmd_ForceSetLevel_f<FP_GRIP>,				CMD_CHEAT },
 	{ "setForceLightning",			Svcmd_ForceSetLevel_f<FP_LIGHTNING>,		CMD_CHEAT },
 	{ "setMindTrick",				Svcmd_ForceSetLevel_f<FP_TELEPATHY>,		CMD_CHEAT },
-	{ "setSaberDefense",			Svcmd_ForceSetLevel_f<FP_SABER_DEFENSE>,	CMD_CHEAT },
-	{ "setSaberOffense",			Svcmd_ForceSetLevel_f<FP_SABER_OFFENSE>,	CMD_CHEAT },
+	{ "setSaberDefense",				Svcmd_ForceSetLevel_f<FP_SABER_DEFENSE>,	CMD_NONE },
+	{ "setSaberOffense",				Svcmd_ForceSetLevel_f<FP_SABER_OFFENSE>,	CMD_NONE },
+	{ "setSaberLevel",				Svcmd_SaberSetLevel_f,	CMD_NONE },
 	{ "setForceAll",				Svcmd_SetForceAll_f,						CMD_CHEAT },
 	{ "setSaberAll",				Svcmd_SetSaberAll_f,						CMD_CHEAT },
 	
 	{ "saberAttackCycle",			Svcmd_SaberAttackCycle_f,					CMD_NONE },
-	
+
 	{ "runscript",					Svcmd_RunScript_f,							CMD_CHEAT },
 	
 	{ "playerTeam",					Svcmd_PlayerTeam_f,							CMD_CHEAT },

@@ -1293,6 +1293,10 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.cloakedShader				= cgi_R_RegisterShader( "gfx/effects/cloakedShader" );
 											cgi_R_RegisterShader( "gfx/misc/ion_shield" );
 
+	//VR Hand models
+	cgs.media.handModel_relaxed		= cgi_R_RegisterModel( "models/players/kyle/lhand_r.md3" );
+	cgs.media.handModel_force		= cgi_R_RegisterModel( "models/players/kyle/lhand_f.md3" );
+
 	cgs.media.boltShader			= cgi_R_RegisterShader( "gfx/misc/blueLine" );
 
 	// FIXME: do these conditionally
