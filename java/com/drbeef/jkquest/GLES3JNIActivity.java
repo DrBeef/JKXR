@@ -171,7 +171,7 @@ import static android.system.Os.setenv;
 		for (File child : new File("/sdcard/JKQuest/Demo/base").listFiles()) {
 			if (child.isFile() &&
 					child.getName().contains("pk3") &&
-					!child.getName().contains("z_npc_vr") // don't delete our npc mod as this might be tweaked
+					!child.getName().contains("z_vr_assets") // don't delete our npc mod as this might be tweaked
 			)
 				child.delete();
 		}
@@ -190,7 +190,7 @@ import static android.system.Os.setenv;
 		copy_asset("/sdcard/JKQuest/Demo/base", "z_bryar_ashura.pk3", false);
 
 		//Our assets
-		copy_asset("/sdcard/JKQuest/JK2/base", "z_vr_assets.pk3", true);
+		copy_asset("/sdcard/JKQuest/Demo/base", "z_vr_assets.pk3", true);
 
 		commandLineParams = "jo";
 

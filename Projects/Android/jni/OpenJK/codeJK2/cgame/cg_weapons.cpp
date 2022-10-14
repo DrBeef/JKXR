@@ -2898,7 +2898,6 @@ void CG_DrawItemSelector( void )
 				break;
 			}
 
-#ifdef _DEMO
 			if (itemId == WP_SABER ||
 				itemId == WP_BRYAR_PISTOL ||
 				itemId == WP_BLASTER ||
@@ -2909,9 +2908,6 @@ void CG_DrawItemSelector( void )
 			} else {
 				continue;
 			}
-#else
-            CG_RegisterWeapon(itemId);
-#endif
 		}
 
 		{
