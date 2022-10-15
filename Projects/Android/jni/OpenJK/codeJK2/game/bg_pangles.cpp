@@ -498,7 +498,8 @@ void PM_UpdateViewAngles( playerState_t *ps, usercmd_t *cmd, gentity_t *gent )
 		}
 	}
 
-	if ( (!cg.renderingThirdPerson||cg.zoomMode) && (cmd->buttons & BUTTON_USE) && cmd->rightmove != 0 && !cmd->forwardmove && cmd->upmove <= 0 )
+	//We don't want to trigger lean as this messes us up if we turn our head left or right
+	if ( false )//(!cg.renderingThirdPerson||cg.zoomMode) && (cmd->buttons & BUTTON_USE) && cmd->rightmove != 0 && !cmd->forwardmove && cmd->upmove <= 0 )
 	{//Only lean if holding use button, strafing and not moving forward or back and not jumping
 		if ( gent )
 		{
