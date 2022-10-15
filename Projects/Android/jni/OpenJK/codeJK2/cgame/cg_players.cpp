@@ -3450,7 +3450,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		hiltEnt.hModel = cgi_R_RegisterModel( "models/weapons2/saber/saber_w.md3" );
 		vec3_t angles;
 		BG_CalculateVRSaberPosition(hiltEnt.origin, hiltEnt.angles);
-		hiltEnt.angles[ROLL] += 180;
+		//hiltEnt.angles[ROLL] += 180;
 		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
 		vec3_t axis[3];
 		AnglesToAxis(hiltEnt.angles, axis);

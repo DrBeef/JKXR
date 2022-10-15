@@ -635,6 +635,10 @@ extern	vmCvar_t		cg_missionInfoCentered;
 extern	vmCvar_t		cg_missionInfoFlashTime;
 extern	vmCvar_t		cg_hudFiles;
 
+extern	vmCvar_t		cg_showForcePowerDirection;
+extern	vmCvar_t		cg_forceSpeedFOVAdjust;
+
+
 /*
 Ghoul2 Insert Start
 */

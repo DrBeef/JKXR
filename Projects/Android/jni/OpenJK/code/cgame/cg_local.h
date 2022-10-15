@@ -647,6 +647,9 @@ extern	vmCvar_t		fx_debug;
 extern	vmCvar_t		cg_missionInfoFlashTime;
 extern	vmCvar_t		cg_hudFiles;
 
+extern	vmCvar_t		cg_showForcePowerDirection;
+extern	vmCvar_t		cg_forceSpeedFOVAdjust;
+
 extern	vmCvar_t		cg_turnAnims;
 extern	vmCvar_t		cg_motionBoneComp;
 extern	vmCvar_t		cg_reliableAnimSounds;
