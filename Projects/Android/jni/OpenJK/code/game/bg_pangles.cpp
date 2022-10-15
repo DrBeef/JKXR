@@ -1587,7 +1587,8 @@ void PM_UpdateViewAngles( playerState_t *ps, usercmd_t *cmd, gentity_t *gent )
 		}
 	}
 
-	if ( gent )
+	//We don't want to trigger lean as this messes us up if we turn our head left or right
+	if ( false )//gent )
 	{	//only in the real pmove
 		if ( (cmd->buttons & BUTTON_USE) )
 		{//check leaning
