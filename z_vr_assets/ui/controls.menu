@@ -21,11 +21,11 @@
 		{
 				uiScript 		loadControls
 				hide			forcecontrols
-				hide			movecontrols
+				show			commoncontrols
 				hide			invcontrols
 				hide			comfortcontrols
 				show			setup_background
-				show 			weaponcontrols
+				hide 			weaponcontrols
 		}
 
 		onClose 
@@ -445,6 +445,61 @@
   	    		decoration 
 		}
 
+		// Common  button
+		itemDef 
+		{
+			name				commoncontrolbutton_glow
+			group				mods
+			style				WINDOW_STYLE_SHADER
+			rect				120 173 170 30
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			name				commoncontrolbutton
+			group				none
+			text				"Common"
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				120 173 170 30
+			font				3
+			textscale			0.9
+			textalignx			170
+			textaligny			5
+			textalign			ITEM_ALIGN_RIGHT
+			textstyle			3
+			forecolor			0.65 0.65 1 1
+			visible			1
+			descText			"Common controls configuration."
+
+			mouseEnter 
+			{ 
+				show			commoncontrolbutton_glow
+			}
+			mouseExit 
+			{ 
+				hide			commoncontrolbutton_glow
+			}	  	  
+			action 
+			{ 
+				play			sound/interface/button1 
+				show			setup_background 
+				hide 			weaponcontrols 
+				hide			forcecontrols 
+				show			commoncontrols 
+				hide			invcontrols 
+				hide			comfortcontrols 
+				setitemcolor		weaponscontrolbutton 		forecolor 0.64 0.65 1 1 
+				setitemcolor		forcecontrolbutton 		forecolor 0.64 0.65 1 1 
+				setitemcolor		commoncontrolbutton 		forecolor 1 1 1 1 
+				setitemcolor		inventorycontrolbutton 		forecolor 0.64 0.65 1 1 
+				setitemcolor		comfortcontrolbutton 		forecolor 0.64 0.65 1 1 
+			}
+		}
 
 		// Weapons button
 		itemDef 
@@ -452,7 +507,7 @@
 			name				weaponscontrolbutton_glow
 			group				mods
 			style				WINDOW_STYLE_SHADER
-			rect				120 173 170 30
+			rect				120 203 170 30
 			background			"gfx/menus/menu_blendbox2"			// Frame around button
 			forecolor			1 1 1 1
 			visible			0
@@ -466,7 +521,7 @@
 			text				@MENUS0_WEAPONS
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			rect				120 173 170 30
+			rect				120 203 170 30
 			font				3
 			textscale			0.9
 			textalignx			170
@@ -475,7 +530,7 @@
 			textstyle			3
 			forecolor			0.65 0.65 1 1
 			visible			1
-			descText			@MENUS0_CONFIGURE_WEAPON_CONTROLS
+			descText			"Weapon specific control configuration."
 
 			mouseEnter 
 			{ 
@@ -491,12 +546,12 @@
 				show			setup_background 
 				show 			weaponcontrols 
 				hide			forcecontrols 
-				hide			movecontrols 
+				hide			commoncontrols 
 				hide			invcontrols 
 				hide			comfortcontrols 
 				setitemcolor		weaponscontrolbutton 		forecolor 1 1 1 1 
 				setitemcolor		forcecontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		movementcontrolbutton 		forecolor 0.64 0.65 1 1 
+				setitemcolor		commoncontrolbutton 		forecolor 0.64 0.65 1 1 
 				setitemcolor		inventorycontrolbutton 		forecolor 0.64 0.65 1 1 
 				setitemcolor		comfortcontrolbutton 		forecolor 0.64 0.65 1 1 
 			}
@@ -508,7 +563,7 @@
 			name				forcecontrolbutton_glow
 			group				mods
 			style				WINDOW_STYLE_SHADER
-			rect				120 203 170 30
+			rect				120 233 170 30
 			background			"gfx/menus/menu_blendbox2"			// Frame around button
 			forecolor			1 1 1 1
 			visible			0
@@ -522,7 +577,7 @@
 			text				@MENUS1_FORCE_POWERS
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			rect				120 203 170 30
+			rect				120 233 170 30
 			font				3
 			textscale			0.9
 			textalignx			170
@@ -531,7 +586,7 @@
 			textstyle			3
 			forecolor			0.65 0.65 1 1
 			visible			1
-			descText			"Configure Force Power controls."
+			descText			"Force Power specific control configuration."
 
 			mouseEnter 
 			{ 
@@ -547,68 +602,12 @@
 				show			setup_background 
 				hide 			weaponcontrols 
 				show			forcecontrols 
-				hide			movecontrols 
+				hide			commoncontrols 
 				hide			invcontrols  
 				hide			comfortcontrols 
 				setitemcolor		weaponscontrolbutton 		forecolor 0.64 0.65 1 1 
 				setitemcolor		forcecontrolbutton 		forecolor 1 1 1 1 
-				setitemcolor		movementcontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		inventorycontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		comfortcontrolbutton 		forecolor 0.64 0.65 1 1 
-			}
-		}
-
-		// movement  button
-		itemDef 
-		{
-			name				movementcontrolbutton_glow
-			group				mods
-			style				WINDOW_STYLE_SHADER
-			rect				120 233 170 30
-			background			"gfx/menus/menu_blendbox2"			// Frame around button
-			forecolor			1 1 1 1
-			visible				0
-			decoration
-		}
-
-		itemDef 
-		{
-			name				movementcontrolbutton
-			group				none
-			text				@MENUS0_MOVEMENT
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				120 233 170 30
-			font				3
-			textscale			0.9
-			textalignx			170
-			textaligny			5
-			textalign			ITEM_ALIGN_RIGHT
-			textstyle			3
-			forecolor			0.65 0.65 1 1
-			visible			1
-			descText			"Configure Movement controls"
-
-			mouseEnter 
-			{ 
-				show			movementcontrolbutton_glow
-			}
-			mouseExit 
-			{ 
-				hide			movementcontrolbutton_glow
-			}	  	  
-			action 
-			{ 
-				play			sound/interface/button1 
-				show			setup_background 
-				hide 			weaponcontrols 
-				hide			forcecontrols 
-				show			movecontrols 
-				hide			invcontrols 
-				hide			comfortcontrols 
-				setitemcolor		weaponscontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		forcecontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		movementcontrolbutton 		forecolor 1 1 1 1 
+				setitemcolor		commoncontrolbutton 		forecolor 0.64 0.65 1 1 
 				setitemcolor		inventorycontrolbutton 		forecolor 0.64 0.65 1 1 
 				setitemcolor		comfortcontrolbutton 		forecolor 0.64 0.65 1 1 
 			}
@@ -643,7 +642,7 @@
 			textstyle			3
 			forecolor			0.65 0.65 1 1
 			visible			1
-			descText			"Configure Inventory controls."
+			descText			"Inventory specific control configuration."
 
 			mouseEnter 
 			{ 
@@ -659,12 +658,12 @@
 				show			setup_background 
 				hide 			weaponcontrols 
 				hide			forcecontrols
-				hide			movecontrols 
+				hide			commoncontrols 
 				show			invcontrols 
 				hide			comfortcontrols 
 				setitemcolor		weaponscontrolbutton 		forecolor 0.64 0.65 1 1 
 				setitemcolor		forcecontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		movementcontrolbutton 		forecolor 0.64 0.65 1 1 
+				setitemcolor		commoncontrolbutton 		forecolor 0.64 0.65 1 1 
 				setitemcolor		inventorycontrolbutton 		forecolor 1 1 1 1 
 				setitemcolor		comfortcontrolbutton 		forecolor 0.64 0.65 1 1 
 			}
@@ -715,12 +714,12 @@
 				show			setup_background
 				hide 			weaponcontrols
 				hide			forcecontrols
-				hide			movecontrols
+				hide			commoncontrols
 				hide			invcontrols
 				show			comfortcontrols
 				setitemcolor		weaponscontrolbutton 		forecolor 0.64 0.65 1 1
 				setitemcolor		forcecontrolbutton 		forecolor 0.64 0.65 1 1
-				setitemcolor		movementcontrolbutton 		forecolor 0.64 0.65 1 1
+				setitemcolor		commoncontrolbutton 		forecolor 0.64 0.65 1 1
 				setitemcolor		inventorycontrolbutton 		forecolor 0.64 0.65 1 1
 				setitemcolor		comfortcontrolbutton 		forecolor 1 1 1 1
 			}
@@ -891,6 +890,187 @@
 
 		//----------------------------------------------------------------------------------------------
 		//
+		//	COMMON MENU
+		//
+		//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_SLIDER
+			text				"Movement Speed:"
+			cvarfloat		"vr_movement_multiplier" 0.1 0.4 1.2
+			rect				305 191 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			"Sets player movement speed."
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+		
+			mouseenter 
+			{ 
+				show			highlight2
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight2
+			}			
+		}
+
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_MULTI
+			text				"Direction Mode:"
+			cvar				"vr_walkdirection"
+			cvarFloatList		
+			{ 
+				"Off-hand Controller" 0  
+				"HMD" 1 
+			}
+			rect				305 211 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			"Choose movement direction mode."
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight3
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight3
+			}			
+
+		}
+
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_YESNO
+			text				"Smooth turn:"
+			cvar				"vr_turn_mode"
+			rect				305 231 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151 
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		3
+			descText			"Enables or disables smooth turning."
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight4
+			}
+			mouseexit 
+			{ 
+				hide			highlight4
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_MULTI
+			text				"Turn Angle:"
+			cvar				"vr_turn_angle"
+			cvarFloatList		
+			{ 
+				"30 Degrees" 30  
+				"45 Degrees" 45
+				"90 Degrees" 90
+			}
+			rect				305 251 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151 
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0 
+			// appearance_slot		4
+			descText			"Degrees to turn when using snap turn / Speed of smooth turn"
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight5
+			}
+			mouseexit 
+			{ 
+				hide			highlight5
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_YESNO
+			text				"Switch Sticks:"
+			cvar				"vr_switch_sticks"
+			rect				305 271 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151 
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0 
+			// appearance_slot		5
+			descText			"Switches left/gight controller thubmsticks."
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight6
+			}
+			mouseexit 
+			{ 
+				hide			highlight6
+			}
+		}
+
+
+
+		//----------------------------------------------------------------------------------------------
+		//
 		//	WEAPON MENU
 		//
 		//----------------------------------------------------------------------------------------------
@@ -974,7 +1154,7 @@
 			group				weaponcontrols
 			type				ITEM_TYPE_YESNO
 			text				"Virtual Gun Stock:"
-			cvar				"vr_virtual_stock"
+			cvar			"vr_virtual_stock"
 			rect				305 231 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
@@ -1007,9 +1187,52 @@
 			name				none
 			group				weaponcontrols
 			type				ITEM_TYPE_YESNO
-			text				"Show Force Power Direction:"
-			cvar				"cg_showForcePowerDirection"
+			text				"Saber Auto Blocking:"
+			cvar			"g_saberAutoblocking"
 			rect				305 251 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0 
+			// appearance_slot		2
+			descText			"Enables or disables auto blocking with saber."
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight5
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight5
+			}			
+
+		}
+
+
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	FORCE MENU
+		//
+		//----------------------------------------------------------------------------------------------
+		
+
+		itemDef 
+		{
+			name				none
+			group				forcecontrols
+			type				ITEM_TYPE_YESNO
+			text				"Force Power Direction Hint:"
+			cvar				"cg_showForcePowerDirection"
+			rect				310 191 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1026,12 +1249,12 @@
 
 			mouseenter 
 			{ 
-				show			highlight4
+				show			highlight2
 			}
 
 			mouseexit 
 			{ 
-				hide			highlight4
+				hide			highlight2
 			}			
 
 		}
@@ -1039,11 +1262,11 @@
 		itemDef 
 		{
 			name				none
-			group				weaponcontrols
+			group				forcecontrols
 			type				ITEM_TYPE_YESNO
-			text				"Show Force Speed FOV Change:"
+			text				"Force Speed FOV Change:"
 			cvar				"cg_forceSpeedFOVAdjust"
-			rect				305 271 300 20
+			rect				310 211 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1060,157 +1283,6 @@
 
 			mouseenter 
 			{ 
-				show			highlight4
-			}
-
-			mouseexit 
-			{ 
-				hide			highlight4
-			}			
-
-		}
-
-
-
-		//----------------------------------------------------------------------------------------------
-		//
-		//	FORCE MENU
-		//
-		//----------------------------------------------------------------------------------------------
-		itemDef 
-		{
-			name				none
-			group				forcecontrols
-			type				ITEM_TYPE_YESNO
-			text				"Placeholder:"
-			cvar				"place_holder"
-			rect				305 191 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			"Item placeholder."
-			action 
-			{ 
-				play			sound/interface/button1
-			}
-		
-			mouseenter 
-			{ 
-				show			highlight2
-			}
-			mouseexit 
-			{ 
-				hide			highlight2
-			}
-		}
-
-
-
-		//----------------------------------------------------------------------------------------------
-		//
-		//	MOVEMENT MENU
-		//
-		//----------------------------------------------------------------------------------------------
-		//itemDef 
-		//{
-		//	name				none
-		//	group				movecontrols
-		//	type				ITEM_TYPE_YESNO
-		//	text				@MENUS0_ALWAYS_RUN
-		//	cvar				"cl_run"
-		//	rect				305 191 300 20
-		//	textalign			ITEM_ALIGN_RIGHT
-		//	textalignx			151
-		//	textaligny			-2
-		//	font				2
-		//	textscale			0.8
-		//	forecolor			1 1 1 1
-		//	visible			0
-		//	// appearance_slot		1
-		//	descText			@MENUS1_WHEN_ON_PLAYER_ALWAYS
-		//	action 
-		//	{ 
-		//		play			sound/interface/button1
-		//	}
-		//
-		//	mouseenter 
-		//	{ 
-		//		show			highlight2
-		//	}
-		//
-		//	mouseexit 
-		//	{ 
-		//		hide			highlight2
-		//	}			
-		//}
-
-		itemDef 
-		{
-			name				none
-			group				movecontrols
-			type				ITEM_TYPE_SLIDER
-			text				"Movement Speed:"
-			cvarfloat		"vr_movement_multiplier" 0.1 0.4 1.2
-			rect				305 191 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			"Sets player movement speed."
-			action 
-			{ 
-				play			sound/interface/button1
-			}
-		
-			mouseenter 
-			{ 
-				show			highlight2
-			}
-
-			mouseexit 
-			{ 
-				hide			highlight2
-			}			
-		}
-
-		itemDef 
-		{
-			name				none
-			group				movecontrols
-			type				ITEM_TYPE_MULTI
-			text				"Direction Mode:"
-			cvar				"vr_walkdirection"
-			cvarFloatList		
-			{ 
-				"Off-hand Controller" 0  
-				"HMD" 1 
-			}
-			rect				305 211 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			"Choose movement direction mode."
-			action 
-			{ 
-				play			sound/interface/button1
-			}
-
-			mouseenter 
-			{ 
 				show			highlight3
 			}
 
@@ -1219,108 +1291,6 @@
 				hide			highlight3
 			}			
 
-		}
-
-		itemDef 
-		{
-			name				none
-			group				movecontrols
-			type				ITEM_TYPE_YESNO
-			text				"Smooth turn:"
-			cvar				"vr_turn_mode"
-			rect				305 231 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151 
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		3
-			descText			"Enables or disables smooth turning."
-			action 
-			{ 
-				play			sound/interface/button1
-			}
-
-			mouseenter 
-			{
-				show			highlight4
-			}
-			mouseexit 
-			{ 
-				hide			highlight4
-			}
-		}
-
-		itemDef 
-		{
-			name				none
-			group				movecontrols
-			type				ITEM_TYPE_MULTI
-			text				"Turn Angle:"
-			cvar				"vr_turn_angle"
-			cvarFloatList		
-			{ 
-				"30 Degrees" 30  
-				"45 Degrees" 45
-				"90 Degrees" 90
-			}
-			rect				305 251 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151 
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0 
-			// appearance_slot		4
-			descText			"Degrees to turn when using snap turn / Speed of smooth turn"
-			action 
-			{ 
-				play			sound/interface/button1
-			}
-
-			mouseenter 
-			{
-				show			highlight5
-			}
-			mouseexit 
-			{ 
-				hide			highlight5
-			}
-		}
-
-		itemDef 
-		{
-			name				movement
-			group				movecontrols
-			type				ITEM_TYPE_YESNO
-			text				"Switch Sticks:"
-			cvar				"vr_switch_sticks"
-			rect				305 271 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151 
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0 
-			// appearance_slot		5
-			descText			"Switches left/gight controller thubmsticks."
-			action 
-			{ 
-				play			sound/interface/button1
-			}
-
-			mouseenter 
-			{
-				show			highlight6
-			}
-			mouseexit 
-			{ 
-				hide			highlight6
-			}
 		}
 
 

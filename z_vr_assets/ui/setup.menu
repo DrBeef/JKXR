@@ -526,6 +526,7 @@
 				hide			vidrestart	;
 				hide			sound	;
 				hide			options ;
+				hide			difficulty ;
 				hide			mods	;
 				hide			defaults ;
 				setfocus		graphics ;
@@ -533,6 +534,7 @@
 				setitemcolor	video2menubutton forecolor 0.65 0.65 1 1 ;
 				setitemcolor	soundmenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	gameoptionmenubutton forecolor 0.65 0.65 1 1;
+				setitemcolor	difficultymenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	modsmenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	gamedefaultsmenubutton forecolor 0.65 0.65 1 1;
 			}
@@ -591,12 +593,14 @@
 				hide			vidrestart	;
 				hide			sound	;
 				hide			options ;
+				hide			difficulty ;
 				hide			mods	;
 				hide			defaults ;
 				setitemcolor	video1menubutton forecolor 0.65 0.65 1 1 ;
 				setitemcolor	video2menubutton forecolor 1 1 1 1 ;
 				setitemcolor	soundmenubutton forecolor 0.65 0.65 1 1 ;
 				setitemcolor	gameoptionmenubutton forecolor 0.65 0.65 1 1 ;
+				setitemcolor	difficultymenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	modsmenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	gamedefaultsmenubutton forecolor 0.65 0.65 1 1;
 			}
@@ -655,12 +659,14 @@
 				hide			vidrestart	;
 				show			sound	;
 				hide			options ;
+				hide			difficulty ;
 				hide			mods	;
 				hide			defaults ;
 				setitemcolor	video1menubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	video2menubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	soundmenubutton forecolor 1 1 1 1 ;
 				setitemcolor	gameoptionmenubutton forecolor 0.65 0.65 1 1;
+				setitemcolor	difficultymenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	modsmenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	gamedefaultsmenubutton forecolor 0.65 0.65 1 1;
 			}
@@ -718,12 +724,79 @@
 				hide			vidrestart	;
 				hide			sound	;
 				show			options ;
+				hide			difficulty ;
 				hide			mods	;
 				hide			defaults ;
 				setitemcolor	video1menubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	video2menubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	soundmenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	gameoptionmenubutton forecolor 1 1 1 1 ;
+				setitemcolor	difficultymenubutton forecolor 0.65 0.65 1 1;
+				setitemcolor	modsmenubutton forecolor 0.65 0.65 1 1;
+				setitemcolor	gamedefaultsmenubutton forecolor 0.65 0.65 1 1;
+			}
+		}
+
+		// difficulty  button
+		itemDef 
+		{
+			name				difficultybutton_glow
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				120 293 170 30
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				difficultymenubutton
+			group				none
+			text				"Difficulty"
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				120 293 170 30
+			font				3
+			textscale			0.9
+			textalignx			170
+			textaligny			5
+			textalign			ITEM_ALIGN_RIGHT
+			textstyle			3
+			forecolor			0.65 0.65 1 1
+			visible			1
+			descText			"Various gameplay difficulty tweaks."
+
+			mouseEnter 
+			{ 
+				show			difficultybutton_glow
+			}
+			mouseExit 
+			{ 
+				hide			difficultybutton_glow
+			}	  	  
+			action 
+			{ 
+				defer			VideoSetup	videowarningMenu ;
+
+				play			"sound/interface/button1.wav" ;
+				show			setup_background ;
+				hide 			video ;
+				hide			applyChanges ;
+				hide			video2 ;
+				hide			vidrestart	;
+				hide			sound	;
+				hide			options ;
+				show			difficulty ;
+				hide			mods	;
+				hide			defaults ;
+				setitemcolor	video1menubutton forecolor 0.65 0.65 1 1;
+				setitemcolor	video2menubutton forecolor 0.65 0.65 1 1;
+				setitemcolor	soundmenubutton forecolor 0.65 0.65 1 1;
+				setitemcolor	gameoptionmenubutton forecolor 0.65 0.65 1 1;
+				setitemcolor	difficultymenubutton forecolor 1 1 1 1 ;
 				setitemcolor	modsmenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	gamedefaultsmenubutton forecolor 0.65 0.65 1 1;
 			}
@@ -735,7 +808,7 @@
 			name				modsbutton_glow
 			group				highlights
 			style				WINDOW_STYLE_SHADER
-			rect				120 293 170 30
+			rect				120 323 170 30
 			background			"gfx/menus/menu_blendbox2"			// Frame around button
 			forecolor			1 1 1 1
 			visible			0
@@ -750,7 +823,7 @@
 			text				@MENUS1_MODS
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			rect				120 293 170 30
+			rect				120 323 170 30
 			font				3
 			textscale			0.9
 			textalignx			170
@@ -782,12 +855,14 @@
 				hide			vidrestart	;
 				hide			sound	;
 				hide			options ;
+				hide			difficulty ;
 				show			mods	;
 				hide			defaults ;
 				setitemcolor	video1menubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	video2menubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	soundmenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	gameoptionmenubutton forecolor 0.65 0.65 1 1;
+				setitemcolor	difficultymenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	modsmenubutton forecolor 1 1 1 1 ;
 				setitemcolor	gamedefaultsmenubutton forecolor 0.65 0.65 1 1;
 			}
@@ -799,7 +874,7 @@
 			name				gamedefaultsbutton_glow
 			group				highlights
 			style				WINDOW_STYLE_SHADER
-			rect				120 323 170 30
+			rect				120 353 170 30
 			background			"gfx/menus/menu_blendbox2"			// Frame around button
 			forecolor			1 1 1 1
 			visible			0
@@ -814,7 +889,7 @@
 			text				@MENUS1_DEFAULTS
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			rect				120 323 170 30
+			rect				120 353 170 30
 			font				3
 			textscale			0.9
 			textalignx			170
@@ -846,12 +921,14 @@
 				hide			vidrestart	;
 				hide			sound	;
 				hide			options ;
+				hide			difficulty ;
 				hide			mods	;
 				show			defaults ;
 				setitemcolor	video1menubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	video2menubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	soundmenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	gameoptionmenubutton forecolor 0.65 0.65 1 1;
+				setitemcolor	difficultymenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	modsmenubutton forecolor 0.65 0.65 1 1;
 				setitemcolor	gamedefaultsmenubutton forecolor 1 1 1 1 ;
 			}
@@ -2293,6 +2370,83 @@
 				hide			highlight3
 			} 
 		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	DIFFICULTY FIELDS
+		//
+		//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				none
+			group				difficulty
+			type				ITEM_TYPE_YESNO
+			text				"Realistic Saber Combat:"
+			cvar				"g_saberRealisticCombat"
+			rect				305 191 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			"When enabled, sabers deal more damage."
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+		
+			mouseenter 
+			{ 
+				show			highlight2
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight2
+			}			
+		}
+
+		//itemDef 
+		//{
+		//	name				none
+		//	group				difficulty
+		//	type				ITEM_TYPE_MULTI
+		//	text				"Saber Combat Speed:"
+		//	cvar				"g_saberAnimSpeed"
+		//	cvarFloatList		
+		//	{ 
+		//		"Slow" 0 
+		//		"Medium" 1
+		//		"Fast" 2
+		//	}
+		//	rect				305 211 300 20
+		//	textalign			ITEM_ALIGN_RIGHT
+		//	textalignx			151
+		//	textaligny			-2
+		//	font				2
+		//	textscale			0.8
+		//	forecolor			1 1 1 1
+		//	visible			0
+		//	// appearance_slot		1
+		//	descText			"Choose speed of saber combat."
+		//	action 
+		//	{ 
+		//		play			sound/interface/button1
+		//	}
+		//
+		//	mouseenter 
+		//	{ 
+		//		show			highlight3
+		//	}
+		//
+		//	mouseexit 
+		//	{ 
+		//		hide			highlight3
+		//	}			
+		//}
 
 		//----------------------------------------------------------------------------------------------
 		//
