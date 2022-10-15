@@ -1312,23 +1312,29 @@ qboolean CG_CalcFOVFromX( float fov_x )
 
 float CG_ForceSpeedFOV( float infov )
 {
+	if (!cg_forceSpeedFOVAdjust.integer)
+	{
+		return infov;
+	}
+
 	gentity_t	*player = &g_entities[0];
 	float fov;
 	float timeLeft = player->client->ps.forcePowerDuration[FP_SPEED] - cg.time;
 	float length = FORCE_SPEED_DURATION*forceSpeedValue[player->client->ps.forcePowerLevel[FP_SPEED]];
 	float amt = forceSpeedFOVMod[player->client->ps.forcePowerLevel[FP_SPEED]];
-	if ( timeLeft < 500 )
+	if ( timeLeft < 400 )
 	{//start going back
-		fov = infov + (timeLeft)/500*amt;
+		fov = infov + sinf(DEG2RAD((timeLeft/400)*180))*amt;
 	}
-	else if ( length - timeLeft < 1000 )
+	else if ( length - timeLeft < 600 )
 	{//start zooming in
-		fov = infov + (length - timeLeft)/1000*amt;
+		fov = infov + sinf(DEG2RAD(((length - timeLeft)/600)*180))*amt;
 	}
 	else
 	{//stay at this FOV
-		fov = infov+amt;
+		fov = infov;//+amt;
 	}
+
 	return fov;
 }
 /*

@@ -29,6 +29,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_functions.h"
 #include "wp_saber.h"
 #include "../../code/qcommon/tri_coll_test.h"
+#include "../cgame/FxScheduler.h"
 
 #define MAX_SABER_VICTIMS 16
 static int		victimEntityNum[MAX_SABER_VICTIMS];
@@ -5724,15 +5725,30 @@ void ForceThrow( gentity_t *self, qboolean pull )
 
 	G_Sound( self, soundIndex );
 
+	vec3_t origin, angles;
 	if (self->client->ps.clientNum == 0)
 	{
-		vec3_t origin, angles;
 		BG_CalculateVROffHandPosition(origin, fwdangles);
+
+		if (cg_showForcePowerDirection.integer)
+		{
+			vec3_t	color = { 0, 255, 0 };
+			AngleVectors( fwdangles, forward, right, NULL );
+			VectorMA( origin, radius, forward, end );
+			FX_AddLine( origin, end, 0.1f, 1.0f, 0.0f,
+						1.0f, 0.0f, 0.0f,
+						color, color, 0.0f,
+						500, cgi_R_RegisterShader( "gfx/misc/nav_line" ),
+						FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
+
+		}
 	}
 	else
 	{
 		VectorCopy( self->client->ps.viewangles, fwdangles );
+		VectorCopy( self->client->renderInfo.eyePoint, origin );
 	}
+
 	//fwdangles[1] = self->client->ps.viewangles[1];
 	AngleVectors( fwdangles, forward, right, NULL );
 	VectorCopy( self->currentOrigin, center );
@@ -5756,8 +5772,8 @@ void ForceThrow( gentity_t *self, qboolean pull )
 
 	if ( cone >= 1.0f )
 	{//must be pointing right at them
-		VectorMA( self->client->renderInfo.eyePoint, radius, forward, end );
-		gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, end, self->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, G2_NOCOLLIDE, 0 );//was MASK_SHOT, changed to match crosshair trace
+		VectorMA( origin, radius, forward, end );
+		gi.trace( &tr, origin, vec3_origin, vec3_origin, end, self->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, G2_NOCOLLIDE, 0 );//was MASK_SHOT, changed to match crosshair trace
 		/*
 		//FIXME: can't just return, need to be able to push missiles
 		if ( tr.entityNum >= ENTITYNUM_WORLD )
@@ -5892,8 +5908,8 @@ void ForceThrow( gentity_t *self, qboolean pull )
 						}
 						else
 						{//do a forwardEnt trace
-							VectorMA( self->client->renderInfo.eyePoint, radius, forward, end );
-							gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, end, self->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, G2_NOCOLLIDE, 0 );//was MASK_SHOT, changed to match crosshair trace
+							VectorMA( origin, radius, forward, end );
+							gi.trace( &tr, origin, vec3_origin, vec3_origin, end, self->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, G2_NOCOLLIDE, 0 );//was MASK_SHOT, changed to match crosshair trace
 							if ( tr.entityNum != ent->s.number )
 							{//last chance
 								continue;
@@ -5982,7 +5998,7 @@ void ForceThrow( gentity_t *self, qboolean pull )
 		}
 
 		//in PVS?
-		if ( !ent->bmodel && !gi.inPVS( ent_org, self->client->renderInfo.eyePoint ) )
+		if ( !ent->bmodel && !gi.inPVS( ent_org, origin ) )
 		{//must be in PVS
 			continue;
 		}
@@ -5990,7 +6006,7 @@ void ForceThrow( gentity_t *self, qboolean pull )
 		if ( ent != forwardEnt )
 		{//don't need to trace against forwardEnt again
 		//really should have a clear LOS to this thing...
-			gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, ent_org, self->s.number, MASK_OPAQUE|CONTENTS_SOLID, G2_NOCOLLIDE, 0 );//was MASK_SHOT, but changed to match above trace and crosshair trace
+			gi.trace( &tr, origin, vec3_origin, vec3_origin, ent_org, self->s.number, MASK_OPAQUE|CONTENTS_SOLID, G2_NOCOLLIDE, 0 );//was MASK_SHOT, but changed to match above trace and crosshair trace
 			if ( tr.fraction < 1.0f && tr.entityNum != ent->s.number )
 			{//must have clear LOS
 				continue;
@@ -6263,8 +6279,8 @@ void ForceThrow( gentity_t *self, qboolean pull )
 					AngleVectors(self->client->ps.viewangles, forward, right, NULL);
 				}
 				VectorNormalize( forward );
-				VectorMA( self->client->renderInfo.eyePoint, radius, forward, end );
-				gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT, G2_NOCOLLIDE, 0 );
+				VectorMA( origin, radius, forward, end );
+				gi.trace( &tr, origin, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT, G2_NOCOLLIDE, 0 );
 				if ( tr.entityNum != push_list[x]->s.number || tr.fraction == 1.0 || tr.allsolid || tr.startsolid )
 				{//must be pointing right at it
 					continue;
@@ -6272,22 +6288,22 @@ void ForceThrow( gentity_t *self, qboolean pull )
 
 				if ( pull )
 				{
-					VectorSubtract( self->client->renderInfo.eyePoint, tr.endpos, pushDir );
+					VectorSubtract( origin, tr.endpos, pushDir );
 				}
 				else
 				{
-					VectorSubtract( tr.endpos, self->client->renderInfo.eyePoint, pushDir );
+					VectorSubtract( tr.endpos, origin, pushDir );
 				}
 				/*
 				VectorSubtract( push_list[x]->absmax, push_list[x]->absmin, size );
 				VectorMA( push_list[x]->absmin, 0.5, size, center );
 				if ( pull )
 				{
-					VectorSubtract( self->client->renderInfo.eyePoint, center, pushDir );
+					VectorSubtract( origin, center, pushDir );
 				}
 				else
 				{
-					VectorSubtract( center, self->client->renderInfo.eyePoint, pushDir );
+					VectorSubtract( center, origin, pushDir );
 				}
 				*/
 				damage -= VectorNormalize( pushDir );
@@ -6316,8 +6332,8 @@ void ForceThrow( gentity_t *self, qboolean pull )
 
 				AngleVectors( self->client->ps.viewangles, forward, NULL, NULL );
 				VectorNormalize( forward );
-				VectorMA( self->client->renderInfo.eyePoint, radius, forward, end );
-				gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT, G2_NOCOLLIDE, 0 );
+				VectorMA( origin, radius, forward, end );
+				gi.trace( &tr, origin, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT, G2_NOCOLLIDE, 0 );
 				if ( tr.entityNum != push_list[x]->s.number || tr.fraction == 1.0 || tr.allsolid || tr.startsolid )
 				{//must be pointing right at it
 					continue;
@@ -6345,7 +6361,7 @@ void ForceThrow( gentity_t *self, qboolean pull )
 					VectorCopy( push_list[x]->pos2, pos2 );
 				}
 
-				if ( Distance( pos1, self->client->renderInfo.eyePoint ) < Distance( pos2, self->client->renderInfo.eyePoint ) )
+				if ( Distance( pos1, origin ) < Distance( pos2, origin ) )
 				{//pos1 is closer
 					if ( push_list[x]->moverState == MOVER_POS1 )
 					{//at the closest pos
@@ -6764,17 +6780,31 @@ void ForceTelepathy( gentity_t *self )
 	{
 		BG_CalculateVROffHandPosition(origin, angles);
 		AngleVectors(angles, forward, NULL, NULL);
+
+		if (cg_showForcePowerDirection.integer)
+		{
+			vec3_t	color = { 0, 255, 0 };
+			AngleVectors( angles, forward, NULL, NULL );
+			VectorMA( origin, 512, forward, end );
+			FX_AddLine( origin, end, 0.1f, 1.0f, 0.0f,
+						1.0f, 0.0f, 0.0f,
+						color, color, 0.0f,
+						500, cgi_R_RegisterShader( "gfx/misc/nav_line" ),
+						FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
+
+		}
 	}
 	else
 	{
 		AngleVectors(self->client->ps.viewangles, forward, NULL, NULL);
 		VectorCopy(self->client->ps.viewangles, angles);
+		VectorCopy(self->client->renderInfo.eyePoint, origin);
 	}
 	VectorNormalize( forward );
-	VectorMA( self->client->renderInfo.eyePoint, 2048, forward, end );
+	VectorMA( origin, 2048, forward, end );
 
 	//Cause a distraction if enemy is not fighting
-	gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, end, self->s.number, MASK_OPAQUE|CONTENTS_BODY, G2_NOCOLLIDE, 0 );
+	gi.trace( &tr, origin, vec3_origin, vec3_origin, end, self->s.number, MASK_OPAQUE|CONTENTS_BODY, G2_NOCOLLIDE, 0 );
 	if ( tr.entityNum == ENTITYNUM_NONE || tr.fraction == 1.0 || tr.allsolid || tr.startsolid )
 	{
 		return;
@@ -6987,20 +7017,36 @@ void ForceGrip( gentity_t *self )
 	{
 		BG_CalculateVROffHandPosition(origin, angles);
 		AngleVectors(angles, forward, NULL, NULL);
+
+		if (cg_showForcePowerDirection.integer)
+		{
+			vec3_t origin, angles;
+			vec3_t	color = { 0, 255, 0 };
+			AngleVectors( angles, forward, NULL, NULL );
+			VectorMA( origin, FORCE_GRIP_DIST, forward, end );
+			FX_AddLine( origin, end, 0.1f, 1.0f, 0.0f,
+						1.0f, 0.0f, 0.0f,
+						color, color, 0.0f,
+						500, cgi_R_RegisterShader( "gfx/misc/nav_line" ),
+						FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
+
+		}
 	}
 	else
 	{
 		AngleVectors(self->client->ps.viewangles, forward, NULL, NULL);
 		VectorCopy(self->client->ps.viewangles, angles);
+		VectorCopy(self->client->renderInfo.eyePoint, origin);
 	}
+
 	VectorNormalize( forward );
 	VectorMA( self->client->renderInfo.handLPoint, FORCE_GRIP_DIST, forward, end );
 
-	if ( self->enemy && (self->s.number || InFront( self->enemy->currentOrigin, self->client->renderInfo.eyePoint, angles, 0.2f ) ) )
+	if ( self->enemy && (self->s.number || InFront( self->enemy->currentOrigin, origin, angles, 0.2f ) ) )
 	{//NPCs can always lift enemy since we assume they're looking at them, players need to be facing the enemy
-		if ( gi.inPVS( self->enemy->currentOrigin, self->client->renderInfo.eyePoint ) )
+		if ( gi.inPVS( self->enemy->currentOrigin, origin ) )
 		{//must be in PVS
-			gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, self->enemy->currentOrigin, self->s.number, MASK_SHOT, G2_NOCOLLIDE, 0 );
+			gi.trace( &tr, origin, vec3_origin, vec3_origin, self->enemy->currentOrigin, self->s.number, MASK_SHOT, G2_NOCOLLIDE, 0 );
 			if ( tr.fraction == 1.0f || tr.entityNum == self->enemy->s.number )
 			{//must have clear LOS
 				traceEnt = self->enemy;

@@ -974,7 +974,7 @@
 			group				weaponcontrols
 			type				ITEM_TYPE_YESNO
 			text				"Virtual Gun Stock:"
-			cvar			"vr_virtual_stock"
+			cvar				"vr_virtual_stock"
 			rect				305 231 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
@@ -985,6 +985,74 @@
 			visible			0 
 			// appearance_slot		2
 			descText			"Enables or disables virtual gun stock."
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight4
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight4
+			}			
+
+		}
+
+		itemDef 
+		{
+			name				none
+			group				weaponcontrols
+			type				ITEM_TYPE_YESNO
+			text				"Show Force Power Direction:"
+			cvar				"cg_showForcePowerDirection"
+			rect				305 251 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0 
+			// appearance_slot		2
+			descText			"Hint as to which direction a force power was fired."
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight4
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight4
+			}			
+
+		}
+
+		itemDef 
+		{
+			name				none
+			group				weaponcontrols
+			type				ITEM_TYPE_YESNO
+			text				"Show Force Speed FOV Change:"
+			cvar				"cg_forceSpeedFOVAdjust"
+			rect				305 271 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible				0 
+			// appearance_slot		2
+			descText			"Whether the FOV will be adjusted briefly when engaging Force Speed."
 			action 
 			{ 
 				play			sound/interface/button1

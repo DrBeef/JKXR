@@ -2667,7 +2667,6 @@ void CG_ItemSelectorSelect_f( void )
 
 	if (cg.itemSelectorSelection == -1)
 	{
-		cg.itemSelectorType = 0;
 		return;
 	}
 
