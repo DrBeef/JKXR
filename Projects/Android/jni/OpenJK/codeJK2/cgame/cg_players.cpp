@@ -4458,7 +4458,7 @@ void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, in
 		return;
 	}
 
-	if (vr->item_selector && !cg.renderingThirdPerson)
+	if (vr->item_selector && (cent->gent->client->ps.clientNum == 0 && !cg.renderingThirdPerson))
 	{
 		return;
 	}
