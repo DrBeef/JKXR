@@ -8662,7 +8662,7 @@ void WP_InitForcePowers( gentity_t *ent )
 		ent->client->ps.forcePowerLevel[FP_LEVITATION] = FORCE_LEVEL_3;
 		ent->client->ps.forcePowerLevel[FP_PUSH] = FORCE_LEVEL_3;
 		ent->client->ps.forcePowerLevel[FP_PULL] = FORCE_LEVEL_3;
-		ent->client->ps.forcePowerLevel[FP_SABERTHROW] = FORCE_LEVEL_3;
+		ent->client->ps.forcePowerLevel[FP_SABERTHROW] = FORCE_LEVEL_2;
 		ent->client->ps.forcePowerLevel[FP_SPEED] = FORCE_LEVEL_3;
 		ent->client->ps.forcePowerLevel[FP_LIGHTNING] = FORCE_LEVEL_3;
 		ent->client->ps.forcePowerLevel[FP_TELEPATHY] = FORCE_LEVEL_3;
