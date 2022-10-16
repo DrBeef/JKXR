@@ -45,7 +45,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             vr_control_scheme->value == 99; // Always right-handed for weapon calibration
 
     static bool dominantGripPushed = false;
-	static float dominantGripPushTime = 0.0f;
     static bool canUseBackpack = false;
     static bool canUseQuickSave = false;
 
@@ -158,20 +157,28 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
         float controllerYawHeading = 0.0f;
         //Turn on weapon stabilisation?
-        bool stabilised = qfalse;
         bool offhandGripPushed = (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger);
-        if ( (offhandGripPushed != (pOffTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) &&
-                offhandGripPushed && (distance < STABILISATION_DISTANCE))
-//#ifndef DEBUG
+        if (offhandGripPushed)
         {
-            stabilised = qtrue;
-        }/*
-#else
-        {
-            Cvar_Set("vr_control_scheme", "99");
+            if (!vr.weapon_stabilised && vr.item_selector == 0)
+            {
+                if (distance < STABILISATION_DISTANCE) {
+                    vr.weapon_stabilised = true;
+                } else {
+                    vr.item_selector = 2;
+                }
+            }
         }
-#endif
-*/
+        else if (vr.item_selector == 2)
+        {
+            sendButtonActionSimple("itemselectorselect");
+            vr.item_selector = 0;
+        }
+        else
+        {
+            vr.weapon_stabilised = false;
+        }
+
         dominantGripPushed = (pDominantTrackedRemoteNew->Buttons &
                               ovrButton_GripTrigger) != 0;
         bool dominantButton1Pushed = (pDominantTrackedRemoteNew->Buttons &
@@ -180,22 +187,15 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                                       domButton2) != 0;
 
         //Do this early so we can suppress other button actions when item selector is up
+        if (dominantGripPushed) {
+            if (vr.item_selector == 0) {
+                vr.item_selector = 1;
+            }
+        }
+        else if (vr.item_selector == 1)
         {
-            if (dominantGripPushed) {
-                if (dominantGripPushTime == 0) {
-                    dominantGripPushTime = GetTimeInMilliSeconds();
-                }
-                vr.item_selector = true;
-            }
-            else
-            {
-                dominantGripPushTime = 0;
-                if (vr.item_selector)
-                {
-                    sendButtonActionSimple("itemselectorselect");
-                    vr.item_selector = false;
-                }
-            }
+            sendButtonActionSimple("itemselectorselect");
+            vr.item_selector = 0;
         }
 
 
@@ -254,8 +254,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 switched = false;
             }
         }
-
-        vr.weapon_stabilised = stabilised;
 
         //if (!vr.item_selector)
         {

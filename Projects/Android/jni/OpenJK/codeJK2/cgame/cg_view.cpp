@@ -1994,8 +1994,6 @@ wasForceSpeed=isForceSpeed;
 		cgi_CM_SnapPVS( cg.refdef.vieworg, cg.snap->areamask );
 	}
 
-
-
 	if (vr->item_selector)
 	{
 		CG_DrawItemSelector();

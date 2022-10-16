@@ -2670,7 +2670,7 @@ void CG_ItemSelectorSelect_f( void )
 		return;
 	}
 
-	if (cg.itemSelectorType == 0)
+	if (cg.itemSelectorType == 0) // weapons
 	{
 		if (cg.weaponSelect == cg.itemSelectorSelection)
 		{
@@ -2680,17 +2680,7 @@ void CG_ItemSelectorSelect_f( void )
 		cg.weaponSelectTime = cg.time;
 		cg.weaponSelect = cg.itemSelectorSelection;
 	}
-	else if (cg.itemSelectorType == 1)
-	{
-		if (cg.forcepowerSelect == cg.itemSelectorSelection)
-		{
-			return;
-		}
-
-		cg.forcepowerSelectTime = cg.time;
-		cg.forcepowerSelect = cg.itemSelectorSelection;
-	}
-	else if (cg.itemSelectorType == 2)
+	else if (cg.itemSelectorType == 1) // gadgets
 	{
 		cg.inventorySelectTime = cg.time;
 		cg.inventorySelect = cg.itemSelectorSelection;
@@ -2701,9 +2691,19 @@ void CG_ItemSelectorSelect_f( void )
 			Cmd_UseInventory_f(player);
 		}
 	}
-	else //fighting style
+	else  if (cg.itemSelectorType == 2) //fighting style
 	{
 		cgi_SendConsoleCommand(va( "setSaberLevel %i\n", cg.itemSelectorSelection + 1));
+	}
+	else // 3 - force powers
+	{
+		if (cg.forcepowerSelect == cg.itemSelectorSelection)
+		{
+			return;
+		}
+
+		cg.forcepowerSelectTime = cg.time;
+		cg.forcepowerSelect = cg.itemSelectorSelection;
 	}
 
 	//reset ready for next time
@@ -2712,18 +2712,28 @@ void CG_ItemSelectorSelect_f( void )
 
 void CG_ItemSelectorNext_f( void )
 {
+	if (cg.itemSelectorType  == 3)
+	{
+		return;
+	}
+
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
 	int selectors = ((cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) &&
-					 cent->currentState.weapon == WP_SABER) ? 4 : 3;
+					 cent->currentState.weapon == WP_SABER) ? 3 : 2;
 	cg.itemSelectorType = (cg.itemSelectorType+1) % selectors;
 	cg.itemSelectorTime = cg.time;
 }
 
 void CG_ItemSelectorPrev_f( void )
 {
+	if (cg.itemSelectorType  == 3)
+	{
+		return;
+	}
+
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
 	int selectors = ((cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) &&
-							 cent->currentState.weapon == WP_SABER) ? 4 : 3;
+							 cent->currentState.weapon == WP_SABER) ? 3 : 2;
 	if (--cg.itemSelectorType < 0)
 		cg.itemSelectorType = selectors-1;
 	cg.itemSelectorTime = cg.time;
@@ -2739,9 +2749,20 @@ void CG_DrawItemSelector( void )
 	if (cg.itemSelectorTime == 0)
 	{
 		cg.itemSelectorTime = cg.time;
-		VectorCopy(vr->weaponangles, cg.itemSelectorAngles);
-		VectorCopy(vr->weaponposition, cg.itemSelectorOrigin);
-		VectorCopy(vr->weaponoffset, cg.itemSelectorOffset);
+
+		if (vr->item_selector == 2)
+		{
+			cg.itemSelectorType = 3;
+			VectorCopy(vr->offhandangles, cg.itemSelectorAngles);
+			VectorCopy(vr->offhandposition, cg.itemSelectorOrigin);
+			VectorCopy(vr->offhandoffset, cg.itemSelectorOffset);
+		}
+		else {
+			cg.itemSelectorType = 0;
+			VectorCopy(vr->weaponangles, cg.itemSelectorAngles);
+			VectorCopy(vr->weaponposition, cg.itemSelectorOrigin);
+			VectorCopy(vr->weaponoffset, cg.itemSelectorOffset);
+		}
 	}
 
 	float dist = 10.0f;
@@ -2756,8 +2777,16 @@ void CG_DrawItemSelector( void )
 	cgi_Cvar_Set("timescale", "0.22");
 
 	vec3_t controllerOrigin, controllerAngles, controllerOffset, selectorOrigin;
-	BG_CalculateVRWeaponPosition(controllerOrigin, controllerAngles);
-	VectorSubtract(vr->weaponposition, cg.itemSelectorOrigin, controllerOffset);
+	if (cg.itemSelectorType == 3)
+	{
+		BG_CalculateVROffHandPosition(controllerOrigin, controllerAngles);
+		VectorSubtract(vr->offhandposition, cg.itemSelectorOrigin, controllerOffset);
+	}
+	else
+	{
+		BG_CalculateVRWeaponPosition(controllerOrigin, controllerAngles);
+		VectorSubtract(vr->weaponposition, cg.itemSelectorOrigin, controllerOffset);
+	}
 
 	vec3_t wheelAngles, wheelOrigin, beamOrigin, wheelForward, wheelRight, wheelUp;
     cg.itemSelectorAngles[YAW] = vr->hmdorientation[YAW];
@@ -2805,14 +2834,14 @@ void CG_DrawItemSelector( void )
 		case 0: //weapons
 			count = WP_MELEE;
 			break;
-		case 1: // force powers
-			count = MAX_SHOWPOWERS;
-			break;
-		case 2: //gadgets
+		case 1: //gadgets
 			count = INV_GOODIE_KEY;
 			break;
-		case 3: //fighting style
+		case 2: //fighting style
 			count = 3;
+			break;
+		case 3: // force powers
+			count = MAX_SHOWPOWERS;
 			break;
 	}
 
@@ -2827,18 +2856,7 @@ void CG_DrawItemSelector( void )
 		memset(sprite.shaderRGBA, 0xff, 4);
 		cgi_R_AddRefEntityToScene(&sprite);
 	}
-	else if (cg.itemSelectorType == 1) // force powers
-	{
-		refEntity_t sprite;
-		memset(&sprite, 0, sizeof(sprite));
-		VectorCopy(wheelOrigin, sprite.origin);
-		sprite.reType = RT_SPRITE;
-		sprite.customShader = force_icons[showPowers[cg.forcepowerSelect]];
-		sprite.radius = 1.8f;
-		memset(sprite.shaderRGBA, 0xff, 4);
-		cgi_R_AddRefEntityToScene(&sprite);
-	}
-	else if (cg.itemSelectorType == 3) // fighting style
+	else if (cg.itemSelectorType == 2) // fighting style
 	{
 		//For the fighting style show the active one in the middle
 		int level = cent->gent->client->ps.saberAnimLevel;
@@ -2865,8 +2883,19 @@ void CG_DrawItemSelector( void )
 			cgi_R_AddRefEntityToScene(&sprite);
 		}
 	}
+	else if (cg.itemSelectorType == 3) // force powers
+	{
+		refEntity_t sprite;
+		memset(&sprite, 0, sizeof(sprite));
+		VectorCopy(wheelOrigin, sprite.origin);
+		sprite.reType = RT_SPRITE;
+		sprite.customShader = force_icons[showPowers[cg.forcepowerSelect]];
+		sprite.radius = 1.8f;
+		memset(sprite.shaderRGBA, 0xff, 4);
+		cgi_R_AddRefEntityToScene(&sprite);
+	}
 
-	if (cg.itemSelectorType != 2) {
+	if (cg.itemSelectorType != 1) {
 		for (int s = -1; s < 2; s += 2) {
 			refEntity_t sprite;
 			memset(&sprite, 0, sizeof(sprite));
@@ -2916,13 +2945,10 @@ void CG_DrawItemSelector( void )
 				case 0: //weapons
 					selectable = CG_WeaponSelectable(itemId, cg.weaponSelect, qfalse) && cg.snap->ps.ammo[weaponData[itemId].ammoIndex];
 					break;
-				case 1: // force powers
-					selectable = ForcePower_Valid(itemId);
-					break;
-				case 2: //gadgets
+				case 1: //gadgets
 					selectable = CG_InventorySelectable(itemId) && inv_icons[itemId];
 					break;
-				case 3: //fighting style
+				case 2: //fighting style
 					{
 						if (cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) {
 							selectable = itemId < cent->gent->client->ps.forcePowerLevel[FP_SABER_OFFENSE];
@@ -2930,6 +2956,9 @@ void CG_DrawItemSelector( void )
 							selectable = false;
 						}
 					}
+					break;
+				case 3: // force powers
+					selectable = ForcePower_Valid(itemId);
 					break;
 			}
 
@@ -2994,13 +3023,10 @@ void CG_DrawItemSelector( void )
 						case 0: //weapons
 							sprite.customShader = cg_weapons[itemId].weaponIcon;
 							break;
-						case 1: // force powers
-							sprite.customShader = force_icons[showPowers[itemId]];
-							break;
-						case 2: //gadgets
+						case 1: //gadgets
 							sprite.customShader = inv_icons[itemId];
 							break;
-						case 3: //fighting style
+						case 2: //fighting style
 							switch ( itemId )
 							{
 								case 0://FORCE_LEVEL_1:
@@ -3013,6 +3039,9 @@ void CG_DrawItemSelector( void )
 									sprite.customShader = cgs.media.HUDSaberStyleStrong;
 									break;
 							}
+							break;
+						case 3: // force powers
+							sprite.customShader = force_icons[showPowers[itemId]];
 							break;
 					}
 

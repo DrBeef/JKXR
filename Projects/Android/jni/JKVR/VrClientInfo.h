@@ -38,7 +38,7 @@ typedef struct {
     vec3_t weaponoffset_history[NUM_WEAPON_SAMPLES];
     float weaponoffset_history_timestamp[NUM_WEAPON_SAMPLES];
 
-    bool item_selector;
+    int item_selector = 0; // 1 - weapons/gadgets/saber stance, 2 - Force powers
 
     bool pistol;                // True if the weapon is a pistol
 
