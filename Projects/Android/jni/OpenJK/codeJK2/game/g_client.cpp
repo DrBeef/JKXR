@@ -1663,7 +1663,7 @@ qboolean ClientSpawn(gentity_t *ent, SavedGameJustLoaded_e eSavedGameJustLoaded 
 			client->ps.ammo[i] = ammoData[i].max;
 		}
 
-		client->ps.saberColor = SABER_BLUE;
+		client->ps.saberColor = SABER_RED;
 		client->ps.saberActive = qfalse;
 		client->ps.saberLength = 0;
 		//Initialize force powers

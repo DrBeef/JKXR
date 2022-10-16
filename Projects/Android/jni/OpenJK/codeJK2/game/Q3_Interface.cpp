@@ -4085,6 +4085,8 @@ static void Q3_SetForcePowerLevel ( int entID, int forcePower, int forceLevel )
 		}
 	}
 
+	//HACK - Don't remove or update force  powers in the demo
+	/*
 	self->client->ps.forcePowerLevel[forcePower] = forceLevel;
 	if ( forceLevel )
 	{
@@ -4094,6 +4096,7 @@ static void Q3_SetForcePowerLevel ( int entID, int forcePower, int forceLevel )
 	{
 		self->client->ps.forcePowersKnown &= ~( 1 << forcePower );
 	}
+	 */
 }
 /*
 ============
