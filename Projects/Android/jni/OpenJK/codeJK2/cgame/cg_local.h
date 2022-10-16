@@ -444,7 +444,7 @@ typedef struct {
 	int			weaponAnimation;
 	int			weaponAnimationTime;
 
-	int 		itemSelectorType; // 0 - weapons, 1 - force powers, 2 - gadgets, 3 - fighting-style
+	int 		itemSelectorType; // 0 - weapons, 1 - gadgets, 2 - fighting-style, 3 - force powers
 	int			itemSelectorSelection;
 	int 		itemSelectorTime;
 	vec3_t		itemSelectorAngles;
