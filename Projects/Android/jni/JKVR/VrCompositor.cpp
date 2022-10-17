@@ -120,7 +120,7 @@ static ovrMatrix4f CylinderModelMatrix( const int texWidth, const int texHeight,
 										const float radius,
 										const float density )
 {
-	const ovrMatrix4f scaleMatrix = ovrMatrix4f_CreateScale( radius, radius * (float)texHeight * VRAPI_PI / density, radius );
+	const ovrMatrix4f scaleMatrix = ovrMatrix4f_CreateScale( radius, radius * (float)texHeight * VRAPI_PI / density, radius / 2 );
 	const ovrMatrix4f transMatrix = ovrMatrix4f_CreateTranslation( translation.x, translation.y, translation.z );
 	const ovrMatrix4f rotXMatrix = ovrMatrix4f_CreateRotation( rotateYaw, 0.0f, 0.0f );
 	const ovrMatrix4f rotYMatrix = ovrMatrix4f_CreateRotation( 0.0f, rotatePitch, 0.0f );
@@ -152,18 +152,10 @@ ovrLayerCylinder2 BuildCylinderLayer( ovrRenderer * cylinderRenderer,
 
 	layer.HeadPose = tracking->HeadPose;
 
-	const float density = 4500.0f;
+	const float density = 15000.0f;
 	const float rotateYaw = 0.0f;
-	const float radius = 2.0f;
-	//GB Hacky Override
-	float screen_offset = 0;
-	if(textureWidth > 1900)
-	{
-		screen_offset = -2.625f;
-	}
-	const float distance = vr_screen_dist ? -vr_screen_dist->value + screen_offset : -3.5f + screen_offset;
-
-	const ovrVector3f translation = { 0.0f, playerHeight/2, distance };
+	const float radius = 10.0f;
+	const ovrVector3f translation = { 0.0f, playerHeight/1.8f, -vr_screen_dist->value };
 
 	ovrMatrix4f cylinderTransform = 
 		CylinderModelMatrix( textureWidth, textureHeight, translation,
