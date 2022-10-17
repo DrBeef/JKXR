@@ -1832,44 +1832,6 @@
 
 		itemDef 
 		{	
-			name				identifytarget
-			group				options
-      		type				ITEM_TYPE_MULTI
-			text				@MENUS0_IDENTIFY_TARGET
-			cvar				"cg_crosshairIdentifyTarget"
-			cvarFloatList		
-			{ 
-				@MENUS0_OFF 0  
-				@MENUS0_ON 1 
-			}
-			rect				305 191 300 20
-	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
-			textaligny			-2
-			font 				2
-			textscale 			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			@MENUS2_TOGGLE_TO_HAVE_THE_CROSSHAIR
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-			}
-
-			mouseenter 
-			{ 
-				show			highlight2
-			}
-			mouseexit 
-			{ 
-				hide			highlight2
-			} 
-		}
-
-
-		itemDef 
-		{	
 			name				slowmo
 			group				options
       		type				ITEM_TYPE_MULTI
@@ -1910,251 +1872,6 @@
 			} 
 		}
 
-
-		itemDef 
-		{	
-			name				force3rd
-			group				options
-      		type				ITEM_TYPE_MULTI
-			text				@MENUS2_3RD_PERSON_LIGHTSABER
-			cvar				"cg_saberAutoThird"
-			cvarFloatList		
-			{ 
-				@MENUS0_OFF 0  
-				@MENUS0_ON 1 
-			}
-			rect				305 231 300 20
-	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
-			textaligny			-2
-			font 				2
-			textscale 			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			@MENUS2_WHEN_READYING_LIGHTSABER
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-			}
-
-			mouseenter 
-			{ 
-				show			highlight4
-			}
-			mouseexit 
-			{ 
-				hide			highlight4
-			} 
-		}
-
-
-		itemDef 
-		{	
-			name				force1st
-			group				options
-      		type				ITEM_TYPE_MULTI
-			text				@MENUS2_1ST_PERSON_GUNS
-			cvar				"cg_gunAutoFirst"
-			cvarFloatList		
-			{ 
-				@MENUS0_OFF 0  
-				@MENUS0_ON 1 
-			}
-			rect				305 251 300 20
-	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
-			textaligny			-2
-			font 				2
-			textscale 			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			@MENUS2_WHEN_PUTTING_AWAY_SABER
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-			}
-
-			mouseenter 
-			{ 
-				show			highlight5
-			}
-			mouseexit 
-			{ 
-				hide			highlight5
-			} 
-		}
-
-
-		itemDef 
-		{	
-			name				dismemberment
-			group				options
-      		type				ITEM_TYPE_MULTI
-			text				@MENUS2_DISMEMBERMENT
-			cvar				"g_dismemberment"
-			cvarFloatList		
-			{ 
-				@MENUS0_OFF 	0
-				@MENUS0_ON 		3
-			}
-			cvarTest			ui_iscensored
-			hideCvar			{ 1 }
-			rect				305 291 300 20
-	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
-			textaligny			-2
-			font 				2
-			textscale 			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			@MENUS2_SELECT_WHAT_LIGHTSABER
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-			}
-			mouseenter 
-			{ 
-				show			highlight7
-			}
-			mouseexit 
-			{ 
-				hide			highlight7
-			} 
-		}
-
-
-// Weapon Sway.  Yes, this is nutty.  Two cvars here, one removes weapon sway, the other adds it.
-		itemDef 
-		{	
-			name				weaponswayon
-			group				options
-      		type				ITEM_TYPE_MULTI
-			text				@MENUS3_VIEW_SWAYING
-			descText			@MENUS3_VIEW_SWAYING_DESC
-			cvar				"ui_disableWeaponSway"
-			cvarFloatList		
-			{ 
-				@MENUS0_ON	 	0
-				@MENUS0_OFF 	1
-			}
-			cvarTest			"ui_disableWeaponSway"
-			showCvar
-			{
-				"0"
-			}
-			rect				305 311 300 20
-	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
-			textaligny			-2
-			font 				2
-			textscale 			0.8
-			forecolor			1 1 1 1
-			visible			0
-
-			action 
-			{
-				play			"sound/interface/button1.wav" ; 	
-				exec			"exec noMotion.cfg" ;
-				show			weaponswayoff ;
-				setfocus		weaponswayoff
-			}
-			mouseenter 
-			{ 
-				show			highlight8
-			}
-			mouseexit 
-			{ 
-				hide			highlight8
-			} 
-		}
-
-		itemDef 
-		{	
-			name				weaponswayoff
-			group				options
-      		type				ITEM_TYPE_MULTI
-			text				@MENUS3_VIEW_SWAYING
-			descText			@MENUS3_VIEW_SWAYING_DESC
-			cvar				"ui_disableWeaponSway"
-			cvarFloatList		
-			{ 
-				@MENUS0_ON	 	0
-				@MENUS0_OFF 	1
-			}
-			cvarTest			"ui_disableWeaponSway"
-			hideCvar
-			{
-				"0"
-			}
-			rect				305 311 300 20
-	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
-			textaligny			-2
-			font 				2
-			textscale 			0.8
-			forecolor			1 1 1 1
-			visible				0
-
-			action 
-			{
-				play			"sound/interface/button1.wav" ; 	
-				exec			"exec restoreMotion.cfg" ;
-				show			weaponswayon ;
-				setfocus		weaponswayon
-			}
-			mouseenter 
-			{ 
-				show			highlight8
-			}
-			mouseexit 
-			{ 
-				hide			highlight8
-			} 
-		}
-
-/*
-		itemDef 
-		{	
-			name				dismembermentprob
-			group				options_obsolete
-      		type				ITEM_TYPE_MULTI
-			text				@MENUS2_DISMEMBER_PROBABILITY
-			cvar				"g_dismemberProbabilities"
-			cvarFloatList		
-			{ 
-				@MENUS2_RARE 		2
-				@MENUS1_NORMAL 		1
-				@MENUS2_EXCESSIVE		0
-			}
-			rect				305 311 300 20
-	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
-			textaligny			-2
-			font 				2
-			textscale 			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			@MENUS2_SELECT_FREQUENCY_OF_DISMEMBERMENT
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-			}
-
-			mouseenter 
-			{ 
-				show			highlight8
-			}
-			mouseexit 
-			{ 
-				hide			highlight8
-			} 
-		}
-*/
-
 		itemDef 
 		{	
 			name				text
@@ -2168,7 +1885,7 @@
 				"Francais" 	1
 				"Deutsch" 	2
 			}
-			rect				305 351 300 20
+			rect				305 251 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -2178,18 +1895,18 @@
 			visible			0
 			// appearance_slot		1
 			descText			@MENUS2_CHOOSE_THE_LANGUAGE_FOR
+
 			action
 			{
-				play			"sound/interface/button1.wav" ;
+				play			"sound/interface/button1.wav"
 			}
-
 			mouseenter 
 			{ 
-				show			highlight10
+				show			highlight4
 			}
 			mouseexit 
 			{ 
-				hide			highlight10
+				hide			highlight4
 			} 
 		}
 
@@ -2206,7 +1923,7 @@
 				"Francais" 	"francais"
 				"Deutsch"	"deutsch"
 			}
-			rect				305 371 300 20
+			rect				305 271 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -2216,18 +1933,18 @@
 			visible			0
 			// appearance_slot		1
 			descText			@MENUS3_CHOOSE_THE_LANGUAGE_TO
+
 			action
 			{
-				play			"sound/interface/button1.wav" ;
+				play			"sound/interface/button1.wav"
 			}
-
 			mouseenter 
 			{ 
-				show			highlight11
+				show			highlight5
 			}
 			mouseexit 
 			{ 
-				hide			highlight11
+				hide			highlight5
 			} 
 		}
 
@@ -2244,7 +1961,7 @@
 				@MENUS3_IN_CINEMATICS	2 
 //				@MENUS3_ALL_VOICEOVERS	1 
 			}
-			rect				305 391 300 20
+			rect				305 291 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -2254,42 +1971,6 @@
 			visible			0
 			// appearance_slot		1
 			descText			@MENUS3_TOGGLE_WHETHER_SUBTITLES
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-			}
-
-			mouseenter 
-			{ 
-				show			highlight12
-			}
-			mouseexit 
-			{ 
-				hide			highlight12
-			} 
-		}
-
-
-
-// This menu option is no longer used.
-		itemDef 
-		{	
-			name				sync_frame
-			group				options_obsolete
-      		type				ITEM_TYPE_MULTI
-			text				@MENUS1_SYNC_EVERY_FRAME
-			cvar				"r_finish"
-			cvarFloatList		{  @MENUS0_OFF 0 @MENUS0_ON 1 }
-			rect				305 211 300 20
-	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
-			textaligny			-2
-			font 				2
-			textscale 			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			@MENUS3_TOGGLE_TO_PREVENT_VIDEO
 
 			action
 			{
@@ -2297,13 +1978,15 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight3
+				show			highlight6
 			}
 			mouseexit 
 			{ 
-				hide			highlight3
+				hide			highlight6
 			} 
 		}
+
+
 
 		//----------------------------------------------------------------------------------------------
 		//
