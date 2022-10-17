@@ -2753,13 +2753,11 @@ void CG_DrawItemSelector( void )
 		if (vr->item_selector == 2)
 		{
 			cg.itemSelectorType = 3;
-			VectorCopy(vr->offhandangles, cg.itemSelectorAngles);
 			VectorCopy(vr->offhandposition, cg.itemSelectorOrigin);
 			VectorCopy(vr->offhandoffset, cg.itemSelectorOffset);
 		}
 		else {
 			cg.itemSelectorType = 0;
-			VectorCopy(vr->weaponangles, cg.itemSelectorAngles);
 			VectorCopy(vr->weaponposition, cg.itemSelectorOrigin);
 			VectorCopy(vr->weaponoffset, cg.itemSelectorOffset);
 		}
@@ -2789,8 +2787,10 @@ void CG_DrawItemSelector( void )
 	}
 
 	vec3_t wheelAngles, wheelOrigin, beamOrigin, wheelForward, wheelRight, wheelUp;
-    cg.itemSelectorAngles[YAW] = vr->hmdorientation[YAW];
-	BG_CalculateVRPositionInWorld(cg.itemSelectorOrigin, cg.itemSelectorOffset, cg.itemSelectorAngles, wheelOrigin, wheelAngles);
+	vec3_t angles;
+	VectorClear(angles);
+	angles[YAW] = vr->hmdorientation[YAW];
+	BG_CalculateVRPositionInWorld(cg.itemSelectorOrigin, cg.itemSelectorOffset, angles, wheelOrigin, wheelAngles);
 
 	AngleVectors(wheelAngles, wheelForward, wheelRight, wheelUp);
 	VectorCopy(controllerOrigin, wheelOrigin);
@@ -2818,12 +2818,15 @@ void CG_DrawItemSelector( void )
 
 	{
 		vec3_t	color = { 0, 0, 255 };
-		FX_AddLine( beamOrigin, selectorOrigin, 0.1f, 1.0f, 0.0f,
-					1.0f, 0.0f, 0.0f,
-					color, color, 0.0f,
-					60, cgi_R_RegisterShader( "gfx/misc/nav_line" ),
-					FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
+		refEntity_t beam;
+		VectorCopy(beamOrigin, beam.oldorigin);
+		VectorCopy(selectorOrigin, beam.origin );
+		beam.shaderRGBA[0] = beam.shaderRGBA[1] = beam.shaderRGBA[2] = beam.shaderRGBA[3] = 0xff;
+		beam.customShader = cgs.media.blueSaberCoreShader;
+		beam.reType = RT_LINE;
+		beam.radius = 0.4f;
 
+		cgi_R_AddRefEntityToScene( &beam );
 	}
 
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
@@ -2901,10 +2904,8 @@ void CG_DrawItemSelector( void )
 			memset(&sprite, 0, sizeof(sprite));
 			vec3_t right;
 			AngleVectors(wheelAngles, NULL, right, NULL);
-			float offset = ((float) s * 2.0f) + (((float) s * 0.3f) * sinf(DEG2RAD(
-																				   AngleNormalize360(
-																						   cg.time -
-																						   cg.itemSelectorTime))));
+			float offset = ((float) s * 2.0f) + (((float) s * 0.3f) *
+					sinf(DEG2RAD(AngleNormalize360(cg.time - cg.itemSelectorTime))));
 			VectorMA(wheelOrigin, offset, right, sprite.origin);
 			sprite.reType = RT_SPRITE;
 			sprite.customShader = cgs.media.binocularArrow;

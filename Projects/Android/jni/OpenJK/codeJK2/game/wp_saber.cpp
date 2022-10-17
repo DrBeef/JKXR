@@ -5726,7 +5726,7 @@ void ForceThrow( gentity_t *self, qboolean pull )
 	G_Sound( self, soundIndex );
 
 	vec3_t origin, angles;
-	if (self->client->ps.clientNum == 0)
+	if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
 	{
 		BG_CalculateVROffHandPosition(origin, fwdangles);
 
@@ -6776,7 +6776,7 @@ void ForceTelepathy( gentity_t *self )
 	}
 
 	vec3_t origin, angles;
-	if (self->client->ps.clientNum == 0)
+	if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
 	{
 		BG_CalculateVROffHandPosition(origin, angles);
 		AngleVectors(angles, forward, NULL, NULL);
@@ -7013,14 +7013,13 @@ void ForceGrip( gentity_t *self )
 	}
 
 	vec3_t origin, angles;
-	if (self->client->ps.clientNum == 0)
+	if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
 	{
 		BG_CalculateVROffHandPosition(origin, angles);
 		AngleVectors(angles, forward, NULL, NULL);
 
 		if (cg_showForcePowerDirection.integer)
 		{
-			vec3_t origin, angles;
 			vec3_t	color = { 0, 255, 0 };
 			AngleVectors( angles, forward, NULL, NULL );
 			VectorMA( origin, FORCE_GRIP_DIST, forward, end );
