@@ -3446,17 +3446,18 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 	if (player1stPersonSaber && !cent->currentState.saberInFlight && !vr->item_selector)
 	{
 		memset( &hiltEnt, 0, sizeof(refEntity_t) );
-		hiltEnt.renderfx = RF_DEPTHHACK;
+		//hiltEnt.renderfx = RF_DEPTHHACK;
 		hiltEnt.hModel = cgi_R_RegisterModel( "models/weapons2/saber/saber_w.md3" );
 		vec3_t angles;
 		BG_CalculateVRSaberPosition(hiltEnt.origin, hiltEnt.angles);
 		//hiltEnt.angles[ROLL] += 180;
-		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
 		vec3_t axis[3];
 		AnglesToAxis(hiltEnt.angles, axis);
 		VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
 		VectorCopy(axis[1], hiltEnt.axis[1]);
 		VectorCopy(axis[0], hiltEnt.axis[2]);
+		VectorMA(hiltEnt.origin, 1.0f, hiltEnt.axis[2], hiltEnt.origin);
+		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
 		for (int i = 0; i < 3; ++i)
 			VectorScale(hiltEnt.axis[i], 0.85f, hiltEnt.axis[i]);
 
@@ -5212,7 +5213,7 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 				VectorCopy( ent.origin, cent->gent->client->renderInfo.muzzlePoint );
 				VectorCopy( ent.axis[0], cent->gent->client->renderInfo.muzzleDir );
 
-				if ( !cg.renderingThirdPerson && (cg.snap->ps.weapon == WP_SABER||cg.snap->ps.weapon == WP_MELEE))
+				if ( !cg.renderingThirdPerson && cent->gent->client->ps.clientNum == 0 && (cg.snap->ps.weapon == WP_SABER||cg.snap->ps.weapon == WP_MELEE))
 				{
 					vec3_t angles;
 					BG_CalculateVRSaberPosition(cent->gent->client->renderInfo.muzzlePoint, angles);
@@ -5233,7 +5234,7 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 							&boltMatrix, G2Angles, ent.origin, cg.time,
 							cgs.model_draw, cent->currentState.modelScale );
 			gi.G2API_GiveMeVectorFromMatrix( boltMatrix, ORIGIN, cent->gent->client->renderInfo.handRPoint );
-			if (!cg.renderingThirdPerson && !cent->gent->client->ps.saberInFlight)
+			if (!cg.renderingThirdPerson && !cent->gent->client->ps.saberInFlight && cent->gent->client->ps.clientNum == 0)
 			{
 				vec3_t angles;
 				BG_CalculateVRSaberPosition(cent->gent->client->renderInfo.handRPoint, angles);
@@ -5246,7 +5247,7 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 							&boltMatrix, G2Angles, ent.origin, cg.time,
 							cgs.model_draw, cent->currentState.modelScale );
 			gi.G2API_GiveMeVectorFromMatrix( boltMatrix, ORIGIN, cent->gent->client->renderInfo.handLPoint );
-			if (!cg.renderingThirdPerson && !cent->gent->client->ps.saberInFlight)
+			if (!cg.renderingThirdPerson && !cent->gent->client->ps.saberInFlight && cent->gent->client->ps.clientNum == 0)
 			{
 				vec3_t angles;
 				BG_CalculateVROffHandPosition(cent->gent->client->renderInfo.handLPoint, angles);
@@ -5880,14 +5881,18 @@ Ghoul2 Insert End
 			//FIXME: allow it to be put anywhere and move this out of if(torso.hModel)
 			//Will have to call CG_PositionRotatedEntityOnTag
 
-			//CG_PositionEntityOnTag( &gun, &torso, torso.hModel, "tag_weapon");
-
-			vec3_t angs;
-			BG_CalculateVRWeaponPosition(gun.origin, angs);
-			AnglesToAxis(angs, gun.axis);
-			//Gotta move this forward but test for now
-			VectorCopy( gun.origin, gun.lightingOrigin );
-
+			if (cent->gent->client->ps.clientNum == 0)
+			{
+				vec3_t angs;
+				BG_CalculateVRWeaponPosition(gun.origin, angs);
+				AnglesToAxis(angs, gun.axis);
+				//Gotta move this forward but test for now
+				VectorCopy( gun.origin, gun.lightingOrigin );
+			}
+			else
+			{
+				CG_PositionEntityOnTag( &gun, &torso, torso.hModel, "tag_weapon");
+			}
 
 //--------------------- start saber hacks
 

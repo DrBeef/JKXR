@@ -197,7 +197,7 @@ import static android.system.Os.setenv;
 		copy_asset("/sdcard/JKQuest/JK3/base", "weapons_vr_ja.cfg", true);
 
 		//Our assets
-		copy_asset("/sdcard/JKQuest/JK2/base", "z_vr_assets.pk3", true);
+		copy_asset("/sdcard/JKQuest/JK2/base", "z_vr_assets.pk3", false);
 
 		//Read these from a file and pass through
 		commandLineParams = new String("jo");

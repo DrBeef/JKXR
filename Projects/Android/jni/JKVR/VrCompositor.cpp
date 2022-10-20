@@ -169,7 +169,7 @@ ovrLayerCylinder2 BuildCylinderLayer( ovrRenderer * cylinderRenderer,
 		ovrMatrix4f modelViewMatrix = ovrMatrix4f_Multiply( &tracking->Eye[eye].ViewMatrix, &cylinderTransform );
 		layer.Textures[eye].TexCoordsFromTanAngles = ovrMatrix4f_Inverse( &modelViewMatrix );
 		layer.Textures[eye].ColorSwapChain = cylinderFrameBuffer->ColorTextureSwapChain;
-		layer.Textures[eye].SwapChainIndex = cylinderFrameBuffer->ReadyTextureSwapChainIndex;
+		layer.Textures[eye].SwapChainIndex = cylinderFrameBuffer->TextureSwapChainIndex;
 
 		// Texcoord scale and bias is just a representation of the aspect ratio. The positioning
 		// of the cylinder is handled entirely by the TexCoordsFromTanAngles matrix.

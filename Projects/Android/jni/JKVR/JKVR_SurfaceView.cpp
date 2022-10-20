@@ -31,6 +31,7 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 #include <EGL/eglext.h>
 #include <GLES3/gl3.h>
 #include <GLES3/gl3ext.h>
+#define GL_GLEXT_PROTOTYPES
 #include <GLES/gl2ext.h>
 
 #include "VrApi.h"
@@ -62,6 +63,12 @@ extern "C" {
 #ifndef GL_TEXTURE_BORDER_COLOR
 #define GL_TEXTURE_BORDER_COLOR		0x1004
 #endif
+
+#ifndef GLAPI
+#define GLAPI extern
+#endif
+//#define ENABLE_GL_DEBUG
+#define ENABLE_GL_DEBUG_VERBOSE 1
 
 
 // Must use EGLSyncKHR because the VrApi still supports OpenGL ES 2.0
@@ -484,8 +491,7 @@ static void ovrFramebuffer_Clear( ovrFramebuffer * frameBuffer )
 	frameBuffer->Height = 0;
 	frameBuffer->Multisamples = 0;
 	frameBuffer->TextureSwapChainLength = 0;
-	frameBuffer->ProcessingTextureSwapChainIndex = 0;
-	frameBuffer->ReadyTextureSwapChainIndex = 0;
+	frameBuffer->TextureSwapChainIndex = 0;
 	frameBuffer->ColorTextureSwapChain = NULL;
 	frameBuffer->DepthBuffers = NULL;
 	frameBuffer->FrameBuffers = NULL;
@@ -565,7 +571,7 @@ void GPUWaitSync()
 void ovrFramebuffer_SetCurrent( ovrFramebuffer * frameBuffer )
 {
     //LOAD_GLES2(glBindFramebuffer);
-	GL( glBindFramebuffer( GL_DRAW_FRAMEBUFFER, frameBuffer->FrameBuffers[frameBuffer->ProcessingTextureSwapChainIndex] ) );
+	GL( glBindFramebuffer( GL_DRAW_FRAMEBUFFER, frameBuffer->FrameBuffers[frameBuffer->TextureSwapChainIndex] ) );
 }
 
 void ovrFramebuffer_SetNone()
@@ -587,8 +593,7 @@ void ovrFramebuffer_Resolve( ovrFramebuffer * frameBuffer )
 void ovrFramebuffer_Advance( ovrFramebuffer * frameBuffer )
 {
 	// Advance to the next texture from the set.
-	frameBuffer->ReadyTextureSwapChainIndex = frameBuffer->ProcessingTextureSwapChainIndex;
-	frameBuffer->ProcessingTextureSwapChainIndex = ( frameBuffer->ProcessingTextureSwapChainIndex + 1 ) % frameBuffer->TextureSwapChainLength;
+	frameBuffer->TextureSwapChainIndex = ( frameBuffer->TextureSwapChainIndex + 1 ) % frameBuffer->TextureSwapChainLength;
 }
 
 
@@ -1280,6 +1285,7 @@ void JKVR_Init()
 	vr_immersive_cinematics = Cvar_Get("vr_immersive_cinematics", "0", CVAR_ARCHIVE);
 	vr_screen_dist = Cvar_Get( "vr_screen_dist", "2.5", CVAR_ARCHIVE);
 	vr_weapon_velocity_trigger = Cvar_Get( "vr_weapon_velocity_trigger", "2.3", CVAR_ARCHIVE);
+    vr_two_handed_weapons = Cvar_Get ("vr_two_handed_weapons", "1", CVAR_ARCHIVE);
 }
 
 
@@ -1318,9 +1324,6 @@ void JKVR_finishEyeBuffer(int eye )
 	//Clear edge to prevent smearing
 	ovrFramebuffer_ClearEdgeTexels(frameBuffer);
 	ovrFramebuffer_Resolve(frameBuffer);
-	ovrFramebuffer_Advance(frameBuffer);
-
-	ovrFramebuffer_SetNone();
 }
 
 void JKVR_processMessageQueue() {
@@ -1383,6 +1386,35 @@ int VR_main( int argc, char* argv[] );
 int GetRefresh()
 {
     return vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_DISPLAY_REFRESH_RATE);
+}
+
+void GL_APIENTRYP VR_GLDebugLog(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,GLvoid *userParam)
+{
+	if (type == GL_DEBUG_TYPE_ERROR || type == GL_DEBUG_TYPE_PERFORMANCE || ENABLE_GL_DEBUG_VERBOSE)
+	{
+		char typeStr[128];
+		switch (type) {
+			case GL_DEBUG_TYPE_ERROR: sprintf(typeStr, "ERROR"); break;
+			case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: sprintf(typeStr, "DEPRECATED_BEHAVIOR"); break;
+			case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: sprintf(typeStr, "UNDEFINED_BEHAVIOR"); break;
+			case GL_DEBUG_TYPE_PORTABILITY: sprintf(typeStr, "PORTABILITY"); break;
+			case GL_DEBUG_TYPE_PERFORMANCE: sprintf(typeStr, "PERFORMANCE"); break;
+			case GL_DEBUG_TYPE_MARKER: sprintf(typeStr, "MARKER"); break;
+			case GL_DEBUG_TYPE_PUSH_GROUP: sprintf(typeStr, "PUSH_GROUP"); break;
+			case GL_DEBUG_TYPE_POP_GROUP: sprintf(typeStr, "POP_GROUP"); break;
+			default: sprintf(typeStr, "OTHER"); break;
+		}
+
+		char severinityStr[128];
+		switch (severity) {
+			case GL_DEBUG_SEVERITY_HIGH: sprintf(severinityStr, "HIGH"); break;
+			case GL_DEBUG_SEVERITY_MEDIUM: sprintf(severinityStr, "MEDIUM"); break;
+			case GL_DEBUG_SEVERITY_LOW: sprintf(severinityStr, "LOW"); break;
+			default: sprintf(severinityStr, "VERBOSE"); break;
+		}
+
+		ALOGE("[%s] GL issue - %s: %s\n", severinityStr, typeStr, message);
+	}
 }
 
 void * AppThreadFunction(void * parm ) {
@@ -1452,6 +1484,11 @@ void * AppThreadFunction(void * parm ) {
 	while ( gAppState.Ovr == NULL ) {
 		JKVR_processMessageQueue();
 	}
+
+#ifdef ENABLE_GL_DEBUG
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(reinterpret_cast<GLDEBUGPROC>(VR_GLDebugLog), 0);
+#endif
 
 	ovrRenderer_Create(m_width, m_height, &gAppState.Renderer, &java);
 
@@ -1667,7 +1704,7 @@ void JKVR_submitFrame()
 		{
 			ovrFramebuffer * frameBuffer = &gAppState.Renderer.FrameBuffer[gAppState.Renderer.NumBuffers == 1 ? 0 : eye];
 			layer.Textures[eye].ColorSwapChain = frameBuffer->ColorTextureSwapChain;
-			layer.Textures[eye].SwapChainIndex = frameBuffer->ReadyTextureSwapChainIndex;
+			layer.Textures[eye].SwapChainIndex = frameBuffer->TextureSwapChainIndex;
 
 			ovrMatrix4f projectionMatrix;
 			projectionMatrix = ovrMatrix4f_CreateProjectionFov(vr.fov, vr.fov,
@@ -1679,7 +1716,12 @@ void JKVR_submitFrame()
 			layer.Textures[eye].TextureRect.y = 0;
 			layer.Textures[eye].TextureRect.width = 1.0f;
 			layer.Textures[eye].TextureRect.height = 1.0f;
+
+			ovrFramebuffer_Advance(frameBuffer);
 		}
+
+		ovrFramebuffer_SetNone();
+
 		layer.Header.Flags |= VRAPI_FRAME_LAYER_FLAG_CHROMATIC_ABERRATION_CORRECTION;
 
 		// Set up the description for this frame.
@@ -1709,6 +1751,14 @@ void JKVR_submitFrame()
 		gAppState.Layers[gAppState.LayerCount++].Cylinder =
 				BuildCylinderLayer(&gAppState.Scene.CylinderRenderer,
 								   gAppState.Scene.CylinderWidth, gAppState.Scene.CylinderHeight, &tracking, radians(playerYaw) );
+
+		for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
+		{
+			ovrFramebuffer * frameBuffer = &gAppState.Scene.CylinderRenderer.FrameBuffer[gAppState.Renderer.NumBuffers == 1 ? 0 : eye];
+			ovrFramebuffer_Advance(frameBuffer);
+		}
+
+		ovrFramebuffer_SetNone();
 
 		// Compose the layers for this frame.
 		const ovrLayerHeader2 * layerHeaders[ovrMaxLayerCount] = { 0 };

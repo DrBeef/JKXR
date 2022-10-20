@@ -11,10 +11,11 @@ typedef struct {
     bool weapon_stabilised;
     bool right_handed;
     bool player_moving;
-    int weaponid;
-    int lastweaponid;
     bool mountedgun;
     int cgzoommode;
+
+    int weaponid;
+    int forceid;
 
     vec3_t hmdposition;
     vec3_t hmdposition_last; // Don't use this, it is just for calculating delta!

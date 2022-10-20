@@ -2816,37 +2816,47 @@ void CG_DrawItemSelector( void )
 	VectorMA(selectorOrigin, radius * pos[0], wheelRight, selectorOrigin);
 	VectorMA(selectorOrigin, radius * pos[1], wheelUp, selectorOrigin);
 
-	{
-		vec3_t	color = { 0, 0, 255 };
-		refEntity_t beam;
-		VectorCopy(beamOrigin, beam.oldorigin);
-		VectorCopy(selectorOrigin, beam.origin );
-		beam.shaderRGBA[0] = beam.shaderRGBA[1] = beam.shaderRGBA[2] = beam.shaderRGBA[3] = 0xff;
-		beam.customShader = cgs.media.blueSaberCoreShader;
-		beam.reType = RT_LINE;
-		beam.radius = 0.4f;
-
-		cgi_R_AddRefEntityToScene( &beam );
-	}
-
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
 
+	refEntity_t beam;
+	beam.shaderRGBA[3] = 0xff;
 	int count;
 	switch (cg.itemSelectorType)
 	{
 		case 0: //weapons
 			count = WP_MELEE;
+			beam.shaderRGBA[0] = 0xff;
+			beam.shaderRGBA[1] = 0xae;
+			beam.shaderRGBA[2] = 0x40;
 			break;
 		case 1: //gadgets
 			count = INV_GOODIE_KEY;
+			beam.shaderRGBA[0] = 0x00;
+			beam.shaderRGBA[1] = 0xff;
+			beam.shaderRGBA[2] = 0x00;
 			break;
 		case 2: //fighting style
 			count = 3;
+			beam.shaderRGBA[0] = 0xff;
+			beam.shaderRGBA[1] = 0x00;
+			beam.shaderRGBA[2] = 0x00;
 			break;
 		case 3: // force powers
 			count = MAX_SHOWPOWERS;
+			beam.shaderRGBA[0] = 0x00;
+			beam.shaderRGBA[1] = 0x00;
+			beam.shaderRGBA[2] = 0xff;
 			break;
 	}
+
+	VectorCopy(beamOrigin, beam.oldorigin);
+	VectorCopy(selectorOrigin, beam.origin );
+	beam.customShader = cgi_R_RegisterShader( "gfx/misc/whiteline2" );
+	beam.reType = RT_LINE;
+	beam.radius = 0.3f;
+
+	cgi_R_AddRefEntityToScene( &beam );
+
 
 	if (cg.itemSelectorType == 0) // weapons
 	{
@@ -2888,14 +2898,16 @@ void CG_DrawItemSelector( void )
 	}
 	else if (cg.itemSelectorType == 3) // force powers
 	{
-		refEntity_t sprite;
-		memset(&sprite, 0, sizeof(sprite));
-		VectorCopy(wheelOrigin, sprite.origin);
-		sprite.reType = RT_SPRITE;
-		sprite.customShader = force_icons[showPowers[cg.forcepowerSelect]];
-		sprite.radius = 1.8f;
-		memset(sprite.shaderRGBA, 0xff, 4);
-		cgi_R_AddRefEntityToScene(&sprite);
+		if (cent->gent->client->ps.forcePowersKnown != 0) {
+			refEntity_t sprite;
+			memset(&sprite, 0, sizeof(sprite));
+			VectorCopy(wheelOrigin, sprite.origin);
+			sprite.reType = RT_SPRITE;
+			sprite.customShader = force_icons[showPowers[cg.forcepowerSelect]];
+			sprite.radius = 1.8f;
+			memset(sprite.shaderRGBA, 0xff, 4);
+			cgi_R_AddRefEntityToScene(&sprite);
+		}
 	}
 
 	if (cg.itemSelectorType != 1) {

@@ -1322,11 +1322,11 @@ float CG_ForceSpeedFOV( float infov )
 	float timeLeft = player->client->ps.forcePowerDuration[FP_SPEED] - cg.time;
 	float length = FORCE_SPEED_DURATION*forceSpeedValue[player->client->ps.forcePowerLevel[FP_SPEED]];
 	float amt = forceSpeedFOVMod[player->client->ps.forcePowerLevel[FP_SPEED]];
-	if ( timeLeft < 400 )
+	if ( timeLeft < 200 )
 	{//start going back
 		fov = infov + sinf(DEG2RAD((timeLeft/400)*180))*amt;
 	}
-	else if ( length - timeLeft < 600 )
+	else if ( length - timeLeft < 300 )
 	{//start zooming in
 		fov = infov + sinf(DEG2RAD(((length - timeLeft)/600)*180))*amt;
 	}
@@ -1834,7 +1834,9 @@ extern vec3_t	serverViewOrg;
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 	qboolean	inwater = qfalse;
 
-	cg.time = serverTime;
+	if ( stereoView == STEREO_LEFT ) {
+		cg.time = serverTime;
+	}
 
 	// update cvars
 	CG_UpdateCvars();
@@ -1913,6 +1915,9 @@ wasForceSpeed=isForceSpeed;
 		// update cg.predicted_player_state
 		CG_PredictPlayerState();
 	}
+
+	//Reset seed so random numbers are the same for each eye
+	Rand_Init(cg.time);
 
 	// decide on third person view
 	cg.renderingThirdPerson = (qboolean)(

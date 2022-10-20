@@ -1679,12 +1679,141 @@ static void CG_ScanForRocketLock( void )
 	}
 }
 
+extern float forcePushPullRadius[];
+
+void CG_ScanForForceCrosshairEntity( )
+{
+	trace_t		trace;
+	gentity_t	*traceEnt = NULL;
+	vec3_t		start, end;
+	int			content;
+	int			ignoreEnt = cg.snap->ps.clientNum;
+
+	//FIXME: debounce this to about 10fps?
+
+	cg_forceCrosshair = qfalse;
+	if ( cg_entities[0].gent && cg_entities[0].gent->client ) // <-Mike said it should always do this   //if (cg_crosshairForceHint.integer &&
+	{//try to check for force-affectable stuff first
+		vec3_t angles, d_f, d_rt, d_up;
+
+		//VectorCopy( g_entities[0].client->renderInfo.eyePoint, start );
+		//AngleVectors( cg_entities[0].lerpAngles, d_f, d_rt, d_up );
+		BG_CalculateVROffHandPosition(start, angles);
+		AngleVectors( angles, d_f, d_rt, d_up );
+
+
+		VectorMA( start, 2048, d_f, end );//4028 is max for mind trick
+
+		//YES!  This is very very bad... but it works!  James made me do it.  Really, he did.  Blame James.
+		gi.trace( &trace, start, vec3_origin, vec3_origin, end,
+				  ignoreEnt, MASK_OPAQUE|CONTENTS_SHOTCLIP|CONTENTS_BODY|CONTENTS_ITEM, G2_NOCOLLIDE, 10 );// ); took out CONTENTS_SOLID| so you can target people through glass.... took out CONTENTS_CORPSE so disintegrated guys aren't shown, could just remove their body earlier too...
+
+		if ( trace.entityNum < ENTITYNUM_WORLD )
+		{//hit something
+			traceEnt = &g_entities[trace.entityNum];
+			if ( traceEnt )
+			{
+				if ( traceEnt->client)
+				{//is a client
+					cg_forceCrosshair = qtrue;
+				}
+				// No?  Check for force-push/pullable doors and func_statics
+				else if ( traceEnt->s.eType == ET_MOVER )
+				{//hit a mover
+					if ( !Q_stricmp( "func_door", traceEnt->classname ) )
+					{//it's a func_door
+						if ( traceEnt->spawnflags & 2/*MOVER_FORCE_ACTIVATE*/ )
+						{//it's force-usable
+							if ( cg_entities[0].gent->client->ps.forcePowerLevel[FP_PULL] || cg_entities[0].gent->client->ps.forcePowerLevel[FP_PUSH] )
+							{//player has push or pull
+								float maxRange;
+								if ( cg_entities[0].gent->client->ps.forcePowerLevel[FP_PULL] > cg_entities[0].gent->client->ps.forcePowerLevel[FP_PUSH] )
+								{//use the better range
+									maxRange = forcePushPullRadius[cg_entities[0].gent->client->ps.forcePowerLevel[FP_PULL]];
+								}
+								else
+								{//use the better range
+									maxRange = forcePushPullRadius[cg_entities[0].gent->client->ps.forcePowerLevel[FP_PUSH]];
+								}
+								if ( maxRange >= trace.fraction * 2048 )
+								{//actually close enough to use one of our force powers on it
+									cg_forceCrosshair = qtrue;
+								}
+							}
+						}
+					}
+					else if ( !Q_stricmp( "func_static", traceEnt->classname ) )
+					{//it's a func_static
+						if ( (traceEnt->spawnflags & 1/*F_PUSH*/) && (traceEnt->spawnflags & 2/*F_PULL*/) )
+						{//push or pullable
+							float maxRange;
+							if ( cg_entities[0].gent->client->ps.forcePowerLevel[FP_PULL] > cg_entities[0].gent->client->ps.forcePowerLevel[FP_PUSH] )
+							{//use the better range
+								maxRange = forcePushPullRadius[cg_entities[0].gent->client->ps.forcePowerLevel[FP_PULL]];
+							}
+							else
+							{//use the better range
+								maxRange = forcePushPullRadius[cg_entities[0].gent->client->ps.forcePowerLevel[FP_PUSH]];
+							}
+							if ( maxRange >= trace.fraction * 2048 )
+							{//actually close enough to use one of our force powers on it
+								cg_forceCrosshair = qtrue;
+							}
+						}
+						else if ( (traceEnt->spawnflags & 1/*F_PUSH*/) )
+						{//pushable only
+							if ( forcePushPullRadius[cg_entities[0].gent->client->ps.forcePowerLevel[FP_PUSH]] >= trace.fraction * 2048 )
+							{//actually close enough to use force push on it
+								cg_forceCrosshair = qtrue;
+							}
+						}
+						else if ( (traceEnt->spawnflags & 2/*F_PULL*/) )
+						{//pullable only
+							if ( forcePushPullRadius[cg_entities[0].gent->client->ps.forcePowerLevel[FP_PULL]] >= trace.fraction * 2048 )
+							{//actually close enough to use force pull on it
+								cg_forceCrosshair = qtrue;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if ( !traceEnt || (traceEnt->s.eFlags & EF_NO_TED) )
+	{
+		return;
+	}
+
+	// if the player is in fog, don't show it
+	content = cgi_CM_PointContents( trace.endpos, 0 );
+	if ( content & CONTENTS_FOG )
+	{
+		return;
+	}
+
+	// if the player is cloaked, don't show it
+	if ( cg_entities[ trace.entityNum ].currentState.powerups & ( 1 << PW_CLOAKED ))
+	{
+		return;
+	}
+
+	// update the fade timer
+	if ( cg.crosshairClientNum != trace.entityNum )
+	{
+		infoStringCount = 0;
+	}
+
+	cg.crosshairClientNum = trace.entityNum;
+	cg.crosshairClientTime = cg.time;
+}
+
 /*
 =================
 CG_DrawCrosshair3D
 =================
 */
-static void CG_DrawCrosshair3D(void)
+static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 {
 	float		w;
 	qhandle_t	hShader;
@@ -1714,10 +1843,20 @@ static void CG_DrawCrosshair3D(void)
 		return;
 	}
 
-	if ( cg.snap->ps.weapon == WP_NONE ||
-		 cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_STUN_BATON )
+	if ( type == 1 && (cg.snap->ps.weapon == WP_NONE ||
+		 cg.snap->ps.weapon == WP_SABER ||
+		 cg.snap->ps.weapon == WP_STUN_BATON ))
 	{
 		return;
+	}
+
+	if (type == 0)
+	{
+		CG_ScanForForceCrosshairEntity();
+		if (!cg_forceCrosshair)
+		{
+			return;
+		}
 	}
 
 	w = cg_crosshairSize.value;
@@ -1738,7 +1877,14 @@ static void CG_DrawCrosshair3D(void)
 	float xmax = 64.0f * tan(cg.refdef.fov_x * M_PI / 360.0f);
 
 	vec3_t forward, weaponangles, origin;
-	BG_CalculateVRWeaponPosition(origin, weaponangles);
+	if (type == 0)
+	{
+		BG_CalculateVROffHandPosition(origin, weaponangles);
+	}
+	else
+	{
+		BG_CalculateVRWeaponPosition(origin, weaponangles);
+	}
 	AngleVectors(weaponangles, forward, NULL, NULL);
 	VectorMA(origin, 2048, forward, endpos);
 	CG_Trace(&trace, origin, NULL, NULL, endpos, 0, MASK_SHOT);
@@ -1752,8 +1898,8 @@ static void CG_DrawCrosshair3D(void)
 
 		ent.radius = w / 640 * xmax * trace.fraction * 2048 / 64.0f;
         ent.customShader = hShader;
-		ent.shaderRGBA[0] = 255;
-		ent.shaderRGBA[1] = 255;
+		ent.shaderRGBA[0] = (type == 0) ? 0 : 255;
+		ent.shaderRGBA[1] = (type == 0) ? 0 : 255;
 		ent.shaderRGBA[2] = 255;
 		ent.shaderRGBA[3] = 255;
 
@@ -1766,8 +1912,7 @@ static void CG_DrawCrosshair3D(void)
 CG_ScanForCrosshairEntity
 =================
 */
-extern float forcePushPullRadius[];
-static void CG_ScanForCrosshairEntity( qboolean scanAll ) 
+static void CG_ScanForCrosshairEntity( qboolean scanAll )
 {
 	trace_t		trace;
 	gentity_t	*traceEnt = NULL;
@@ -1782,8 +1927,10 @@ static void CG_ScanForCrosshairEntity( qboolean scanAll )
 	{//try to check for force-affectable stuff first
 		vec3_t d_f, d_rt, d_up;
 
-		VectorCopy( g_entities[0].client->renderInfo.eyePoint, start );
-		AngleVectors( cg_entities[0].lerpAngles, d_f, d_rt, d_up );
+		//VectorCopy( g_entities[0].client->renderInfo.eyePoint, start );
+		//AngleVectors( cg_entities[0].lerpAngles, d_f, d_rt, d_up );
+
+
 		VectorMA( start, 2048, d_f, end );//4028 is max for mind trick
 
 		//YES!  This is very very bad... but it works!  James made me do it.  Really, he did.  Blame James.
@@ -1871,7 +2018,7 @@ static void CG_ScanForCrosshairEntity( qboolean scanAll )
 		if ( cg_dynamicCrosshair.integer )
 		{//100% accurate
 			vec3_t d_f, d_rt, d_up;
-			if ( cg.snap->ps.weapon == WP_NONE || 
+			if ( cg.snap->ps.weapon == WP_NONE ||
 				cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_STUN_BATON )
 			{
 				if ( cg.snap->ps.viewEntity > 0 && cg.snap->ps.viewEntity < ENTITYNUM_WORLD )
@@ -1910,17 +2057,17 @@ static void CG_ScanForCrosshairEntity( qboolean scanAll )
 			VectorMA( start, 4096, cg.refdef.viewaxis[0], end );//was 8192
 		}
 		//YES!  This is very very bad... but it works!  James made me do it.  Really, he did.  Blame James.
-		gi.trace( &trace, start, vec3_origin, vec3_origin, end, 
+		gi.trace( &trace, start, vec3_origin, vec3_origin, end,
 			ignoreEnt, MASK_OPAQUE|CONTENTS_SHOTCLIP|CONTENTS_BODY|CONTENTS_ITEM, G2_NOCOLLIDE, 10 );// ); took out CONTENTS_SOLID| so you can target people through glass.... took out CONTENTS_CORPSE so disintegrated guys aren't shown, could just remove their body earlier too...
 
 		/*
-		CG_Trace( &trace, start, vec3_origin, vec3_origin, end, 
+		CG_Trace( &trace, start, vec3_origin, vec3_origin, end,
 			cg.snap->ps.clientNum, MASK_PLAYERSOLID|CONTENTS_CORPSE|CONTENTS_ITEM );
 		*/
 		//FIXME: pick up corpses
 		if ( trace.startsolid || trace.allsolid )
 		{
-			// trace should not be allowed to pick up anything if it started solid.  I tried actually moving the trace start back, which also worked, 
+			// trace should not be allowed to pick up anything if it started solid.  I tried actually moving the trace start back, which also worked,
 			//	but the dynamic cursor drawing caused it to render around the clip of the gun when I pushed the blaster all the way into a wall.
 			//	It looked quite horrible...but, if this is bad for some reason that I don't know
 			trace.entityNum = ENTITYNUM_NONE;
@@ -1928,7 +2075,7 @@ static void CG_ScanForCrosshairEntity( qboolean scanAll )
 
 		traceEnt = &g_entities[trace.entityNum];
 	}
-	
+
 
 	// if the object is "dead", don't show it
 /*	if ( cg.crosshairClientNum && g_entities[cg.crosshairClientNum].health <= 0 )
@@ -2583,7 +2730,8 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	}
 
 	if (!vr->item_selector) {
-		CG_DrawCrosshair3D();
+		CG_DrawCrosshair3D(0);
+		CG_DrawCrosshair3D(1);
 	}
 
 	//FIXME: these globals done once at start of frame for various funcs
