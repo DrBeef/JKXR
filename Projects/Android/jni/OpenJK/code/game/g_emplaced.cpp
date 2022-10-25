@@ -1085,7 +1085,7 @@ extern void CG_ChangeWeapon( int num );
 
 void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd )
 {
-	if (( (*ucmd)->buttons & BUTTON_USE || (*ucmd)->forwardmove < 0 || (*ucmd)->upmove > 0 ) && ent->owner && ent->owner->delay + 500 < level.time )
+	if (( (*ucmd)->buttons & BUTTON_USE ||/* (*ucmd)->forwardmove < 0 ||*/ (*ucmd)->upmove > 0 ) && ent->owner && ent->owner->delay + 500 < level.time )
 	{
 		ent->owner->s.loopSound = 0;
 
@@ -1129,9 +1129,9 @@ void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd )
 		}
 
 		// don't allow movement, weapon switching, and most kinds of button presses
-		(*ucmd)->forwardmove = 0;
-		(*ucmd)->rightmove = 0;
-		(*ucmd)->upmove = 0;
+		//(*ucmd)->forwardmove = 0;
+		//(*ucmd)->rightmove = 0;
+		//(*ucmd)->upmove = 0;
 		(*ucmd)->buttons &= (BUTTON_ATTACK|BUTTON_ALT_ATTACK);
 
 		(*ucmd)->weapon = ent->client->ps.weapon; //WP_EMPLACED_GUN;

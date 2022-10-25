@@ -596,7 +596,7 @@ void camera_aim( gentity_t *self )
 	self->nextthink = level.time + FRAMETIME;
 	if ( player && player->client && player->client->ps.viewEntity == self->s.number )
 	{//I am the viewEntity
-		if ( (player->client->usercmd.buttons&BUTTON_BLOCKING) || player->client->usercmd.forwardmove || player->client->usercmd.rightmove || player->client->usercmd.upmove )
+		if ( (player->client->usercmd.buttons&BUTTON_BLOCKING)  || player->client->usercmd.upmove)// || player->client->usercmd.forwardmove || player->client->usercmd.rightmove )
 		{//player wants to back out of camera
 			G_UseTargets2( self, player, self->target4 );
 			G_ClearViewEntity( player );

@@ -1843,6 +1843,12 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 		return;
 	}
 
+	if ( cg.snap->ps.viewEntity > 0 && cg.snap->ps.viewEntity < ENTITYNUM_WORLD )
+	{
+		//Not while viewing from another entity (such as a camera)
+		return;
+	}
+
 	if ( type == 1 && (cg.snap->ps.weapon == WP_NONE ||
 		 cg.snap->ps.weapon == WP_SABER ||
 		 cg.snap->ps.weapon == WP_STUN_BATON ))
@@ -2759,8 +2765,12 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		CG_Error( "CG_DrawActive: Undefined stereoView" );
 	}
 
+	bool usingMiscCamera = ( !Q_stricmp( "misc_camera", g_entities[cg.snap->ps.viewEntity].classname ));
+
 	cg.refdef.worldscale = cg_worldScale.value;
-	if (!in_camera) {
+	if (!in_camera &&
+		!usingMiscCamera)
+	{
 		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
 		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
 				SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
@@ -2772,7 +2782,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	// offset vieworg appropriately if we're doing stereo separation
 	VectorCopy( cg.refdef.vieworg, baseOrg );
-	if ( separation != 0 && (!in_camera || vr->immersive_cinematics)) {
+	if ( separation != 0 && (!in_camera || vr->immersive_cinematics) && !usingMiscCamera) {
 		VectorMA( cg.refdef.vieworg, -separation, cg.refdef.viewaxis[1], cg.refdef.vieworg );
 	}
 

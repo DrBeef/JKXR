@@ -1778,7 +1778,7 @@ extern void CG_ChangeWeapon( int num );
 
 void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd )
 {
-	if (( (*ucmd)->buttons & BUTTON_USE || (*ucmd)->forwardmove < 0 || (*ucmd)->upmove > 0 ) && ent->owner && ent->owner->delay + 500 < level.time )
+	if (( (*ucmd)->buttons & BUTTON_USE || /*(*ucmd)->forwardmove < 0 ||*/ (*ucmd)->upmove > 0 ) && ent->owner && ent->owner->delay + 500 < level.time )
 	{
 		ent->owner->s.loopSound = 0;
 

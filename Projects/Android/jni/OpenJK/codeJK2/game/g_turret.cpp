@@ -2006,7 +2006,7 @@ void panel_turret_think( gentity_t *self )
 		self->s.pos.trType	= TR_INTERPOLATE; // not really moving, but this fixes an interpolation bug in cg_ents.
 
 		// Check for backing out of turret
-		if ( ( self->useDebounceTime < level.time ) && ((ucmd->buttons & BUTTON_BLOCKING) || (ucmd->buttons & BUTTON_USE) || ucmd->forwardmove || ucmd->rightmove || ucmd->upmove) )
+		if ( ( self->useDebounceTime < level.time ) && ((ucmd->buttons & BUTTON_BLOCKING) || (ucmd->buttons & BUTTON_USE) || ucmd->upmove) ) // || ucmd->forwardmove || ucmd->rightmove) )
 		{
 			self->useDebounceTime = level.time + 200;
 
