@@ -4866,6 +4866,11 @@ void CG_Player(centity_t *cent ) {
 		vr->weaponid = WP_NONE;
 	}
 
+	if (cent->gent->client->ps.clientNum == 0) {
+		vr->velocitytriggered = (!cg.renderingThirdPerson &&
+								 (cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE));
+	}
+
 	//Get the player's light level for stealth calculations
 	CG_GetPlayerLightLevel( cent );
 
@@ -4885,9 +4890,6 @@ void CG_Player(centity_t *cent ) {
 	{
 		return;
 	}
-
-	//Before we go any further, default this to false, it can be updated later
-	vr->velocitytriggered = false;
 
 	if ( cent->currentState.vehicleModel != 0 )
 	{//Using an alternate (md3 for now) model
@@ -5218,7 +5220,6 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 					vec3_t angles;
 					BG_CalculateVRSaberPosition(cent->gent->client->renderInfo.muzzlePoint, angles);
 					AngleVectors( angles, cent->gent->client->renderInfo.muzzleDir, NULL, NULL );
-					vr->velocitytriggered = true;
 				}
 			}
 		}

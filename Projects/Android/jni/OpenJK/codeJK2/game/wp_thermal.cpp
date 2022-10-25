@@ -28,6 +28,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "w_local.h"
 #include "g_functions.h"
 #include "bg_local.h"
+#include <JKVR/VrClientInfo.h>
+#include <JKVR/mathlib.h>
 
 //---------------------
 //	Thermal Detonator
@@ -266,6 +268,10 @@ void WP_ThermalThink( gentity_t *ent )
 	}
 }
 
+#define OLDEST_READING			5
+#define NEWEST_READING			2
+#define TD_REAL_THROW_VEL_MULT	4.4f
+
 //---------------------------------------------------------
 gentity_t *WP_FireThermalDetonator( gentity_t *ent, qboolean alt_fire )
 //---------------------------------------------------------
@@ -274,11 +280,25 @@ gentity_t *WP_FireThermalDetonator( gentity_t *ent, qboolean alt_fire )
 	vec3_t		dir, start;
 	float		damageScale = 1.0f;
 
-	if ( ent->client && !ent->NPC)
+	bolt = G_Spawn();
+
+	bool realThrow = false;
+	if ( ent->client && !ent->NPC && ent->client->ps.clientNum == 0)
 	{
 		vec3_t	angs;
 		BG_CalculateVRWeaponPosition(start, angs);
-		AngleVectors(angs, dir, NULL, NULL);
+
+		//Caclulate speed between two controller position readings
+		float distance = VectorDistance(vr->weaponoffset_history[NEWEST_READING], vr->weaponoffset_history[OLDEST_READING]);
+		float t = vr->weaponoffset_history_timestamp[NEWEST_READING] - vr->weaponoffset_history_timestamp[OLDEST_READING];
+		float velocity = distance / (t/(float)1000.0);
+
+		//Calculate trajectory
+		VectorSubtract(vr->weaponoffset_history[NEWEST_READING], vr->weaponoffset_history[OLDEST_READING], dir);
+		VectorNormalize( dir );
+		BG_ConvertFromVR(dir, NULL, dir);
+		VectorScale( dir, velocity * TD_REAL_THROW_VEL_MULT, bolt->s.pos.trDelta );
+		realThrow = true;
 	}
 	else {
 		VectorCopy( wpFwd, dir );
@@ -286,7 +306,6 @@ gentity_t *WP_FireThermalDetonator( gentity_t *ent, qboolean alt_fire )
 	}
 
 
-	bolt = G_Spawn();
 
 	bolt->classname = "thermal_detonator";
 
@@ -345,11 +364,16 @@ gentity_t *WP_FireThermalDetonator( gentity_t *ent, qboolean alt_fire )
 	// normal ones bounce, alt ones explode on impact
 	bolt->s.pos.trType = TR_GRAVITY;
 	bolt->owner = ent;
-	VectorScale( dir, TD_VELOCITY * chargeAmount, bolt->s.pos.trDelta );
+
+	if (!realThrow) {
+		VectorScale(dir, TD_VELOCITY * chargeAmount, bolt->s.pos.trDelta);
+	}
 
 	if ( ent->health > 0 )
 	{
-		bolt->s.pos.trDelta[2] += 120;
+		if (!realThrow) {
+			bolt->s.pos.trDelta[2] += 120;
+		}
 
 		if ( ent->NPC && ent->enemy )
 		{//FIXME: we're assuming he's actually facing this direction...

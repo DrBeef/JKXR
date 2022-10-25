@@ -2838,8 +2838,8 @@ void CG_DrawItemSelector( void )
 		case 2: //fighting style
 			count = 3;
 			beam.shaderRGBA[0] = 0xff;
-			beam.shaderRGBA[1] = 0x00;
-			beam.shaderRGBA[2] = 0x00;
+			beam.shaderRGBA[1] = 0xff;
+			beam.shaderRGBA[2] = 0xff;
 			break;
 		case 3: // force powers
 			count = MAX_SHOWPOWERS;
