@@ -124,7 +124,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, A_ESCAPE);
 
     static bool resetCursor = qtrue;
-    if ( JKVR_useScreenLayer() )
+    if ( JKVR_useScreenLayer() && !vr.misc_camera /*bit of a fiddle, but if we are in a misc camera, we are in the game and shouldn't be in here*/)
     {
         interactWithTouchScreen(resetCursor, pDominantTrackedRemoteNew, pDominantTrackedRemoteOld);
         resetCursor = qfalse;

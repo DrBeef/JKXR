@@ -1932,7 +1932,8 @@ wasForceSpeed=isForceSpeed;
 		cg.renderingThirdPerson = qfalse;
 	}
 
-	vr->in_camera = in_camera;
+	vr->cin_camera = in_camera;
+	vr->misc_camera = in_misccamera;
 	if ( in_camera )
 	{
 		// The camera takes over the view

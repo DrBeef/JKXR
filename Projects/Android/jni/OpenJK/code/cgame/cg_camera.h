@@ -136,6 +136,7 @@ typedef struct camera_s
 } camera_t;
 
 extern	bool		in_camera;
+extern	bool		in_misccamera;
 extern	camera_t	client_camera;
 
 void CGCam_Init( void );

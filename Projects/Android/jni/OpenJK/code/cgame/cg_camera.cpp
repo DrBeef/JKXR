@@ -30,6 +30,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include <JKVR/VrClientInfo.h>
 
 bool		in_camera = false;
+bool		in_misccamera = false; // if we are viewing a misc_camera
 camera_t	client_camera={};
 extern qboolean	player_locked;
 

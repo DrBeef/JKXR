@@ -28,7 +28,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
-	if (cg.drawingHUD && !vr->in_camera && !vr->using_screen_layer && !vr->scopeengaged)
+	if (cg.drawingHUD && !vr->cin_camera && !vr->using_screen_layer && !vr->scopeengaged)
 	{
 		float screenXScale = 1.0f / 2.5f;
 		float screenYScale = 1.0f / 2.5f;

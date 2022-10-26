@@ -4,7 +4,8 @@
 #define NUM_WEAPON_SAMPLES      10
 
 typedef struct {
-    bool in_camera; // cinematic camera taken over
+    bool cin_camera; // cinematic camera taken over
+    bool misc_camera; // looking through a misc camera view entity
     bool using_screen_layer;
     float  fov;
     bool immersive_cinematics;

@@ -1495,6 +1495,12 @@ Ghoul2 Insert End
 		CG_NewClientinfo( i );
 	}
 
+	//Just register all weapons to avoid a pause when opening the selector
+	for (i=0; i < WP_MELEE; i++)
+	{
+		CG_RegisterWeapon(i);
+	}
+
 	for (i=0 ; i < ENTITYNUM_WORLD ; i++)
 	{
 		if(&g_entities[i])

@@ -4384,8 +4384,11 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		CG_Error( "CG_DrawActive: Undefined stereoView" );
 	}
 
+	in_misccamera = ( !Q_stricmp( "misc_camera", g_entities[cg.snap->ps.viewEntity].classname ));
+
 	cg.refdef.worldscale = cg_worldScale.value;
-	if (!in_camera) {
+	if (!in_camera &&
+		!in_misccamera) {
 		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
 		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
 				SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
@@ -4397,7 +4400,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	// offset vieworg appropriately if we're doing stereo separation
 	VectorCopy( cg.refdef.vieworg, baseOrg );
-	if ( separation != 0 && (!in_camera || vr->immersive_cinematics)) {
+	if ( separation != 0 && (!in_camera || vr->immersive_cinematics) && !in_misccamera) {
 		VectorMA( cg.refdef.vieworg, -separation, cg.refdef.viewaxis[1], cg.refdef.vieworg );
 	}
 
@@ -4406,7 +4409,9 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		cgi_R_LAGoggles();
 	}
 
-	if (!in_camera || vr->immersive_cinematics) {
+	bool in_turret = ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON );
+
+	if (!in_turret && (!in_camera || vr->immersive_cinematics)) {
 		//Vertical Positional Movement
 		cg.refdef.vieworg[2] -= DEFAULT_PLAYER_HEIGHT;
 		cg.refdef.vieworg[2] += (vr->hmdposition[1] + cg_heightAdjust.value) * cg_worldScale.value;

@@ -2090,8 +2090,10 @@ static void CG_ScanForCrosshairEntity( qboolean scanAll )
 		return;
 	}
 */
-	//draw crosshair at endpoint
-	//CG_DrawCrosshair( trace.endpos );
+	if ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON ) {
+		//draw crosshair at endpoint
+		CG_DrawCrosshair(trace.endpos);
+	}
 
 	g_crosshairEntNum = trace.entityNum;
 	g_crosshairEntDist = 4096*trace.fraction;
@@ -2482,6 +2484,11 @@ static qboolean CG_RenderingFromMiscCamera()
 			// don't render other 2d stuff
 			return qtrue;
 		}
+		if ( !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname ))
+		{
+			//Render as if we are looking through a camera
+			CG_DrawPic( 0, 0, 640, 480, cgi_R_RegisterShader( "gfx/2d/workingCamera" ));
+		}
 		else if ( !Q_stricmp( "misc_panel_turret", g_entities[cg.snap->ps.viewEntity].classname ))
 		{
 			// could do a panel turret screen overlay...this is a cheesy placeholder
@@ -2765,15 +2772,16 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		CG_Error( "CG_DrawActive: Undefined stereoView" );
 	}
 
-	bool usingMiscCamera = ( !Q_stricmp( "misc_camera", g_entities[cg.snap->ps.viewEntity].classname ));
+	in_misccamera = ( !Q_stricmp( "misc_camera", g_entities[cg.snap->ps.viewEntity].classname ))
+			|| ( !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname ));
 
 	cg.refdef.worldscale = cg_worldScale.value;
 	if (!in_camera &&
-		!usingMiscCamera)
+		!in_misccamera)
 	{
 		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
 		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
-				SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
+									SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}
 
@@ -2782,7 +2790,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	// offset vieworg appropriately if we're doing stereo separation
 	VectorCopy( cg.refdef.vieworg, baseOrg );
-	if ( separation != 0 && (!in_camera || vr->immersive_cinematics) && !usingMiscCamera) {
+	if ( separation != 0 && (!in_camera || vr->immersive_cinematics) && !in_misccamera) {
 		VectorMA( cg.refdef.vieworg, -separation, cg.refdef.viewaxis[1], cg.refdef.vieworg );
 	}
 
@@ -2791,7 +2799,8 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		cgi_R_LAGoggles();
 	}
 
-	if (!in_camera || vr->immersive_cinematics) {
+	bool in_turret = ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON );
+	if (!in_turret && !in_misccamera && (!in_camera || vr->immersive_cinematics)) {
 		//Vertical Positional Movement
 		cg.refdef.vieworg[2] -= DEFAULT_PLAYER_HEIGHT;
 		cg.refdef.vieworg[2] += (vr->hmdposition[1] + cg_heightAdjust.value) * cg_worldScale.value;

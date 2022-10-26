@@ -139,7 +139,8 @@ LAMBDA1VR Stuff
 
 bool JKVR_useScreenLayer()
 {
-	vr.using_screen_layer = (bool)((vr.in_camera && !vr.immersive_cinematics) ||
+	vr.using_screen_layer = (bool)((vr.cin_camera && !vr.immersive_cinematics) ||
+			vr.misc_camera ||
 			(CL_IsRunningInGameCinematic() || CL_InGameCinematicOnStandBy()) ||
             (cls.state == CA_CINEMATIC) ||
             (cls.state == CA_LOADING) ||
