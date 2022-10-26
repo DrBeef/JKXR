@@ -1,4 +1,4 @@
-//--------------------------------------------------------------
+// //--------------------------------------------------------------
 //
 // SETUP MENU
 //
@@ -27,6 +27,7 @@
 			hide				vidrestart	;
 			hide				sound	;
 			hide				options ;
+			hide				difficulty ;
 			hide				mods	;
 			hide				defaults ;
 			show				video ;
@@ -847,6 +848,7 @@
 				play			"sound/interface/button1.wav" ;
 
 				defer			VideoSetup	videowarningMenu ;
+				uiScript		loadMods ;
 
 				show			setup_background ;
 				hide 			video ;
@@ -1101,7 +1103,7 @@
 		//
 		//----------------------------------------------------------------------------------------------
 		itemDef 
-		{	
+		{
 			name				geometric_detail
 			group				video
 			type				ITEM_TYPE_MULTI
@@ -1569,10 +1571,9 @@
 			cvar				"cg_shadows"
 			cvarFloatList		
 			{  
-				@MENUS3_NONE				0 
-				@MENUS3_SHADOWS_SIMPLE		1 
-				@MENUS3_SHADOWS_VOLUMETRIC	2
-//				"Projected"		3
+				"None"		0 
+				"Low"		1 
+				"High"	3
 			}
 			rect				305 271 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
@@ -1884,7 +1885,7 @@
 			text				@MENUS2_DRAW_CROSSHAIR
 			cvar				"cg_drawcrosshair"
 			cvarFloatList		{  @MENUS0_OFF 0 @MENUS0_ON 1 }
-			rect				305 171 300 20
+			rect				305 191 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -1899,31 +1900,23 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight1
+				show			highlight2
 			}
 			mouseexit 
 			{ 
-				hide			highlight1
+				hide			highlight2
 			} 
 		}
 
+
 		itemDef 
 		{	
-			name				slowmo
+			name				identifytarget
 			group				options
       		type				ITEM_TYPE_MULTI
-			text				@MENUS2_SLOW_MOTION_DEATH
-			cvar				"d_slowmodeath"
-			cvarFloatList		
-			{ 
-				@MENUS2_NEVER 			0  
-				@MENUS2_ON_DEATH	 		1 
-				@MENUS2_RARELY		 	2
-				@MENUS1_NORMAL		 	3
-				@MENUS2_OFTEN 			4
-				@MENUS2_FREQUENTLY		5
-				@MENUS2_EXCESSIVELY		6
-			}
+			text				@MENUS0_IDENTIFY_TARGET
+			cvar				"cg_crosshairIdentifyTarget"
+			cvarFloatList		{  @MENUS0_OFF 0 @MENUS0_ON 1 }
 			rect				305 211 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
@@ -1932,8 +1925,7 @@
 			textscale 			0.8
 			forecolor			1 1 1 1
 			visible			0
-			// appearance_slot		1
-			descText			@MENUS2_SELECT_THE_FREQUENCY
+			descText			@MENUS2_TOGGLE_TO_HAVE_THE_CROSSHAIR
 
 			action
 			{
@@ -1952,18 +1944,21 @@
 
 		itemDef 
 		{	
-			name				dismemberment
+			name				slowmo
 			group				options
       		type				ITEM_TYPE_MULTI
-			text				@MENUS2_DISMEMBERMENT
-			cvar				"g_dismemberment"
+			text				@MENUS2_SLOW_MOTION_DEATH
+			cvar				"d_slowmodeath"
 			cvarFloatList		
 			{ 
-				@MENUS0_OFF 	0
-				@MENUS0_ON 		3
+				@MENUS2_NEVER 			0  
+				@MENUS2_ON_DEATH	 		1 
+				@MENUS2_RARELY		 	2
+				@MENUS1_NORMAL		 	3
+				@MENUS2_OFTEN 			4
+				@MENUS2_FREQUENTLY		5
+				@MENUS2_EXCESSIVELY		6
 			}
-			cvarTest			ui_iscensored
-			hideCvar			{ 1 }
 			rect				305 231 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
@@ -1973,11 +1968,11 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			@MENUS2_SELECT_WHAT_LIGHTSABER
+			descText			@MENUS2_SELECT_THE_FREQUENCY
 
 			action
 			{
-				play			"sound/interface/button1.wav"
+				play			"sound/interface/button1.wav" 
 			}
 			mouseenter 
 			{ 
@@ -1989,20 +1984,24 @@
 			} 
 		}
 
+
 		itemDef 
 		{	
-			name				text
+			name				dismemberment
 			group				options
       		type				ITEM_TYPE_MULTI
-			text				@MENUS0_TEXT
-			cvar				"sp_language"
+			text				@MENUS2_DISMEMBERMENT
+			cvar				"g_dismemberment"
 			cvarFloatList		
 			{ 
-				"English"	0  
-				"Francais" 	1
-				"Deutsch" 	2
+				"Disabled"	0
+				"Mild"			1
+				"Bearable"	2
+				"Unsettling"	3
 			}
-			rect				305 251 300 20
+			cvarTest			ui_iscensored
+			hideCvar			{ 1 }
+			rect				325 271 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -2011,45 +2010,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			@MENUS2_CHOOSE_THE_LANGUAGE_FOR
-
-			action
-			{
-				play			"sound/interface/button1.wav"
-			}
-			mouseenter 
-			{ 
-				show			highlight5
-			}
-			mouseexit 
-			{ 
-				hide			highlight5
-			} 
-		}
-
-		itemDef 
-		{	
-			name				voice
-			group				options
-      		type				ITEM_TYPE_MULTI
-			text				@MENUS1_VOICE
-			cvar				"s_language"
-			cvarStrList		
-			{ 
-				"English",	"english"
-				"Francais" 	"francais"
-				"Deutsch"	"deutsch"
-			}
-			rect				305 271 300 20
-	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
-			textaligny			-2
-			font 				2
-			textscale 			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			@MENUS3_CHOOSE_THE_LANGUAGE_TO
+			descText			@MENUS2_SELECT_WHAT_LIGHTSABER
 
 			action
 			{
@@ -2067,18 +2028,20 @@
 
 		itemDef 
 		{	
-			name				voice
+			name				dismemberment_probability
 			group				options
       		type				ITEM_TYPE_MULTI
-			text				@MENUS1_SUBTITLES
-			cvar				"g_subtitles"
+			text				"Dismemberment Probability:"
+			cvar				"g_dismemberprobabilities"
 			cvarFloatList		
 			{ 
-				@MENUS3_NONE		0  
-				@MENUS3_IN_CINEMATICS	2 
-//				@MENUS3_ALL_VOICEOVERS	1 
+				"Rarely"	30
+				"Often"			50
+				"Always"	100
 			}
-			rect				305 291 300 20
+			cvarTest			ui_iscensored
+			hideCvar			{ 1 }
+			rect				325 291 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -2087,7 +2050,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			@MENUS3_TOGGLE_WHETHER_SUBTITLES
+			descText			"How often do model dismemberments happen."
 
 			action
 			{
@@ -2105,6 +2068,195 @@
 
 
 
+/*
+		itemDef 
+		{	
+			name				dismembermentprob
+			group				options_obsolete
+      		type				ITEM_TYPE_MULTI
+			text				@MENUS2_DISMEMBER_PROBABILITY
+			cvar				"g_dismemberProbabilities"
+			cvarFloatList		
+			{ 
+				@MENUS2_RARE 		2
+				@MENUS1_NORMAL 		1
+				@MENUS2_EXCESSIVE		0
+			}
+			rect				305 311 300 20
+	   		textalign			ITEM_ALIGN_RIGHT
+			textalignx			165
+			textaligny			-2
+			font 				2
+			textscale 			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			@MENUS2_SELECT_FREQUENCY_OF_DISMEMBERMENT
+			action
+			{
+				play			"sound/interface/button1.wav"
+			}
+			mouseenter 
+			{ 
+				show			highlight8
+			}
+			mouseexit 
+			{ 
+				hide			highlight8
+			} 
+		}
+*/
+
+		itemDef 
+		{	
+			name				text
+			group				options
+      		type				ITEM_TYPE_MULTI
+			text				@MENUS0_TEXT
+			cvar				"sp_language"
+			cvarFloatList		
+			{ 
+				"English"	0  
+				"Francais" 	1
+				"Deutsch" 	2
+			}
+			rect				305 351 300 20
+	   		textalign			ITEM_ALIGN_RIGHT
+			textalignx			165
+			textaligny			-2
+			font 				2
+			textscale 			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			@MENUS2_CHOOSE_THE_LANGUAGE_FOR
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+			}
+			mouseenter 
+			{ 
+				show			highlight10
+			}
+			mouseexit 
+			{ 
+				hide			highlight10
+			} 
+		}
+
+		itemDef 
+		{	
+			name				voice
+			group				options
+      		type				ITEM_TYPE_MULTI
+			text				@MENUS1_VOICE
+			cvar				"s_language"
+			cvarStrList		
+			{ 
+				"English",	"english"
+				"Francais" 	"francais"
+				"Deutsch"	"deutsch"
+			}
+			rect				305 371 300 20
+	   		textalign			ITEM_ALIGN_RIGHT
+			textalignx			165
+			textaligny			-2
+			font 				2
+			textscale 			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			@MENUS3_CHOOSE_THE_LANGUAGE_TO
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+			}
+			mouseenter 
+			{ 
+				show			highlight11
+			}
+			mouseexit 
+			{ 
+				hide			highlight11
+			} 
+		}
+
+		itemDef 
+		{	
+			name				voice
+			group				options
+      		type				ITEM_TYPE_MULTI
+			text				@MENUS1_SUBTITLES
+			cvar				"g_subtitles"
+			cvarFloatList		
+			{ 
+				@MENUS3_NONE		0  
+				@MENUS3_IN_CINEMATICS	2 
+//				@MENUS3_ALL_VOICEOVERS	1 
+			}
+			rect				305 391 300 20
+	   		textalign			ITEM_ALIGN_RIGHT
+			textalignx			165
+			textaligny			-2
+			font 				2
+			textscale 			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			@MENUS3_TOGGLE_WHETHER_SUBTITLES
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+			}
+			mouseenter 
+			{ 
+				show			highlight12
+			}
+			mouseexit 
+			{ 
+				hide			highlight12
+			} 
+		}
+
+
+
+// This menu option is no longer used.
+		itemDef 
+		{	
+			name				sync_frame
+			group				options_obsolete
+      		type				ITEM_TYPE_MULTI
+			text				@MENUS1_SYNC_EVERY_FRAME
+			cvar				"r_finish"
+			cvarFloatList		{  @MENUS0_OFF 0 @MENUS0_ON 1 }
+			rect				305 211 300 20
+	   		textalign			ITEM_ALIGN_RIGHT
+			textalignx			165
+			textaligny			-2
+			font 				2
+			textscale 			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			@MENUS3_TOGGLE_TO_PREVENT_VIDEO
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+			}
+			mouseenter 
+			{ 
+				show			highlight3
+			}
+			mouseexit 
+			{ 
+				hide			highlight3
+			} 
+		}
+
 		//----------------------------------------------------------------------------------------------
 		//
 		//	DIFFICULTY FIELDS
@@ -2114,9 +2266,16 @@
 		{
 			name				none
 			group				difficulty
-			type				ITEM_TYPE_YESNO
-			text				"Realistic Saber Combat:"
+			type				ITEM_TYPE_MULTI
+			text				"Lightsaber Realism:"
 			cvar				"g_saberRealisticCombat"
+			cvarFloatList		
+			{ 
+				"Default" 0 
+				"Increased Damage" 1
+				"Fatal Critical Hit" 2
+				"Instant Kill" 3
+			}
 			rect				305 191 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
@@ -2126,7 +2285,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			"When enabled, sabers deal more damage."
+			descText			"Choose effectivity of lightsaber, affects lightsaber duels difficulty mostly."
 			action 
 			{ 
 				play			sound/interface/button1
@@ -2143,44 +2302,44 @@
 			}			
 		}
 
-		//itemDef 
-		//{
-		//	name				none
-		//	group				difficulty
-		//	type				ITEM_TYPE_MULTI
-		//	text				"Saber Combat Speed:"
-		//	cvar				"g_saberAnimSpeed"
-		//	cvarFloatList		
-		//	{ 
-		//		"Slow" 0 
-		//		"Medium" 1
-		//		"Fast" 2
-		//	}
-		//	rect				305 211 300 20
-		//	textalign			ITEM_ALIGN_RIGHT
-		//	textalignx			151
-		//	textaligny			-2
-		//	font				2
-		//	textscale			0.8
-		//	forecolor			1 1 1 1
-		//	visible			0
-		//	// appearance_slot		1
-		//	descText			"Choose speed of saber combat."
-		//	action 
-		//	{ 
-		//		play			sound/interface/button1
-		//	}
-		//
-		//	mouseenter 
-		//	{ 
-		//		show			highlight3
-		//	}
-		//
-		//	mouseexit 
-		//	{ 
-		//		hide			highlight3
-		//	}			
-		//}
+		itemDef 
+		{
+			name				none
+			group				difficulty
+			type				ITEM_TYPE_MULTI
+			text				"Enemy Fencing Speed:"
+			cvar				"g_saberAnimSpeed"
+			cvarFloatList		
+			{ 
+				"Slower" 1.0 
+				"Default" 1.2
+				"Faster" 1.3
+			}
+			rect				305 211 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			"Choose fencing swiftness of enemies, affects lightsaber duels difficulty."
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+		
+			mouseenter 
+			{ 
+				show			highlight3
+			}
+		
+			mouseexit 
+			{ 
+				hide			highlight3
+			}			
+		}
 
 		//----------------------------------------------------------------------------------------------
 		//
@@ -2208,7 +2367,7 @@
 			feeder			9
 			notselectable
 			visible			0
-			columns 2	2 40 20   200 80 30
+			columns 1	2 40 280
 		}
 
 		itemDef 
@@ -2243,7 +2402,7 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav"
-//				uiScript		loadgame
+				uiScript		RunMod ;
 			}
 
 			mouseEnter 

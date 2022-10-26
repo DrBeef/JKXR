@@ -1,0 +1,30 @@
+// menu defs
+// 
+{
+	loadMenu { "ui/main.menu"							}
+	loadMenu { "ui/newgame.menu"						}
+	loadMenu { "ui/loadgame.menu"						}
+	loadMenu { "ui/controls.menu"						}
+	loadMenu { "ui/setup.menu"						}
+	loadMenu { "ui/credits.menu"						}
+	loadMenu { "ui/quit.menu"							}
+
+	loadMenu { "ui/ingame.menu"						}
+	loadMenu { "ui/ingamesave.menu"						}
+	loadMenu { "ui/ingameload.menu"						}
+	loadMenu { "ui/ingamecontrols.menu"					}
+	loadMenu { "ui/ingamesetup.menu"					}
+	loadMenu { "ui/ingamequit.menu"					}
+
+	loadMenu { "ui/datapadforcepowers.menu"				}
+	loadMenu { "ui/datapadinventory.menu"				}
+	loadMenu { "ui/datapadmission.menu"					}
+	loadMenu { "ui/datapadweapons.menu"					}
+	loadMenu { "ui/datapadcheats.menu"					}
+
+	loadMenu { "ui/error.menu" }
+	loadMenu { "ui/vid_warning.menu"					}
+	loadMenu { "ui/ingamevid_warning.menu"				}
+	loadMenu { "ui/videodriver.menu"					}
+
+}

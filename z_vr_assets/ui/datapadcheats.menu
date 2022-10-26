@@ -1,0 +1,582 @@
+// DATAPAD/CHEATS menu
+// 
+// defines from ui_shared.h
+{
+	menuDef 
+	{
+		name					"datapadCheatsMenu"
+		fullScreen				1								// MENU_TRUE				
+		rect					0 0 640 480						// Size and position of the menu
+		visible					1								// Visible on open
+		focusColor				1 1 1 1							// Focus color for text and items
+		appearanceIncrement		75								// In miliseconds
+		descX					320
+		descY					350
+		descScale				.8
+		descColor				.96 .933 .40 1					// Focus color for text and items
+		descAlignment			ITEM_ALIGN_CENTER		
+
+		onESC 
+		{ 
+				uiScript		closedatapad					// Close menu				
+		}
+
+		onOpen
+		{ 
+				exec				"helpUsObi 1"
+				setfocus		none
+		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	MENU BACKGROUND
+		//
+		//----------------------------------------------------------------------------------------------
+		itemDef
+		{
+			name				frame_pic
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 640 480
+			background			"*white"
+			forecolor			0 0 0 1
+			visible				1
+			decoration
+		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	DATAPAD SCREEN
+		//
+		//----------------------------------------------------------------------------------------------
+
+		// we use mission overdraw to fill in player status
+		itemDef
+		{
+			name				player_status
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_OWNERDRAW
+			rect				50 40 95 40 
+			textscale			.4
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+			ownerdraw			203
+		}
+
+		// cover mssion overdraw with datapad background to hide mission data
+		itemDef
+		{
+			name				mission_cover
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 640 480
+			forecolor			1 1 1 1
+			visible				1
+			decoration		1
+			background		"gfx/hud/datapad2"
+		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	CHEAT MENU ITEMS
+		//
+		//----------------------------------------------------------------------------------------------
+
+		itemDef 
+		{
+			name				cheats_title
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			rect				0 30 640 25
+			text				"May the force be with you..."
+			font				2
+			textscale			1
+			textalignx			320
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+			decoration 		1
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				100 80 200 20
+			text				"Replenish Health"
+			descText		"Replenishes health."
+			font				2
+			textscale			1
+			textalignx			100
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"give health;"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				100 105 200 20
+			text				"Replenish Armor"
+			descText		"Replenishes armor."
+			font				2
+			textscale			1
+			textalignx			100
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"give armor;"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				100 130 200 20
+			text				"Replenish Ammo"
+			descText		"Replenishes ammunition."
+			font				2
+			textscale			1
+			textalignx			100
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"give ammo;"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				100 155 200 20
+			text				"Replenish Batteries"
+			descText		"Replenishes batteries."
+			font				2
+			textscale			1
+			textalignx			100
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"give batteries;"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				340 80 200 20
+			text				"Give Lightsaber"
+			descText		"Gives only lighsaber."
+			font				2
+			textscale			1
+			textalignx			100
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"give weapon_saber;"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				340 105 200 20
+			text				"Give All Weapons"
+			descText		"Gives all weapons."
+			font				2
+			textscale			1
+			textalignx			100
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"give weapons;"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				340 130 200 20
+			text				"Give All Items"
+			descText		"Gives all inventory items."
+			font				2
+			textscale			1
+			textalignx			100
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"give inventory;"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				340 155 200 20
+			text				"Unlock All Powers"
+			descText		"Unlocks all force powers."
+			font				2
+			textscale			1
+			textalignx			100
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"setforceall 2"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			rect				220 210 200 20
+			text				"Lightsaber Color:"
+			font				2
+			textscale			1
+			textalignx			100
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+			decoration		1
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				190 235 50 20
+			text				"Blue"
+			descText		"Use blue lightsaber."
+			font				2
+			textscale			1
+			textalignx			25
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"saberColor blue;"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				240 235 48 20
+			text				"Green"
+			descText		"Use green lightsaber."
+			font				2
+			textscale			1
+			textalignx			25
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"saberColor green;"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				288 235 50 20
+			text				"Red"
+			descText		"Use red lightsaber."
+			font				2
+			textscale			1
+			textalignx			25
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"saberColor red;"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				340 235 50 20
+			text				"Orange"
+			descText		"Use orange lightsaber."
+			font				2
+			textscale			1
+			textalignx			25
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"saberColor orange;"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				400 235 50 20
+			text				"Purple"
+			descText		"Use purple lightsaber."
+			font				2
+			textscale			1
+			textalignx			25
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"saberColor purple;"
+			}
+		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	LOWER MENU BUTTONS
+		//
+		//----------------------------------------------------------------------------------------------
+	
+		itemDef 
+		{
+			name				mission
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				130 382 95 25 
+			text				@MENUS1_DP_MISSION
+			descText			@MENUS1_AN_OVERVIEW_OF_MISSION
+			font				2
+			textscale			1
+			textalignx			48
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			datapadMissionMenu 
+			}
+		}
+
+		itemDef 
+		{
+			name				exit
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				417 382 95 25 
+			text				@MENUS1_RESUME
+			descText			@MENUS1_RETURN_TO_GAME
+			font				2
+			textscale			1
+			textalignx			48
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				uiScript		closedatapad			// Close menu				
+			}
+		}
+
+		itemDef 
+		{
+			name				weapons
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				130 420 95 25 
+			text				@MENUS0_WEAPONS
+			descText			@MENUS1_VIEW_CURRENTLY_OWNED
+			font				2
+			textscale			1
+			textalignx			48
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			datapadWeaponsMenu 
+			}
+		}
+
+		itemDef 
+		{
+			name				inventory
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				274 420 95 25 
+			text				@MENUS1_INVENTORY
+			descText			@MENUS1_VIEW_CURRENT_INVENTORY
+			font				2
+			textscale			1
+			textalignx			48
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			datapadInventoryMenu 
+			}
+		}
+
+		itemDef 
+		{
+			name				force
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				417 420 95 25
+			text				@MENUS1_DP_FORCE
+			descText			@MENUS1_VIEW_CURRENT_FORCE_POWERS
+			font				2
+			textscale			1
+			textalignx			48
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			datapadForcePowersMenu 
+			}
+		}
+
+		itemDef 
+		{
+			name				cheats
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				274 382 95 25
+			text				"CHEATS"
+			font				2
+			textscale			1
+			textalignx			48
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+			decoration	1
+		}
+
+	}
+}

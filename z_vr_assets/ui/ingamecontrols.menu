@@ -1075,76 +1075,44 @@
 			{ 
 				hide			highlight6
 			}
-		}				
+		}
 
 		itemDef 
 		{
 			name				none
-			group				weaponcontrols
-			type				ITEM_TYPE_YESNO
-			text				"Force Power Direction:"
-			cvar				"cg_showForcePowerDirection"
+			group				commoncontrols
+			type				ITEM_TYPE_MULTI
+			text				"Left-Handed Mode:"
+			cvar				"vr_control_scheme"
+			cvarFloatList		
+			{ 
+				"No" 0
+				"Yes" 10
+			}
 			rect				305 291 300 20
 			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
+			textalignx			151 
 			textaligny			-2
 			font				2
 			textscale			0.8
 			forecolor			1 1 1 1
 			visible			0 
-			// appearance_slot		2
-			descText			"Hint as to which direction a force power was fired."
+			// appearance_slot		5
+			descText			"Enables left-handed mode."
 			action 
 			{ 
 				play			sound/interface/button1
 			}
 
 			mouseenter 
-			{ 
-				show			highlight4
+			{
+				show			highlight7
 			}
-
 			mouseexit 
 			{ 
-				hide			highlight4
-			}			
-
-		}
-
-		itemDef 
-		{
-			name				none
-			group				weaponcontrols
-			type				ITEM_TYPE_YESNO
-			text				"Force Speed FOV Change:"
-			cvar				"cg_forceSpeedFOVAdjust"
-			rect				305 311 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible				0 
-			// appearance_slot		2
-			descText			"Whether the FOV will be adjusted briefly when engaging Force Speed."
-			action 
-			{ 
-				play			sound/interface/button1
+				hide			highlight7
 			}
-
-			mouseenter 
-			{ 
-				show			highlight4
-			}
-
-			mouseexit 
-			{ 
-				hide			highlight4
-			}			
-
 		}
-
 
 
 		//----------------------------------------------------------------------------------------------
@@ -1231,8 +1199,8 @@
 			name				none
 			group				weaponcontrols
 			type				ITEM_TYPE_YESNO
-			text				"Virtual Gun Stock:"
-			cvar			"vr_virtual_stock"
+			text				"Two-Handed Mode:"
+			cvar			"vr_two_handed_weapons"
 			rect				305 231 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
@@ -1242,7 +1210,7 @@
 			forecolor			1 1 1 1
 			visible			0 
 			// appearance_slot		2
-			descText			"Enables or disables virtual gun stock."
+			descText			"Enables two-handed weapon handling."
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1265,9 +1233,43 @@
 			name				none
 			group				weaponcontrols
 			type				ITEM_TYPE_YESNO
+			text				"Virtual Gun Stock:"
+			cvar			"vr_virtual_stock"
+			rect				305 251 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0 
+			// appearance_slot		2
+			descText			"Enables or disables virtual gun stock."
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight5
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight5
+			}			
+
+		}
+
+		itemDef 
+		{
+			name				none
+			group				weaponcontrols
+			type				ITEM_TYPE_YESNO
 			text				"Saber Auto Blocking:"
 			cvar			"g_saberAutoblocking"
-			rect				305 251 300 20
+			rect				305 271 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1284,12 +1286,12 @@
 
 			mouseenter 
 			{ 
-				show			highlight5
+				show			highlight6
 			}
 
 			mouseexit 
 			{ 
-				hide			highlight5
+				hide			highlight6
 			}			
 
 		}
@@ -1308,7 +1310,7 @@
 			type				ITEM_TYPE_YESNO
 			text				"Force Power Direction Hint:"
 			cvar				"cg_showForcePowerDirection"
-			rect				305 191 300 20
+			rect				340 191 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1342,7 +1344,7 @@
 			type				ITEM_TYPE_YESNO
 			text				"Force Speed FOV Change:"
 			cvar				"cg_forceSpeedFOVAdjust"
-			rect				305 211 300 20
+			rect				340 211 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
