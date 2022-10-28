@@ -5734,24 +5734,26 @@ void ForceThrow( gentity_t *self, qboolean pull )
 		{
 			vec3_t	color = { 0, 255, 0 };
 			AngleVectors( fwdangles, forward, right, NULL );
+			VectorCopy( origin, center );
+
+			//Quick hint as to where we fired
 			VectorMA( origin, radius, forward, end );
 			FX_AddLine( origin, end, 0.1f, 1.0f, 0.0f,
 						1.0f, 0.0f, 0.0f,
 						color, color, 0.0f,
 						500, cgi_R_RegisterShader( "gfx/misc/nav_line" ),
 						FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
-
 		}
 	}
 	else
 	{
 		VectorCopy( self->client->ps.viewangles, fwdangles );
 		VectorCopy( self->client->renderInfo.eyePoint, origin );
+		AngleVectors( fwdangles, forward, right, NULL );
+		VectorCopy( self->currentOrigin, center );
 	}
 
 	//fwdangles[1] = self->client->ps.viewangles[1];
-	AngleVectors( fwdangles, forward, right, NULL );
-	VectorCopy( self->currentOrigin, center );
 
 	for ( i = 0 ; i < 3 ; i++ )
 	{
@@ -6267,17 +6269,6 @@ void ForceThrow( gentity_t *self, qboolean pull )
 				trace_t tr;
 				vec3_t	pushDir;
 				float	damage = 800;
-
-				if (self->client->ps.clientNum == 0)
-				{
-					vec3_t origin, angles;
-					BG_CalculateVROffHandPosition(origin, angles);
-					AngleVectors(angles, forward, right, NULL);
-				}
-				else
-				{
-					AngleVectors(self->client->ps.viewangles, forward, right, NULL);
-				}
 				VectorNormalize( forward );
 				VectorMA( origin, radius, forward, end );
 				gi.trace( &tr, origin, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT, G2_NOCOLLIDE, 0 );
@@ -6329,8 +6320,6 @@ void ForceThrow( gentity_t *self, qboolean pull )
 			else if ( !Q_stricmp( "func_door", push_list[x]->classname ) && (push_list[x]->spawnflags&2/*MOVER_FORCE_ACTIVATE*/) )
 			{//push/pull the door
 				vec3_t	pos1, pos2;
-
-				AngleVectors( self->client->ps.viewangles, forward, NULL, NULL );
 				VectorNormalize( forward );
 				VectorMA( origin, radius, forward, end );
 				gi.trace( &tr, origin, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT, G2_NOCOLLIDE, 0 );
@@ -7359,7 +7348,7 @@ void ForceShootLightning( gentity_t *self )
 		return;
 	}
 
-	if (self->client->ps.clientNum == 0)
+	if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
 	{
 		vec3_t origin, angles;
 		BG_CalculateVROffHandPosition(origin, angles);
@@ -8205,7 +8194,7 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 					NPC_SetAnim( self, SETANIM_TORSO, BOTH_FORCEGRIP_HOLD, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 				}
 				//get their org
-				if (self->client->ps.clientNum == 0)
+				if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
 				{
 					vec3_t origin;
 					BG_CalculateVROffHandPosition(origin, angles);
