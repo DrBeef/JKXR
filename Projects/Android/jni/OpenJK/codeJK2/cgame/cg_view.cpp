@@ -2035,7 +2035,7 @@ wasForceSpeed=isForceSpeed;
 			VectorMA( handEnt.origin, -1.0f, forward, handEnt.origin );
 
 
-			handEnt.renderfx = RF_DEPTHHACK;
+			handEnt.renderfx = RF_DEPTHHACK | RF_VRVIEWMODEL;
 
 			if (cg.snap->ps.powerups[PW_FORCE_PUSH] > cg.time ||
 				(cg.snap->ps.forcePowersActive & (1<<FP_GRIP)) ||
@@ -2048,9 +2048,31 @@ wasForceSpeed=isForceSpeed;
 				handEnt.hModel = cgs.media.handModel_relaxed;
 			}
 			VectorCopy(handEnt.origin, handEnt.oldorigin);
+
 			AnglesToAxis(handEnt.angles, handEnt.axis);
+			for ( int i = 0; i < 3; i++ ) {
+				VectorScale( handEnt.axis[i], (vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
+			}
 
 			cgi_R_AddRefEntityToScene(&handEnt);
+
+			if (cg.snap->ps.weapon == WP_NONE)
+			{
+				BG_CalculateVRWeaponPosition(handEnt.origin, handEnt.angles);
+
+				//Move it back a bit?
+				AngleVectors(handEnt.angles, forward, NULL, NULL);
+				VectorMA( handEnt.origin, -1.0f, forward, handEnt.origin );
+				VectorCopy(handEnt.origin, handEnt.oldorigin);
+
+				vec3_t axis[3];
+				AnglesToAxis(handEnt.angles, handEnt.axis);
+				for ( int i = 0; i < 3; i++ ) {
+					VectorScale( handEnt.axis[i], (!vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
+				}
+
+				cgi_R_AddRefEntityToScene(&handEnt);
+			}
 		}
 	}
 

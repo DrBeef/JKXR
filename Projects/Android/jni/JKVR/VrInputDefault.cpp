@@ -163,7 +163,8 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             if (!vr.weapon_stabilised && vr.item_selector == 0)
             {
                 if (distance < STABILISATION_DISTANCE &&
-                        vr_two_handed_weapons->integer) {
+                        vr_two_handed_weapons->integer &&
+                        vr.weaponid > WP_SABER) {
                     vr.weapon_stabilised = true;
                 } else {
                     vr.item_selector = 2;

@@ -1221,7 +1221,8 @@ void CG_AddViewWeapon( playerState_t *ps )
 	AnglesToAxis( angles, gun.axis );
 	CG_PositionEntityOnTag( &gun, &hand, weapon->handsModel, "tag_weapon");
 
-	gun.renderfx = RF_DEPTHHACK | RF_FIRST_PERSON;
+    gun.renderfx = RF_DEPTHHACK | RF_FIRST_PERSON | RF_VRVIEWMODEL;
+
 
 //---------
 	// OK, we are making an assumption here that if we have the phaser that it is always on....
@@ -2860,14 +2861,17 @@ void CG_DrawItemSelector( void )
 
 	if (cg.itemSelectorType == 0) // weapons
 	{
-		refEntity_t sprite;
-		memset(&sprite, 0, sizeof(sprite));
-		VectorCopy(wheelOrigin, sprite.origin);
-		sprite.reType = RT_SPRITE;
-		sprite.customShader = cg_weapons[cg.weaponSelect].weaponIcon;
-		sprite.radius = 1.8f;
-		memset(sprite.shaderRGBA, 0xff, 4);
-		cgi_R_AddRefEntityToScene(&sprite);
+		if (cg.weaponSelect != WP_NONE &&
+				cg.weaponSelect != WP_MELEE) {
+			refEntity_t sprite;
+			memset(&sprite, 0, sizeof(sprite));
+			VectorCopy(wheelOrigin, sprite.origin);
+			sprite.reType = RT_SPRITE;
+			sprite.customShader = cg_weapons[cg.weaponSelect].weaponIcon;
+			sprite.radius = 1.8f;
+			memset(sprite.shaderRGBA, 0xff, 4);
+			cgi_R_AddRefEntityToScene(&sprite);
+		}
 	}
 	else if (cg.itemSelectorType == 2) // fighting style
 	{
@@ -2910,13 +2914,13 @@ void CG_DrawItemSelector( void )
 		}
 	}
 
-	if (cg.itemSelectorType != 1) {
+	if (cg.itemSelectorType != 3) {
 		for (int s = -1; s < 2; s += 2) {
 			refEntity_t sprite;
 			memset(&sprite, 0, sizeof(sprite));
 			vec3_t right;
 			AngleVectors(wheelAngles, NULL, right, NULL);
-			float offset = ((float) s * 2.0f) + (((float) s * 0.3f) *
+			float offset = ((float) s * 6.0f) + (((float) s * 0.3f) *
 					sinf(DEG2RAD(AngleNormalize360(cg.time - cg.itemSelectorTime))));
 			VectorMA(wheelOrigin, offset, right, sprite.origin);
 			sprite.reType = RT_SPRITE;
