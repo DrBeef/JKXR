@@ -733,14 +733,14 @@ void BG_ConvertFromVR(vec3_t in, vec3_t offset, vec3_t out)
 	}
 }
 
-void BG_CalculateVRPositionInWorld( vec3_t in_position,  vec3_t in_offset, vec3_t in_orientation, vec3_t origin, vec3_t angles )
+void BG_CalculateVRPositionInWorld( const vec3_t in_position,  vec3_t in_offset, vec3_t in_orientation, vec3_t origin, vec3_t angles )
 {
 	vec3_t offset;
 	VectorCopy(in_offset, offset);
 	offset[1] = 0; // up/down is index 1 in this case
 	BG_ConvertFromVR(offset, cg.refdef.vieworg, origin);
 	origin[2] -= DEFAULT_PLAYER_HEIGHT;
-	origin[2] += in_position[1] * cg_worldScale.value;
+	origin[2] += (in_position[1] + cg_heightAdjust.value) * cg_worldScale.value;
 
 	VectorCopy(in_orientation, angles);
 	angles[YAW] += (cg.refdefViewAngles[YAW] - vr->hmdorientation[YAW]);

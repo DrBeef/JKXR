@@ -49,8 +49,6 @@ float positional_movementSideways;
 float positional_movementForward;
 bool openjk_initialised;
 long long global_time;
-float playerHeight;
-float playerYaw;
 ovrTracking2 tracking;
 int ducked;
 vr_client_info_t vr;

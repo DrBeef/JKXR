@@ -821,14 +821,12 @@ void setHMDPosition( float x, float y, float z )
     {
 		s_useScreen = JKVR_useScreenLayer();
 
-		//Record player height on transition
-        playerHeight = y;
+		//Record player position on transition
+		VectorSet(vr.hmdposition_snap, x, y, z);
+		VectorCopy(vr.hmdorientation_snap, vr.hmdorientation);
     }
 
-	if (!JKVR_useScreenLayer())
-    {
-    	playerYaw = vr.hmdorientation[YAW];
-	}
+	VectorSubtract(vr.hmdposition, vr.hmdposition_snap, vr.hmdposition_offset);
 }
 
 bool isMultiplayer()
@@ -1257,7 +1255,6 @@ void initialize_gl4es();
 void JKVR_Init()
 {
 	//Initialise all our variables
-	playerYaw = 0.0f;
 	remote_movementSideways = 0.0f;
 	remote_movementForward = 0.0f;
 	remote_movementUp = 0.0f;
@@ -1751,7 +1748,7 @@ void JKVR_submitFrame()
 		// Add a simple cylindrical layer
 		gAppState.Layers[gAppState.LayerCount++].Cylinder =
 				BuildCylinderLayer(&gAppState.Scene.CylinderRenderer,
-								   gAppState.Scene.CylinderWidth, gAppState.Scene.CylinderHeight, &tracking, radians(playerYaw) );
+								   gAppState.Scene.CylinderWidth, gAppState.Scene.CylinderHeight, &tracking, radians(vr.hmdorientation_snap[YAW]) );
 
 		for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
 		{

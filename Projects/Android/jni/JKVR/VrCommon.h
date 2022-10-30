@@ -33,8 +33,6 @@ typedef enum control_scheme {
 
 extern bool openjk_initialised;
 extern long long global_time;
-extern float playerHeight;
-extern float playerYaw;
 extern ovrTracking2 tracking;
 extern int ducked;
 extern vr_client_info_t vr;

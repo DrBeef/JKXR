@@ -282,6 +282,10 @@ typedef struct {
 #define	CG_OVERRIDE_3RD_PERSON_APH	0x00000040
 #define	CG_OVERRIDE_FOV				0x00000080
 
+#define CG_HUD_NORMAL				0x00
+#define CG_HUD_SCALED				0x01
+#define CG_HUD_ZOOM					0x02
+
 typedef struct {
 	//NOTE: these probably get cleared in save/load!!!
 	int				active;	//bit-flag field of which overrides are active
@@ -429,7 +433,7 @@ typedef struct {
 	int			itemPickupTime;
 	int			itemPickupBlendTime;	// the pulse around the crosshair is timed seperately
 
-	bool 		drawingHUD;
+	int 		drawingHUD;
 	float		iconHUDPercent;			// How far into opening sequence the icon HUD is
 	int			iconSelectTime;			// How long the Icon HUD has been active
 	qboolean	iconHUDActive;

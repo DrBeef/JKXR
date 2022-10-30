@@ -153,7 +153,7 @@ ovrLayerCylinder2 BuildCylinderLayer( ovrRenderer * cylinderRenderer,
 	const float density = 15000.0f;
 	const float rotateYaw = 0.0f;
 	const float radius = 10.0f;
-	const ovrVector3f translation = { 0.0f, playerHeight/1.8f, -vr_screen_dist->value };
+	const ovrVector3f translation = { 0.0f, vr.hmdposition_snap[1]/1.8f, -vr_screen_dist->value };
 
 	ovrMatrix4f cylinderTransform = 
 		CylinderModelMatrix( textureWidth, textureHeight, translation,

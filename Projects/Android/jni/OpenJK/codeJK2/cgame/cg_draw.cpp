@@ -1851,7 +1851,8 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 
 	if ( type == 1 && (cg.snap->ps.weapon == WP_NONE ||
 		 cg.snap->ps.weapon == WP_SABER ||
-		 cg.snap->ps.weapon == WP_STUN_BATON ))
+		 cg.snap->ps.weapon == WP_STUN_BATON ||
+		 cg.snap->ps.weapon == WP_THERMAL ))
 	{
 		return;
 	}
@@ -2531,9 +2532,9 @@ static void CG_Draw2D( void )
 
 	if ( cg.snap->ps.pm_type == PM_INTERMISSION ) 
 	{
-		cg.drawingHUD = true;
+		cg.drawingHUD = CG_HUD_SCALED;
 		CG_DrawIntermission();
-		cg.drawingHUD = false;
+		cg.drawingHUD = CG_HUD_NORMAL;
 		return;
 	}
 
@@ -2549,29 +2550,32 @@ static void CG_Draw2D( void )
 		CGCam_DrawWideScreen();
 	}
 
-	cg.drawingHUD = true;
+	cg.drawingHUD = CG_HUD_SCALED;
 
 	CG_DrawBatteryCharge();
 
 	// Draw this before the text so that any text won't get clipped off
 	if ( !in_camera )
 	{
-		cg.drawingHUD = false;
+		cg.drawingHUD = CG_HUD_ZOOM;
 		CG_DrawZoomMask();
-		cg.drawingHUD = true;
+		cg.drawingHUD = CG_HUD_SCALED;
 	}
 
 	CG_DrawScrollText();
-	CG_DrawCaptionText(); 
+
+	if (!vr->immersive_cinematics) {
+		CG_DrawCaptionText();
+	}
 
 	if ( in_camera )
 	{//still draw the saber clash flare, but nothing else
-		cg.drawingHUD = false;
+		cg.drawingHUD = CG_HUD_NORMAL;
 		CG_SaberClashFlare();
 		return;
 	}
 
-	cg.drawingHUD = false;
+	cg.drawingHUD = CG_HUD_NORMAL;
 	if ( CG_RenderingFromMiscCamera())
 	{
 		// purposely doing an early out when in a misc_camera, change it if needed.
@@ -2580,7 +2584,7 @@ static void CG_Draw2D( void )
 		CG_DrawCenterString();
 		return;
 	}
-	cg.drawingHUD = true;
+	cg.drawingHUD = CG_HUD_SCALED;
 
 	// don't draw any status if dead
 	if ( cg.snap->ps.stats[STAT_HEALTH] > 0 ) 
@@ -2720,7 +2724,7 @@ static void CG_Draw2D( void )
 		}
 	}
 
-	cg.drawingHUD = false;
+	cg.drawingHUD = CG_HUD_NORMAL;
 
 }
 
@@ -2774,6 +2778,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	in_misccamera = ( !Q_stricmp( "misc_camera", g_entities[cg.snap->ps.viewEntity].classname ))
 			|| ( !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname ));
+	bool in_turret = ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON );
 
 	cg.refdef.worldscale = cg_worldScale.value;
 	if (!in_camera &&
@@ -2783,6 +2788,11 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
 									SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+	}
+
+	if ((in_camera && vr->immersive_cinematics) || in_turret)
+	{
+		BG_ConvertFromVR(vr->hmdposition_offset, cg.refdef.vieworg, cg.refdef.vieworg);
 	}
 
 	// clear around the rendered view if sized down
@@ -2799,8 +2809,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		cgi_R_LAGoggles();
 	}
 
-	bool in_turret = ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON );
-	if (!in_turret && !in_misccamera && (!in_camera || vr->immersive_cinematics)) {
+	if (!in_turret && !in_misccamera && !in_camera) {
 		//Vertical Positional Movement
 		cg.refdef.vieworg[2] -= DEFAULT_PLAYER_HEIGHT;
 		cg.refdef.vieworg[2] += (vr->hmdposition[1] + cg_heightAdjust.value) * cg_worldScale.value;

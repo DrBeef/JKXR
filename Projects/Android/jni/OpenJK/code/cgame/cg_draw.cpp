@@ -4026,9 +4026,9 @@ static void CG_Draw2D( void )
 
 	if ( cg.snap->ps.pm_type == PM_INTERMISSION )
 	{
-		cg.drawingHUD = true;
+		cg.drawingHUD = CG_HUD_SCALED;
 		CG_DrawIntermission();
-		cg.drawingHUD = false;
+		cg.drawingHUD = CG_HUD_NORMAL;
 		return;
 	}
 
@@ -4048,7 +4048,7 @@ static void CG_Draw2D( void )
 	}
 
 	//Everything below here needs to be fitted into the visible portion of the display
-	cg.drawingHUD = true;
+	cg.drawingHUD = CG_HUD_SCALED;
 
 	CG_DrawBatteryCharge();
 
@@ -4060,9 +4060,9 @@ static void CG_Draw2D( void )
 	// Draw this before the text so that any text won't get clipped off
 	if ( !in_camera )
 	{
-		cg.drawingHUD = false;
+		cg.drawingHUD = CG_HUD_NORMAL;
 		CG_DrawZoomMask();
-		cg.drawingHUD = true;
+		cg.drawingHUD = CG_HUD_SCALED;
 	}
 
 	CG_DrawScrollText();
@@ -4070,12 +4070,12 @@ static void CG_Draw2D( void )
 
 	if ( in_camera )
 	{//still draw the saber clash flare, but nothing else
-		cg.drawingHUD = false;
+		cg.drawingHUD = CG_HUD_NORMAL;
 		CG_SaberClashFlare();
 		return;
 	}
 
-	cg.drawingHUD = false;
+	cg.drawingHUD = CG_HUD_NORMAL;
 	if ( CG_RenderingFromMiscCamera())
 	{
 		// purposely doing an early out when in a misc_camera, change it if needed.
@@ -4084,7 +4084,7 @@ static void CG_Draw2D( void )
 		CG_DrawCenterString();
 		return;
 	}
-	cg.drawingHUD = true;
+	cg.drawingHUD = CG_HUD_SCALED;
 
 	if ( (cg.snap->ps.forcePowersActive&(1<<FP_SEE)) )
 	{//force sight is on

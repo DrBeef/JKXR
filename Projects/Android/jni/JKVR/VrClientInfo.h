@@ -20,11 +20,14 @@ typedef struct {
 
     vec3_t hmdposition;
     vec3_t hmdposition_last; // Don't use this, it is just for calculating delta!
-    vec3_t hmdposition_delta;
+    vec3_t hmdposition_delta; // delta since last frame
+    vec3_t hmdposition_snap; // The position the HMD was in last time the menu was up (snapshot position)
+    vec3_t hmdposition_offset; // offset from the position the HMD was in last time the menu was up
 
     vec3_t hmdorientation;
     vec3_t hmdorientation_last; // Don't use this, it is just for calculating delta!
     vec3_t hmdorientation_delta;
+    vec3_t hmdorientation_snap;
 
     vec3_t weaponangles_saber;
     vec3_t weaponangles;
