@@ -7,12 +7,12 @@ typedef struct {
     bool cin_camera; // cinematic camera taken over
     bool misc_camera; // looking through a misc camera view entity
     bool using_screen_layer;
+    bool third_person;
     float  fov;
     bool immersive_cinematics;
     bool weapon_stabilised;
     bool right_handed;
     bool player_moving;
-    bool mountedgun;
     int cgzoommode;
 
     int weaponid;
@@ -28,6 +28,7 @@ typedef struct {
     vec3_t hmdorientation_last; // Don't use this, it is just for calculating delta!
     vec3_t hmdorientation_delta;
     vec3_t hmdorientation_snap;
+    vec3_t hmdorientation_first; // only updated when in first person
 
     vec3_t weaponangles_saber;
     vec3_t weaponangles;

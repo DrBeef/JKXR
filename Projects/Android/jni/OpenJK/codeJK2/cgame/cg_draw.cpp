@@ -2782,7 +2782,8 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	cg.refdef.worldscale = cg_worldScale.value;
 	if (!in_camera &&
-		!in_misccamera)
+		!in_misccamera &&
+		!cg.renderingThirdPerson)
 	{
 		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
 		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
@@ -2790,7 +2791,18 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}
 
-	if ((in_camera && vr->immersive_cinematics) || in_turret)
+	if (!in_camera &&
+		!in_misccamera &&
+		cg.renderingThirdPerson)
+	{
+		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
+		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
+				(vr->hmdorientation[YAW] - vr->hmdorientation_first[YAW]) +
+				SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
+		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+	}
+
+	if ((in_camera && vr->immersive_cinematics) || in_turret || cg.renderingThirdPerson)
 	{
 		BG_ConvertFromVR(vr->hmdposition_offset, cg.refdef.vieworg, cg.refdef.vieworg);
 	}

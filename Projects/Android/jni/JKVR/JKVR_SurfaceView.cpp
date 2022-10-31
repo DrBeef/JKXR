@@ -809,6 +809,10 @@ void updateHMDOrientation()
 
 	//Keep this for our records
 	VectorCopy(vr.hmdorientation, vr.hmdorientation_last);
+
+	if (!vr.third_person){
+		VectorCopy(vr.hmdorientation, vr.hmdorientation_first);
+	}
 }
 
 void setHMDPosition( float x, float y, float z )
@@ -823,17 +827,11 @@ void setHMDPosition( float x, float y, float z )
 
 		//Record player position on transition
 		VectorSet(vr.hmdposition_snap, x, y, z);
-		VectorCopy(vr.hmdorientation_snap, vr.hmdorientation);
+		VectorCopy(vr.hmdorientation, vr.hmdorientation_snap);
     }
 
 	VectorSubtract(vr.hmdposition, vr.hmdposition_snap, vr.hmdposition_offset);
 }
-
-bool isMultiplayer()
-{
-	return Cvar_VariableValue("maxclients") > 1;
-}
-
 
 /*
 ========================
@@ -860,14 +858,26 @@ void JKVR_Vibrate( int duration, int channel, float intensity )
 void JKVR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side, float *up,
                     float *yaw, float *pitch, float *roll)
 {
-    *forward = remote_movementForward;
-    *pos_forward = positional_movementForward;
-    *up = remote_movementUp;
-    *side = remote_movementSideways;
-    *pos_side = positional_movementSideways;
-	*yaw = vr.hmdorientation[YAW] + vr.snapTurn;
-	*pitch = vr.hmdorientation[PITCH];
-	*roll = vr.hmdorientation[ROLL];
+	if (!vr.third_person) {
+		*forward = remote_movementForward;
+		*pos_forward = positional_movementForward;
+		*up = remote_movementUp;
+		*side = remote_movementSideways;
+		*pos_side = positional_movementSideways;
+		*yaw = vr.hmdorientation[YAW] + vr.snapTurn;
+		*pitch = vr.hmdorientation[PITCH];
+		*roll = vr.hmdorientation[ROLL];
+	} else {
+		//in third person just send the bare minimum
+		*forward = remote_movementForward;
+		*pos_forward = 0.0f;
+		*up = 0.0f;
+		*side = remote_movementSideways;
+		*pos_side = 0.0f;
+		*yaw = vr.snapTurn + vr.hmdorientation_first[YAW];
+		*pitch = 0.0f;
+		*roll = 0.0f;
+	}
 }
 
 /*
@@ -1268,7 +1278,7 @@ void JKVR_Init()
 	srand(time(NULL));
 
 	//Create Cvars
-	vr_turn_mode = Cvar_Get( "vr_turn_mode", "0", CVAR_ARCHIVE); // 0 = snap, 1 = smooth
+	vr_turn_mode = Cvar_Get( "vr_turn_mode", "0", CVAR_ARCHIVE); // 0 = snap, 1 = smooth (3rd person only), 2 = smooth (all modes)
 	vr_turn_angle = Cvar_Get( "vr_turn_angle", "45", CVAR_ARCHIVE);
 	vr_positional_factor = Cvar_Get( "vr_positional_factor", "12", CVAR_ARCHIVE);
     vr_walkdirection = Cvar_Get( "vr_walkdirection", "1", CVAR_ARCHIVE);

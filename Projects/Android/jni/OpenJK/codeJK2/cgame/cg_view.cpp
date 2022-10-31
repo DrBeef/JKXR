@@ -1797,6 +1797,7 @@ void CG_RunEmplacedWeapon()
 
 		// don't let the player try and change this
 		cg.renderingThirdPerson = qtrue;
+		vr->third_person = false; // don't treat this as a true 3rd person scenario
 
 //		cg.refdefViewAngles[PITCH] += cg.overrides.thirdPersonPitchOffset? cg.overrides.thirdPersonPitchOffset: cg_thirdPersonPitchOffset.value;
 //		cg.refdefViewAngles[YAW] += cg.overrides.thirdPersonAngle ? cg.overrides.thirdPersonAngle : cg_thirdPersonAngle.value;;
@@ -1926,10 +1927,13 @@ wasForceSpeed=isForceSpeed;
 		(g_entities[0].client &&
 			g_entities[0].client->NPC_class == CLASS_ATST));
 
+	vr->third_person = cg.renderingThirdPerson;
+
 	if ( cg.zoomMode )
 	{
 		// zoomed characters should never do third person stuff??
 		cg.renderingThirdPerson = qfalse;
+		vr->third_person = false;
 	}
 
 	vr->cin_camera = in_camera;

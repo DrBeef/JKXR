@@ -679,53 +679,50 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     }
                 }
 
-                //Resync Yaw on mounted gun transition
-                static int usingMountedGun = false;
-                if (vr.mountedgun != usingMountedGun) {
-                    usingMountedGun = vr.mountedgun;
-                }
+                //Use smooth in 3rd person
+                bool usingSnapTurn = vr_turn_mode->integer == 0 ||
+                        (vr.third_person && vr_turn_mode->integer == 1);
 
                 //No snap turn when using mounted gun
-                static int syncCount = 0;
                 static int increaseSnap = true;
-                if (!vr.item_selector && !vr.mountedgun && !vr.scopeengaged) {
-                    if (primaryJoystickX > 0.7f) {
-                        if (increaseSnap) {
-                            float turnAngle = vr_turn_mode->integer ? (vr_turn_angle->value / 9.0f)
-                                                                    : vr_turn_angle->value;
-                            vr.snapTurn -= turnAngle;
-
-                            if (vr_turn_mode->integer == 0) {
+                if (!vr.item_selector && !vr.scopeengaged) {
+                    if (usingSnapTurn) {
+                        if (primaryJoystickX > 0.7f) {
+                            if (increaseSnap) {
+                                vr.snapTurn -= vr_turn_angle->value;
                                 increaseSnap = false;
+                                if (vr.snapTurn < -180.0f) {
+                                    vr.snapTurn += 360.f;
+                                }
                             }
-
-                            if (vr.snapTurn < -180.0f) {
-                                vr.snapTurn += 360.f;
-                            }
+                        } else if (primaryJoystickX < 0.3f) {
+                            increaseSnap = true;
                         }
-                    } else if (primaryJoystickX < 0.3f) {
-                        increaseSnap = true;
                     }
 
                     static int decreaseSnap = true;
-                    if (primaryJoystickX < -0.7f) {
-                        if (decreaseSnap) {
-
-                            float turnAngle = vr_turn_mode->integer ? (vr_turn_angle->value / 9.0f)
-                                                                    : vr_turn_angle->value;
-                            vr.snapTurn += turnAngle;
-
-                            //If snap turn configured for less than 10 degrees
-                            if (vr_turn_mode->integer == 0) {
+                    if (usingSnapTurn) {
+                        if (primaryJoystickX < -0.7f) {
+                            if (decreaseSnap) {
+                                vr.snapTurn += vr_turn_angle->value;
                                 decreaseSnap = false;
-                            }
 
-                            if (vr.snapTurn > 180.0f) {
-                                vr.snapTurn -= 360.f;
+                                if (vr.snapTurn > 180.0f) {
+                                    vr.snapTurn -= 360.f;
+                                }
                             }
+                        } else if (primaryJoystickX > -0.3f) {
+                            decreaseSnap = true;
                         }
-                    } else if (primaryJoystickX > -0.3f) {
-                        decreaseSnap = true;
+                    }
+
+                    if (!usingSnapTurn && fabs(primaryJoystickX) > 0.1f) //smooth turn
+                    {
+                        vr.snapTurn -= ((vr_turn_angle->value / 10.0f) *
+                                        primaryJoystickX);
+                        if (vr.snapTurn > 180.0f) {
+                            vr.snapTurn -= 360.f;
+                        }
                     }
                 } else {
                     if (fabs(primaryJoystickX) > 0.5f) {

@@ -653,13 +653,22 @@ void rotateAboutOrigin(float x, float y, float rotation, vec2_t out)
 	out[1] = cosf(DEG2RAD(-rotation)) * y  -  sinf(DEG2RAD(-rotation)) * x;
 }
 
+float getHMDYawForCalc()
+{
+	if (!vr->third_person) {
+		return vr->hmdorientation[YAW];
+	}
+	return 0.0f;
+}
+
 void BG_ConvertFromVR(vec3_t in, vec3_t offset, vec3_t out)
 {
 	vec3_t vrSpace;
 	VectorSet(vrSpace, in[2], in[0], in[1] );
 
 	vec2_t r;
-	rotateAboutOrigin(vrSpace[0], vrSpace[1], cg.refdefViewAngles[YAW] - vr->hmdorientation[YAW], r);
+	rotateAboutOrigin(vrSpace[0], vrSpace[1],
+						  cg.refdefViewAngles[YAW] - getHMDYawForCalc(), r);
 
 	vrSpace[0] = -r[0];
 	vrSpace[1] = -r[1];
@@ -684,7 +693,7 @@ void BG_CalculateVRPositionInWorld( const vec3_t in_position,  vec3_t in_offset,
 	origin[2] += (in_position[1] + cg_heightAdjust.value) * cg_worldScale.value;
 
 	VectorCopy(in_orientation, angles);
-	angles[YAW] += (cg.refdefViewAngles[YAW] - vr->hmdorientation[YAW]);
+	angles[YAW] += (cg.refdefViewAngles[YAW] - getHMDYawForCalc());
 }
 
 void BG_CalculateVROffHandPosition( vec3_t origin, vec3_t angles )
