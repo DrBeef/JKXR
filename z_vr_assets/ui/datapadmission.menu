@@ -58,7 +58,7 @@
 
 		//----------------------------------------------------------------------------------------------
 		//
-		//	LOWER MENU BUTTONS
+		//	LOWER MENU BUTTONS FOR STANDARD MENU
 		//
 		//----------------------------------------------------------------------------------------------
 
@@ -78,6 +78,8 @@
 			forecolor			.509 .609 .847 1
 			appearance_slot		1		
 			visible				1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 
 			action 
 			{ 
@@ -101,6 +103,8 @@
 			forecolor			.509 .609 .847 1
 			appearance_slot		1		
 			visible				1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 
 			action 
 			{ 
@@ -125,6 +129,8 @@
 			forecolor			.509 .609 .847 1
 			appearance_slot		1		
 			visible				1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 
 			action 
 			{ 
@@ -151,6 +157,8 @@
 			forecolor			.509 .609 .847 1
 			appearance_slot		1		
 			visible				1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 
 			action 
 			{ 
@@ -176,6 +184,8 @@
 			forecolor			.509 .609 .847 1
 			appearance_slot		1		
 			visible				1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 
 			action 
 			{ 
@@ -192,8 +202,6 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				274 382 95 25
-			//text				"CHEATS"
-			//descText			"Bla Bla"
 			font				2
 			textscale			1
 			textalignx			48
@@ -201,11 +209,273 @@
 			forecolor			.509 .609 .847 1
 			appearance_slot		1		
 			visible				1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 
 			action
 			{
 				close			all
 				open			datapadCheatsMenu
+			}
+		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	LOWER MENU BUTTONS FOR EXTENDED MENU
+		//
+		//----------------------------------------------------------------------------------------------
+
+		itemDef 
+		{
+			name				mission
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				130 379 0 0
+			text				@MENUS1_DP_MISSION
+			descText			@MENUS1_AN_OVERVIEW_OF_MISSION
+			font				2
+			textscale			0.8
+			textalignx			48
+			textaligny			5
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+			}
+		}
+
+		itemDef 
+		{
+			name				exit
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				274 416 95 25
+			text				@MENUS1_RESUME
+			descText			@MENUS1_RETURN_TO_GAME
+			font				2
+			textscale			0.8
+			textalignx			48
+			textaligny			5
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				uiScript		closedatapad			// Close menu				
+			}
+		}
+
+		itemDef 
+		{
+			name				weapons
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				130 416 95 25
+			text				@MENUS0_WEAPONS
+			descText			@MENUS1_VIEW_CURRENTLY_OWNED
+			font				2
+			textscale			0.8
+			textalignx			48
+			textaligny			5
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			datapadWeaponsMenu 
+			}
+		}
+
+
+		itemDef 
+		{
+			name				inventory
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				417 379 95 25
+			text				@MENUS1_INVENTORY
+			descText			@MENUS1_VIEW_CURRENT_INVENTORY
+			font				2
+			textscale			0.8
+			textalignx			48
+			textaligny			5
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			datapadInventoryMenu 
+			}
+		}
+
+		itemDef 
+		{
+			name				force
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				417 416 95 25
+			text				@MENUS1_DP_FORCE
+			descText			@MENUS1_VIEW_CURRENT_FORCE_POWERS
+			font				2
+			textscale			0.8
+			textalignx			48
+			textaligny			5
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			datapadForcePowersMenu 
+			}
+		}
+
+		itemDef
+		{
+			name				camera_menu
+			group				none
+			rect				20 388 95 25
+			text				@MENUS4_CAMERA
+			descText			@MENUS4_CAMERA_DESC
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			48
+			textaligny			0
+			textscale			0.7
+			textstyle			3
+			font				3
+			forecolor			.509 .609 .847 1
+			appearance_slot		1
+			visible				1
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+				close			all
+				open			cameraMenu
+			}
+		}
+
+		itemDef
+		{
+			name				music_menu
+			group				none
+			rect				20 425 95 25
+			text				@MENUS4_MUSIC
+			descText			@MENUS4_MUSIC_DESC
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			48
+			textaligny			0
+			textscale			0.7
+			textstyle			3
+			font				3
+			forecolor			.509 .609 .847 1
+			appearance_slot		1
+			visible				1
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+				close			all
+				open			musicMenu
+			}
+		}
+
+		itemDef
+		{
+			name				spawner_menu
+			group				none
+			rect				520 388 95 25
+			text				@MENUS4_NPC_SPAWNER
+			descText			@MENUS4_NPC_SPAWNER_DESC
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			48
+			textaligny			0
+			textscale			0.7
+			textstyle			3
+			font				3
+			forecolor			.509 .609 .847 1
+			appearance_slot		1
+			visible				1
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+				close			all
+				open			spawnerMenu
+			}
+		}
+
+		itemDef
+		{
+			name				cheats_menu
+			group				none
+			rect				520 425 95 25
+			text				@MENUS4_CHEATS
+			descText			@MENUS4_CHEATS_DESC
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			48
+			textaligny			0
+			textscale			0.7
+			textstyle			3
+			font				3
+			forecolor			.509 .609 .847 1
+			appearance_slot		1
+			visible				1
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+				close			all
+				open			cheatsForcePowersMenu
 			}
 		}
 

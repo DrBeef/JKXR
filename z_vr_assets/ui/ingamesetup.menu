@@ -67,6 +67,8 @@
 			forecolor			0.8 0.8 0.8 1
 			visible			1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 
@@ -81,6 +83,8 @@
 			forecolor			1 1 1 1
 			visible			1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		// The saber halo on the left
@@ -94,6 +98,8 @@
 			forecolor			0.5 0.5 0.5 1
 			visible			1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef
@@ -110,6 +116,8 @@
 //			model_origin		100 100 100
 			visible			1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		// The saber halo on the left
@@ -123,6 +131,67 @@
 			forecolor			0.25 0.25 0.25 1
 			visible			1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+		// Expanded menu shaders
+		// Sun red
+		itemDef
+		{
+			name				sun
+			group				none
+			rect				-40 145 300 300
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu2r"
+			forecolor			0.7 0.7 0.7 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+		// Sun halo
+		itemDef
+		{
+			name				sun_halo
+			group				none
+			rect				-95 100 400 400
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu2br"
+			forecolor			0.3 0.3 0.3 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+		// Long sunflare
+		itemDef
+		{
+			name				sunflares
+			group				none
+			rect				-235 -60 700 700
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu2br"
+			forecolor			0.3 0.3 0.3 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+
+		// Expanded Menu Starwars Logo
+		itemDef
+		{
+			name				star_wars
+			group				none
+			rect				272 10 365 95
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/expanded_menu_logo"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
 		}
 
 		//----------------------------------------------------------------------------------------------
@@ -143,6 +212,8 @@
 			forecolor			1 1 1 1
 			visible			0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef 
@@ -162,6 +233,8 @@
 			textalignx			65
 			forecolor			0.65 0.65 1 1
 			visible			1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 
 			mouseEnter 
 			{ 
@@ -194,6 +267,8 @@
 			forecolor			1 1 1 1
 			visible			0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef 
@@ -213,6 +288,8 @@
 			textalignx			65
 			forecolor			0.65 0.65 1 1
 			visible				1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 
 			mouseEnter 
 			{ 
@@ -245,6 +322,8 @@
 			forecolor			1 1 1 1
 			visible			0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef {
@@ -264,6 +343,8 @@
 			backcolor			0 0 0 0
 			forecolor			0.65 0.65 1 1
 			visible			1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 			 
 			mouseEnter 
 			{ 
@@ -295,6 +376,8 @@
 			forecolor			1 1 1 1
 			visible				0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef {
@@ -315,6 +398,9 @@
 			forecolor			1 1 1 1
 			visible				1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+			
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
@@ -340,6 +426,8 @@
 			forecolor			1 1 1 1
 			visible				1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		//----------------------------------------------------------------------------------------------
@@ -358,6 +446,8 @@
 			forecolor			1 1 1 1
 			visible			0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef 
@@ -377,6 +467,8 @@
 			textaligny			-1
 			forecolor			0.65 0.65 1 1
 			visible			1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 
 			mouseEnter
 			{
@@ -408,6 +500,8 @@
 			forecolor			1 1 1 1
 			visible			0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef 
@@ -427,6 +521,9 @@
 			textaligny			-1
 			forecolor			0.65 0.65 1 1
 			visible			1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+
 			mouseEnter 
 			{ 
 				show			resumebutton_glow 
@@ -445,6 +542,62 @@
 			}
 		}
 
+		// Expanded Menu Back Button
+		itemDef
+		{
+			name				back_menu_button_hover
+			group				highlights
+			rect				585 445 50 15
+			style				WINDOW_STYLE_SHADER
+			textalign			ITEM_ALIGN_RIGHT
+			background			"gfx/menus/expanded_menu_buttonback"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+
+		itemDef
+		{
+			name				back_menu_button
+			group				none
+			rect				585 445 50 15
+			text				@MENUS0_BACK
+			descText			@MENUS0_BACKUP_ONE_MENU
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			49
+			textaligny			0
+			textscale			0.53
+			textstyle			3
+			font				3
+			forecolor			0.65 0.65 1 1
+			visible				1
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+
+				hide			highlights
+
+				close			all
+				open			ingameMainMenu
+			}
+
+			mouseEnter
+			{
+				show			back_menu_button_hover
+			}
+			mouseExit
+			{
+				hide			back_menu_button_hover
+			}
+		}
+
 		//----------------------------------------------------------------------------------------------
 		//
 		//	SECOND ROW MENU BUTTONS
@@ -458,16 +611,36 @@
 			style				WINDOW_STYLE_SHADER
 			background			"gfx/menus/menu_blendbox"
 			text				@MENUS2_SETUP_OPTIONS
-      		rect				150 145 450 16
+			rect				150 145 450 16
 			font				3
 			textscale			0.7
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			225
 			textaligny			-2	
 			forecolor			1 1 1 1
-      		visible			1 
-			// appearance_slot		2
-      		decoration 
+			visible			1 
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+		itemDef 
+		{
+			name				setup_title
+			group				none
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/expanded_menu_box"
+			text				@MENUS2_SETUP_OPTIONS
+			rect				120 145 486 16
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			241
+			textaligny			-1
+			forecolor			1 1 1 1
+			visible			1 
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
 		}
 
 
@@ -744,7 +917,7 @@
 		{
 			name				difficultymenubutton
 			group				none
-			text				"Difficulty"
+			text				@MENUS_VR_DIFFICULTY_SETUP_ITEM
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
 			rect				120 293 170 30
@@ -756,7 +929,7 @@
 			textstyle			3
 			forecolor			0.65 0.65 1 1
 			visible			1
-			descText			"Various gameplay difficulty tweaks."
+			descText			@MENUS_VR_DIFFICULTY_SETUP_DESC
 
 			mouseEnter 
 			{ 
@@ -863,6 +1036,35 @@
 			forecolor			1 1 1 1
 			visible				0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+		itemDef 
+		{
+			name				setup_background
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				300 166 306 250	
+			background			"gfx/menus/expanded_menu_box"					// Frame
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+		itemDef 
+		{
+			name				setup_background
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				120 166 175 250	
+			background			"gfx/menus/expanded_menu_box"					// Frame
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
 		}
 
 		//----------------------------------------------------------------------------------------------
@@ -1020,7 +1222,7 @@
 		//
 		//----------------------------------------------------------------------------------------------
 		itemDef 
-		{	
+		{
 			name				geometric_detail
 			group				video
 			type				ITEM_TYPE_MULTI
@@ -1486,9 +1688,9 @@
 			cvar				"cg_shadows"
 			cvarFloatList		
 			{  
-				"None"		0 
-				"Low"		1 
-				"High"	3
+				@MENUS3_NONE		0 
+				@MENUS0_LOW		1 
+				@MENUS0_HIGH	3
 			}
 			rect				305 271 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
@@ -1821,11 +2023,11 @@
 
 			mouseenter 
 			{ 
-				show			highlight1
+				show			highlight2
 			}
 			mouseexit 
 			{ 
-				hide			highlight1
+				hide			highlight2
 			} 
 		}
 
@@ -1859,11 +2061,11 @@
 
 			mouseenter 
 			{ 
-				show			highlight2
+				show			highlight3
 			}
 			mouseexit 
 			{ 
-				hide			highlight2
+				hide			highlight3
 			} 
 		}
 
@@ -1902,11 +2104,11 @@
 
 			mouseenter 
 			{ 
-				show			highlight3
+				show			highlight4
 			}
 			mouseexit 
 			{ 
-				hide			highlight3
+				hide			highlight4
 			} 
 		}
 
@@ -1920,10 +2122,10 @@
 			cvar				"g_dismemberment"
 			cvarFloatList		
 			{ 
-				"Disabled"	0
-				"Mild"			1
-				"Bearable"	2
-				"Unsettling"	3
+				@MENUS_VR_MODEL_DISMEMBERMENT_DISABLED	0
+				@MENUS_VR_MODEL_DISMEMBERMENT_MILD			1
+				@MENUS_VR_MODEL_DISMEMBERMENT_BEARABLE	2
+				@MENUS_VR_MODEL_DISMEMBERMENT_UNSETTLING	3
 			}
 			cvarTest			ui_iscensored
 			hideCvar			{ 1 }
@@ -1956,14 +2158,14 @@
 		{	
 			name				dismemberment_probability
 			group				options
-      		type				ITEM_TYPE_MULTI
-			text				"Dismemberment Probability:"
+			type				ITEM_TYPE_MULTI
+			text				@MENUS2_DISMEMBER_PROBABILITY
 			cvar				"g_dismemberprobabilities"
 			cvarFloatList		
 			{ 
-				"Rarely"	30
-				"Often"			50
-				"Always"	100
+				@MENUS2_RARE	30
+				@MENUS_VR_DISMEMBERMENT_PROBABILITY_OFTEN			50
+				@MENUS_VR_DISMEMBERMENT_PROBABILITY_ALWAYS	100
 			}
 			cvarTest			ui_iscensored
 			hideCvar			{ 1 }
@@ -1976,7 +2178,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			"How often do model dismemberments happen."
+			descText			@MENUS2_SELECT_FREQUENCY_OF_DISMEMBERMENT
 			action
 			{
 				play			"sound/interface/button1.wav" ;
@@ -1992,47 +2194,6 @@
 		}
 
 
-
-/*
-		itemDef 
-		{	
-			name				dismembermentprob
-			group				options_obsolete
-      		type				ITEM_TYPE_MULTI
-			text				@MENUS2_DISMEMBER_PROBABILITY
-			cvar				"g_dismemberProbabilities"
-			cvarFloatList		
-			{ 
-				@MENUS2_RARE 		2
-				@MENUS1_NORMAL 		1
-				@MENUS2_EXCESSIVE		0
-			}
-			rect				305 311 300 20
-	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
-			textaligny			-2
-			font 				2
-			textscale 			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			@MENUS2_SELECT_FREQUENCY_OF_DISMEMBERMENT
-			action
-			{
-				play			"sound/interface/button1.wav" ;
-			}
-
-			mouseenter 
-			{ 
-				show			highlight8
-			}
-			mouseexit 
-			{ 
-				hide			highlight8
-			} 
-		}
-*/
-
 		itemDef 
 		{	
 			name				text
@@ -2045,6 +2206,7 @@
 				"English"	0  
 				"Francais" 	1
 				"Deutsch" 	2
+				"Español"	7
 			}
 			rect				305 351 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
@@ -2083,6 +2245,7 @@
 				"English",	"english"
 				"Francais" 	"francais"
 				"Deutsch"	"deutsch"
+				"Español"   "espanol"
 			}
 			rect				305 371 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
@@ -2192,31 +2355,24 @@
 		{
 			name				none
 			group				difficulty
-			type				ITEM_TYPE_MULTI
-			text				"Lightsaber Realism:"
-			cvar				"g_saberRealisticCombat"
-			cvarFloatList		
-			{ 
-				"Default" 0 
-				"Increased Damage" 1
-				"Fatal Critical Hit" 2
-				"Instant Kill" 3
-			}
-			rect				305 191 300 20
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_LASER_AUTODEFLECTING_ITEM
+			cvar			"g_saberAutoDeflect1stPerson"
+			rect				315 191 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
 			font				2
 			textscale			0.8
 			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			"Choose effectivity of lightsaber, affects lightsaber duels difficulty mostly."
+			visible			0 
+			// appearance_slot		2
+			descText			@MENUS_VR_LASER_AUTODEFLECTING_DESC
 			action 
 			{ 
 				play			sound/interface/button1
 			}
-		
+
 			mouseenter 
 			{ 
 				show			highlight2
@@ -2226,22 +2382,58 @@
 			{ 
 				hide			highlight2
 			}			
+
 		}
 
 		itemDef 
 		{
 			name				none
 			group				difficulty
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_SABER_AUTOBLOCKING_ITEM
+			cvar			"g_saberAutoblocking"
+			rect				315 211 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0 
+			// appearance_slot		2
+			descText			@MENUS_VR_SABER_AUTOBLOCKING_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight3
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight3
+			}			
+
+		}
+
+		itemDef
+		{
+			name				none
+			group				difficulty
 			type				ITEM_TYPE_MULTI
-			text				"Enemy Fencing Speed:"
-			cvar				"g_saberAnimSpeed"
+			text				@MENUS_VR_SABER_REALISM_ITEM
+			cvar				"g_saberRealisticCombat"
 			cvarFloatList		
 			{ 
-				"Slower" 1.0 
-				"Default" 1.2
-				"Faster" 1.3
+				@MENUS_VR_SABER_REALISM_DEFAULT 0 
+				@MENUS_VR_SABER_REALISM_INCREASED 1
+				@MENUS_VR_SABER_REALISM_CRITICAL 2
+				@MENUS_VR_SABER_REALISM_INSTANT 3
 			}
-			rect				305 211 300 20
+			rect				315 231 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -2250,19 +2442,20 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			"Choose fencing swiftness of enemies, affects lightsaber duels difficulty."
+			descText			@MENUS_VR_SABER_REALISM_DESC
 			action 
 			{ 
-				play			"sound/interface/button1.wav" ;
+				play			sound/interface/button1
 			}
 		
 			mouseenter 
 			{ 
-				show			highlight3
+				show			highlight4
 			}
+
 			mouseexit 
 			{ 
-				hide			highlight3
+				hide			highlight4
 			}			
 		}
 
@@ -2271,16 +2464,15 @@
 			name				none
 			group				difficulty
 			type				ITEM_TYPE_MULTI
-			text				"Game Difficulty:"
-			cvar				"g_spskill"
+			text				@MENUS_VR_FENCING_SPEED_ITEM
+			cvar				"g_saberAnimSpeed"
 			cvarFloatList		
-		{
-				"Padawan" 0 
-				"Jedi" 1
-				"Jedi Knight" 2
-				"Jedi Master" 3
-		}
-			rect				305 231 300 20
+			{ 
+				@MENUS_VR_FENCING_SPEED_SLOWER 1.0 
+				@MENUS_VR_FENCING_SPEED_DEFAULT 1.2
+				@MENUS_VR_FENCING_SPEED_FASTER 1.3
+			}
+			rect				315 251 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -2289,7 +2481,46 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			"Change game difficulty."
+			descText			@MENUS_VR_FENCING_SPEED_DESC
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+			}
+		
+			mouseenter 
+			{ 
+				show			highlight5
+			}
+			mouseexit 
+			{ 
+				hide			highlight5
+			}			
+		}
+
+		itemDef 
+		{
+			name				none
+			group				difficulty
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_GAME_DIFFICULTY_ITEM
+			cvar				"g_spskill"
+			cvarFloatList		
+		{
+				@MENUS1_APPRENTICE 0 
+				@MENUS1_JEDI 1
+				@MENUS2_JEDI_KNIGHT 2
+				@MENUS1_JEDI_MASTER 3
+		}
+			rect				315 291 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			@MENUS_VR_GAME_DIFFICULTY_DESC
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
@@ -2297,11 +2528,11 @@
 
 			mouseenter 
 			{ 
-				show			highlight4
+				show			highlight7
 			}
 			mouseexit 
 			{ 
-				hide			highlight4
+				hide			highlight7
 			}
 		}
 
@@ -2317,7 +2548,7 @@
 			name				vidrestart_background
 			group				defaults
 			style				WINDOW_STYLE_SHADER
-			rect				300 171 300 250	
+			rect				304 168 300 247
 			background			"gfx/menus/menu_boxred"					// Frame
 			forecolor			1 1 1 0.5
 			visible			0

@@ -74,7 +74,7 @@
 			rect				0 0 640 480
 			forecolor			1 1 1 1
 			visible				1
-			decoration		1
+			decoration
 			background		"gfx/hud/datapad2"
 		}
 
@@ -90,7 +90,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			rect				0 30 640 25
-			text				"May the force be with you..."
+			text				@MENUS_VR_CHEATS_TITLE
 			font				2
 			textscale			1
 			textalignx			320
@@ -98,7 +98,7 @@
 			forecolor			.509 .609 .847 1
 			appearance_slot		1		
 			visible				1
-			decoration 		1
+			decoration
 		}
 
 		itemDef 
@@ -108,8 +108,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				100 80 200 20
-			text				"Replenish Health"
-			descText		"Replenishes health."
+			text				@MENUS_VR_CHEATS_GIVE_HEALTH_ITEM
+			descText		@MENUS_VR_CHEATS_GIVE_HEALTH_DESC
 			font				2
 			textscale			1
 			textalignx			100
@@ -132,8 +132,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				100 105 200 20
-			text				"Replenish Armor"
-			descText		"Replenishes armor."
+			text				@MENUS_VR_CHEATS_GIVE_ARMOR_ITEM
+			descText		@MENUS_VR_CHEATS_GIVE_ARMOR_DESC
 			font				2
 			textscale			1
 			textalignx			100
@@ -156,8 +156,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				100 130 200 20
-			text				"Replenish Ammo"
-			descText		"Replenishes ammunition."
+			text				@MENUS_VR_CHEATS_GIVE_AMMO_ITEM
+			descText		@MENUS_VR_CHEATS_GIVE_AMMO_DESC
 			font				2
 			textscale			1
 			textalignx			100
@@ -180,8 +180,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				100 155 200 20
-			text				"Replenish Batteries"
-			descText		"Replenishes batteries."
+			text				@MENUS_VR_CHEATS_GIVE_BATTERIES_ITEM
+			descText		@MENUS_VR_CHEATS_GIVE_BATTERIES_DESC
 			font				2
 			textscale			1
 			textalignx			100
@@ -204,8 +204,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				340 80 200 20
-			text				"Give Lightsaber"
-			descText		"Gives only lighsaber."
+			text				@MENUS_VR_CHEATS_GIVE_SABER_ITEM
+			descText		@MENUS_VR_CHEATS_GIVE_SABER_DESC
 			font				2
 			textscale			1
 			textalignx			100
@@ -228,8 +228,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				340 105 200 20
-			text				"Give All Weapons"
-			descText		"Gives all weapons."
+			text				@MENUS_VR_CHEATS_GIVE_WEAPONS_ITEM
+			descText		@MENUS_VR_CHEATS_GIVE_WEAPONS_DESC
 			font				2
 			textscale			1
 			textalignx			100
@@ -252,8 +252,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				340 130 200 20
-			text				"Give All Items"
-			descText		"Gives all inventory items."
+			text				@MENUS_VR_CHEATS_GIVE_ITEMS_ITEM
+			descText		@MENUS_VR_CHEATS_GIVE_ITEMS_DESC
 			font				2
 			textscale			1
 			textalignx			100
@@ -276,8 +276,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				340 155 200 20
-			text				"Unlock All Powers"
-			descText		"Unlocks all force powers."
+			text				@MENUS_VR_CHEATS_GIVE_POWERS_ITEM
+			descText		@MENUS_VR_CHEATS_GIVE_POWERS_DESC
 			font				2
 			textscale			1
 			textalignx			100
@@ -299,7 +299,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			rect				220 210 200 20
-			text				"Lightsaber Color:"
+			text				@MENUS_VR_CHEATS_SABER_COLOR_TITLE
 			font				2
 			textscale			1
 			textalignx			100
@@ -307,7 +307,7 @@
 			forecolor			.509 .609 .847 1
 			appearance_slot		1		
 			visible				1
-			decoration		1
+			decoration
 		}
 
 		itemDef 
@@ -317,8 +317,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				190 235 50 20
-			text				"Blue"
-			descText		"Use blue lightsaber."
+			text				@MENUS_VR_CHEATS_SABER_COLOR_BLUE_ITEM
+			descText		@MENUS_VR_CHEATS_SABER_COLOR_BLUE_DESC
 			font				2
 			textscale			1
 			textalignx			25
@@ -341,8 +341,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				240 235 48 20
-			text				"Green"
-			descText		"Use green lightsaber."
+			text				@MENUS_VR_CHEATS_SABER_COLOR_GREEN_ITEM
+			descText		@MENUS_VR_CHEATS_SABER_COLOR_GREEN_DESC
 			font				2
 			textscale			1
 			textalignx			25
@@ -365,8 +365,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				288 235 50 20
-			text				"Red"
-			descText		"Use red lightsaber."
+			text				@MENUS_VR_CHEATS_SABER_COLOR_RED_ITEM
+			descText		@MENUS_VR_CHEATS_SABER_COLOR_RED_DESC
 			font				2
 			textscale			1
 			textalignx			25
@@ -389,8 +389,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				340 235 50 20
-			text				"Orange"
-			descText		"Use orange lightsaber."
+			text				@MENUS_VR_CHEATS_SABER_COLOR_ORANGE_ITEM
+			descText		@MENUS_VR_CHEATS_SABER_COLOR_ORANGE_DESC
 			font				2
 			textscale			1
 			textalignx			25
@@ -413,8 +413,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				400 235 50 20
-			text				"Purple"
-			descText		"Use purple lightsaber."
+			text				@MENUS_VR_CHEATS_SABER_COLOR_PURPLE_ITEM
+			descText		@MENUS_VR_CHEATS_SABER_COLOR_PURPLE_DESC
 			font				2
 			textscale			1
 			textalignx			25
@@ -567,7 +567,7 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				274 382 95 25
-			text				"CHEATS"
+			text				@MENUS_VR_CHEATS_ITEM
 			font				2
 			textscale			1
 			textalignx			48
@@ -575,7 +575,7 @@
 			forecolor			.509 .609 .847 1
 			appearance_slot		1		
 			visible				1
-			decoration	1
+			decoration
 		}
 
 	}

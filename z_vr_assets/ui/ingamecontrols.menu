@@ -69,6 +69,8 @@
 			forecolor			0.8 0.8 0.8 1
 			visible			1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 
@@ -83,6 +85,8 @@
 			forecolor			1 1 1 1
 			visible			1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		// The saber halo on the left
@@ -96,6 +100,8 @@
 			forecolor			0.5 0.5 0.5 1
 			visible			1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef
@@ -112,6 +118,8 @@
 //			model_origin		100 100 100
 			visible			1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		// The saber halo on the left
@@ -125,6 +133,67 @@
 			forecolor			0.25 0.25 0.25 1
 			visible			1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+		// Expanded menu shaders
+		// Sun red
+		itemDef
+		{
+			name				sun
+			group				none
+			rect				-40 145 300 300
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu2r"
+			forecolor			0.7 0.7 0.7 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+		// Sun halo
+		itemDef
+		{
+			name				sun_halo
+			group				none
+			rect				-95 100 400 400
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu2br"
+			forecolor			0.3 0.3 0.3 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+		// Long sunflare
+		itemDef
+		{
+			name				sunflares
+			group				none
+			rect				-235 -60 700 700
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu2br"
+			forecolor			0.3 0.3 0.3 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+
+		// Expanded Menu Starwars Logo
+		itemDef
+		{
+			name				star_wars
+			group				none
+			rect				272 10 365 95
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/expanded_menu_logo"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
 		}
 
 		//----------------------------------------------------------------------------------------------
@@ -145,6 +214,8 @@
 			forecolor			1 1 1 1
 			visible			0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef 
@@ -164,6 +235,8 @@
 			textalignx			65
 			forecolor			0.65 0.65 1 1
 			visible			1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 
 			mouseEnter 
 			{ 
@@ -192,6 +265,8 @@
 			forecolor			1 1 1 1
 			visible			0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef 
@@ -211,6 +286,8 @@
 			textalignx			65
 			forecolor			0.65 0.65 1 1
 			visible				1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 
 			mouseEnter 
 			{ 
@@ -239,6 +316,8 @@
 			forecolor			1 1 1 1
 			visible				0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef {
@@ -259,6 +338,9 @@
 			forecolor			1 1 1 1
 			visible				1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+			
 			action 
 			{ 
 				play			sound/interface/button1 
@@ -285,6 +367,8 @@
 			forecolor			1 1 1 1
 			visible			0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef {
@@ -304,6 +388,8 @@
 			backcolor			0 0 0 0
 			forecolor			0.65 0.65 1 1
 			visible				1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 			 
 			mouseEnter 
 			{ 
@@ -331,6 +417,8 @@
 			forecolor			1 1 1 1
 			visible				1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 
@@ -350,6 +438,8 @@
 			forecolor			1 1 1 1
 			visible			0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef 
@@ -369,6 +459,8 @@
 			textaligny			-1
 			forecolor			0.65 0.65 1 1
 			visible			1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 
 			mouseEnter
 			{
@@ -397,6 +489,8 @@
 			forecolor			1 1 1 1
 			visible			0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
 		}
 
 		itemDef 
@@ -416,6 +510,9 @@
 			textaligny			-1
 			forecolor			0.65 0.65 1 1
 			visible			1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+
 			mouseEnter 
 			{ 
 				show			resumebutton_glow 
@@ -428,6 +525,62 @@
 			{ 
 				play			sound/interface/button1 
 				uiScript		closeingame			// Close menu				
+			}
+		}
+
+		// Expanded Menu Back Button
+		itemDef
+		{
+			name				back_menu_button_hover
+			group				highlights
+			rect				585 445 50 15
+			style				WINDOW_STYLE_SHADER
+			textalign			ITEM_ALIGN_RIGHT
+			background			"gfx/menus/expanded_menu_buttonback"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+
+		itemDef
+		{
+			name				back_menu_button
+			group				none
+			rect				585 445 50 15
+			text				@MENUS0_BACK
+			descText			@MENUS0_BACKUP_ONE_MENU
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			49
+			textaligny			0
+			textscale			0.53
+			textstyle			3
+			font				3
+			forecolor			0.65 0.65 1 1
+			visible				1
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+
+				hide			highlights
+
+				close			all
+				open			ingameMainMenu
+			}
+
+			mouseEnter
+			{
+				show			back_menu_button_hover
+			}
+			mouseExit
+			{
+				hide			back_menu_button_hover
 			}
 		}
 
@@ -444,15 +597,36 @@
 			style				WINDOW_STYLE_SHADER
 			background			"gfx/menus/menu_blendbox"
 			text				@MENUS1_CONFIGURE_CONTROLS
-      			rect				150 145 450 16
+			rect				150 145 450 16
 			font				3
 			textscale			0.7
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			225
 			textaligny			-2
 			forecolor			1 1 1 1
-      			visible			1 
-  	    		decoration 
+			visible			1 
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+		itemDef 
+		{
+			name				control_title
+			group				none
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/expanded_menu_box"
+			text				@MENUS1_CONFIGURE_CONTROLS
+			rect				120 145 486 16
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			241
+			textaligny			-1
+			forecolor			1 1 1 1
+			visible			1 
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
 		}
 
 		// Common  button
@@ -472,7 +646,7 @@
 		{
 			name				commoncontrolbutton
 			group				none
-			text				"Common"
+			text				@MENUS_VR_COMMON_CONTROLS_ITEM
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
 			rect				120 173 170 30
@@ -484,7 +658,7 @@
 			textstyle			3
 			forecolor			0.65 0.65 1 1
 			visible			1
-			descText			"Common controls configuration."
+			descText			@MENUS_VR_COMMON_CONTROLS_DESC
 
 			mouseEnter 
 			{ 
@@ -540,7 +714,7 @@
 			textstyle			3
 			forecolor			0.65 0.65 1 1
 			visible			1
-			descText			"Weapon specific control configuration."
+			descText			@MENUS_VR_WEAPON_CONTROLS_DESC
 
 			mouseEnter 
 			{ 
@@ -596,7 +770,7 @@
 			textstyle			3
 			forecolor			0.65 0.65 1 1
 			visible			1
-			descText			"Force Power specific control configuration."
+			descText			@MENUS_VR_POWER_CONTROLS_DESC
 
 			mouseEnter 
 			{ 
@@ -652,7 +826,7 @@
 			textstyle			3
 			forecolor			0.65 0.65 1 1
 			visible			1
-			descText			"Inventory specific control configuration."
+			descText			@MENUS_VR_POWER_CONTROLS_DESC
 
 			mouseEnter 
 			{ 
@@ -696,7 +870,7 @@
 		{
 			name				comfortcontrolbutton
 			group				none
-			text				"Comfort"
+			text				@MENUS_VR_COMFORT_CONTROLS_ITEM
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
 			rect				120 293 170 30
@@ -708,7 +882,7 @@
 			textstyle			3
 			forecolor			0.65 0.65 1 1
 			visible			1
-			descText			"Configure comfort options."
+			descText			@MENUS_VR_COMFORT_CONTROLS_DESC
 
 			mouseEnter 
 			{ 
@@ -745,6 +919,35 @@
 			forecolor			1 1 1 1
 			visible				0
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+		itemDef 
+		{
+			name				setup_background
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				300 166 306 250	
+			background			"gfx/menus/expanded_menu_box"					// Frame
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+		itemDef 
+		{
+			name				setup_background
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				120 166 175 250	
+			background			"gfx/menus/expanded_menu_box"					// Frame
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
 		}
 
 		//----------------------------------------------------------------------------------------------
@@ -908,7 +1111,7 @@
 			name				none
 			group				commoncontrols
 			type				ITEM_TYPE_SLIDER
-			text				"Movement Speed:"
+			text				@MENUS_VR_MOVEMENT_SPEED_ITEM
 			cvarfloat		"vr_movement_multiplier" 0.1 0.4 1.2
 			rect				305 191 300 20
 			textalign			ITEM_ALIGN_RIGHT
@@ -919,7 +1122,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			"Sets player movement speed."
+			descText			@MENUS_VR_MOVEMENT_SPEED_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -941,12 +1144,12 @@
 			name				none
 			group				commoncontrols
 			type				ITEM_TYPE_MULTI
-			text				"Direction Mode:"
+			text				@MENUS_VR_DIRECTION_MODE_ITEM
 			cvar				"vr_walkdirection"
 			cvarFloatList		
 			{ 
-				"Off-hand Controller" 0  
-				"HMD" 1 
+				@MENUS_VR_DIRECTION_MODE_CONTROLLER 0  
+				@MENUS_VR_DIRECTION_MODE_HMD 1 
 			}
 			rect				305 211 300 20
 			textalign			ITEM_ALIGN_RIGHT
@@ -957,7 +1160,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			"Choose movement direction mode."
+			descText			@MENUS_VR_DIRECTION_MODE_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -979,9 +1182,15 @@
 		{
 			name				none
 			group				commoncontrols
-			type				ITEM_TYPE_YESNO
-			text				"Smooth turn:"
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_SMOOTH_TURN_ITEM
 			cvar				"vr_turn_mode"
+			cvarFloatList		
+			{ 
+				@MENUS0_NO 0
+				@MENUS_VR_SMOOTH_TURN_3RD_PERSON 1
+				@MENUS0_YES 2
+			}
 			rect				305 231 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151 
@@ -991,7 +1200,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		3
-			descText			"Enables or disables smooth turning."
+			descText			@MENUS_VR_SMOOTH_TURN_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1012,13 +1221,13 @@
 			name				none
 			group				commoncontrols
 			type				ITEM_TYPE_MULTI
-			text				"Turn Angle:"
+			text				@MENUS_VR_TURN_ANGLE_ITEM
 			cvar				"vr_turn_angle"
 			cvarFloatList		
 			{ 
-				"30 Degrees" 30  
-				"45 Degrees" 45
-				"90 Degrees" 90
+				@MENUS_VR_TURN_ANGLE_30DEGREES 30  
+				@MENUS_VR_TURN_ANGLE_45DEGREES 45
+				@MENUS_VR_TURN_ANGLE_90DEGREES 90
 			}
 			rect				305 251 300 20
 			textalign			ITEM_ALIGN_RIGHT
@@ -1029,7 +1238,7 @@
 			forecolor			1 1 1 1
 			visible			0 
 			// appearance_slot		4
-			descText			"Degrees to turn when using snap turn / Speed of smooth turn"
+			descText			@MENUS_VR_TURN_ANGLE_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1050,7 +1259,7 @@
 			name				none
 			group				commoncontrols
 			type				ITEM_TYPE_YESNO
-			text				"Switch Sticks:"
+			text				@MENUS_VR_SWITCH_STICKS_ITEM
 			cvar				"vr_switch_sticks"
 			rect				305 271 300 20
 			textalign			ITEM_ALIGN_RIGHT
@@ -1061,7 +1270,7 @@
 			forecolor			1 1 1 1
 			visible			0 
 			// appearance_slot		5
-			descText			"Switches left/gight controller thubmsticks."
+			descText			@MENUS_VR_SWITCH_STICKS_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1082,12 +1291,12 @@
 			name				none
 			group				commoncontrols
 			type				ITEM_TYPE_MULTI
-			text				"Left-Handed Mode:"
+			text				@MENUS_VR_LEFT_HANDED_ITEM
 			cvar				"vr_control_scheme"
 			cvarFloatList		
 			{ 
-				"No" 0
-				"Yes" 10
+				@MENUS0_NO 0
+				@MENUS0_YES 10
 			}
 			rect				305 291 300 20
 			textalign			ITEM_ALIGN_RIGHT
@@ -1098,7 +1307,7 @@
 			forecolor			1 1 1 1
 			visible			0 
 			// appearance_slot		5
-			descText			"Enables left-handed mode."
+			descText			@MENUS_VR_LEFT_HANDED_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1165,7 +1374,7 @@
 			name				none
 			group				weaponcontrols
 			type				ITEM_TYPE_SLIDER
-			text				"Weapon Pitch:"
+			text				@MENUS_VR_WEAPON_PITCH_ITEM
 			cvarfloat			"vr_weapon_pitchadjust" 5 -25 5
 			rect				305 211 300 20
 			textalign			ITEM_ALIGN_RIGHT
@@ -1176,7 +1385,7 @@
 			forecolor			1 1 1 1
 			visible			0 
 			// appearance_slot		2
-			descText			"Sets aiming pitch of held weapon."
+			descText			@MENUS_VR_WEAPON_PITCH_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1199,7 +1408,7 @@
 			name				none
 			group				weaponcontrols
 			type				ITEM_TYPE_YESNO
-			text				"Two-Handed Mode:"
+			text				@MENUS_VR_TWO_HANDED_ITEM
 			cvar			"vr_two_handed_weapons"
 			rect				305 231 300 20
 			textalign			ITEM_ALIGN_RIGHT
@@ -1210,7 +1419,7 @@
 			forecolor			1 1 1 1
 			visible			0 
 			// appearance_slot		2
-			descText			"Enables two-handed weapon handling."
+			descText			@MENUS_VR_TWO_HANDED_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1233,7 +1442,7 @@
 			name				none
 			group				weaponcontrols
 			type				ITEM_TYPE_YESNO
-			text				"Virtual Gun Stock:"
+			text				@MENUS_VR_GUN_STOCK_ITEM
 			cvar			"vr_virtual_stock"
 			rect				305 251 300 20
 			textalign			ITEM_ALIGN_RIGHT
@@ -1244,7 +1453,7 @@
 			forecolor			1 1 1 1
 			visible			0 
 			// appearance_slot		2
-			descText			"Enables or disables virtual gun stock."
+			descText			@MENUS_VR_GUN_STOCK_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1262,40 +1471,6 @@
 
 		}
 
-		itemDef 
-		{
-			name				none
-			group				weaponcontrols
-			type				ITEM_TYPE_YESNO
-			text				"Saber Auto Blocking:"
-			cvar			"g_saberAutoblocking"
-			rect				305 271 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0 
-			// appearance_slot		2
-			descText			"Enables or disables auto blocking with saber."
-			action 
-			{ 
-				play			sound/interface/button1
-			}
-
-			mouseenter 
-			{ 
-				show			highlight6
-			}
-
-			mouseexit 
-			{ 
-				hide			highlight6
-			}			
-
-		}
-
 
 
 		//----------------------------------------------------------------------------------------------
@@ -1308,7 +1483,7 @@
 			name				none
 			group				forcecontrols
 			type				ITEM_TYPE_YESNO
-			text				"Force Power Direction Hint:"
+			text				@MENUS_VR_FORCE_POWER_DIRECTION_ITEM
 			cvar				"cg_showForcePowerDirection"
 			rect				340 191 300 20
 			textalign			ITEM_ALIGN_RIGHT
@@ -1319,7 +1494,7 @@
 			forecolor			1 1 1 1
 			visible			0 
 			// appearance_slot		2
-			descText			"Hint as to which direction a force power was fired."
+			descText			@MENUS_VR_FORCE_POWER_DIRECTION_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1342,7 +1517,7 @@
 			name				none
 			group				forcecontrols
 			type				ITEM_TYPE_YESNO
-			text				"Force Speed FOV Change:"
+			text				@MENUS_VR_FORCE_SPEED_FOV_ITEM
 			cvar				"cg_forceSpeedFOVAdjust"
 			rect				340 211 300 20
 			textalign			ITEM_ALIGN_RIGHT
@@ -1353,7 +1528,7 @@
 			forecolor			1 1 1 1
 			visible				0 
 			// appearance_slot		2
-			descText			"Whether the FOV will be adjusted briefly when engaging Force Speed."
+			descText			@MENUS_VR_FORCE_SPEED_FOV_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1422,7 +1597,7 @@
 			name				none
 			group				comfortcontrols
 			type				ITEM_TYPE_YESNO
-			text				"Immersive Cinematics:"
+			text				@MENUS_VR_IMMERSIVE_CINEMATICS_ITEM
 			cvar				"vr_immersive_cinematics"
 			rect				305 191 300 20
 			textalign			ITEM_ALIGN_RIGHT
@@ -1433,7 +1608,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			"Enables or disables immersive cinematics."
+			descText			@MENUS_VR_IMMERSIVE_CINEMATICS_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1455,13 +1630,13 @@
 			name				none
 			group				comfortcontrols
 			type				ITEM_TYPE_MULTI
-			text				"Menu Screen Distance:"
+			text				@MENUS_VR_SCREEN_DISTANCE_ITEM
 			cvar				"vr_screen_dist"
 			cvarFloatList		
 			{ 
-				"Near" 1.5  
-				"Medium" 2.5
-				"Far" 3.5
+				@MENUS_VR_SCREEN_DISTANCE_NEAR 1.5  
+				@MENUS_VR_SCREEN_DISTANCE_MEDIUM 2.5
+				@MENUS_VR_SCREEN_DISTANCE_FAR 3.5
 			}
 			rect				305 211 300 20
 			textalign			ITEM_ALIGN_RIGHT
@@ -1472,7 +1647,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			"Select menu screen distance."
+			descText			@MENUS_VR_SCREEN_DISTANCE_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1486,6 +1661,39 @@
 			mouseexit 
 			{ 
 				hide			highlight3
+			}			
+		}
+
+		itemDef 
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_HEIGHT_ADJUST_ITEM
+			cvarfloat 	"cg_heightAdjust" 0.2 0 1
+			rect				305 231 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			@MENUS_VR_HEIGHT_ADJUST_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+		
+			mouseenter 
+			{ 
+				show			highlight4
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight4
 			}			
 		}
 

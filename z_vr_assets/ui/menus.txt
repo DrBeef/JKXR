@@ -27,4 +27,13 @@
 	loadMenu { "ui/ingamevid_warning.menu"				}
 	loadMenu { "ui/videodriver.menu"					}
 
+	// expanded menu mod support
+	loadMenu { "ui/selectmission.menu"	}
+	loadMenu { "ui/selectmap.menu"		}
+	loadMenu { "ui/camera.menu"		}
+	loadMenu { "ui/music.menu"		}
+	loadMenu { "ui/spawner.menu"		}
+	loadMenu { "ui/cheatsforcepowers.menu"	}
+	loadMenu { "ui/cheatsinventory.menu"	}
+
 }

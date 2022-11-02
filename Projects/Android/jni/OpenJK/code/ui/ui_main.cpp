@@ -2643,6 +2643,10 @@ void _UI_Init( qboolean inGameLoad )
 		if (!ui.SP_Register(va("menus%d",i), /*SP_REGISTER_REQUIRED|*/SP_REGISTER_MENU))
 			break;
 	}
+
+	//Our special VR locale file - tanks to @MuadDib!
+	ui.SP_Register("menus_vr", /*SP_REGISTER_REQUIRED|*/SP_REGISTER_MENU);
+
 #endif
 
 	uiInfo.inGameLoad = inGameLoad;
