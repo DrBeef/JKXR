@@ -1851,6 +1851,7 @@ public:
 	float		forceJumpZStart;					//So when you land, you don't get hurt as much
 	float		forceJumpCharge;					//you're current forceJump charge-up level, increases the longer you hold the force jump button down
 	int			forceGripEntityNum;					//what entity I'm gripping
+	float		forceGripEntityInitialDist;			//the initial distance of the gripped entity
 	vec3_t		forceGripOrg;						//where the gripped ent should be lifted to
 
 #ifndef JK2_MODE

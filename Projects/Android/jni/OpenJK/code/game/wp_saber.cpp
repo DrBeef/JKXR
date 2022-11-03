@@ -13141,6 +13141,7 @@ void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower )
 			}
 			self->s.loopSound = 0;
 			self->client->ps.forceGripEntityNum = ENTITYNUM_NONE;
+			self->client->ps.forceGripEntityInitialDist = ENTITYNUM_NONE;
 		}
 		if ( self->client->ps.torsoAnim == BOTH_FORCEGRIP_HOLD )
 		{
@@ -14401,7 +14402,7 @@ void WP_InitForcePowers( gentity_t *ent )
 	ent->client->ps.forcePower = ent->client->ps.forcePowerMax;
 	ent->client->ps.forcePowerRegenDebounceTime = level.time;
 
-	ent->client->ps.forceGripEntityNum = ent->client->ps.forceDrainEntityNum = ent->client->ps.pullAttackEntNum = ENTITYNUM_NONE;
+	ent->client->ps.forceGripEntityInitialDist = ent->client->ps.forceGripEntityNum = ent->client->ps.forceDrainEntityNum = ent->client->ps.pullAttackEntNum = ENTITYNUM_NONE;
 	ent->client->ps.forceRageRecoveryTime = 0;
 	ent->client->ps.forceDrainTime = 0;
 	ent->client->ps.pullAttackTime = 0;

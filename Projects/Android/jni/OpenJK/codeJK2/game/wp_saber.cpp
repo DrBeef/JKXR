@@ -30,6 +30,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "../../code/qcommon/tri_coll_test.h"
 #include "../cgame/FxScheduler.h"
+#include <JKVR/VrClientInfo.h>
 
 #define MAX_SABER_VICTIMS 16
 static int		victimEntityNum[MAX_SABER_VICTIMS];
@@ -3992,24 +3993,19 @@ void WP_RunSaber( gentity_t *self, gentity_t *saber )
 			fwdangles[0] -= 5;
 		}
 
-		if ( self->client->ps.forcePowerLevel[FP_SABERTHROW] > FORCE_LEVEL_1
-			|| self->client->ps.saberEntityState == SES_RETURNING
+		//For now make FORCE_LEVEL_1 saber throw do the same as FORCE_LEVEL_2, otherwise it is impossible to use
+		if ( self->client->ps.forcePowerLevel[FP_SABERTHROW] >= FORCE_LEVEL_1 ||
+			self->client->ps.saberEntityState == SES_RETURNING
 			|| VectorCompare( saber->s.pos.trDelta, vec3_origin ) )
 		{//control if it's returning or just starting
-			float	saberSpeed = 500;//FIXME: based on force level?
+			float	saberSpeed = self->client->ps.forcePowerLevel[FP_SABERTHROW] == FORCE_LEVEL_1 ? 300 : 500;
 			float	dist;
 			gentity_t *enemy = NULL;
 
 			AngleVectors( fwdangles, forward, NULL, NULL );
 
-			if ( self->client->ps.saberEntityDist < 100 )
-			{//make the saber head to my hand- the bolt it was attached to
-				VectorCopy( self->client->renderInfo.handRPoint, saberHome );
-			}
-			else
-			{//aim saber from eyes
-				VectorCopy( self->client->renderInfo.eyePoint, saberHome );
-			}
+			//Always use right hand as saber home
+			VectorCopy( self->client->renderInfo.handRPoint, saberHome );
 			VectorMA( saberHome, self->client->ps.saberEntityDist, forward, saberDest );
 
 			if ( self->client->ps.forcePowerLevel[FP_SABERTHROW] > FORCE_LEVEL_2 && self->client->ps.saberEntityState == SES_LEAVING )
@@ -4024,7 +4020,6 @@ void WP_RunSaber( gentity_t *self, gentity_t *saber )
 					self->client->ps.saberEntityDist = enemyDist;
 				}
 			}
-
 
 			//Make the saber head there
 			VectorSubtract( saberDest, saber->currentOrigin, saber->s.pos.trDelta );
@@ -8019,6 +8014,7 @@ void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower )
 			}
 			self->s.loopSound = 0;
 			self->client->ps.forceGripEntityNum = ENTITYNUM_NONE;
+			self->client->ps.forceGripEntityInitialDist = ENTITYNUM_NONE;
 		}
 		if ( self->client->ps.torsoAnim == BOTH_FORCEGRIP_HOLD )
 		{
@@ -8193,8 +8189,10 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 				{//holding it
 					NPC_SetAnim( self, SETANIM_TORSO, BOTH_FORCEGRIP_HOLD, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 				}
+
+				bool isFirstPersonPlayer = (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson);
 				//get their org
-				if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
+				if (isFirstPersonPlayer)
 				{
 					vec3_t origin;
 					BG_CalculateVROffHandPosition(origin, angles);
@@ -8215,6 +8213,17 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 					VectorCopy( gripEnt->currentOrigin, gripEntOrg );
 				}
 
+				if (isFirstPersonPlayer &&
+					self->client->ps.forcePowerLevel[FP_GRIP] > FORCE_LEVEL_2 &&
+					self->client->ps.forceGripEntityInitialDist == ENTITYNUM_NONE)
+				{
+					vec3_t diff;
+					diff[2] = 0;
+					VectorSubtract2(self->client->renderInfo.handLPoint,
+									self->client->renderInfo.eyePoint, diff);
+					self->client->ps.forceGripEntityInitialDist = VectorLength(diff);
+				}
+
 				//how far are they
 				dist = Distance( self->client->renderInfo.handLPoint, gripEntOrg );
 				if ( self->client->ps.forcePowerLevel[FP_GRIP] == FORCE_LEVEL_2 &&
@@ -8228,16 +8237,35 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 				//check for lift or carry
 				if ( self->client->ps.forcePowerLevel[FP_GRIP] > FORCE_LEVEL_2 )
 				{//carry
-					//cap dist
-					if ( dist > 256 )
-					{
-						dist = 256;
+					if (isFirstPersonPlayer) {
+						vec3_t diff;
+						diff[2] = 0;
+						VectorSubtract2(self->client->renderInfo.handLPoint,
+										self->client->renderInfo.eyePoint, diff);
+						float length = VectorLength(diff);
+						if (fabs(length - self->client->ps.forceGripEntityInitialDist) > 1.0f) {
+							dist += (length - self->client->ps.forceGripEntityInitialDist) *
+									 5.0f;
+						}
+						if (dist > 384) {
+							dist = 384;
+						} else if (dist < 32) {
+							dist = 32;
+						}
 					}
-					else if ( dist < 128 )
+					else
 					{
-						dist = 128;
+						//cap dist
+						if (dist > 256) {
+							dist = 256;
+						} else if (dist < 128) {
+							dist = 128;
+						}
 					}
-					VectorMA( self->client->renderInfo.handLPoint, dist, dir, gripOrg );
+
+					VectorMA(self->client->renderInfo.handLPoint,
+							 dist, dir,
+							 gripOrg);
 				}
 				else if ( self->client->ps.forcePowerLevel[FP_GRIP] > FORCE_LEVEL_1 )
 				{//just lift
@@ -8533,6 +8561,7 @@ void WP_InitForcePowers( gentity_t *ent )
 		ent->client->ps.forcePower = ent->client->ps.forcePowerMax = FORCE_POWER_MAX;
 		ent->client->ps.forcePowerRegenDebounceTime = 0;
 		ent->client->ps.forceGripEntityNum = ENTITYNUM_NONE;
+		ent->client->ps.forceGripEntityInitialDist = ENTITYNUM_NONE;
 
 		if ( ent->client->NPC_class == CLASS_DESANN )
 		{
@@ -8665,5 +8694,6 @@ void WP_InitForcePowers( gentity_t *ent )
 			ent->client->ps.forcePowerLevel[FP_GRIP] = FORCE_LEVEL_2;
 		}
 		ent->client->ps.forceGripEntityNum = ENTITYNUM_NONE;
+		ent->client->ps.forceGripEntityInitialDist = ENTITYNUM_NONE;
 	}
 }

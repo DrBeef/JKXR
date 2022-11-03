@@ -842,7 +842,7 @@ static void Player_RestoreFromPrevLevel(gentity_t *ent, SavedGameJustLoaded_e eS
 			}
 			assert (i==NUM_FORCE_POWERS);
 
-			client->ps.forceGripEntityNum = client->ps.forceDrainEntityNum = ENTITYNUM_NONE;
+			client->ps.forceGripEntityInitialDist = client->ps.forceGripEntityNum = client->ps.forceDrainEntityNum = ENTITYNUM_NONE;
 		}
 	}
 }

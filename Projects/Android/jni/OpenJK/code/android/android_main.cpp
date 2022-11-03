@@ -15,6 +15,8 @@
 
 #if defined(MACOS_X) || defined(__linux__) || defined(__FreeBSD_kernel__)
 #include <unistd.h>
+#include <VrCommon.h>
+
 #endif
 
 static char binaryPath[ MAX_OSPATH ] = { 0 };
@@ -110,6 +112,7 @@ void Conbuf_AppendText( const char *pMsg )
 	char msg[MAXPRINTMSG] = {0};
 	Q_strncpyz(msg, pMsg, sizeof(msg));
 	Q_StripColor(msg);
+	ALOGV("%s", msg);
 	//((void)__android_log_print(ANDROID_LOG_INFO,"JK3","%s", msg));
 	//printf("%s", msg);
 }

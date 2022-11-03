@@ -1859,11 +1859,13 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 
 	if (type == 0)
 	{
-		CG_ScanForForceCrosshairEntity();
-		if (!cg_forceCrosshair)
+		if (showPowers[cg.forcepowerSelect] == FP_HEAL ||
+				showPowers[cg.forcepowerSelect] == FP_SPEED)
 		{
 			return;
 		}
+
+		CG_ScanForForceCrosshairEntity();
 	}
 
 	w = cg_crosshairSize.value;
@@ -1905,7 +1907,7 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 
 		ent.radius = w / 640 * xmax * trace.fraction * 2048 / 64.0f;
         ent.customShader = hShader;
-		ent.shaderRGBA[0] = (type == 0) ? 0 : 255;
+		ent.shaderRGBA[0] = (type == 0 && !cg_forceCrosshair) ? 0 : 255;
 		ent.shaderRGBA[1] = (type == 0) ? 0 : 255;
 		ent.shaderRGBA[2] = 255;
 		ent.shaderRGBA[3] = 255;

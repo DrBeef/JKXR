@@ -238,22 +238,29 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 sendButtonAction("+attack", between(0.8f, pPrimaryJoystick->y, 1.0f));
                 sendButtonAction("+altattack", between(-1.0f, pPrimaryJoystick->y, -0.8f));
             }
-        } else if (vr.weaponid == WP_SABER)
+        }
+        else if (vr.weaponid == WP_SABER)
         {
+            int mode = (int)Cvar_VariableValue("cg_thirdPerson");
             static bool switched = false;
             if (between(-0.2f, primaryJoystickX, 0.2f) &&
                 (between(0.8f, pPrimaryJoystick->y, 1.0f) ||
                  between(-1.0f, pPrimaryJoystick->y, -0.8f))) {
                 if (!switched) {
-                    if (between(0.8f, pPrimaryJoystick->y, 1.0f)) {
-                        sendButtonActionSimple("cg_thirdPerson 1");
-                    } else {
-                        sendButtonActionSimple("cg_thirdPerson 0");
-                    }
+                    mode = 1 - mode;
+                    sendButtonActionSimple(va("cg_thirdPerson %i", mode));
                     switched = true;
                 }
             } else {
                 switched = false;
+            }
+        }
+        else
+        {
+            int mode = (int)Cvar_VariableValue("cg_thirdPerson");
+            if (mode != 0)
+            {
+                sendButtonActionSimple("cg_thirdPerson 0");
             }
         }
 

@@ -46,8 +46,6 @@ typedef struct {
 
     int item_selector = 0; // 1 - weapons/gadgets/saber stance, 2 - Force powers
 
-    bool pistol;                // True if the weapon is a pistol
-
     //Lots of scope weapon stuff
     bool scopeengaged;          // Scope has been engaged on a scoped weapon
     bool scopedweapon;          // Weapon scope is available

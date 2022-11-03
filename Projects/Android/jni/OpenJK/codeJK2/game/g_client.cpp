@@ -773,6 +773,7 @@ void Player_RestoreFromPrevLevel(gentity_t *ent)
 
 			client->ps.forcePowerMax = FORCE_POWER_MAX;
 			client->ps.forceGripEntityNum = ENTITYNUM_NONE;
+			client->ps.forceGripEntityInitialDist = ENTITYNUM_NONE;
 		}
 	}
 }
