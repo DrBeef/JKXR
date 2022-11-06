@@ -187,20 +187,31 @@ import static android.system.Os.setenv;
 	public void create() {
 		//Make the directories
 		new File("/sdcard/JKQuest/JK2/base").mkdirs();
-		new File("/sdcard/JKQuest/JK3/base").mkdirs();
 
 		//Copy the command line params file
 		copy_asset("/sdcard/JKQuest", "commandline.txt", false);
 
-		//Copy the weapon adjustment config - should we force overwrite?
-		copy_asset("/sdcard/JKQuest/JK2/base", "weapons_vr_jo.cfg", true);
-		copy_asset("/sdcard/JKQuest/JK3/base", "weapons_vr_ja.cfg", true);
+		//Copy the weapon adjustment config
+		copy_asset("/sdcard/JKQuest/JK2/base", "weapons_vr_jo.cfg", false);
 
 		//Our assets
 		copy_asset("/sdcard/JKQuest/JK2/base", "z_vr_assets.pk3", true);
 		
 		//Bummser's default configuration
 		copy_asset("/sdcard/JKQuest/JK2/base", "openjo_sp.cfg", false);
+
+		//Bummser's default configuration
+		copy_asset("/sdcard/JKQuest/JK2/base", "openjo_sp.cfg", false);
+
+		//Bunch of cool mods and their credits - only copy if user wants them
+		if (!new File("/sdcard/JKQuest/JK2/base/no_copy").exists()) {
+			copy_asset("/sdcard/JKQuest/JK2/base", "packaged_mods_credits.txt", false);
+			copy_asset("/sdcard/JKQuest/JK2/base", "GGDynamicWeapons.pk3", false);
+			copy_asset("/sdcard/JKQuest/JK2/base", "Haps_Stormtrooper.pk3", false);
+			copy_asset("/sdcard/JKQuest/JK2/base", "Kyle's_lightsaber_hilt_hd.pk3", false);
+			copy_asset("/sdcard/JKQuest/JK2/base", "UltimateSounds_JK2.pk3", false);
+			copy_asset("/sdcard/JKQuest/JK2/base", "z_bryar_ashura.pk3", false);
+		}
 
 		//Read these from a file and pass through
 		commandLineParams = new String("jo");

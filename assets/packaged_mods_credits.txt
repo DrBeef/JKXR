@@ -1,0 +1,149 @@
+The following excellent mods were included in the apk:
+
+=============================================================================================================================
+
+BRYAR BLASTER PISTOL
+
+MODELS : AshuraDX
+TEXTURES : AshuraDX
+E-MAIL : ashuradx@yahoo.de
+VERSION: 1.0
+
+Description :
+Well, I made a thing. A pretty Thing.
+This my rendition of Kyle Katarns Signature blaster, based at it's appeareance in the live action-cutscenes from Dark Forces 2.
+I originally made this for the DF2 mod which will feature a PBR version of this model but decided to release a version for the base game
+aswell.
+
+This weapon works in both games JKA and JK2 and comes with an optional .pk3 to swap the blaster pistol model in JKA for the bryar model.
+
+BUGS : none
+
+INSTALL : put the Pk3(s) in your base folder
+UNINSTAL : remove the Pk3(s) from your base folder
+
+=============================================================================================================================
+
+
+
+Author:
+Grab
+
+File name:
+GGDynamicWeapons v1.0
+
+Description:
+Dynamic light for weapons effects
+
+Instalation:
+Take one of these .pk3's and put it into your base folder.
+
+Known issues:
+Probably only Seeker's shots are missing dynamic lightning. Might be fixed in future.
+
+Copyright:
+Grab
+
+
+=============================================================================================================================
+
+
+
+Title : HapSlash's Improved Stormtrooper - JO
+Author : HapSlash
+E-Mail : slash_happy@yahoo.com
+Website : www.hapslash.com
+
+File Name : Haps-Stormtrooper.pk3
+File Size : 1.23MB
+Date Released : 02-27-04
+
+Description
+The first pk3 includes the Improved Stormtrooper model, which features accurate movie stylings, team skins, complete caps, and full LOD support . This file is set up to replace the default Stormtrooper.
+
+Also included is a second pk3 which will replace the 3rd person
+Stormtrooper blaster with my own version of the E-11.
+
+Installation
+Simply extract both pk3's to the gamedata/base folder of your Jedi Outcast
+directory.
+
+Comments
+First of all I think that thank's are in order to INFINITY BLADE, who
+took the time to weight the model & convert it almost 5 times before the
+finished product was released. Without him this project never would have
+gotten very far.
+
+I originally started this upgrade due to the number of problems I had
+with the original. The main changes are primarily in the head, torso,
+and knees, with texture changes throughout. Other than the cosmetic
+changes I also noticed that not all of the body sections had caps on
+them, with this model I've added them all in.
+
+Well here it is, my first released model. A lot of hard work, blood,
+sweat, tears, and almost a years worth of procrastination went into this,...
+
+Enjoy.
+
+-----------------------------------------------------------------------------------------------
+THIS MODIFICATION IS NOT MADE, DISTRIBUTED, OR SUPPORTED BY ACTIVISION, RAVEN, OR LUCASARTS ENTERTAINMENT COMPANY LLC. ELEMENTS TM & © LUCASARTS ENTERTAINMENT COMPANY LLC AND/OR ITS LICENSORS.
+
+
+
+
+=============================================================================================================================
+
+
+TITLE: REAL sounds
+AUTHOR: neo
+E-MAIL: neo_mp5@hotmail.com
+WEBSITE: none
+
+FILENAME: myskin.zip
+FILESIZE: 768 KB
+DATE RELEASED: 28 september 2005
+
+CREDITS: ben burtt, for his original sounds, and dveditor, for getting ahold of several of the sounds
+themselves (http://boards.theforce.net/Fan_Films/b10015/20495395/?278).
+
+INSTALLATION INSTRUCTIONS: just drop each wav over the wav of the same name in the folder of the
+same name. If there's an easier way to do this, please let me know.
+
+If you don't want a specific sound, you can just leave it out. If you want to change it back, I suggest you back
+up the original sounds somewhere.
+
+DESCRIPTION: I HATE the sound work in this game, so I figured I'd replace as many as possible with the
+REAL sounds. these sounds are top possible quality, not just movie rips.
+
+BUGS: it's too simple to have bugs
+
+COMMENTS: this is my first mod, and I intend to make more sound mods, and update this one, if possible. I would
+replace the sounds to the repeater and the force lightning loop, but I can't figure out how to make a wav with
+a bitrate of 352 kbps. my audio programs only go to 320. help would be appreciated
+
+If volumes are off, please inform me. If yyou want a specific sound from the movies made into another mod,
+I likely have the sound, and can probably do that, so e-mail me.
+
+THIS MODIFICATION IS NOT MADE, DISTRIBUTED, OR SUPPORTED BY ACTIVISION, RAVEN, OR
+LUCASARTS ENTERTAINMENT COMPANY LLC. ELEMENTS TM & © LUCASARTS
+ENTERTAINMENT COMPANY LLC AND/OR ITS LICENSORS.
+
+
+
+=============================================================================================================================
+
+
+TITLE: KYLE'S LIGHTSABER HILT HD
+AUTHORS: CPT. BROSKI / PUNISHER
+FILE NAME: kyle's_lightsaber_hilt_hd.pk3
+FILE SIZE: 1.6 MB
+DATE RELEASED: 21 JULY 2021
+
+DESCRIPTION: This mod replaces Kyle's original lightsaber with a new model.
+The model is based entirely on the in-game model, but it uses better shaders to shine.
+INSTALL: Put the hilt_lightsaber_kyle's_hd.pk3 to your Jedi Outcast\GameData\base folder.
+UNINSTALL: Remove the hilt_lightsaber_kyle's_hd.pk3 from your Jedi Outcast\GameData\base folder.
+BUGS: none
+
+THIS MODIFICATION IS NOT MADE, DISTRIBUTED, OR SUPPORTED BY ACTIVISION, RAVEN, OR LUCASARTS ENTERTAINMENT COMPANY LLC. ELEMENTS TM & © LUCASARTS ENTERTAINMENT COMPANY LLC AND/OR ITS LICENSORS.
+
