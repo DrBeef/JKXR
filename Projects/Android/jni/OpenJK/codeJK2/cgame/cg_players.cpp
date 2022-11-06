@@ -4676,6 +4676,32 @@ Ghoul2 Insert End
 
 	saberTrail_t	*saberTrail = &client->saberTrail;
 
+	//Changing
+	saber_colors_t	saberColor = client->ps.saberColor;
+	if (cg_debugSaberCombat.integer)
+	{
+		if (client->ps.saberLockEnemy != ENTITYNUM_NONE)
+		{
+			saberColor = SABER_RED;
+		}
+		else if (client->ps.saberBlocked)
+		{
+			saberColor = SABER_ORANGE;
+		}
+		else if ( client->ps.saberDamageDebounceTime > level.time )
+		{
+			saberColor = SABER_YELLOW;
+		}
+		else if (saberTrail->inAction)
+		{
+			saberColor = SABER_GREEN;
+		}
+		else
+		{
+			saberColor = SABER_BLUE;
+		}
+	}
+
 #define SABER_TRAIL_TIME	60.0f
 
 	// if we happen to be timescaled or running in a high framerate situation, we don't want to flood
@@ -4694,7 +4720,7 @@ Ghoul2 Insert End
 		{
 			vec3_t	rgb1={255,255,255};
 
-			switch( client->ps.saberColor )
+			switch( saberColor )
 			{
 				case SABER_RED:
 					VectorSet( rgb1, 255.0f, 0.0f, 0.0f );
@@ -4784,7 +4810,7 @@ Ghoul2 Insert End
 
 	// Pass in the renderfx flags attached to the saber weapon model...this is done so that saber glows
 	//	will get rendered properly in a mirror...not sure if this is necessary??
-	CG_DoSaber( org_, axis_[0], length, client->ps.saberLengthMax, client->ps.saberColor, renderfx );
+	CG_DoSaber( org_, axis_[0], length, client->ps.saberLengthMax, saberColor, renderfx );
 }
 
 //--------------- END SABER STUFF --------

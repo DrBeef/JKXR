@@ -2059,7 +2059,7 @@ void SCR_AddCreditTextCrawl()
 	VectorScaleM( verts[2].modulate, 0.1f, verts[2].modulate ); // darken at the top??
 	VectorScaleM( verts[3].modulate, 0.1f, verts[3].modulate );
 
-	float timeoffset = (cls.realtime-startTime)*0.00003f -1;
+	float timeoffset = (cls.realtime-startTime)*0.000022f -1;
 	VectorSet( verts[0].xyz, TC_PLANE_NEAR, -TC_PLANE_WIDTH, TC_PLANE_TOP );
 	verts[0].st[0] = 1;
 	verts[0].st[1] = 1 +timeoffset;

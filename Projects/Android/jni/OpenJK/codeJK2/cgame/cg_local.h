@@ -619,6 +619,7 @@ extern	vmCvar_t		cg_thirdPersonCameraDamp;
 extern	vmCvar_t		cg_thirdPersonTargetDamp;
 extern	vmCvar_t		cg_saberAutoThird;
 extern	vmCvar_t		cg_gunAutoFirst;
+extern	vmCvar_t		cg_debugSaberCombat;
 
 extern	vmCvar_t		cg_zProj;
 extern	vmCvar_t		cg_stereoSeparation;
