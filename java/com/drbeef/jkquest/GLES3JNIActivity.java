@@ -198,6 +198,9 @@ import static android.system.Os.setenv;
 
 		//Our assets
 		copy_asset("/sdcard/JKQuest/JK2/base", "z_vr_assets.pk3", true);
+		
+		//Bummser's default configuration
+		copy_asset("/sdcard/JKQuest/JK2/base", "openjo_sp.cfg", false);
 
 		//Read these from a file and pass through
 		commandLineParams = new String("jo");
