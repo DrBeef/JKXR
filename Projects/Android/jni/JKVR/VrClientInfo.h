@@ -6,6 +6,7 @@
 typedef struct {
     bool cin_camera; // cinematic camera taken over
     bool misc_camera; // looking through a misc camera view entity
+    bool remote_turret; // controlling a remote turret
     bool using_screen_layer;
     bool third_person;
     float  fov;
@@ -34,6 +35,7 @@ typedef struct {
     vec3_t weaponangles;
     vec3_t weaponangles_last; // Don't use this, it is just for calculating delta!
     vec3_t weaponangles_delta;
+    vec3_t weaponangles_first; // only updated when in first person
 
     vec3_t clientviewangles; //orientation in the client - we use this in the cgame
     float snapTurn; // how much turn has been applied to the yaw by joystick

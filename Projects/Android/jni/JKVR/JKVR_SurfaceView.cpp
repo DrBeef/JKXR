@@ -813,6 +813,11 @@ void updateHMDOrientation()
 	if (!vr.third_person){
 		VectorCopy(vr.hmdorientation, vr.hmdorientation_first);
 	}
+
+	if (!vr.remote_turret)
+	{
+		VectorCopy(vr.weaponangles, vr.weaponangles_first);
+	}
 }
 
 void setHMDPosition( float x, float y, float z )
@@ -858,7 +863,18 @@ void JKVR_Vibrate( int duration, int channel, float intensity )
 void JKVR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side, float *up,
                     float *yaw, float *pitch, float *roll)
 {
-	if (!vr.third_person) {
+	if (vr.remote_turret) {
+		*forward = 0.0f;
+		*pos_forward = 0.0f;
+		*up = 0.0f;
+		*side = 0.0f;
+		*pos_side = 0.0f;
+		*yaw = vr.snapTurn + vr.hmdorientation_first[YAW] +
+				vr.weaponangles[YAW] - vr.weaponangles_first[YAW];
+		*pitch = vr.weaponangles[PITCH];
+		*roll = 0.0f;
+	}
+	else if (!vr.third_person) {
 		*forward = remote_movementForward;
 		*pos_forward = positional_movementForward;
 		*up = remote_movementUp;

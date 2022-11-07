@@ -688,9 +688,8 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
                 //Use smooth in 3rd person
                 bool usingSnapTurn = vr_turn_mode->integer == 0 ||
-                        (vr.third_person && vr_turn_mode->integer == 1);
+                        (!vr.third_person && vr_turn_mode->integer == 1);
 
-                //No snap turn when using mounted gun
                 static int increaseSnap = true;
                 if (!vr.item_selector && !vr.scopeengaged) {
                     if (usingSnapTurn) {

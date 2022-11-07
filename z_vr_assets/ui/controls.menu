@@ -1484,43 +1484,9 @@
 			name				none
 			group				forcecontrols
 			type				ITEM_TYPE_YESNO
-			text				@MENUS_VR_FORCE_POWER_DIRECTION_ITEM
-			cvar				"cg_showForcePowerDirection"
-			rect				340 191 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0 
-			// appearance_slot		2
-			descText			@MENUS_VR_FORCE_POWER_DIRECTION_DESC
-			action 
-			{ 
-				play			sound/interface/button1
-			}
-
-			mouseenter 
-			{ 
-				show			highlight2
-			}
-
-			mouseexit 
-			{ 
-				hide			highlight2
-			}			
-
-		}
-
-		itemDef 
-		{
-			name				none
-			group				forcecontrols
-			type				ITEM_TYPE_YESNO
 			text				@MENUS_VR_FORCE_SPEED_FOV_ITEM
 			cvar				"cg_forceSpeedFOVAdjust"
-			rect				340 211 300 20
+			rect				340 191 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1537,12 +1503,12 @@
 
 			mouseenter 
 			{ 
-				show			highlight3
+				show			highlight2
 			}
 
 			mouseexit 
 			{ 
-				hide			highlight3
+				hide			highlight2
 			}			
 
 		}

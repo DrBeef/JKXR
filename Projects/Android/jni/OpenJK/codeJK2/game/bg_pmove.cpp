@@ -38,6 +38,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../cgame/cg_local.h"	// yeah I know this is naughty, but we're shipping soon...
 #include "wp_saber.h"
 #include <float.h>
+#include <JKVR/VrClientInfo.h>
 
 extern qboolean G_DoDismemberment( gentity_t *self, vec3_t point, int mod, int damage, int hitLoc, qboolean force = qfalse );
 extern qboolean G_EntIsUnlockedDoor( int entityNum );
@@ -8395,7 +8396,8 @@ extern void ForceHeal( gentity_t *self );
 extern void ForceTelepathy( gentity_t *self );
 void PM_CheckForceUseButton( gentity_t *ent, usercmd_t *ucmd  )
 {
-	if ( !ent )
+	if ( !ent ||
+		(vr->weapon_stabilised && showPowers[cg.forcepowerSelect] >= FP_PUSH))
 	{
 		return;
 	}

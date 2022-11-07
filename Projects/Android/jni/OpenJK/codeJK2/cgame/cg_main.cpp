@@ -252,6 +252,7 @@ vmCvar_t	cg_drawFPS;
 vmCvar_t	cg_drawSnapshot;
 vmCvar_t	cg_drawAmmoWarning;
 vmCvar_t	cg_drawCrosshair;
+vmCvar_t	cg_drawCrosshairForce;
 vmCvar_t	cg_crosshairIdentifyTarget;
 vmCvar_t	cg_dynamicCrosshair;
 vmCvar_t	cg_crosshairForceHint;
@@ -322,7 +323,6 @@ vmCvar_t	cg_missionInfoCentered;
 vmCvar_t	cg_missionInfoFlashTime;
 vmCvar_t	cg_hudFiles;
 
-vmCvar_t	cg_showForcePowerDirection;
 vmCvar_t	cg_forceSpeedFOVAdjust;
 
 vmCvar_t vr_weapon_adjustment_1;
@@ -387,6 +387,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
 	{ &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE  },
 	{ &cg_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
+	{ &cg_drawCrosshairForce, "cg_drawCrosshairForce", "4", CVAR_ARCHIVE },
 	{ &cg_dynamicCrosshair, "cg_dynamicCrosshair", "1", CVAR_ARCHIVE },
 	{ &cg_crosshairIdentifyTarget, "cg_crosshairIdentifyTarget", "1", CVAR_ARCHIVE },
 	{ &cg_crosshairForceHint, "cg_crosshairForceHint", "1", CVAR_ARCHIVE|CVAR_SAVEGAME|CVAR_NORESTART },
@@ -459,7 +460,6 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_missionInfoCentered, "cg_missionInfoCentered", "1", CVAR_ARCHIVE },
 	{ &cg_missionInfoFlashTime, "cg_missionInfoFlashTime", "10000", 0  },
 	{ &cg_hudFiles, "cg_hudFiles", "ui/jk2hud.txt", CVAR_ARCHIVE},
-	{ &cg_showForcePowerDirection, "cg_showForcePowerDirection", "1", CVAR_ARCHIVE},
 	{ &cg_forceSpeedFOVAdjust, "cg_forceSpeedFOVAdjust", "1", CVAR_ARCHIVE},
 
 	//Default Weapon adjustments - these WILL be overridden
