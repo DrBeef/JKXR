@@ -1308,8 +1308,10 @@ void JKVR_Init()
 
 	vr_immersive_cinematics = Cvar_Get("vr_immersive_cinematics", "1", CVAR_ARCHIVE);
 	vr_screen_dist = Cvar_Get( "vr_screen_dist", "2.5", CVAR_ARCHIVE);
-	vr_weapon_velocity_trigger = Cvar_Get( "vr_weapon_velocity_trigger", "2.3", CVAR_ARCHIVE);
+	vr_weapon_velocity_trigger = Cvar_Get( "vr_weapon_velocity_trigger", "2.0", CVAR_ARCHIVE);
+	vr_force_velocity_trigger = Cvar_Get( "vr_force_velocity_trigger", "2.0", CVAR_ARCHIVE);
     vr_two_handed_weapons = Cvar_Get ("vr_two_handed_weapons", "1", CVAR_ARCHIVE);
+	vr_force_motion_controlled = Cvar_Get ("vr_force_motion_controlled", "1", CVAR_ARCHIVE);
 
 	cvar_t *expanded_menu_enabled = Cvar_Get ("expanded_menu_enabled", "0", CVAR_ARCHIVE);
 	if (FS_FileExists("expanded_menu.pk3")) {

@@ -5599,7 +5599,13 @@ void WP_ForceKnockdown( gentity_t *self, gentity_t *pusher, qboolean pull, qbool
 	self->forcePushTime = level.time + 600; // let the push effect last for 600 ms
 }
 
+void ForceThrowEx( gentity_t *self, qboolean pull, qboolean aimByViewAngles );
 void ForceThrow( gentity_t *self, qboolean pull )
+{
+	ForceThrowEx(self, pull, qfalse);
+}
+
+void ForceThrowEx( gentity_t *self, qboolean pull, qboolean aimByViewAngles )
 {//FIXME: pass in a target ent so we (an NPC) can push/pull just one targeted ent.
 	//shove things in front of you away
 	float		dist;
@@ -5721,10 +5727,11 @@ void ForceThrow( gentity_t *self, qboolean pull )
 	G_Sound( self, soundIndex );
 
 	vec3_t origin, angles;
-	if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
+	if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson && !aimByViewAngles)
 	{
 		BG_CalculateVROffHandPosition(origin, fwdangles);
-
+		AngleVectors( fwdangles, forward, right, NULL );
+		VectorCopy( origin, center );
 	}
 	else
 	{
@@ -8178,9 +8185,7 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 					self->client->ps.forceGripEntityInitialDist == ENTITYNUM_NONE)
 				{
 					vec3_t diff;
-					diff[2] = 0;
-					VectorSubtract2(self->client->renderInfo.handLPoint,
-									self->client->renderInfo.eyePoint, diff);
+					VectorSubtract(vr->offhandposition, vr->hmdposition, diff);
 					self->client->ps.forceGripEntityInitialDist = VectorLength(diff);
 				}
 
@@ -8199,13 +8204,11 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 				{//carry
 					if (isFirstPersonPlayer) {
 						vec3_t diff;
-						diff[2] = 0;
-						VectorSubtract2(self->client->renderInfo.handLPoint,
-										self->client->renderInfo.eyePoint, diff);
+						VectorSubtract(vr->offhandposition, vr->hmdposition, diff);
 						float length = VectorLength(diff);
-						if (fabs(length - self->client->ps.forceGripEntityInitialDist) > 1.0f) {
-							dist += (length - self->client->ps.forceGripEntityInitialDist) *
-									 5.0f;
+						float movedLength = (length - self->client->ps.forceGripEntityInitialDist) * cg_worldScale.value;
+						if (fabs(movedLength) > 1.0f) {
+							dist += movedLength * 5.0f;
 						}
 						if (dist > 384) {
 							dist = 384;

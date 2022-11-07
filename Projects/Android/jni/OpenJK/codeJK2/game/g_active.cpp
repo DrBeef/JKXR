@@ -1980,6 +1980,40 @@ usually be a couple times for each server frame on fast clients.
 */
 
 extern int G_FindLocalInterestPoint( gentity_t *self );
+extern void ForceGrip(gentity_t *ent);
+extern void ForceLightning(gentity_t *ent);
+extern void ForceTelepathy(gentity_t *ent);
+extern void ForceHeal(gentity_t *ent);
+extern void ForceThrowEx( gentity_t *self, qboolean pull, qboolean aimByViewAngles );
+static void ProcessGenericCmd(gentity_t *ent, byte cmd)
+{
+	switch(cmd) {
+		default:
+			break;
+		case GENCMD_FORCE_HEAL:
+			ForceHeal( ent );
+			break;
+		case GENCMD_FORCE_SPEED:
+			ForceSpeed( ent );
+			break;
+		case GENCMD_FORCE_THROW:
+			ForceThrowEx(ent, qfalse, qtrue);
+			break;
+		case GENCMD_FORCE_PULL:
+			ForceThrowEx(ent, qtrue, qtrue);
+			break;
+		case GENCMD_FORCE_DISTRACT:
+			ForceTelepathy(ent);
+			break;
+		case GENCMD_FORCE_GRIP:
+			ForceGrip(ent);
+			break;
+		case GENCMD_FORCE_LIGHTNING:
+			ForceLightning(ent);
+			break;
+	}
+}
+
 void ClientThink_real( gentity_t *ent, usercmd_t *ucmd ) 
 {
 	gclient_t	*client;
@@ -2767,6 +2801,8 @@ extern cvar_t	*g_skippingcin;
 
 	// perform a pmove
 	Pmove( &pm );
+
+	ProcessGenericCmd(ent, pm.cmd.generic_cmd);
 
 	// save results of pmove
 	if ( ent->client->ps.eventSequence != oldEventSequence ) 

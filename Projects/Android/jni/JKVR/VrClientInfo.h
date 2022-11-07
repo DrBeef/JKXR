@@ -61,6 +61,7 @@ typedef struct {
     bool primaryVelocityTriggeredAttack;
     float secondaryswingvelocity;
     bool secondaryVelocityTriggeredAttack;
+    vec3_t secondaryVelocityTriggerLocation;
 
     vec3_t offhandangles;
     vec3_t offhandangles_last; // Don't use this, it is just for calculating delta!
