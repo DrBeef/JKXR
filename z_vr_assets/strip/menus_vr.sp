@@ -3,7 +3,7 @@ CONFIG W:\bin\striped.cfg
 ID 100
 REFERENCE MENUS_VR
 DESCRIPTION "VR Menu Localizations"
-COUNT 98
+COUNT 102
 INDEX 0
 {
    REFERENCE COMMON_CONTROLS_ITEM
@@ -162,12 +162,12 @@ INDEX 30
 INDEX 31
 {
    REFERENCE FORCE_POWER_DIRECTION_ITEM
-   TEXT_LANGUAGE1 "Force Power Direction Hint:"
+   TEXT_LANGUAGE1 "OBSOLETE Force Power Direction Hint:"
 }
 INDEX 32
 {
    REFERENCE FORCE_POWER_DIRECTION_DESC
-   TEXT_LANGUAGE1 "Hint as to which direction a force power was fired."
+   TEXT_LANGUAGE1 "OBSOLETE Hint as to which direction a force power was fired."
 }
 INDEX 33
 {
@@ -402,7 +402,7 @@ INDEX 78
 INDEX 79
 {
    REFERENCE CHEATS_GIVE_SABER_DESC
-   TEXT_LANGUAGE1 "Gives only lighsaber."
+   TEXT_LANGUAGE1 "Gives only lighsaber (with powers to use it)."
 }
 INDEX 80
 {
@@ -412,7 +412,7 @@ INDEX 80
 INDEX 81
 {
    REFERENCE CHEATS_GIVE_WEAPONS_DESC
-   TEXT_LANGUAGE1 "Gives all weapons."
+   TEXT_LANGUAGE1 "Gives all weapons (including powers to use lightsaber)."
 }
 INDEX 82
 {
@@ -493,4 +493,24 @@ INDEX 97
 {
    REFERENCE CHEATS_ITEM
    TEXT_LANGUAGE1 "CHEATS"
+}
+INDEX 98
+{
+   REFERENCE WEAPON_CROSSHAIR_ITEM
+   TEXT_LANGUAGE1 "Weapon Crosshair:"
+}
+INDEX 99
+{
+   REFERENCE WEAPON_CROSSHAIR_DESC
+   TEXT_LANGUAGE1 "Select style of weapon crosshair or disable it."
+}
+INDEX 100
+{
+   REFERENCE FORCE_CROSSHAIR_ITEM
+   TEXT_LANGUAGE1 "Force Power Crosshair:"
+}
+INDEX 101
+{
+   REFERENCE FORCE_CROSSHAIR_DESC
+   TEXT_LANGUAGE1 "Select style of force power crosshair or disable it."
 }

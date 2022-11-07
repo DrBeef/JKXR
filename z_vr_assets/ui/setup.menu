@@ -1745,7 +1745,7 @@
 			group				video2
 			type				ITEM_TYPE_SLIDER
 			text				@MENUS0_VIDEO_BRIGHTNESS
-			cvarfloat			"r_gamma" 1 .5 3
+			cvarfloat			"r_gamma" 0.05 0.8 1.2
 			rect				305 251 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			120
@@ -1759,6 +1759,9 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
+				uiScript update "r_gamma" ;
+				setcvar			ui_r_modified	1
+				show			applyChanges
 			}
 
 			mouseenter 
@@ -1787,7 +1790,7 @@
 			}
 			rect				305 271 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
+			textalignx			120
 			textaligny			-2
 			font 				2
 			textscale 			0.8
@@ -1819,7 +1822,7 @@
 			cvarFloatList		{  @MENUS0_OFF 0 @MENUS0_ON 1 }
 			rect				305 291 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
+			textalignx			120
 			textaligny			-2
 			font 				2
 			textscale 			0.8
@@ -1838,8 +1841,7 @@
 			}
 			action 
 			{
-				play			"sound/interface/button1.wav" ; 
-
+				play			"sound/interface/button1.wav" ;
 			} 
 		}
 
@@ -1853,7 +1855,7 @@
 			cvarFloatList		{  @MENUS0_OFF 0 @MENUS0_ON 1 }
 			rect				305 311 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
+			textalignx			120
 			textaligny			-2
 			font 				2
 			textscale 			0.8
@@ -1888,7 +1890,7 @@
 			cvarFloatList		{  @MENUS0_OFF 0 @MENUS0_ON 1 }
 			rect				305 331 300 20
 			textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
+			textalignx			120
 			textaligny			-2
 			font				2
 			textscale			0.8
@@ -1922,7 +1924,7 @@
 			cvarFloatList		{  @MENUS0_OFF 0 @MENUS0_ON 1 }
 			rect				305 351 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
+			textalignx			120
 			textaligny			-2
 			font 				2
 			textscale 			0.8
@@ -2087,23 +2089,47 @@
 		//	OPTION FIELDS
 		//
 		//----------------------------------------------------------------------------------------------
+		itemDef
+		{
+			name				crosshair_back
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				472 189 32 24
+			background			"gfx/2d/iris_mono"
+			forecolor			1 1 1 0.8
+			visible			1
+			decoration
+			cvarTest			cg_drawcrosshair
+			hideCvar			{ 0 }
+		}
 		itemDef 
 		{	
 			name				draw_crosshair
 			group				options
-      		type				ITEM_TYPE_MULTI
-			text				@MENUS2_DRAW_CROSSHAIR
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_WEAPON_CROSSHAIR_ITEM
 			cvar				"cg_drawcrosshair"
-			cvarFloatList		{  @MENUS0_OFF 0 @MENUS0_ON 1 }
+			cvarFloatList		{
+				@MENUS0_OFF 0
+				" " 1
+				" " 2
+				" " 3
+				" " 4
+				" " 5
+				" " 6
+				" " 7
+				" " 8
+				" " 9
+			}
 			rect				305 191 300 20
-	   		textalign			ITEM_ALIGN_RIGHT
+			textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
 			font 				2
 			textscale 			0.8
 			forecolor			1 1 1 1
 			visible			0
-			descText			@MENUS2_TOGGLE_TO_SHOW_OR_HIDE
+			descText			@MENUS_VR_WEAPON_CROSSHAIR_DESC
 			action
 			{
 				play			"sound/interface/button1.wav"
@@ -2117,6 +2143,296 @@
 				hide			highlight2
 			} 
 		}
+		itemDef
+		{
+			name				crosshair1
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 192 24 18
+			background			"gfx/2d/crosshairb"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawcrosshair
+			showCvar			{ 1 }
+		}
+		itemDef
+		{
+			name				crosshair2
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 192 24 18
+			background			"gfx/2d/crosshairc"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawcrosshair
+			showCvar			{ 2 }
+		}
+		itemDef
+		{
+			name				crosshair3
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 192 24 18
+			background			"gfx/2d/crosshaird"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawcrosshair
+			showCvar			{ 3 }
+		}
+		itemDef
+		{
+			name				crosshair4
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 192 24 18
+			background			"gfx/2d/crosshaire"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawcrosshair
+			showCvar			{ 4 }
+		}
+		itemDef
+		{
+			name				crosshair5
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 192 24 18
+			background			"gfx/2d/crosshairf"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawcrosshair
+			showCvar			{ 5 }
+		}
+		itemDef
+		{
+			name				crosshair6
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 192 24 18
+			background			"gfx/2d/crosshairg"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawcrosshair
+			showCvar			{ 6 }
+		}
+		itemDef
+		{
+			name				crosshair7
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 192 24 18
+			background			"gfx/2d/crosshairh"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawcrosshair
+			showCvar			{ 7 }
+		}
+		itemDef
+		{
+			name				crosshair8
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 192 24 18
+			background			"gfx/2d/crosshairi"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawcrosshair
+			showCvar			{ 8 }
+		}
+		itemDef
+		{
+			name				crosshair9
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 192 24 18
+			background			"gfx/2d/crosshaira"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawcrosshair
+			showCvar			{ 9 }
+		}
+
+
+		itemDef
+		{
+			name				force_crosshair_back
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				472 209 32 24
+			background			"gfx/2d/iris_mono"
+			forecolor			1 1 1 0.8
+			visible			1
+			decoration
+			cvarTest			cg_drawCrosshairForce
+			hideCvar			{ 0 }
+		}
+		itemDef 
+		{	
+			name				draw_force_crosshair
+			group				options
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_FORCE_CROSSHAIR_ITEM
+			cvar				"cg_drawCrosshairForce"
+			cvarFloatList		{
+				@MENUS0_OFF 0
+				" " 1
+				" " 2
+				" " 3
+				" " 4
+				" " 5
+				" " 6
+				" " 7
+				" " 8
+				" " 9
+			}
+			rect				305 211 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			165
+			textaligny			-2
+			font 				2
+			textscale 			0.8
+			forecolor			1 1 1 1
+			visible			0
+			descText			@MENUS_VR_FORCE_CROSSHAIR_DESC
+			action
+			{
+				play			"sound/interface/button1.wav"
+			}
+			mouseenter 
+			{ 
+				show			highlight3
+			}
+			mouseexit 
+			{ 
+				hide			highlight3
+			} 
+		}
+		itemDef
+		{
+			name				force_crosshair1
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 212 24 18
+			background			"gfx/2d/crosshairb"
+			forecolor			0.6 0.6 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawCrosshairForce
+			showCvar			{ 1 }
+		}
+		itemDef
+		{
+			name				force_crosshair2
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 212 24 18
+			background			"gfx/2d/crosshairc"
+			forecolor			0.6 0.6 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawCrosshairForce
+			showCvar			{ 2 }
+		}
+		itemDef
+		{
+			name				force_crosshair3
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 212 24 18
+			background			"gfx/2d/crosshaird"
+			forecolor			0.6 0.6 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawCrosshairForce
+			showCvar			{ 3 }
+		}
+		itemDef
+		{
+			name				force_crosshair4
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 212 24 18
+			background			"gfx/2d/crosshaire"
+			forecolor			0.6 0.6 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawCrosshairForce
+			showCvar			{ 4 }
+		}
+		itemDef
+		{
+			name				force_crosshair5
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 212 24 18
+			background			"gfx/2d/crosshairf"
+			forecolor			0.6 0.6 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawCrosshairForce
+			showCvar			{ 5 }
+		}
+		itemDef
+		{
+			name				force_crosshair6
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 212 24 18
+			background			"gfx/2d/crosshairg"
+			forecolor			0.6 0.6 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawCrosshairForce
+			showCvar			{ 6 }
+		}
+		itemDef
+		{
+			name				force_crosshair7
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 212 24 18
+			background			"gfx/2d/crosshairh"
+			forecolor			0.6 0.6 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawCrosshairForce
+			showCvar			{ 7 }
+		}
+		itemDef
+		{
+			name				force_crosshair8
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 212 24 18
+			background			"gfx/2d/crosshairi"
+			forecolor			0.6 0.6 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawCrosshairForce
+			showCvar			{ 8 }
+		}
+		itemDef
+		{
+			name				force_crosshair9
+			group				options
+			style				WINDOW_STYLE_SHADER
+			rect				476 212 24 18
+			background			"gfx/2d/crosshaira"
+			forecolor			0.6 0.6 1 1
+			visible			0
+			decoration
+			cvarTest			cg_drawCrosshairForce
+			showCvar			{ 9 }
+		}
 
 
 		itemDef 
@@ -2127,7 +2443,7 @@
 			text				@MENUS0_IDENTIFY_TARGET
 			cvar				"cg_crosshairIdentifyTarget"
 			cvarFloatList		{  @MENUS0_OFF 0 @MENUS0_ON 1 }
-			rect				305 211 300 20
+			rect				305 231 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -2143,11 +2459,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight3
+				show			highlight4
 			}
 			mouseexit 
 			{ 
-				hide			highlight3
+				hide			highlight4
 			} 
 		}
 
@@ -2169,7 +2485,7 @@
 				@MENUS2_FREQUENTLY		5
 				@MENUS2_EXCESSIVELY		6
 			}
-			rect				305 231 300 20
+			rect				305 251 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -2186,11 +2502,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight4
+				show			highlight5
 			}
 			mouseexit 
 			{ 
-				hide			highlight4
+				hide			highlight5
 			} 
 		}
 
@@ -2211,7 +2527,7 @@
 			}
 			cvarTest			ui_iscensored
 			hideCvar			{ 1 }
-			rect				325 271 300 20
+			rect				325 291 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -2228,11 +2544,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight6
+				show			highlight7
 			}
 			mouseexit 
 			{ 
-				hide			highlight6
+				hide			highlight7
 			} 
 		}
 
@@ -2251,7 +2567,7 @@
 			}
 			cvarTest			ui_iscensored
 			hideCvar			{ 1 }
-			rect				325 291 300 20
+			rect				325 311 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -2268,11 +2584,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight7
+				show			highlight8
 			}
 			mouseexit 
 			{ 
-				hide			highlight7
+				hide			highlight8
 			} 
 		}
 

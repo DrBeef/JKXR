@@ -1824,7 +1824,8 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 	vec3_t endpos;
 	refEntity_t ent;
 
-	if ( !cg_drawCrosshair.integer ) {
+	if (( type == 1 && !cg_drawCrosshair.integer) ||
+			(type == 0 && !cg_drawCrosshairForce.integer)) {
 		return;
 	}
 
@@ -1860,7 +1861,8 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 	if (type == 0)
 	{
 		if (showPowers[cg.forcepowerSelect] == FP_HEAL ||
-				showPowers[cg.forcepowerSelect] == FP_SPEED)
+				showPowers[cg.forcepowerSelect] == FP_SPEED ||
+				vr->weapon_stabilised)
 		{
 			return;
 		}
@@ -1877,7 +1879,7 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 		w *= ( 1 + f );
 	}
 
-	ca = cg_drawCrosshair.integer;
+	ca = (type == 1) ? cg_drawCrosshair.integer : cg_drawCrosshairForce.integer;
 	if (ca < 0) {
 		ca = 0;
 	}
@@ -2093,7 +2095,8 @@ static void CG_ScanForCrosshairEntity( qboolean scanAll )
 		return;
 	}
 */
-	if ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON ) {
+	if ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON  ||
+			(!Q_stricmp( "misc_panel_turret", g_entities[cg.snap->ps.viewEntity].classname ))) {
 		//draw crosshair at endpoint
 		CG_DrawCrosshair(trace.endpos);
 	}
@@ -2778,9 +2781,11 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		CG_Error( "CG_DrawActive: Undefined stereoView" );
 	}
 
+	vr->remote_turret = (!Q_stricmp( "misc_panel_turret", g_entities[cg.snap->ps.viewEntity].classname ));
 	in_misccamera = ( !Q_stricmp( "misc_camera", g_entities[cg.snap->ps.viewEntity].classname ))
-			|| ( !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname ));
-	bool in_turret = ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON );
+			|| ( !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname )
+			|| vr->remote_turret);
+	bool emplaced_gun = ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON );
 
 	cg.refdef.worldscale = cg_worldScale.value;
 	if (!in_camera &&
@@ -2804,7 +2809,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}
 
-	if ((in_camera && vr->immersive_cinematics) || in_turret || cg.renderingThirdPerson)
+	if ((in_camera && vr->immersive_cinematics) || emplaced_gun || cg.renderingThirdPerson)
 	{
 		BG_ConvertFromVR(vr->hmdposition_offset, cg.refdef.vieworg, cg.refdef.vieworg);
 	}
@@ -2823,7 +2828,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		cgi_R_LAGoggles();
 	}
 
-	if (!in_turret && !in_misccamera && !in_camera) {
+	if (!emplaced_gun && !in_misccamera && !in_camera) {
 		//Vertical Positional Movement
 		cg.refdef.vieworg[2] -= DEFAULT_PLAYER_HEIGHT;
 		cg.refdef.vieworg[2] += (vr->hmdposition[1] + cg_heightAdjust.value) * cg_worldScale.value;

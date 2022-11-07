@@ -5725,20 +5725,6 @@ void ForceThrow( gentity_t *self, qboolean pull )
 	{
 		BG_CalculateVROffHandPosition(origin, fwdangles);
 
-		if (cg_showForcePowerDirection.integer)
-		{
-			vec3_t	color = { 0, 255, 0 };
-			AngleVectors( fwdangles, forward, right, NULL );
-			VectorCopy( origin, center );
-
-			//Quick hint as to where we fired
-			VectorMA( origin, radius, forward, end );
-			FX_AddLine( origin, end, 0.1f, 1.0f, 0.0f,
-						1.0f, 0.0f, 0.0f,
-						color, color, 0.0f,
-						500, cgi_R_RegisterShader( "gfx/misc/nav_line" ),
-						FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
-		}
 	}
 	else
 	{
@@ -6764,19 +6750,6 @@ void ForceTelepathy( gentity_t *self )
 	{
 		BG_CalculateVROffHandPosition(origin, angles);
 		AngleVectors(angles, forward, NULL, NULL);
-
-		if (cg_showForcePowerDirection.integer)
-		{
-			vec3_t	color = { 0, 255, 0 };
-			AngleVectors( angles, forward, NULL, NULL );
-			VectorMA( origin, 512, forward, end );
-			FX_AddLine( origin, end, 0.1f, 1.0f, 0.0f,
-						1.0f, 0.0f, 0.0f,
-						color, color, 0.0f,
-						500, cgi_R_RegisterShader( "gfx/misc/nav_line" ),
-						FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
-
-		}
 	}
 	else
 	{
@@ -7001,19 +6974,6 @@ void ForceGrip( gentity_t *self )
 	{
 		BG_CalculateVROffHandPosition(origin, angles);
 		AngleVectors(angles, forward, NULL, NULL);
-
-		if (cg_showForcePowerDirection.integer)
-		{
-			vec3_t	color = { 0, 255, 0 };
-			AngleVectors( angles, forward, NULL, NULL );
-			VectorMA( origin, FORCE_GRIP_DIST, forward, end );
-			FX_AddLine( origin, end, 0.1f, 1.0f, 0.0f,
-						1.0f, 0.0f, 0.0f,
-						color, color, 0.0f,
-						500, cgi_R_RegisterShader( "gfx/misc/nav_line" ),
-						FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
-
-		}
 	}
 	else
 	{

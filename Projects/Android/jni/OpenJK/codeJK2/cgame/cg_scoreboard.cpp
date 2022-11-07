@@ -490,7 +490,7 @@ qboolean CG_DrawScoreboard( void )
 	if (((cg.predicted_player_state.pm_type == PM_DEAD) && (cg.missionStatusDeadTime < level.time)) 
 		|| (cg.missionStatusShow))
 	{
-		//CG_MissionFailed();
+		CG_MissionFailed();
 		return qtrue;
 	}
 

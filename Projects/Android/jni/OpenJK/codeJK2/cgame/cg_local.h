@@ -573,6 +573,7 @@ extern	vmCvar_t		cg_drawFPS;
 extern	vmCvar_t		cg_drawSnapshot;
 extern	vmCvar_t		cg_drawAmmoWarning;
 extern	vmCvar_t		cg_drawCrosshair;
+extern	vmCvar_t		cg_drawCrosshairForce;
 extern	vmCvar_t		cg_dynamicCrosshair;
 extern	vmCvar_t		cg_crosshairForceHint;
 extern	vmCvar_t		cg_crosshairIdentifyTarget;
@@ -639,7 +640,6 @@ extern	vmCvar_t		cg_missionInfoCentered;
 extern	vmCvar_t		cg_missionInfoFlashTime;
 extern	vmCvar_t		cg_hudFiles;
 
-extern	vmCvar_t		cg_showForcePowerDirection;
 extern	vmCvar_t		cg_forceSpeedFOVAdjust;
 
 

@@ -217,7 +217,7 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
-				exec			"give weapon_saber;"
+				exec			"give weapon_saber; setSaberThrow 2; setSaberDefense 3; setSaberOffense 3;"
 			}
 		}
 
@@ -241,7 +241,7 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
-				exec			"give weapons;"
+				exec			"give weapons; setSaberThrow 2; setSaberDefense 3; setSaberOffense 3;"
 			}
 		}
 
@@ -289,7 +289,7 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
-				exec			"setforceall 2"
+				exec			"setforceall 3"
 			}
 		}
 
