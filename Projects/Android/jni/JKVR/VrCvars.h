@@ -10,5 +10,7 @@ extern cvar_t	*vr_switch_sticks;
 extern cvar_t	*vr_immersive_cinematics;
 extern cvar_t	*vr_screen_dist;
 extern cvar_t   *vr_weapon_velocity_trigger;
+extern cvar_t   *vr_force_velocity_trigger;
 extern cvar_t   *vr_two_handed_weapons;
+extern cvar_t   *vr_force_motion_controlled;
 
