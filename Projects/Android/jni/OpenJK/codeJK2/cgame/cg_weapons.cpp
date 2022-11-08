@@ -2651,6 +2651,18 @@ void CG_Weapon_f( void )
 
 void Cmd_UseInventory_f(gentity_t *ent);
 
+void CG_ExitZoom_f( )
+{
+	if ( cg.zoomMode == 2 )
+	{
+		G_SoundOnEnt( pm->gent, CHAN_AUTO, "sound/weapons/disruptor/zoomend.wav" );
+		// already zooming, so must be wanting to turn it off
+		cg.zoomMode = 0;
+		cg.zoomTime = cg.time;
+		cg.zoomLocked = qfalse;
+	}
+}
+
 void CG_ToggleSaber_f( )
 {
 	player->client->ps.saberActive = (qboolean)!player->client->ps.saberActive;

@@ -8261,7 +8261,7 @@ static qboolean Item_Paint(itemDef_t *item, qboolean bDraw)
 				while (1)
 				{
 					// FIXME - add some type of parameter in the menu file like descfont to specify the font for the descriptions for this menu.
-					textWidth = DC->textWidth(textPtr, fDescScale, 4);	//  item->font);
+					textWidth = DC->textWidth(textPtr, fDescScale, 0);	//  item->font);
 
 					if (parent->descAlignment == ITEM_ALIGN_RIGHT)
 					{
@@ -8297,7 +8297,7 @@ static qboolean Item_Paint(itemDef_t *item, qboolean bDraw)
 					}
 
 					// FIXME - add some type of parameter in the menu file like descfont to specify the font for the descriptions for this menu.
-					DC->drawText(xPos, parent->descY + iYadj, fDescScale, parent->descColor, textPtr, 0, parent->descTextStyle, 4);	//item->font);
+					DC->drawText(xPos, parent->descY + iYadj, fDescScale, parent->descColor, textPtr, 0, parent->descTextStyle, 0);	//item->font);
 					break;
 				}
 			}

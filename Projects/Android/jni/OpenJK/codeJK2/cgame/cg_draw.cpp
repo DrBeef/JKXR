@@ -2765,6 +2765,8 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	VectorNormalize( vright_n );
 	VectorNormalize( vup_n );
 
+	vr->cgzoommode = cg.zoomMode;
+
 	cg.refdef.stereoView = stereoView;
 	switch ( stereoView ) {
 	case STEREO_CENTER:
@@ -2790,11 +2792,21 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	cg.refdef.worldscale = cg_worldScale.value;
 	if (!in_camera &&
 		!in_misccamera &&
+		cg.zoomMode != 2 &&
 		!cg.renderingThirdPerson)
 	{
 		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
 		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
 									SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
+		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+	}
+
+	if (cg.zoomMode == 2)
+	{
+		cg.refdef.viewangles[ROLL] = vr->clientviewangles[ROLL];
+		cg.refdef.viewangles[PITCH] = vr->weaponangles[PITCH];
+		cg.refdef.viewangles[YAW] = (vr->clientviewangles[YAW] - vr->hmdorientation[YAW])
+				+ vr->weaponangles[YAW] + SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}
 

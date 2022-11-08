@@ -3976,9 +3976,12 @@ void WP_RunSaber( gentity_t *self, gentity_t *saber )
 		//figure out where saber should be
 		vec3_t	forward, saberHome, saberDest, fwdangles = {0};
 
-		if (self->client->ps.clientNum == 0)
+		if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
 		{
 			BG_CalculateVRWeaponPosition(saberHome, fwdangles);
+
+            //Ignore roll
+            fwdangles[ROLL] = 0;
 		}
 		else {
 			VectorCopy(self->client->ps.viewangles, fwdangles);

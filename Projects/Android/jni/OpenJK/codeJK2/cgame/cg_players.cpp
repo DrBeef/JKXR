@@ -4886,12 +4886,6 @@ void CG_Player(centity_t *cent ) {
 		return;
 	}
 
-	if (cg.snap->ps.stats[STAT_HEALTH] > 0) {
-		vr->weaponid = cg.snap->ps.weapon;
-	} else {
-		vr->weaponid = WP_NONE;
-	}
-
 	if (cent->gent->client->ps.clientNum == 0) {
 		vr->velocitytriggered = (!cg.renderingThirdPerson &&
 								 (cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE));

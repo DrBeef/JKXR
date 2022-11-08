@@ -16,7 +16,6 @@ typedef struct {
     bool player_moving;
     int cgzoommode;
 
-    int weaponid;
     int forceid;
 
     vec3_t hmdposition;

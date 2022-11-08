@@ -141,8 +141,6 @@ void CG_ToggleBinoculars( void )
 		cg.zoomTime = cg.time;
 		cgi_S_StartSound( NULL, cg.snap->ps.clientNum, CHAN_AUTO, cgs.media.zoomEnd );
 	}
-
-	vr->cgzoommode = cg.zoomMode;
 }
 
 void CG_ToggleLAGoggles( void )
@@ -185,8 +183,6 @@ void CG_ToggleLAGoggles( void )
 		cg.zoomTime = cg.time;
 		cgi_S_StartSound( NULL, cg.snap->ps.clientNum, CHAN_AUTO, cgs.media.zoomEnd );
 	}
-
-	vr->cgzoommode = cg.zoomMode;
 }
 
 void CG_LoadHud_f( void) 
@@ -211,6 +207,7 @@ void CG_ItemSelectorSelect_f( void );
 void CG_ItemSelectorNext_f( void );
 void CG_ItemSelectorPrev_f( void );
 void CG_ToggleSaber_f( void );
+void CG_ExitZoom_f( void );
 
 /* This array MUST be sorted correctly by alphabetical name field */
 static consoleCommand_t	commands[] = {
@@ -253,6 +250,7 @@ static consoleCommand_t	commands[] = {
 	{ "itemselectornext", CG_ItemSelectorNext_f },
 	{ "itemselectorprev", CG_ItemSelectorPrev_f },
 	{ "togglesaber", CG_ToggleSaber_f },
+	{ "exitzoom", CG_ExitZoom_f },
 };
 
 static const size_t numCommands = ARRAY_LEN( commands );

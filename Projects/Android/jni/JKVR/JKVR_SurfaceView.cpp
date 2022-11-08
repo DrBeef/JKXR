@@ -874,6 +874,17 @@ void JKVR_GetMove(float *forward, float *side, float *pos_forward, float *pos_si
 		*pitch = vr.weaponangles[PITCH];
 		*roll = 0.0f;
 	}
+	else if (vr.cgzoommode == 2)
+	{
+		*forward = 0.0f;
+		*pos_forward = 0.0f;
+		*up = 0.0f;
+		*side = 0.0f;
+		*pos_side = 0.0f;
+		*yaw = vr.snapTurn + vr.weaponangles[YAW];
+		*pitch = vr.weaponangles[PITCH];
+		*roll = vr.hmdorientation[ROLL];
+	}
 	else if (!vr.third_person) {
 		*forward = remote_movementForward;
 		*pos_forward = positional_movementForward;

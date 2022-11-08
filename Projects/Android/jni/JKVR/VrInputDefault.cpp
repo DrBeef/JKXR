@@ -21,6 +21,7 @@ Authors		:	Simon Brown
 #include "qcommon/q_shared.h"
 #include <qcommon/qcommon.h>
 #include <client/client.h>
+#include <statindex.h>
 #include "android/sys_local.h"
 #include "weapons.h"
 
@@ -155,16 +156,18 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                                     powf(vr.hmdposition[1] - pOff->HeadPose.Pose.Position.y, 2) +
                                     powf(vr.hmdposition[2] - pOff->HeadPose.Pose.Position.z, 2));
 
+         
         float controllerYawHeading = 0.0f;
         //Turn on weapon stabilisation?
         bool offhandGripPushed = (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger);
         if (offhandGripPushed)
         {
-            if (!vr.weapon_stabilised && vr.item_selector == 0)
+            if (!vr.weapon_stabilised && vr.item_selector == 0 &&
+                !vr.misc_camera)
             {
                 if (distance < STABILISATION_DISTANCE &&
                         vr_two_handed_weapons->integer &&
-                        vr.weaponid > WP_SABER) {
+                        cl.frame.ps.weapon >= WP_SABER) {
                     vr.weapon_stabilised = true;
                 } else {
                     vr.item_selector = 2;
@@ -190,7 +193,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
         //Do this early so we can suppress other button actions when item selector is up
         if (dominantGripPushed) {
-            if (vr.item_selector == 0) {
+            if (vr.item_selector == 0 && !vr.misc_camera) {
                 vr.item_selector = 1;
             }
         }
@@ -232,14 +235,36 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             }
         }
 
+        //Should we trigger the disruptor scope?
+        if (cl.frame.ps.weapon == WP_DISRUPTOR &&
+            cl.frame.ps.stats[STAT_HEALTH] > 0)
+        {
+            if (vr.weapon_stabilised &&
+                VectorLength(vr.weaponoffset) < 0.24f &&
+                vr.cgzoommode == 0) {
+                sendButtonAction("+altattack", true);
+            } else if ((VectorLength(vr.weaponoffset) >= 0.24f || !vr.weapon_stabilised) &&
+                vr.cgzoommode == 2) {
+                sendButtonActionSimple("exitzoom");
+            }
+            //We don't need to send the -altattack as the block below in the next frame will send it for us
+        }
+
         if (vr.cgzoommode > 0)
         {
             if (between(-0.2f, primaryJoystickX, 0.2f)) {
-                sendButtonAction("+attack", between(0.8f, pPrimaryJoystick->y, 1.0f));
-                sendButtonAction("+altattack", between(-1.0f, pPrimaryJoystick->y, -0.8f));
+                if (cl.frame.ps.weapon == WP_DISRUPTOR)
+                {
+                    sendButtonAction("+altattack", between(0.8f, pPrimaryJoystick->y, 1.0f));
+                }
+                else
+                {
+                    sendButtonAction("+attack", between(0.8f, pPrimaryJoystick->y, 1.0f));
+                    sendButtonAction("+altattack", between(-1.0f, pPrimaryJoystick->y, -0.8f));
+                }
             }
         }
-        else if (vr.weaponid == WP_SABER)
+        else if (cl.frame.ps.weapon == WP_SABER)
         {
             int mode = (int)Cvar_VariableValue("cg_thirdPerson");
             static bool switched = false;
@@ -316,7 +341,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
 
             //For melee right hand is alt attack and left hand is attack
-            if (vr.weaponid == WP_MELEE) {
+            if (cl.frame.ps.weapon == WP_MELEE) {
                 //Does weapon velocity trigger attack (melee) and is it fast enough
                 if (vr.velocitytriggered) {
                     static bool fired = false;
@@ -355,7 +380,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     ALOGV("**WEAPON EVENT**  veocity triggered -attack");
                     sendButtonAction("+attack", vr.secondaryVelocityTriggeredAttack);
                 }
-            } else if (vr.weaponid == WP_SABER) {
+            } else if (cl.frame.ps.weapon == WP_SABER) {
                 //Does weapon velocity trigger attack
                 if (vr.velocitytriggered) {
                     static bool fired = false;
@@ -556,20 +581,20 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 sendButtonAction("+moveup", (primaryButtonsNew & primaryButton1));
             }
 
-            //Alt Fire (B Button)
+            //B Button
             if ((primaryButtonsNew & primaryButton2) != (primaryButtonsOld & primaryButton2)) {
-                if (vr.cgzoommode > 0)
+                if (vr.cgzoommode == 1 || vr.cgzoommode == 3)
                 {
                     sendButtonActionSimple("invuse");
                 }
-                else if (vr.weaponid == WP_SABER && vr.velocitytriggered)
+                else if (cl.frame.ps.weapon == WP_SABER && vr.velocitytriggered)
                 {
                     //B button toggles saber on/off in first person
                     if (primaryButtonsNew & primaryButton2) {
                         sendButtonActionSimple("togglesaber");
                     }
                 }
-                else
+                else if (cl.frame.ps.weapon != WP_DISRUPTOR)
                 {
                     sendButtonAction("+altattack", (primaryButtonsNew & primaryButton2));
                 }
@@ -581,7 +606,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
             int thirdPerson = Cvar_VariableIntegerValue("cg_thirdPerson");
 
-            if (vr.weaponid == WP_SABER && !thirdPerson && vr.cgzoommode == 0)
+            if (cl.frame.ps.weapon == WP_SABER && !thirdPerson && vr.cgzoommode == 0)
             {
                 static bool previous_throwing = false;
                 previous_throwing = throwing;
@@ -757,11 +782,11 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     VectorSubtract(vr.secondaryVelocityTriggerLocation, vr.hmdposition, delta2);
                     if (VectorLength(delta1) > VectorLength(delta2))
                     {
-                        sendButtonActionSimple("useGivenForce 3"); // PULL
+                        sendButtonActionSimple(va("useGivenForce %i", FP_PULL));
                     }
                     else
                     {
-                        sendButtonActionSimple("useGivenForce 4"); // PUSH
+                        sendButtonActionSimple(va("useGivenForce %i", FP_PUSH));
                     }
 
                     vr.secondaryVelocityTriggeredAttack = false;
