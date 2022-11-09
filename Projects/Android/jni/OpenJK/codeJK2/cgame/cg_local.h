@@ -68,7 +68,9 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define	MAX_STEP_CHANGE		32
 
 #define	MAX_VERTS_ON_POLY	10
-#define	MAX_MARK_POLYS		256
+#define	MAX_MARK_POLYS		2048
+#define	MARK_TOTAL_TIME		10000
+#define	MARK_FADE_TIME		1000
 
 #define STAT_MINUS			10	// num frame for '-' stats digit
 
@@ -192,6 +194,7 @@ typedef centity_s centity_t;
 typedef struct markPoly_s {
 	struct markPoly_s	*prevMark, *nextMark;
 	int			time;
+	int			fadeTime; // custom fade time (to slow down fade of saber burn marks)
 	qhandle_t	markShader;
 	qboolean	alphaFade;		// fade alpha instead of rgb
 	float		color[4];
@@ -621,6 +624,7 @@ extern	vmCvar_t		cg_thirdPersonTargetDamp;
 extern	vmCvar_t		cg_saberAutoThird;
 extern	vmCvar_t		cg_gunAutoFirst;
 extern	vmCvar_t		cg_debugSaberCombat;
+extern	vmCvar_t		cg_saberBurnMarkExtraTime;
 
 extern	vmCvar_t		cg_zProj;
 extern	vmCvar_t		cg_stereoSeparation;

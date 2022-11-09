@@ -4388,19 +4388,25 @@ void CG_CreateSaberMarks( vec3_t start, vec3_t end, vec3_t normal )
 			v->st[1] = 0.5 + DotProduct( delta, axis[2] ) * (0.15f + Q_flrand(0.0f, 1.0f) * 0.05f);
 		}
 
-		// save it persistantly, do burn first
-		mark = CG_AllocMark();
-		mark->time = cg.time;
-		mark->alphaFade = qtrue;
-		mark->markShader = cgs.media.rivetMarkShader;
-		mark->poly.numVerts = mf->numPoints;
-		mark->color[0] = mark->color[1] = mark->color[2] = mark->color[3] = 255;
-		memcpy( mark->verts, verts, mf->numPoints * sizeof( verts[0] ) );
+		// Allow to prolong max saber mark time
+		cvar_t	*sabeBurnMarkExtraTime = gi.cvar( "cg_saberBurnMarkExtraTime", "0", 1 );
+		int extraTime = sabeBurnMarkExtraTime->value * MARK_TOTAL_TIME;
 
-		// And now do a glow pass
-		// by moving the start time back, we can hack it to fade out way before the burn does
+		if (sabeBurnMarkExtraTime->value == 0.0f) {
+			mark = CG_AllocMark();
+			mark->time = cg.time;
+			mark->time = cg.time + 8500;
+			mark->alphaFade = qtrue;
+			mark->markShader = cgs.media.rivetMarkShader;
+			mark->poly.numVerts = mf->numPoints;
+			mark->color[0] = mark->color[1] = mark->color[2] = mark->color[3] = 255;
+			memcpy(mark->verts, verts, mf->numPoints * sizeof(verts[0]));
+		}
+
+		// Instead do only the glow pass and make it slowly fade (to make it look like cooling down)
 		mark = CG_AllocMark();
-		mark->time = cg.time - 8500;
+		mark->time = cg.time + extraTime;
+		mark->fadeTime = MARK_TOTAL_TIME + extraTime;
 		mark->alphaFade = qfalse;
 		mark->markShader = cgi_R_RegisterShader("gfx/effects/saberDamageGlow" );
 		mark->poly.numVerts = mf->numPoints;

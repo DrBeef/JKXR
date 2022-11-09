@@ -225,8 +225,6 @@ void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
 CG_AddMarks
 ===============
 */
-#define	MARK_TOTAL_TIME		20000
-#define	MARK_FADE_TIME		10000
 
 void CG_AddMarks( void ) {
 	int			j;
@@ -270,9 +268,13 @@ void CG_AddMarks( void ) {
 		}
 
 		// fade all marks out with time
+		int markFadeTime = mp->fadeTime;
+		if (!markFadeTime) {
+				markFadeTime = MARK_FADE_TIME;
+			}
 		t = mp->time + MARK_TOTAL_TIME - cg.time;
-		if ( t < MARK_FADE_TIME ) {
-			fade = 255 * t / MARK_FADE_TIME;
+		if ( t < markFadeTime ) {
+				fade = 255 * t / markFadeTime;
 			if ( mp->alphaFade ) {
 				for ( j = 0 ; j < mp->poly.numVerts ; j++ ) {
 					mp->verts[j].modulate[3] = fade;
@@ -280,7 +282,7 @@ void CG_AddMarks( void ) {
 			}
 			else
 			{
-				float f = (float)t / MARK_FADE_TIME;
+				float f = (float)t / markFadeTime;
 				for ( j = 0 ; j < mp->poly.numVerts ; j++ ) {
 					mp->verts[j].modulate[0] = mp->color[0] * f;
 					mp->verts[j].modulate[1] = mp->color[1] * f;
