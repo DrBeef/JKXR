@@ -242,12 +242,11 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             if (vr.weapon_stabilised &&
                 VectorLength(vr.weaponoffset) < 0.24f &&
                 vr.cgzoommode == 0) {
-                sendButtonAction("+altattack", true);
+                sendButtonAction("disruptorscope", true);
             } else if ((VectorLength(vr.weaponoffset) >= 0.24f || !vr.weapon_stabilised) &&
                 vr.cgzoommode == 2) {
                 sendButtonActionSimple("exitzoom");
             }
-            //We don't need to send the -altattack as the block below in the next frame will send it for us
         }
 
         if (vr.cgzoommode > 0)
@@ -287,28 +286,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             {
                 sendButtonActionSimple("cg_thirdPerson 0");
             }
-        }
-
-        //Engage scope / virtual stock if conditions are right
-        bool scopeready = vr.weapon_stabilised && (distanceToHMD < SCOPE_ENGAGE_DISTANCE);
-        static bool lastScopeReady = qfalse;
-        if (scopeready != lastScopeReady) {
-            if (vr.scopedweapon && !vr.scopedetached) {
-                if (!vr.scopeengaged && scopeready) {
-                    ALOGV("**WEAPON EVENT**  trigger scope mode");
-                    sendButtonActionSimple("weapalt");
-                } else if (vr.scopeengaged && !scopeready) {
-                    ALOGV("**WEAPON EVENT**  disable scope mode");
-                    sendButtonActionSimple("weapalt");
-                }
-                lastScopeReady = scopeready;
-            }
-        }
-
-        //Engage scope / virtual stock (iron sight lock) if conditions are right
-        static bool scopeEngaged = qfalse;
-        if (scopeEngaged != vr.scopeengaged) {
-            scopeEngaged = vr.scopeengaged;
         }
 
         //dominant hand stuff first
@@ -403,7 +380,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             }
 
             if (vr.weapon_stabilised) {
-                if (vr.scopeengaged || vr_virtual_stock->integer == 1) {
+                if (vr_virtual_stock->integer == 1) {
                     //offset to the appropriate eye a little bit
                     vec2_t xy;
                     rotateAboutOrigin(Cvar_VariableValue("cg_stereoSeparation") / 2.0f, 0.0f,
@@ -418,7 +395,26 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                         VectorSet(vr.weaponangles, -degrees(atanf(y / zxDist)),
                                   -degrees(atan2f(x, -z)), 0);
                     }
-                } else {
+                }
+                else if (vr.cgzoommode == 2)
+                {
+                    float x =
+                            pOff->HeadPose.Pose.Position.x - vr.hmdposition[0];
+                    float y =
+                            pOff->HeadPose.Pose.Position.y - (vr.hmdposition[1] - 0.1f);
+                    float z =
+                            pOff->HeadPose.Pose.Position.z - vr.hmdposition[2];
+                    float zxDist = length(x, z);
+
+                    if (zxDist != 0.0f && z != 0.0f) {
+                        VectorSet(vr.weaponangles, -degrees(atanf(y / zxDist)),
+                                  -degrees(atan2f(x, -z)), vr.weaponangles[ROLL] /
+                                                           2.0f); //Dampen roll on stabilised weapon
+                        vr.weaponposition[1] += 0.1;
+                    }
+                }
+                else
+                {
                     float x =
                             pOff->HeadPose.Pose.Position.x - pWeapon->HeadPose.Pose.Position.x;
                     float y =
@@ -583,9 +579,9 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
             //B Button
             if ((primaryButtonsNew & primaryButton2) != (primaryButtonsOld & primaryButton2)) {
-                if (vr.cgzoommode == 1 || vr.cgzoommode == 3)
+                if (vr.cgzoommode)
                 {
-                    sendButtonActionSimple("invuse");
+                    sendButtonActionSimple("exitzoom");
                 }
                 else if (cl.frame.ps.weapon == WP_SABER && vr.velocitytriggered)
                 {
@@ -676,9 +672,9 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
             //Move a lot slower if scope is engaged
             remote_movementSideways =
-                    v[0] * (vr.scopeengaged ? 0.3f : 1.0f) * vr_movement_multiplier->value;
+                    v[0] * vr_movement_multiplier->value;
             remote_movementForward =
-                    v[1] * (vr.scopeengaged ? 0.3f : 1.0f) * vr_movement_multiplier->value;
+                    v[1] * vr_movement_multiplier->value;
             ALOGV("        remote_movementSideways: %f, remote_movementForward: %f",
                   remote_movementSideways,
                   remote_movementForward);
@@ -714,7 +710,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     (!vr.third_person && vr_turn_mode->integer == 1);
 
             static int increaseSnap = true;
-            if (!vr.item_selector && !vr.scopeengaged) {
+            if (!vr.item_selector) {
                 if (usingSnapTurn) {
                     if (primaryJoystickX > 0.7f) {
                         if (increaseSnap) {
@@ -793,8 +789,6 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 }
             }
         }
-
-        updateScopeAngles();
     }
 
 

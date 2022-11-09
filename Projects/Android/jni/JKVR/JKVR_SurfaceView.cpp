@@ -1751,8 +1751,17 @@ void JKVR_submitFrame()
 			layer.Textures[eye].SwapChainIndex = frameBuffer->TextureSwapChainIndex;
 
 			ovrMatrix4f projectionMatrix;
-			projectionMatrix = ovrMatrix4f_CreateProjectionFov(vr.fov, vr.fov,
-															   0.0f, 0.0f, 0.1f, 0.0f);
+
+			if (vr.cgzoommode)
+			{
+				projectionMatrix = ovrMatrix4f_CreateProjectionFov(vr.fov / 1.4, vr.fov / 1.4,
+																   0.0f, 0.0f, 0.1f, 0.0f);
+			}
+			else
+			{
+				projectionMatrix = ovrMatrix4f_CreateProjectionFov(vr.fov, vr.fov,
+																   0.0f, 0.0f, 0.1f, 0.0f);
+			}
 
 			layer.Textures[eye].TexCoordsFromTanAngles = ovrMatrix4f_TanAngleMatrixFromProjection(&projectionMatrix);
 

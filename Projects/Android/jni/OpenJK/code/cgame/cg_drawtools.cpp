@@ -28,10 +28,10 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
-	if (cg.drawingHUD && !vr->cin_camera && !vr->using_screen_layer && !vr->scopeengaged)
+	if (cg.drawingHUD && !vr->cin_camera && !vr->using_screen_layer)
 	{
-		float screenXScale = 1.0f / (cg.drawingHUD == CG_HUD_SCALED ? 2.5f : 1.2f);
-		float screenYScale = 1.0f / (cg.drawingHUD == CG_HUD_SCALED ? 2.5f : 1.2f);
+		float screenXScale = 1.0f / (cg.drawingHUD == CG_HUD_SCALED ? 2.5f : 1.0f);
+		float screenYScale = 1.0f / (cg.drawingHUD == CG_HUD_SCALED ? 2.5f : 1.0f);
 
 		float xoffset = cg.drawingHUD == CG_HUD_SCALED ? -20 : 0;
 		if (cg.refdef.stereoView == STEREO_LEFT) {

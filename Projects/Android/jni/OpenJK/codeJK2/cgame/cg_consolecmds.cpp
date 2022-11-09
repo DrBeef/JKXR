@@ -208,6 +208,7 @@ void CG_ItemSelectorNext_f( void );
 void CG_ItemSelectorPrev_f( void );
 void CG_ToggleSaber_f( void );
 void CG_ExitZoom_f( void );
+void CG_DisruptorScope_f( void );
 
 /* This array MUST be sorted correctly by alphabetical name field */
 static consoleCommand_t	commands[] = {
@@ -251,6 +252,7 @@ static consoleCommand_t	commands[] = {
 	{ "itemselectorprev", CG_ItemSelectorPrev_f },
 	{ "togglesaber", CG_ToggleSaber_f },
 	{ "exitzoom", CG_ExitZoom_f },
+	{ "disruptorscope", CG_DisruptorScope_f },
 };
 
 static const size_t numCommands = ARRAY_LEN( commands );

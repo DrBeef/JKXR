@@ -47,14 +47,6 @@ typedef struct {
 
     int item_selector = 0; // 1 - weapons/gadgets/saber stance, 2 - Force powers
 
-    //Lots of scope weapon stuff
-    bool scopeengaged;          // Scope has been engaged on a scoped weapon
-    bool scopedweapon;          // Weapon scope is available
-    bool scopedetached;         // Scope has been detached from weapon
-    bool detachablescope;       // Scope can be detached from weapon
-
-    bool hasbinoculars;
-
     bool velocitytriggered;
     float primaryswingvelocity;
     bool primaryVelocityTriggeredAttack;

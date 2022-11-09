@@ -2651,15 +2651,29 @@ void CG_Weapon_f( void )
 
 void Cmd_UseInventory_f(gentity_t *ent);
 
+extern float cg_zoomFov;	//from cg_view.cpp
+
 void CG_ExitZoom_f( )
 {
-	if ( cg.zoomMode == 2 )
+	if ( cg.zoomMode )
 	{
 		G_SoundOnEnt( pm->gent, CHAN_AUTO, "sound/weapons/disruptor/zoomend.wav" );
 		// already zooming, so must be wanting to turn it off
 		cg.zoomMode = 0;
 		cg.zoomTime = cg.time;
 		cg.zoomLocked = qfalse;
+	}
+}
+
+void CG_DisruptorScope_f( )
+{
+	if ( cg.zoomMode == 0 || cg.zoomMode == 3 )
+	{
+		G_SoundOnEnt( pm->gent, CHAN_AUTO, "sound/weapons/disruptor/zoomstart.wav" );
+		// not already zooming, so do it now
+		cg.zoomMode = 2;
+		cg.zoomLocked = qfalse;
+		cg_zoomFov = 80.0f;//(cg.overrides.active&CG_OVERRIDE_FOV) ? cg.overrides.fov : cg_fov.value;
 	}
 }
 

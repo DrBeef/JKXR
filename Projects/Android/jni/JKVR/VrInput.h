@@ -4,11 +4,7 @@
 
 #include "VrCommon.h"
 
-#define STABILISATION_DISTANCE   0.25
-#define SCOPE_ENGAGE_DISTANCE   0.25
-#define VSTOCK_ENGAGE_DISTANCE   0.25
-#define BINOCULAR_ENGAGE_DISTANCE   0.25
-#define VELOCITY_TRIGGER        1.0
+#define STABILISATION_DISTANCE   0.28
 
 extern ovrInputStateTrackedRemote leftTrackedRemoteState_old;
 extern ovrInputStateTrackedRemote leftTrackedRemoteState_new;
@@ -42,6 +38,5 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
 
 
 void CalculateShoulderPosition();
-void updateScopeAngles();
 
 #endif //vrinput_h
