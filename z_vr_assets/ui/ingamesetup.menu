@@ -1466,7 +1466,7 @@
 			name				vidrestart_background
 			group				vidrestart
 			style				WINDOW_STYLE_SHADER
-			rect				300 171 300 250	
+			rect				304 168 300 247
 			background			"gfx/menus/menu_boxred"					// Frame
 			forecolor			1 1 1 0.5
 			visible			0
@@ -1666,7 +1666,6 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
-				uiScript update "r_gamma" ;
 				setcvar			ui_r_modified	1
 				show			applyChanges
 			}

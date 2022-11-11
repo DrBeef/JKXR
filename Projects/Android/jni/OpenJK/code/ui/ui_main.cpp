@@ -960,27 +960,14 @@ static qboolean UI_RunMenuScript ( const char **args )
 		}
 		else if (Q_stricmp(name, "savegame") == 0)
 		{
-			char fileName[MAX_SAVELOADNAME];
-			char description[64];
 			// Create a new save game
-//			if ( !s_savedata[s_savegame.currentLine].currentSaveFileName)	// No line was chosen
-			{
-				CreateNextSaveName(fileName);	// Get a name to save to
-			}
-//			else	// Overwrite a current save game? Ask first.
-			{
-//				s_savegame.yes.generic.flags	= QMF_HIGHLIGHT_IF_FOCUS;
-//				s_savegame.no.generic.flags		= QMF_HIGHLIGHT_IF_FOCUS;
-
-//				strcpy(fileName,s_savedata[s_savegame.currentLine].currentSaveFileName);
-//				s_savegame.awaitingSave = qtrue;
-//				s_savegame.deletegame.generic.flags	= QMF_GRAYED;	// Turn off delete button
-//				break;
-			}
+			char fileName[MAX_SAVELOADNAME];
+			CreateNextSaveName(fileName);
 
 			// Save description line
-			ui.Cvar_VariableStringBuffer("ui_gameDesc",description,sizeof(description));
-			ui.SG_StoreSaveGameComment(description);
+			const char *serverInfo = sv.configstrings[CS_SERVERINFO];
+			const char *mapName = Info_ValueForKey( serverInfo, "mapname" );
+			ui.SG_StoreSaveGameComment(mapName);
 
 			ui.Cmd_ExecuteText( EXEC_APPEND, va("save %s\n", fileName));
 			s_savegame.saveFileCnt = -1;	//force a refresh the next time around
@@ -6560,7 +6547,9 @@ void ReadSaveDirectory (void)
 
 					struct tm *localTime;
 					localTime = localtime( &result );
-					strcpy(s_savedata[s_savegame.saveFileCnt].currentSaveFileDateTimeString,asctime( localTime ) );
+					char timeStr[20] = {0};
+					strftime( timeStr, sizeof( timeStr ), "%y/%m/%d %H:%M", localTime );
+					strcpy(s_savedata[s_savegame.saveFileCnt].currentSaveFileDateTimeString, timeStr );
 					s_savegame.saveFileCnt++;
 					if (s_savegame.saveFileCnt == MAX_SAVELOADFILES)
 					{

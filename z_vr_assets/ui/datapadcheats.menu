@@ -107,7 +107,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				100 80 200 20
+			rect				100 60 200 20
 			text				@MENUS_VR_CHEATS_GIVE_HEALTH_ITEM
 			descText		@MENUS_VR_CHEATS_GIVE_HEALTH_DESC
 			font				2
@@ -131,7 +131,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				100 105 200 20
+			rect				100 85 200 20
 			text				@MENUS_VR_CHEATS_GIVE_ARMOR_ITEM
 			descText		@MENUS_VR_CHEATS_GIVE_ARMOR_DESC
 			font				2
@@ -155,7 +155,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				100 130 200 20
+			rect				100 110 200 20
 			text				@MENUS_VR_CHEATS_GIVE_AMMO_ITEM
 			descText		@MENUS_VR_CHEATS_GIVE_AMMO_DESC
 			font				2
@@ -179,7 +179,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				100 155 200 20
+			rect				100 135 200 20
 			text				@MENUS_VR_CHEATS_GIVE_BATTERIES_ITEM
 			descText		@MENUS_VR_CHEATS_GIVE_BATTERIES_DESC
 			font				2
@@ -203,7 +203,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				340 80 200 20
+			rect				340 60 200 20
 			text				@MENUS_VR_CHEATS_GIVE_SABER_ITEM
 			descText		@MENUS_VR_CHEATS_GIVE_SABER_DESC
 			font				2
@@ -227,7 +227,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				340 105 200 20
+			rect				340 85 200 20
 			text				@MENUS_VR_CHEATS_GIVE_WEAPONS_ITEM
 			descText		@MENUS_VR_CHEATS_GIVE_WEAPONS_DESC
 			font				2
@@ -251,7 +251,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				340 130 200 20
+			rect				340 110 200 20
 			text				@MENUS_VR_CHEATS_GIVE_ITEMS_ITEM
 			descText		@MENUS_VR_CHEATS_GIVE_ITEMS_DESC
 			font				2
@@ -275,7 +275,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				340 155 200 20
+			rect				340 135 200 20
 			text				@MENUS_VR_CHEATS_GIVE_POWERS_ITEM
 			descText		@MENUS_VR_CHEATS_GIVE_POWERS_DESC
 			font				2
@@ -298,7 +298,7 @@
 			name				none
 			group				none
 			style				WINDOW_STYLE_EMPTY
-			rect				220 210 200 20
+			rect				220 170 200 20
 			text				@MENUS_VR_CHEATS_SABER_COLOR_TITLE
 			font				2
 			textscale			1
@@ -316,7 +316,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				190 235 50 20
+			rect				190 190 50 20
 			text				@MENUS_VR_CHEATS_SABER_COLOR_BLUE_ITEM
 			descText		@MENUS_VR_CHEATS_SABER_COLOR_BLUE_DESC
 			font				2
@@ -340,7 +340,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				240 235 48 20
+			rect				240 190 48 20
 			text				@MENUS_VR_CHEATS_SABER_COLOR_GREEN_ITEM
 			descText		@MENUS_VR_CHEATS_SABER_COLOR_GREEN_DESC
 			font				2
@@ -364,7 +364,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				288 235 50 20
+			rect				288 190 50 20
 			text				@MENUS_VR_CHEATS_SABER_COLOR_RED_ITEM
 			descText		@MENUS_VR_CHEATS_SABER_COLOR_RED_DESC
 			font				2
@@ -388,7 +388,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				340 235 50 20
+			rect				340 190 50 20
 			text				@MENUS_VR_CHEATS_SABER_COLOR_ORANGE_ITEM
 			descText		@MENUS_VR_CHEATS_SABER_COLOR_ORANGE_DESC
 			font				2
@@ -412,7 +412,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				400 235 50 20
+			rect				400 190 50 20
 			text				@MENUS_VR_CHEATS_SABER_COLOR_PURPLE_ITEM
 			descText		@MENUS_VR_CHEATS_SABER_COLOR_PURPLE_DESC
 			font				2
@@ -428,6 +428,40 @@
 				play			"sound/interface/button1.wav" ;
 				exec			"saberColor purple;"
 			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			rect				220 225 200 20
+			text				@MENUS_VR_CHEATS_SABER_MARK_COOL_DOWN_TITLE
+			font				2
+			textscale			1
+			textalignx			100
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			type				ITEM_TYPE_SLIDER
+			text				" "
+			cvarfloat		"cg_saberBurnMarkCoolDownTime" 0.1 0.0 1.0
+			rect				220 250 200 20
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			20
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			1
+			descText			@MENUS_VR_CHEATS_SABER_MARK_COOL_DOWN_DESC
 		}
 
 		//----------------------------------------------------------------------------------------------

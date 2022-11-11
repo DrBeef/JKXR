@@ -1,0 +1,857 @@
+// LOADGAME MENU 
+{
+	menuDef 
+	{
+		name					"loadgameMenu"
+		visible					0
+		fullScreen				1						// MENU_TRUE				
+		rect					0 0 640 480					// Size and position of the menu
+		focusColor				1 1 1 1					// Focus color for text and items
+		appearanceIncrement		75						// In miliseconds
+		descX					375
+		descY					425
+		descScale				.8
+		descColor				.235 .882 .847 1					// Focus color for text and items
+		descAlignment			ITEM_ALIGN_CENTER		
+		disablecolor			.5 .5 .5 1
+
+		onESC 
+		{ 
+			play				sound/interface/button1.wav
+			close				all
+			open				mainMenu
+		}
+		onOpen
+		{
+			uiScript	ReadSaveDirectory ;
+		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	MENU BACKGROUND
+		//
+		//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				frame_pic
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 640 480
+			background			"gfx/menus/menu1"					// Frame
+			forecolor			1 1 1 1
+			visible			1
+			decoration
+		}
+
+		// The saber glow on the left
+		itemDef 
+		{
+			name				saberglow
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				30 0 90 480
+			background			"gfx/menus/menu3"					// Frame
+			forecolor			0.8 0.8 0.8 1
+			visible			1
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+
+		// The starwars logo on the top
+		itemDef 
+		{
+			name				starwars
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				143 12 470 93
+			background			"gfx/menus/menu4"					// Frame
+			forecolor			1 1 1 1
+			visible			1
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+		// The saber halo on the left
+		itemDef 
+		{
+			name				saberhalo
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				-425 -185 1000 1000
+			background			"gfx/menus/menu2"					// Frame
+			forecolor			0.5 0.5 0.5 1
+			visible			1
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+		itemDef
+		{
+			name				logomodel
+			group				none
+			type 				ITEM_TYPE_MODEL
+			rect				-123 48 400 400
+			model_angle			90
+			model_rotation		3.5
+			asset_model			"models/map_objects/bespin/jk2logo.md3"
+//			model_fovx			37
+//			model_fovy			34
+//			model_origin		100 100 100
+			visible			1
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+		// The saber halo on the left
+		itemDef 
+		{
+			name				saberhalo2
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				-225 15 600 600
+			background			"gfx/menus/menu2b"					// Frame
+			forecolor			0.25 0.25 0.25 1
+			visible			1
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+		// Expanded menu shaders
+		// Sun red
+		itemDef
+		{
+			name				sun
+			group				none
+			rect				-40 145 300 300
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu2r"
+			forecolor			0.7 0.7 0.7 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+		// Sun halo
+		itemDef
+		{
+			name				sun_halo
+			group				none
+			rect				-95 100 400 400
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu2br"
+			forecolor			0.3 0.3 0.3 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+		// Long sunflare
+		itemDef
+		{
+			name				sunflares
+			group				none
+			rect				-235 -60 700 700
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu2br"
+			forecolor			0.3 0.3 0.3 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+
+		// Expanded Menu Background Video
+		itemDef
+		{
+			name				background_video
+			group				none
+			rect				0 -100 640 680
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/expanded_menu_video_1"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_video
+			showCvar			{ 1 }
+		}
+
+		// Expanded Menu Starwars Logo
+		itemDef
+		{
+			name				star_wars
+			group				none
+			rect				272 10 365 95
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/expanded_menu_logo"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	TOP MAIN MENU BUTTONS
+		//
+		//----------------------------------------------------------------------------------------------
+
+		// Big button "NEW"
+		itemDef 
+		{
+			name				newgamebutton_glow
+			group				glow
+			style				WINDOW_STYLE_SHADER
+			rect				115 115 130 24
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+		itemDef 
+		{
+			name				newgamebutton
+			group				toprow
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				115 115 130 24
+			text				@MENUS1_NEW
+			descText			@MENUS1_START_A_NEW_GAME
+			font				3
+			textscale			0.9
+			textaligny			0
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			3
+			textalignx			65
+			forecolor			0.64 0.65 1 1
+			visible			1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+
+			mouseEnter 
+			{ 
+				show			newgamebutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			newgamebutton_glow 
+			}	  	  
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			newgameMenu 
+			}
+		}
+
+		// Big button "LOAD"
+		itemDef 
+		{
+			name				loadgamebutton_glow
+			group				glow
+			style				WINDOW_STYLE_SHADER
+			rect				245 115 130 24
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			// appearance_slot		1
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+		itemDef 
+		{
+			name				loadgamebutton
+			group				toprow
+			text				@MENUS1_LOAD
+			descText			@MENUS1_LOAD_A_SAVED_GAME
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				245 115 130 24
+			textaligny			0
+			font				3
+			textscale			0.9
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			3
+			textalignx			65
+			forecolor			1 1 1 1
+			visible			1
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+
+			mouseEnter 
+			{ 
+				show			loadgamebutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			loadgamebutton_glow 
+			}	  	  
+		}
+
+		// Big button "CONTROLS"
+		itemDef 
+		{
+			name				controlsbutton_glow
+			group				glow
+			style				WINDOW_STYLE_SHADER
+			rect				375 115 130 24
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+		itemDef {
+			name				controlsbutton
+			group				toprow
+			text				@MENUS0_CONTROLS2
+			descText			@MENUS0_CONFIGURE_GAME_CONTROLS
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				375 115 130 24
+			font				3
+			textscale			0.9
+			textaligny			0
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			3
+			textalignx			65
+			backcolor			0 0 0 0
+			forecolor			0.64 0.65 1 1
+			visible				1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+			 
+			mouseEnter 
+			{ 
+				show			controlsbutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			controlsbutton_glow 
+			}	  	  
+			action 
+			{
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			controlsMenu ; 
+			}
+		}
+
+		// Big button "SETUP"
+		itemDef 
+		{
+			name				setupbutton_glow
+			group				glow
+			style				WINDOW_STYLE_SHADER
+			rect				505 115 130 24
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+		itemDef {
+			name				setupbutton
+			group				toprow
+			text				@MENUS0_SETUP
+			descText			@MENUS0_CONFIGURE_GAME_SETTINGS
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				505 115 130 24
+			font				3
+			textscale			0.9
+			textaligny			0
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			3
+			textalignx			65
+			backcolor			0 0 0 0
+			forecolor			0.64 0.65 1 1
+			visible				1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+			 
+			mouseEnter 
+			{ 
+				show			setupbutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			setupbutton_glow 
+			}	  	  
+			action 
+			{
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			setupMenu ; 
+			}
+		}
+
+		itemDef 
+		{
+			name				header_line
+			group				toprow
+			style				WINDOW_STYLE_SHADER
+			rect				125 136 500 4
+			background			"gfx/menus/menu_line"					// Frame
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	OTHER MAIN MENU BUTTONS
+		//
+		//----------------------------------------------------------------------------------------------
+		// Credits hidden button
+		itemDef 
+		{
+			name				creditsbutton
+			group				othermain
+//			text				@CREDITS
+			descText			@MENUS0_SHOW_GAME_CREDITS
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				51 284 52 60
+			font				2
+			textscale			1
+			textaligny			0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			46
+			backcolor			0 0 0 0
+			forecolor			0.65 0.65 1 1
+			visible				0
+
+			mouseEnter
+			{
+				setitemcolor		saberhalo2 	forecolor 	 0.7 0.7 0.7 1
+			}		
+			mouseExit
+			{
+				setitemcolor		saberhalo2 	forecolor 	 0.25 0.25 0.25 1
+			}		
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 	
+				close			all ; 
+				open			creditsMenu 
+			}
+		}
+
+		// EXIT button in lower left corner
+		// Big button "SETUP"
+		itemDef 
+		{
+			name				exitgamebutton_glow
+			group				glow
+			style				WINDOW_STYLE_SHADER
+			rect				115 444 130 24 
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+
+		itemDef 
+		{
+			name				exitgamebutton
+			group				othermain
+			text				@MENUS0_EXIT
+			descText			@MENUS1_JEDI_KNIGHT_II
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				115 444 130 24 
+			font				3
+			textscale			1
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			3
+			textalignx			65
+			textaligny			-1
+			forecolor			0.65 0.65 1 1
+			visible				1
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+
+			mouseEnter 
+			{ 
+				show			exitgamebutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			exitgamebutton_glow 
+			}	  	  
+			action 
+			{ 
+				play			"sound/weapons/saber/saberoff.mp3" ; 
+				close			all ; 
+				open			quitMenu 
+			}
+		}
+
+		// Expanded Menu Back Button
+		itemDef
+		{
+			name				back_menu_button_hover
+			group				highlights
+			rect				585 445 50 15
+			style				WINDOW_STYLE_SHADER
+			textalign			ITEM_ALIGN_RIGHT
+			background			"gfx/menus/expanded_menu_buttonback"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+
+		itemDef
+		{
+			name				back_menu_button
+			group				none
+			rect				585 445 50 15
+			text				@MENUS0_BACK
+			descText			@MENUS0_BACKUP_ONE_MENU
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			49
+			textaligny			0
+			textscale			0.53
+			textstyle			3
+			font				3
+			forecolor			0.65 0.65 1 1
+			visible				1
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+
+				hide			highlights
+
+				close			all
+				open			mainbackMenu
+			}
+
+			mouseEnter
+			{
+				show			back_menu_button_hover
+			}
+			mouseExit
+			{
+				hide			back_menu_button_hover
+			}
+		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//   LOAD GAME MENU specific stuff
+		//
+		//----------------------------------------------------------------------------------------------
+		// Load Game title
+		itemDef 
+		{
+			name				loadgame_title
+			group				none
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu_blendbox"
+			text				@MENUS1_LOAD_GAME
+      		rect				150 145 450 16
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			225
+			textaligny			-2
+			forecolor			1 1 1 1
+      		visible			1 
+			// appearance_slot		2
+  	    		decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+		itemDef 
+		{
+			name				loadgame_title
+			group				none
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/expanded_menu_box"
+			text				@MENUS1_LOAD_GAME
+			rect				140 145 486 16
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			241
+			textaligny			-1
+			forecolor			1 1 1 1
+			visible			1 
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+
+		itemDef 
+		{
+			name				loadgame_background
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				140 166 486 245	
+			background			"gfx/menus/expanded_menu_box"					// Frame
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
+		}
+		
+		itemDef 
+		{
+			name				loadgamelist
+			group				loadscreen
+			rect				145 170 285 230
+			type				ITEM_TYPE_LISTBOX
+			style				WINDOW_STYLE_FILLED
+			elementwidth		120
+			elementheight		16
+			font				2
+			textaligny			2 
+			textscale			0.7
+			border			1
+			bordersize			1
+			bordercolor			.5 .5 .5 .5
+			forecolor			0.65 0.65 1 1
+			backcolor			0 0 .5 .25
+			outlinecolor		.5 .5 .5 .5
+			elementtype			LISTBOX_TEXT
+			feeder			FEEDER_SAVEGAMES
+			notselectable
+			visible			1
+			columns			2 	0 35 155   160 25 102
+			mouseEnter 
+			{ 
+				setitemcolor	loadgamelist bordercolor .265 .824 .886 1
+			} 
+			mouseExit 
+			{ 
+				setitemcolor	loadgamelist bordercolor .5 .5 .5 .5
+			} 
+			doubleclick
+			{
+				play			sound/interface/button1.wav
+				uiScript		loadgame
+			}
+		}
+
+		itemDef 
+		{
+			name				loadgamepic
+			group				loadscreen
+			style				WINDOW_STYLE_EMPTY	
+			ownerdraw			236					//UI_ALLMAPS_SELECTION
+			font				2
+			textscale			.8
+			forecolor			1 1 1 1
+			rect				435 170 180 135
+			border				1
+			bordercolor			.265 .824 .886 .25
+			visible				1 
+		}
+
+		// loadgame button
+		itemDef 
+		{
+			name				loadgameaction_glow
+			group				glow
+			style				WINDOW_STYLE_SHADER
+			rect				440 330 175 25 
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				loadgameaction
+			group				actionbutton
+			text				@MENUS1_LOAD_GAME
+			descText			@MENUS1_LOAD_CHOSEN_GAME
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				440 330 175 25 
+			font				3
+			textscale			0.8
+			textalignx			175
+			textaligny			1
+			textalign			ITEM_ALIGN_RIGHT
+			textstyle			3
+			forecolor			0.65 0.65 1 1
+			visible			1
+			cvarTest			ui_SelectionOK
+			enableCvar			{ "1" }
+
+			mouseEnter 
+			{ 
+				show			loadgameaction_glow
+			} 
+			mouseExit 
+			{ 
+				hide			loadgameaction_glow
+			} 
+			action 
+			{ 
+				play			sound/interface/button1.wav ;
+				hide			glow ;
+				uiScript		loadgame
+			}
+		}
+
+		// deletegame button
+		itemDef 
+		{
+			name				deletegameaction_glow
+			group				glow
+			style				WINDOW_STYLE_SHADER
+			rect				440 355 175 25 
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				deletegamebutton
+			group				actionbutton
+			text				@MENUS1_DELETE_GAME
+			descText			@MENUS1_DELETE_CHOSEN_GAME
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				440 355 175 25 
+			font				3
+			textscale			0.8
+			textalignx			175
+			textaligny			1
+			textalign			ITEM_ALIGN_RIGHT
+			textstyle			3
+			forecolor			0.65 0.65 1 1
+			visible				1
+			cvarTest			ui_SelectionOK
+			enableCvar			{ "1" }
+
+			mouseEnter 
+			{ 
+				show			deletegameaction_glow
+			} 
+			mouseExit 
+			{ 
+				hide			deletegameaction_glow
+			} 
+			action
+			{ 
+				play			sound/interface/button1.wav ;
+				hide			glow ;
+				uiScript		deletegame
+			}
+		}
+
+		
+		// resumegame button
+		itemDef 
+		{
+			name				resumegameaction_glow
+			group				glow
+			style				WINDOW_STYLE_SHADER
+			rect				440 380 175 25 
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			name				resumeautobutton
+			group				actionbutton
+			text				@MENUS2_RESUME_MISSION
+			descText			@MENUS2_RESUME_LAST_MISSION_ENTERED
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				440 380 175 25 
+			font				3
+			textscale			0.8
+			textalignx			175
+			textaligny			1
+			textalign			ITEM_ALIGN_RIGHT
+			textstyle			3
+			forecolor			0.65 0.65 1 1
+			visible				1					// This button isn't used when not in game.
+			cvarTest			ui_ResumeOK
+			enableCvar			{ "1" }
+
+			mouseEnter 
+			{ 
+				show			resumegameaction_glow
+			} 
+			mouseExit 
+			{ 
+				hide			resumegameaction_glow
+			} 
+			action
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				hide			glow ;
+				uiScript		loadAuto
+			}
+		}
+
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
