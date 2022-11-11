@@ -141,6 +141,7 @@ typedef struct {
 	qhandle_t	handModel_relaxed;
 	qhandle_t	handModel_force;
 
+	qhandle_t	saberHilt;
 
 	qhandle_t	solidWhiteShader;
 	qhandle_t	electricBodyShader;

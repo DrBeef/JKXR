@@ -3401,7 +3401,6 @@ Adds a piece with modifications or duplications for powerups
 */
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cent )
 {
-	refEntity_t hiltEnt;
 	if ( !cent )
 	{
 		cgi_R_AddRefEntityToScene( ent );
@@ -3441,34 +3440,6 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		!gent->client->ps.powerups[PW_DISRUPTION] )
 	{
 		cgi_R_AddRefEntityToScene(ent);
-	}
-
-	if (player1stPersonSaber && !cent->currentState.saberInFlight && !vr->item_selector)
-	{
-		memset( &hiltEnt, 0, sizeof(refEntity_t) );
-		//hiltEnt.renderfx = RF_DEPTHHACK;
-		hiltEnt.hModel = cgi_R_RegisterModel( "models/weapons2/saber/saber_w.md3" );
-		vec3_t angles;
-		BG_CalculateVRSaberPosition(hiltEnt.origin, hiltEnt.angles);
-		//hiltEnt.angles[ROLL] += 180;
-		vec3_t axis[3];
-		AnglesToAxis(hiltEnt.angles, axis);
-		VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
-		VectorCopy(axis[1], hiltEnt.axis[1]);
-		VectorCopy(axis[0], hiltEnt.axis[2]);
-		VectorMA(hiltEnt.origin, 1.0f, hiltEnt.axis[2], hiltEnt.origin);
-		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
-		for (int i = 0; i < 3; ++i)
-			VectorScale(hiltEnt.axis[i], 0.85f, hiltEnt.axis[i]);
-
-		cgi_R_AddRefEntityToScene(&hiltEnt);
-
-		static int playingSaberSwingSound = 0;
-		if (vr->primaryVelocityTriggeredAttack && ((cg.time - playingSaberSwingSound) > 800))
-		{
-			cgi_S_StartSound ( hiltEnt.origin, cent->gent->s.number, CHAN_AUTO, cgi_S_RegisterSound( va( "sound/weapons/saber/saberhup%d.wav", Q_irand( 1, 9 ) ) ) );
-			playingSaberSwingSound = cg.time;
-		}
 	}
 
 	// Disruptor Gun Alt-fire
@@ -4388,25 +4359,36 @@ void CG_CreateSaberMarks( vec3_t start, vec3_t end, vec3_t normal )
 			v->st[1] = 0.5 + DotProduct( delta, axis[2] ) * (0.15f + Q_flrand(0.0f, 1.0f) * 0.05f);
 		}
 
-		// Allow to prolong max saber mark time
-		cvar_t	*sabeBurnMarkExtraTime = gi.cvar( "cg_saberBurnMarkExtraTime", "0", 1 );
-		int extraTime = sabeBurnMarkExtraTime->value * MARK_TOTAL_TIME;
-
-		if (sabeBurnMarkExtraTime->value == 0.0f) {
-			mark = CG_AllocMark();
-			mark->time = cg.time;
-			mark->time = cg.time + 8500;
-			mark->alphaFade = qtrue;
-			mark->markShader = cgs.media.rivetMarkShader;
-			mark->poly.numVerts = mf->numPoints;
-			mark->color[0] = mark->color[1] = mark->color[2] = mark->color[3] = 255;
-			memcpy(mark->verts, verts, mf->numPoints * sizeof(verts[0]));
+		// Allow to prolong saber mark cool down time
+		int glowFadeTime = MARK_FADE_TIME + (cg_saberBurnMarkCoolDownTime.value * MARK_TOTAL_TIME);
+		// If glow fade time is longer than mark time, prolong mark time
+		int glowExtraTime;
+		if (glowFadeTime > MARK_TOTAL_TIME - 8500) {
+			glowExtraTime = glowFadeTime - (MARK_TOTAL_TIME - 8500);
+		} else {
+			glowExtraTime = 0;
+		}
+		// Maker sure burn mark is always visible for some time after glow cool down
+		int burnExtraTime;
+		if (glowFadeTime > MARK_TOTAL_TIME - MARK_FADE_TIME) {
+			burnExtraTime = glowFadeTime - (MARK_TOTAL_TIME - MARK_FADE_TIME);
+		} else {
+			burnExtraTime = 0;
 		}
 
-		// Instead do only the glow pass and make it slowly fade (to make it look like cooling down)
+		// Save it persistantly, do burn first
 		mark = CG_AllocMark();
-		mark->time = cg.time + extraTime;
-		mark->fadeTime = MARK_TOTAL_TIME + extraTime;
+		mark->time = cg.time + burnExtraTime;
+		mark->alphaFade = qtrue;
+		mark->markShader = cgs.media.rivetMarkShader;
+		mark->poly.numVerts = mf->numPoints;
+		mark->color[0] = mark->color[1] = mark->color[2] = mark->color[3] = 255;
+		memcpy( mark->verts, verts, mf->numPoints * sizeof( verts[0] ) );
+
+		// And now do a glow pass
+		mark = CG_AllocMark();
+		mark->time = cg.time - 8500 + glowExtraTime;
+		mark->fadeTime = glowFadeTime;
 		mark->alphaFade = qfalse;
 		mark->markShader = cgi_R_RegisterShader("gfx/effects/saberDamageGlow" );
 		mark->poly.numVerts = mf->numPoints;
@@ -4491,7 +4473,9 @@ Ghoul2 Insert Start
 		// work the matrix axis stuff into the original axis and origins used.
 		gi.G2API_GiveMeVectorFromMatrix(boltMatrix, ORIGIN, org_);
 		gi.G2API_GiveMeVectorFromMatrix(boltMatrix, NEGATIVE_X, axis_[0]);//was NEGATIVE_Y, but the md3->glm exporter screws up this tag somethin' awful
-		if (!cent->gent->client->ps.saberInFlight && CG_getPlayer1stPersonSaber(cent))
+		if (!cent->gent->client->ps.saberInFlight &&
+			CG_getPlayer1stPersonSaber(cent) &&
+			cent->gent->client->ps.saberLockEnemy == ENTITYNUM_NONE)
 		{
 			vec3_t angles;
 			BG_CalculateVRSaberPosition(org_, angles);
@@ -4817,6 +4801,29 @@ Ghoul2 Insert End
 	// Pass in the renderfx flags attached to the saber weapon model...this is done so that saber glows
 	//	will get rendered properly in a mirror...not sure if this is necessary??
 	CG_DoSaber( org_, axis_[0], length, client->ps.saberLengthMax, saberColor, renderfx );
+
+	if (CG_getPlayer1stPersonSaber(cent) &&
+		cent->gent->client->ps.saberLockEnemy != ENTITYNUM_NONE)
+	{
+		refEntity_t hiltEnt;
+		memset( &hiltEnt, 0, sizeof(refEntity_t) );
+
+		hiltEnt.hModel = cgs.media.saberHilt;
+
+		VectorCopy(org_, hiltEnt.origin);
+		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
+		vectoangles(axis_[0], hiltEnt.angles);
+
+		vec3_t axis[3];
+		AnglesToAxis(hiltEnt.angles, axis);
+		VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
+		VectorCopy(axis[1], hiltEnt.axis[1]);
+		VectorCopy(axis[0], hiltEnt.axis[2]);
+		VectorMA(hiltEnt.origin, 1.0f, hiltEnt.axis[2], hiltEnt.origin);
+		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
+
+		cgi_R_AddRefEntityToScene(&hiltEnt);
+	}
 }
 
 //--------------- END SABER STUFF --------
@@ -6077,6 +6084,39 @@ Ghoul2 Insert End
 		vectoangles( legs.axis[0], cent->gent->client->renderInfo.eyeAngles );
 	}
 
+	}
+
+	if (CG_getPlayer1stPersonSaber(cent) && !cent->currentState.saberInFlight && !vr->item_selector &&
+			cent->gent->client->ps.saberLockEnemy == ENTITYNUM_NONE)
+	{
+		refEntity_t hiltEnt;
+		memset( &hiltEnt, 0, sizeof(refEntity_t) );
+
+		hiltEnt.hModel = cgs.media.saberHilt;
+
+		BG_CalculateVRSaberPosition(hiltEnt.origin, hiltEnt.angles);
+
+		vec3_t axis[3];
+		AnglesToAxis(hiltEnt.angles, axis);
+		VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
+		VectorCopy(axis[1], hiltEnt.axis[1]);
+		VectorCopy(axis[0], hiltEnt.axis[2]);
+		VectorMA(hiltEnt.origin, 1.0f, hiltEnt.axis[2], hiltEnt.origin);
+		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
+
+		for (auto & axi : hiltEnt.axis)
+			VectorScale(axi, 0.85f, axi);
+
+		cgi_R_AddRefEntityToScene(&hiltEnt);
+
+
+		//Should be a much better place to do this...
+		static int playingSaberSwingSound = 0;
+		if (vr->primaryVelocityTriggeredAttack && ((cg.time - playingSaberSwingSound) > 800))
+		{
+			cgi_S_StartSound ( hiltEnt.origin, cent->gent->s.number, CHAN_AUTO, cgi_S_RegisterSound( va( "sound/weapons/saber/saberhup%d.wav", Q_irand( 1, 9 ) ) ) );
+			playingSaberSwingSound = cg.time;
+		}
 	}
 
 	//FIXME: for debug, allow to draw a cone of the NPC's FOV...

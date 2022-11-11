@@ -341,6 +341,9 @@ qboolean PM_AdjustAnglesForBackAttack( gentity_t *ent, usercmd_t *ucmd )
 
 qboolean PM_AdjustAnglesForSaberLock( gentity_t *ent, usercmd_t *ucmd )
 {
+	//Don't do this in VR!
+	return qfalse;
+
 	if ( ent->client->ps.saberLockTime > level.time )
 	{
 		if ( ent->client->ps.viewEntity <= 0 || ent->client->ps.viewEntity >= ENTITYNUM_WORLD )
@@ -374,6 +377,9 @@ qboolean PM_AdjustAnglesForKnockdown( gentity_t *ent, usercmd_t *ucmd, qboolean 
 				ucmd->buttons = 0;
 			}
 		}
+
+		//Don't do this in VR!
+/*
 		if ( !PM_InForceGetUp( &ent->client->ps ) )
 		{//can't turn unless in a force getup
 			if ( ent->client->ps.viewEntity <= 0 || ent->client->ps.viewEntity >= ENTITYNUM_WORLD )
@@ -384,6 +390,7 @@ qboolean PM_AdjustAnglesForKnockdown( gentity_t *ent, usercmd_t *ucmd, qboolean 
 			ucmd->angles[YAW] = ANGLE2SHORT( ent->client->ps.viewangles[YAW] ) - ent->client->ps.delta_angles[YAW];
 			return qtrue;
 		}
+*/
 	}
 	return qfalse;
 }
