@@ -163,7 +163,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         if (offhandGripPushed)
         {
             if (!vr.weapon_stabilised && vr.item_selector == 0 &&
-                !vr.misc_camera)
+                !vr.misc_camera && !vr.cgzoommode)
             {
                 if (distance < STABILISATION_DISTANCE &&
                         vr_two_handed_weapons->integer &&
@@ -186,14 +186,11 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
         dominantGripPushed = (pDominantTrackedRemoteNew->Buttons &
                               ovrButton_GripTrigger) != 0;
-        bool dominantButton1Pushed = (pDominantTrackedRemoteNew->Buttons &
-                                      domButton1) != 0;
-        bool dominantButton2Pushed = (pDominantTrackedRemoteNew->Buttons &
-                                      domButton2) != 0;
 
         //Do this early so we can suppress other button actions when item selector is up
         if (dominantGripPushed) {
-            if (vr.item_selector == 0 && !vr.misc_camera) {
+            if (!vr.weapon_stabilised && vr.item_selector == 0
+                && !vr.misc_camera && !vr.cgzoommode) {
                 vr.item_selector = 1;
             }
         }
@@ -602,7 +599,8 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
             int thirdPerson = Cvar_VariableIntegerValue("cg_thirdPerson");
 
-            if (cl.frame.ps.weapon == WP_SABER && !thirdPerson && vr.cgzoommode == 0)
+            if (cl.frame.ps.weapon == WP_SABER && !thirdPerson &&
+                vr.cgzoommode == 0 && cl.frame.ps.stats[STAT_HEALTH] > 0)
             {
                 static bool previous_throwing = false;
                 previous_throwing = throwing;
@@ -773,10 +771,10 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             {
                 if (vr.secondaryVelocityTriggeredAttack)
                 {
-                    vec3_t delta1, delta2;
-                    VectorSubtract(vr.offhandposition, vr.hmdposition, delta1);
-                    VectorSubtract(vr.secondaryVelocityTriggerLocation, vr.hmdposition, delta2);
-                    if (VectorLength(delta1) > VectorLength(delta2))
+                    vec3_t start, end;
+                    VectorSubtract(vr.secondaryVelocityTriggerLocation, vr.hmdposition, start);
+                    VectorSubtract(vr.offhandposition, vr.hmdposition, end);
+                    if (VectorLength(end) < VectorLength(start))
                     {
                         sendButtonActionSimple(va("useGivenForce %i", FP_PULL));
                     }
