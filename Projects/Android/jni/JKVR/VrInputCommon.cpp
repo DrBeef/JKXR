@@ -33,6 +33,7 @@ cvar_t	*vr_weapon_velocity_trigger;
 cvar_t	*vr_force_velocity_trigger;
 cvar_t	*vr_two_handed_weapons;
 cvar_t	*vr_force_motion_controlled;
+cvar_t	*vr_crouch_toggle;
 
 ovrInputStateTrackedRemote leftTrackedRemoteState_old;
 ovrInputStateTrackedRemote leftTrackedRemoteState_new;

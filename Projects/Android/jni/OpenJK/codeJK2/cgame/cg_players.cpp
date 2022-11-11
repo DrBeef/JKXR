@@ -4670,25 +4670,9 @@ Ghoul2 Insert End
 	saber_colors_t	saberColor = client->ps.saberColor;
 	if (cg_debugSaberCombat.integer)
 	{
-		if (client->ps.saberLockEnemy != ENTITYNUM_NONE)
+		if (vr->saberBlockDebounce > cg.time)
 		{
 			saberColor = SABER_RED;
-		}
-		else if (client->ps.saberBlocked)
-		{
-			saberColor = SABER_ORANGE;
-		}
-		else if ( client->ps.saberDamageDebounceTime > level.time )
-		{
-			saberColor = SABER_YELLOW;
-		}
-		else if (saberTrail->inAction)
-		{
-			saberColor = SABER_GREEN;
-		}
-		else
-		{
-			saberColor = SABER_BLUE;
 		}
 	}
 
@@ -4802,8 +4786,15 @@ Ghoul2 Insert End
 	//	will get rendered properly in a mirror...not sure if this is necessary??
 	CG_DoSaber( org_, axis_[0], length, client->ps.saberLengthMax, saberColor, renderfx );
 
+    if (CG_getPlayer1stPersonSaber(cent) &&
+        cent->gent->client->ps.saberEventFlags & (SEF_BLOCKED|SEF_PARRIED) &&
+			vr->saberBlockDebounce < cg.time)
+    {
+		vr->saberBlockDebounce = cg.time + 200;
+    }
+
 	if (CG_getPlayer1stPersonSaber(cent) &&
-		cent->gent->client->ps.saberLockEnemy != ENTITYNUM_NONE)
+			cent->gent->client->ps.saberLockEnemy != ENTITYNUM_NONE)
 	{
 		refEntity_t hiltEnt;
 		memset( &hiltEnt, 0, sizeof(refEntity_t) );

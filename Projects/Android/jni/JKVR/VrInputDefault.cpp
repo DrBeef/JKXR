@@ -101,8 +101,12 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
     {
         //Set gun angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
         vec3_t rotation = {0};
-        rotation[PITCH] = 45;
-        QuatToYawPitchRoll(pWeapon->HeadPose.Pose.Orientation, rotation, vr.weaponangles_saber);
+
+        //if we are in saber block debounce, don't update the angles
+        if (vr.saberBlockDebounce < cl.serverTime) {
+            rotation[PITCH] = 45;
+            QuatToYawPitchRoll(pWeapon->HeadPose.Pose.Orientation, rotation, vr.weaponangles_saber);
+        }
         rotation[PITCH] = vr_weapon_pitchadjust->value;
         QuatToYawPitchRoll(pWeapon->HeadPose.Pose.Orientation, rotation, vr.weaponangles);
 
@@ -295,14 +299,16 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             VectorCopy(vr.weaponoffset, vr.weaponoffset_history[0]);
             vr.weaponoffset_history_timestamp[0] = vr.weaponoffset_timestamp;
 
-            VectorSet(vr.weaponposition, pWeapon->HeadPose.Pose.Position.x,
-                      pWeapon->HeadPose.Pose.Position.y, pWeapon->HeadPose.Pose.Position.z);
+            if (vr.saberBlockDebounce < cl.serverTime) {
+                VectorSet(vr.weaponposition, pWeapon->HeadPose.Pose.Position.x,
+                          pWeapon->HeadPose.Pose.Position.y, pWeapon->HeadPose.Pose.Position.z);
 
-            ///Weapon location relative to view
-            VectorSet(vr.weaponoffset, pWeapon->HeadPose.Pose.Position.x,
-                      pWeapon->HeadPose.Pose.Position.y, pWeapon->HeadPose.Pose.Position.z);
-            VectorSubtract(vr.weaponoffset, vr.hmdposition, vr.weaponoffset);
-            vr.weaponoffset_timestamp = Sys_Milliseconds();
+                ///Weapon location relative to view
+                VectorSet(vr.weaponoffset, pWeapon->HeadPose.Pose.Position.x,
+                          pWeapon->HeadPose.Pose.Position.y, pWeapon->HeadPose.Pose.Position.z);
+                VectorSubtract(vr.weaponoffset, vr.hmdposition, vr.weaponoffset);
+                vr.weaponoffset_timestamp = Sys_Milliseconds();
+            }
 
             vec3_t velocity;
             VectorSet(velocity, pWeapon->HeadPose.LinearVelocity.x,
@@ -644,7 +650,15 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             if ((secondaryButtonsNew & secondaryThumb) !=
                 (secondaryButtonsOld & secondaryThumb)) {
 
-                sendButtonAction("+movedown", (secondaryButtonsNew & secondaryThumb));
+                if (vr_crouch_toggle->integer)
+                {
+                    vr.crouched = !vr.crouched;
+                    sendButtonAction("+movedown", vr.crouched);
+                }
+                else
+                {
+                    sendButtonAction("+movedown", (secondaryButtonsNew & secondaryThumb));
+                }
             }
 
             //Use

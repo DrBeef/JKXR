@@ -1658,6 +1658,10 @@ Ghoul2 Insert End
 	cg.weaponSelect = WP_BRYAR_PISTOL;
 	cg.forcepowerSelect = FP_HEAL;
 
+	//reset some of the vr stuff here as we know we are starting afresh
+	vr->saberBlockDebounce = 0;
+	vr->crouched = false;
+
 	if (gbUseTheseValuesFromLoadSave)
 	{
 		gbUseTheseValuesFromLoadSave = qfalse;	// ack

@@ -14,7 +14,9 @@ typedef struct {
     bool weapon_stabilised;
     bool right_handed;
     bool player_moving;
+    bool crouched;
     int cgzoommode;
+    int saberBlockDebounce; // Amount of time after player is blocked that the saber position is fixed
 
     int forceid;
 
@@ -45,7 +47,7 @@ typedef struct {
     vec3_t weaponoffset_history[NUM_WEAPON_SAMPLES];
     float weaponoffset_history_timestamp[NUM_WEAPON_SAMPLES];
 
-    int item_selector = 0; // 1 - weapons/gadgets/saber stance, 2 - Force powers
+    int item_selector; // 1 - weapons/gadgets/saber stance, 2 - Force powers
 
     bool velocitytriggered;
     float primaryswingvelocity;
