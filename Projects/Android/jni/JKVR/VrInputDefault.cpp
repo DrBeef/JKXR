@@ -791,7 +791,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     VectorSubtract(vr.secondaryVelocityTriggerLocation, vr.hmdposition, start);
                     VectorSubtract(vr.offhandposition, vr.hmdposition, end);
                     float deltaLength = VectorLength(end) - VectorLength(start);
-                    if (fabs(deltaLength) > 0.25f) {
+                    if (fabs(deltaLength) > 0.2f) {
                         if (deltaLength < 0) {
                             sendButtonActionSimple(va("useGivenForce %i", FP_PULL));
                         } else {
