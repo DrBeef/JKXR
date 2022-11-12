@@ -790,16 +790,16 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     vec3_t start, end;
                     VectorSubtract(vr.secondaryVelocityTriggerLocation, vr.hmdposition, start);
                     VectorSubtract(vr.offhandposition, vr.hmdposition, end);
-                    if (VectorLength(end) < VectorLength(start))
-                    {
-                        sendButtonActionSimple(va("useGivenForce %i", FP_PULL));
-                    }
-                    else
-                    {
-                        sendButtonActionSimple(va("useGivenForce %i", FP_PUSH));
-                    }
+                    float deltaLength = VectorLength(end) - VectorLength(start);
+                    if (fabs(deltaLength) > 0.25f) {
+                        if (deltaLength < 0) {
+                            sendButtonActionSimple(va("useGivenForce %i", FP_PULL));
+                        } else {
+                            sendButtonActionSimple(va("useGivenForce %i", FP_PUSH));
+                        }
 
-                    vr.secondaryVelocityTriggeredAttack = false;
+                        vr.secondaryVelocityTriggeredAttack = false;
+                    }
                 }
             }
         }

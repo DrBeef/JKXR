@@ -601,6 +601,21 @@ void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, 
 	VectorRotate( point, m, dst );
 }
 
+
+
+void AxisMultiply (matrix3_t out, const matrix3_t axis1, const matrix3_t axis2)
+{
+	out[0][0] = axis1[0][0] * axis2[0][0] + axis1[0][1] * axis2[1][0] + axis1[0][2] * axis2[2][0];
+	out[0][1] = axis1[0][0] * axis2[0][1] + axis1[0][1] * axis2[1][1] + axis1[0][2] * axis2[2][1];
+	out[0][2] = axis1[0][0] * axis2[0][2] + axis1[0][1] * axis2[1][2] + axis1[0][2] * axis2[2][2];
+	out[1][0] = axis1[1][0] * axis2[0][0] + axis1[1][1] * axis2[1][0] + axis1[1][2] * axis2[2][0];
+	out[1][1] = axis1[1][0] * axis2[0][1] + axis1[1][1] * axis2[1][1] + axis1[1][2] * axis2[2][1];
+	out[1][2] = axis1[1][0] * axis2[0][2] + axis1[1][1] * axis2[1][2] + axis1[1][2] * axis2[2][2];
+	out[2][0] = axis1[2][0] * axis2[0][0] + axis1[2][1] * axis2[1][0] + axis1[2][2] * axis2[2][0];
+	out[2][1] = axis1[2][0] * axis2[0][1] + axis1[2][1] * axis2[1][1] + axis1[2][2] * axis2[2][1];
+	out[2][2] = axis1[2][0] * axis2[0][2] + axis1[2][1] * axis2[1][2] + axis1[2][2] * axis2[2][2];
+}
+
 void RotateAroundDirection( matrix3_t axis, float yaw ) {
 
 	// create an arbitrary axis[1]
