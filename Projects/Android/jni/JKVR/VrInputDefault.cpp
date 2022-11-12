@@ -652,8 +652,10 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
                 if (vr_crouch_toggle->integer)
                 {
-                    vr.crouched = !vr.crouched;
-                    sendButtonAction("+movedown", vr.crouched);
+                    if (secondaryButtonsOld & secondaryThumb) {
+                        vr.crouched = !vr.crouched;
+                        sendButtonAction("+movedown", vr.crouched);
+                    }
                 }
                 else
                 {

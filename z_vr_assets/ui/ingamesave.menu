@@ -644,7 +644,7 @@
 			feeder			FEEDER_SAVEGAMES
 			notselectable
 			visible			1
-			columns			2 	0 35 155   160 25 102
+			columns			2 	0 35 168   173 25 102
 			mouseEnter 
 			{ 
 				setitemcolor	savegamelist bordercolor .265 .824 .886 1

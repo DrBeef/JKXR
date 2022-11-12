@@ -19,13 +19,15 @@
 
 		onOpen 
 		{
-				uiScript 		loadControls
-				hide			forcecontrols
-				show			commoncontrols
-				hide			invcontrols
-				hide			comfortcontrols
 				show			setup_background
+				show			comfortcontrols
 				hide 			weaponcontrols
+				hide			forcecontrols
+				hide			invcontrols
+				setitemcolor		comfortcontrolbutton 		forecolor 1 1 1 1
+				setitemcolor		weaponscontrolbutton 		forecolor 0.64 0.65 1 1
+				setitemcolor		forcecontrolbutton 		forecolor 0.64 0.65 1 1
+				setitemcolor		inventorycontrolbutton 		forecolor 0.64 0.65 1 1
 		}
 
 		onClose 
@@ -113,9 +115,9 @@
 			model_angle			90
 			model_rotation		3.5
 			asset_model			"models/map_objects/bespin/jk2logo.md3"
-//			model_fovx			37
-//			model_fovy			34
-//			model_origin		100 100 100
+			// model_fovx			37
+			// model_fovy			34
+			// model_origin		100 100 100
 			visible			1
 			decoration
 			cvarTest			expanded_menu_enabled
@@ -629,10 +631,10 @@
 			showCvar			{ 1 }
 		}
 
-		// Common  button
+		// Comfort  button
 		itemDef 
 		{
-			name				commoncontrolbutton_glow
+			name				comfortbutton_glow
 			group				mods
 			style				WINDOW_STYLE_SHADER
 			rect				120 173 170 30
@@ -644,9 +646,9 @@
 
 		itemDef 
 		{
-			name				commoncontrolbutton
+			name				comfortcontrolbutton
 			group				none
-			text				@MENUS_VR_COMMON_CONTROLS_ITEM
+			text				@MENUS_VR_COMFORT_CONTROLS_ITEM
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
 			rect				120 173 170 30
@@ -658,30 +660,28 @@
 			textstyle			3
 			forecolor			0.65 0.65 1 1
 			visible			1
-			descText			@MENUS_VR_COMMON_CONTROLS_DESC
+			descText			@MENUS_VR_COMFORT_CONTROLS_DESC
 
 			mouseEnter 
 			{ 
-				show			commoncontrolbutton_glow
+				show			comfortbutton_glow
 			}
 			mouseExit 
 			{ 
-				hide			commoncontrolbutton_glow
+				hide			comfortbutton_glow
 			}	  	  
 			action 
 			{ 
 				play			sound/interface/button1 
-				show			setup_background 
-				hide 			weaponcontrols 
-				hide			forcecontrols 
-				show			commoncontrols 
-				hide			invcontrols 
-				hide			comfortcontrols 
-				setitemcolor		weaponscontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		forcecontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		commoncontrolbutton 		forecolor 1 1 1 1 
-				setitemcolor		inventorycontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		comfortcontrolbutton 		forecolor 0.64 0.65 1 1 
+				show			setup_background
+				show			comfortcontrols
+				hide 			weaponcontrols
+				hide			forcecontrols
+				hide			invcontrols
+				setitemcolor		comfortcontrolbutton 		forecolor 1 1 1 1
+				setitemcolor		weaponscontrolbutton 		forecolor 0.64 0.65 1 1
+				setitemcolor		forcecontrolbutton 		forecolor 0.64 0.65 1 1
+				setitemcolor		inventorycontrolbutton 		forecolor 0.64 0.65 1 1
 			}
 		}
 
@@ -727,17 +727,15 @@
 			action 
 			{ 
 				play			sound/interface/button1 
-				show			setup_background 
-				show 			weaponcontrols 
-				hide			forcecontrols 
-				hide			commoncontrols 
-				hide			invcontrols 
-				hide			comfortcontrols 
-				setitemcolor		weaponscontrolbutton 		forecolor 1 1 1 1 
-				setitemcolor		forcecontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		commoncontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		inventorycontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		comfortcontrolbutton 		forecolor 0.64 0.65 1 1 
+				show			setup_background
+				hide			comfortcontrols
+				show 			weaponcontrols
+				hide			forcecontrols
+				hide			invcontrols
+				setitemcolor		comfortcontrolbutton 		forecolor 0.64 0.65 1 1
+				setitemcolor		weaponscontrolbutton 		forecolor 1 1 1 1
+				setitemcolor		forcecontrolbutton 		forecolor 0.64 0.65 1 1
+				setitemcolor		inventorycontrolbutton 		forecolor 0.64 0.65 1 1
 			}
 		}
 
@@ -783,17 +781,15 @@
 			action 
 			{ 
 				play			sound/interface/button1 
-				show			setup_background 
+				show			setup_background
+				hide			comfortcontrols
 				hide 			weaponcontrols 
-				show			forcecontrols 
-				hide			commoncontrols 
-				hide			invcontrols  
-				hide			comfortcontrols 
-				setitemcolor		weaponscontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		forcecontrolbutton 		forecolor 1 1 1 1 
-				setitemcolor		commoncontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		inventorycontrolbutton 		forecolor 0.64 0.65 1 1 
+				show			forcecontrols
+				hide			invcontrols
 				setitemcolor		comfortcontrolbutton 		forecolor 0.64 0.65 1 1 
+				setitemcolor		weaponscontrolbutton 		forecolor 0.64 0.65 1 1
+				setitemcolor		forcecontrolbutton 		forecolor 1 1 1 1
+				setitemcolor		inventorycontrolbutton 		forecolor 0.64 0.65 1 1
 			}
 		}
 
@@ -826,7 +822,7 @@
 			textstyle			3
 			forecolor			0.65 0.65 1 1
 			visible			1
-			descText			@MENUS_VR_POWER_CONTROLS_DESC
+			descText			@MENUS_VR_INVENTORY_CONTROLS_DESC
 
 			mouseEnter 
 			{ 
@@ -839,73 +835,15 @@
 			action 
 			{ 
 				play			sound/interface/button1
-				show			setup_background 
+				show			setup_background
+				hide			comfortcontrols
 				hide 			weaponcontrols 
 				hide			forcecontrols
-				hide			commoncontrols 
-				show			invcontrols 
-				hide			comfortcontrols 
-				setitemcolor		weaponscontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		forcecontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		commoncontrolbutton 		forecolor 0.64 0.65 1 1 
-				setitemcolor		inventorycontrolbutton 		forecolor 1 1 1 1 
-				setitemcolor		comfortcontrolbutton 		forecolor 0.64 0.65 1 1 
-			}
-		}
-
-		// comfort  button
-		itemDef 
-		{
-			name				comfortcontrolbutton_glow
-			group				mods
-			style				WINDOW_STYLE_SHADER
-			rect				120 293 170 30
-			background			"gfx/menus/menu_blendbox2"			// Frame around button
-			forecolor			1 1 1 1
-			visible			0
-			decoration
-		}
-
-		itemDef 
-		{
-			name				comfortcontrolbutton
-			group				none
-			text				@MENUS_VR_COMFORT_CONTROLS_ITEM
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			rect				120 293 170 30
-			font				3
-			textscale			0.9
-			textalignx			170
-			textaligny			5
-			textalign			ITEM_ALIGN_RIGHT
-			textstyle			3
-			forecolor			0.65 0.65 1 1
-			visible			1
-			descText			@MENUS_VR_COMFORT_CONTROLS_DESC
-
-			mouseEnter 
-			{ 
-				show			comfortcontrolbutton_glow
-			}
-			mouseExit 
-			{ 
-				hide			comfortcontrolbutton_glow
-			}	  	  
-			action 
-			{ 
-				play			sound/interface/button1
-				show			setup_background
-				hide 			weaponcontrols
-				hide			forcecontrols
-				hide			commoncontrols
-				hide			invcontrols
-				show			comfortcontrols
+				show			invcontrols
+				setitemcolor		comfortcontrolbutton 		forecolor 0.64 0.65 1 1
 				setitemcolor		weaponscontrolbutton 		forecolor 0.64 0.65 1 1
 				setitemcolor		forcecontrolbutton 		forecolor 0.64 0.65 1 1
-				setitemcolor		commoncontrolbutton 		forecolor 0.64 0.65 1 1
-				setitemcolor		inventorycontrolbutton 		forecolor 0.64 0.65 1 1
-				setitemcolor		comfortcontrolbutton 		forecolor 1 1 1 1
+				setitemcolor		inventorycontrolbutton 		forecolor 1 1 1 1
 			}
 		}
 
@@ -1103,16 +1041,16 @@
 
 		//----------------------------------------------------------------------------------------------
 		//
-		//	COMMON MENU
+		//	COMFORT MENU
 		//
 		//----------------------------------------------------------------------------------------------
 		itemDef 
 		{
 			name				none
-			group				commoncontrols
+			group				comfortcontrols
 			type				ITEM_TYPE_SLIDER
 			text				@MENUS_VR_MOVEMENT_SPEED_ITEM
-			cvarfloat		"vr_movement_multiplier" 0.1 0.4 1.2
+			cvarfloat		"vr_movement_multiplier" 0 0.4 1.2
 			rect				305 191 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
@@ -1142,7 +1080,7 @@
 		itemDef 
 		{
 			name				none
-			group				commoncontrols
+			group				comfortcontrols
 			type				ITEM_TYPE_MULTI
 			text				@MENUS_VR_DIRECTION_MODE_ITEM
 			cvar				"vr_walkdirection"
@@ -1181,7 +1119,7 @@
 		itemDef 
 		{
 			name				none
-			group				commoncontrols
+			group				comfortcontrols
 			type				ITEM_TYPE_MULTI
 			text				@MENUS_VR_SMOOTH_TURN_ITEM
 			cvar				"vr_turn_mode"
@@ -1219,7 +1157,7 @@
 		itemDef 
 		{
 			name				none
-			group				commoncontrols
+			group				comfortcontrols
 			type				ITEM_TYPE_MULTI
 			text				@MENUS_VR_TURN_ANGLE_ITEM
 			cvar				"vr_turn_angle"
@@ -1257,7 +1195,7 @@
 		itemDef 
 		{
 			name				none
-			group				commoncontrols
+			group				comfortcontrols
 			type				ITEM_TYPE_YESNO
 			text				@MENUS_VR_SWITCH_STICKS_ITEM
 			cvar				"vr_switch_sticks"
@@ -1289,7 +1227,7 @@
 		itemDef 
 		{
 			name				none
-			group				commoncontrols
+			group				comfortcontrols
 			type				ITEM_TYPE_MULTI
 			text				@MENUS_VR_LEFT_HANDED_ITEM
 			cvar				"vr_control_scheme"
@@ -1321,6 +1259,144 @@
 			{ 
 				hide			highlight7
 			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_IMMERSIVE_CINEMATICS_ITEM
+			cvar				"vr_immersive_cinematics"
+			rect				305 311 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			@MENUS_VR_IMMERSIVE_CINEMATICS_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+		
+			mouseenter 
+			{ 
+				show			highlight8
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight8
+			}			
+		}
+
+		itemDef 
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_SCREEN_DISTANCE_ITEM
+			cvar				"vr_screen_dist"
+			cvarFloatList		
+			{ 
+				@MENUS_VR_SCREEN_DISTANCE_NEAR 1.5  
+				@MENUS_VR_SCREEN_DISTANCE_MEDIUM 2.5
+				@MENUS_VR_SCREEN_DISTANCE_FAR 3.5
+			}
+			rect				305 331 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			@MENUS_VR_SCREEN_DISTANCE_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+		
+			mouseenter 
+			{ 
+				show			highlight9
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight9
+			}			
+		}
+
+		itemDef 
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_HEIGHT_ADJUST_ITEM
+			cvarfloat 	"cg_heightAdjust" 0 0 1
+			rect				305 351 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			@MENUS_VR_HEIGHT_ADJUST_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+		
+			mouseenter 
+			{ 
+				show			highlight10
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight10
+			}			
+		}
+
+		itemDef 
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_CROUCH_TOGGLE_ITEM
+			cvar				"vr_crouch_toggle"
+			rect				305 371 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			@MENUS_VR_CROUCH_TOGGLE_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+		
+			mouseenter 
+			{ 
+				show			highlight11
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight11
+			}			
 		}
 
 
@@ -1375,7 +1451,7 @@
 			group				weaponcontrols
 			type				ITEM_TYPE_SLIDER
 			text				@MENUS_VR_WEAPON_PITCH_ITEM
-			cvarfloat			"vr_weapon_pitchadjust" 5 -25 5
+			cvarfloat			"vr_weapon_pitchadjust" 0 -25 5
 			rect				305 211 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
@@ -1471,6 +1547,40 @@
 
 		}
 
+		itemDef 
+		{
+			name				none
+			group				weaponcontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_WEAPON_VELOCITY_TRIGGER_ITEM
+			cvarfloat			"vr_weapon_velocity_trigger" 0 1.5 2.5
+			rect				305 271 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0 
+			// appearance_slot		2
+			descText			@MENUS_VR_WEAPON_VELOCITY_TRIGGER_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight6
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight6
+			}			
+
+		}
+
 
 
 		//----------------------------------------------------------------------------------------------
@@ -1508,6 +1618,74 @@
 			mouseexit 
 			{ 
 				hide			highlight2
+			}			
+
+		}
+
+		itemDef 
+		{
+			name				none
+			group				forcecontrols
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_FORCE_MOTION_TRIGGER_TOGGLE_ITEM
+			cvar				"vr_force_motion_controlled"
+			rect				340 211 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0 
+			// appearance_slot		2
+			descText			@MENUS_VR_FORCE_MOTION_TRIGGER_TOGGLE_ITEM
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight3
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight3
+			}			
+
+		}
+
+		itemDef 
+		{
+			name				none
+			group				forcecontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_FORCE_VELOCITY_TRIGGER_ITEM
+			cvarfloat		"vr_force_velocity_trigger" 0 1.5 2.5
+			rect				304 231 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0 
+			// appearance_slot		2
+			descText			@MENUS_VR_FORCE_VELOCITY_TRIGGER_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight4
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight4
 			}			
 
 		}
@@ -1550,183 +1728,5 @@
 				hide			highlight2
 			}
 		}
-
-
-
-		//----------------------------------------------------------------------------------------------
-		//
-		//	COMFORT MENU
-		//
-		//----------------------------------------------------------------------------------------------
-		itemDef 
-		{
-			name				none
-			group				comfortcontrols
-			type				ITEM_TYPE_YESNO
-			text				@MENUS_VR_IMMERSIVE_CINEMATICS_ITEM
-			cvar				"vr_immersive_cinematics"
-			rect				305 191 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			@MENUS_VR_IMMERSIVE_CINEMATICS_DESC
-			action 
-			{ 
-				play			sound/interface/button1
-			}
-		
-			mouseenter 
-			{ 
-				show			highlight2
-			}
-
-			mouseexit 
-			{ 
-				hide			highlight2
-			}			
-		}
-
-		itemDef 
-		{
-			name				none
-			group				comfortcontrols
-			type				ITEM_TYPE_MULTI
-			text				@MENUS_VR_SCREEN_DISTANCE_ITEM
-			cvar				"vr_screen_dist"
-			cvarFloatList		
-			{ 
-				@MENUS_VR_SCREEN_DISTANCE_NEAR 1.5  
-				@MENUS_VR_SCREEN_DISTANCE_MEDIUM 2.5
-				@MENUS_VR_SCREEN_DISTANCE_FAR 3.5
-			}
-			rect				305 211 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			@MENUS_VR_SCREEN_DISTANCE_DESC
-			action 
-			{ 
-				play			sound/interface/button1
-			}
-		
-			mouseenter 
-			{ 
-				show			highlight3
-			}
-
-			mouseexit 
-			{ 
-				hide			highlight3
-			}			
-		}
-
-		itemDef 
-		{
-			name				none
-			group				comfortcontrols
-			type				ITEM_TYPE_SLIDER
-			text				@MENUS_VR_HEIGHT_ADJUST_ITEM
-			cvarfloat 	"cg_heightAdjust" 0.2 0 1
-			rect				305 231 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			@MENUS_VR_HEIGHT_ADJUST_DESC
-			action 
-			{ 
-				play			sound/interface/button1
-			}
-		
-			mouseenter 
-			{ 
-				show			highlight4
-			}
-
-			mouseexit 
-			{ 
-				hide			highlight4
-			}			
-		}
-
-
-
-		//----------------------------------------------------------------------------------------------
-		//
-		//	Text
-		//
-		//----------------------------------------------------------------------------------------------
-		itemDef 
-		{
-			name				keyBindStatus
-			group				none
-			ownerdraw			250		// UI_KEYBINDSTATUS
-			text				@MENUS2_BLANK_1      
-			rect				320 425 0 0
-			textStyle			0
-			font				2
-			textscale			.8
-			textalign			ITEM_ALIGN_CENTER
-			forecolor			.235 .882 .847 1
-			visible				0
-			decoration 
-		}
-
-		itemDef 
-		{
-			name				slider_message
-			group				none
-			text				@MENUS0_MOVE_THE_SLIDER_TO_INCREASE      
-			rect				320 425 0 0
-			textStyle			0
-			font				2
-			textscale			.8
-			textalign			ITEM_ALIGN_CENTER
-			visible				0
-			decoration 
-		}
-
-		itemDef 
-		{
-			name				yesno_message
-			group				none
-			text				@MENUS0_CLICK_ON_FIELD_TO_TOGGLE  
-			rect				320 425 0 0
-			textStyle			0
-			font				2
-			textscale			.8
-			textalign			ITEM_ALIGN_CENTER
-			visible				0
-			decoration 
-		}
-
-		itemDef 
-		{
-			name				multi_message
-			group				none
-			text				@MENUS0_CLICK_ON_FIELD_TO_CHANGE
-			rect				320 425 0 0
-			textStyle			0
-			font				2
-			textscale			.8
-			textalign			ITEM_ALIGN_CENTER
-			visible				0
-			decoration 
-		}
-
 	}
 }

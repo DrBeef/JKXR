@@ -3,16 +3,16 @@ CONFIG W:\bin\striped.cfg
 ID 100
 REFERENCE MENUS_VR
 DESCRIPTION "VR Menu Localizations"
-COUNT 106
+COUNT 114
 INDEX 0
 {
    REFERENCE COMMON_CONTROLS_ITEM
-   TEXT_LANGUAGE1 "Common"
+   TEXT_LANGUAGE1 "OBSOLETE Common"
 }
 INDEX 1
 {
    REFERENCE COMMON_CONTROLS_DESC
-   TEXT_LANGUAGE1 "Common controls configuration."
+   TEXT_LANGUAGE1 "OBSOLETE Common controls configuration."
 }
 INDEX 2
 {
@@ -37,7 +37,7 @@ INDEX 5
 INDEX 6
 {
    REFERENCE COMFORT_CONTROLS_DESC
-   TEXT_LANGUAGE1 "Configure comfort options."
+   TEXT_LANGUAGE1 "Configure common controls and comfort options."
 }
 INDEX 7
 {
@@ -277,12 +277,12 @@ INDEX 53
 INDEX 54
 {
    REFERENCE SABER_AUTOBLOCKING_ITEM
-   TEXT_LANGUAGE1 "Lightsaber Auto Blocking:"
+   TEXT_LANGUAGE1 "OBSOLETE Lightsaber Auto Blocking:"
 }
 INDEX 55
 {
    REFERENCE SABER_AUTOBLOCKING_DESC
-   TEXT_LANGUAGE1 "Enables or disables auto blocking of enemy lightsaber."
+   TEXT_LANGUAGE1 "OBSOLETE Enables or disables auto blocking of enemy lightsaber."
 }
 INDEX 56
 {
@@ -533,4 +533,44 @@ INDEX 105
 {
    REFERENCE OVERWRITE_GAME_DESC
    TEXT_LANGUAGE1 "Overwrite chosen game."
+}
+INDEX 106
+{
+   REFERENCE WEAPON_VELOCITY_TRIGGER_ITEM
+   TEXT_LANGUAGE1 "Melee Trigger Speed:"
+}
+INDEX 107
+{
+   REFERENCE WEAPON_VELOCITY_TRIGGER_DESC
+   TEXT_LANGUAGE1 "Adjust how fast to move hand to trigger melee attack."
+}
+INDEX 108
+{
+   REFERENCE FORCE_MOTION_TRIGGER_TOGGLE_ITEM
+   TEXT_LANGUAGE1 "Gesture Triggered Force:"
+}
+INDEX 109
+{
+   REFERENCE FORCE_MOTION_TRIGGER_TOGGLE_DESC
+   TEXT_LANGUAGE1 "Toggles triggering of force powers by gesture."
+}
+INDEX 110
+{
+   REFERENCE FORCE_VELOCITY_TRIGGER_ITEM
+   TEXT_LANGUAGE1 "Force Trigger Speed:"
+}
+INDEX 111
+{
+   REFERENCE FORCE_VELOCITY_TRIGGER_DESC
+   TEXT_LANGUAGE1 "Adjust how fast to move hand to trigger force power."
+}
+INDEX 112
+{
+   REFERENCE CROUCH_TOGGLE_ITEM
+   TEXT_LANGUAGE1 "Crouch Toggle:"
+}
+INDEX 113
+{
+   REFERENCE CROUCH_TOGGLE_DESC
+   TEXT_LANGUAGE1 "Turn on to enable crouch toggle."
 }
