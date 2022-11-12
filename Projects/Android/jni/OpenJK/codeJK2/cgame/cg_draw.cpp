@@ -2512,6 +2512,24 @@ static qboolean CG_RenderingFromMiscCamera()
 	return qfalse;
 }
 
+
+/*
+-------------------------
+CG_DrawZoomBorders
+-------------------------
+*/
+
+static void CG_DrawZoomBorders( void )
+{
+	vec4_t	modulate;
+	modulate[0] = modulate[1] = modulate[2] = 0.0f;
+	modulate[3] = 1.0f;
+
+	int bar_height = 80;
+	CG_FillRect( 0, 0, 640, bar_height, modulate  );
+	CG_FillRect( 0, 480 - 80, 640, bar_height, modulate  );
+}
+
 /*
 =================
 CG_Draw2D
@@ -2553,6 +2571,11 @@ static void CG_Draw2D( void )
 
 	if (!vr->immersive_cinematics) {
 		CGCam_DrawWideScreen();
+	}
+
+	if (cg.zoomMode)
+	{
+		CG_DrawZoomBorders();
 	}
 
 	cg.drawingHUD = CG_HUD_SCALED;
@@ -2831,7 +2854,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	// offset vieworg appropriately if we're doing stereo separation
 	VectorCopy( cg.refdef.vieworg, baseOrg );
-	if ( separation != 0 && (!in_camera || vr->immersive_cinematics) && !in_misccamera) {
+	if ( separation != 0 && (!in_camera || vr->immersive_cinematics) && !in_misccamera && cg.zoomMode != 2 ) {
 		VectorMA( cg.refdef.vieworg, -separation, cg.refdef.viewaxis[1], cg.refdef.vieworg );
 	}
 
