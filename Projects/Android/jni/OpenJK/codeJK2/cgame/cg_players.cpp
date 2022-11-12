@@ -4790,7 +4790,8 @@ Ghoul2 Insert End
         cent->gent->client->ps.saberEventFlags & (SEF_BLOCKED|SEF_PARRIED) &&
 			vr->saberBlockDebounce < cg.time)
     {
-		vr->saberBlockDebounce = cg.time + 200;
+		cvar_t *vr_saber_block_debounce_time = gi.cvar("vr_saber_block_debounce_time", "200", CVAR_ARCHIVE); // defined in VrCvars.h
+		vr->saberBlockDebounce = cg.time + vr_saber_block_debounce_time->integer;
     }
 
 	if (CG_getPlayer1stPersonSaber(cent) &&
