@@ -1756,7 +1756,7 @@ void JKVR_submitFrame()
 
 			if (vr.cgzoommode)
 			{
-				projectionMatrix = ovrMatrix4f_CreateProjectionFov(vr.fov / 1.4, vr.fov / 1.4,
+				projectionMatrix = ovrMatrix4f_CreateProjectionFov(vr.fov / 1.3, vr.fov / 1.3,
 																   0.0f, 0.0f, 0.1f, 0.0f);
 			}
 			else
