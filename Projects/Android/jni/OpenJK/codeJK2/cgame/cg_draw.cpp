@@ -715,6 +715,47 @@ static qboolean CG_DrawCustomHealthHud( centity_t *cent )
 	return qtrue;
 }
 
+
+/*
+==============
+CG_DrawWeapReticle
+==============
+*/
+static void CG_DrawWeapReticle( void )
+{
+    vec4_t light_color = {0.7, 0.7, 0.7, 1};
+    vec4_t black = {0.0, 0.0, 0.0, 1};
+
+    float indent = 0.16;
+    float X_WIDTH=640;
+    float Y_HEIGHT=480;
+
+    float x = (X_WIDTH * indent), y = (Y_HEIGHT * indent), w = (X_WIDTH * (1-(2*indent))) / 2.0f, h = (Y_HEIGHT * (1-(2*indent))) / 2;
+
+    // sides
+    CG_FillRect( 0, 0, (X_WIDTH * indent), Y_HEIGHT, black );
+    CG_FillRect( X_WIDTH * (1 - indent), 0, (X_WIDTH * indent), Y_HEIGHT, black );
+    // top/bottom
+    CG_FillRect( X_WIDTH * indent, 0, X_WIDTH * (1-indent), Y_HEIGHT * indent, black );
+    CG_FillRect( X_WIDTH * indent, Y_HEIGHT * (1-indent), X_WIDTH * (1-indent), Y_HEIGHT * indent, black );
+
+    {
+        // center
+        if ( cgs.media.reticleShader ) {
+            cgi_R_DrawStretchPic( x, y, w, h, 0, 0, 1, 1, cgs.media.reticleShader );    // tl
+            cgi_R_DrawStretchPic( x + w, y, w, h, 1, 0, 0, 1, cgs.media.reticleShader );  // tr
+            cgi_R_DrawStretchPic( x, y + h, w, h, 0, 1, 1, 0, cgs.media.reticleShader );    // bl
+            cgi_R_DrawStretchPic( x + w, y + h, w, h, 1, 1, 0, 0, cgs.media.reticleShader );  // br
+        }
+
+        // hairs
+        CG_FillRect( 84, 239, 177, 2, black );   // left
+        CG_FillRect( 320, 242, 1, 58, black );   // center top
+        CG_FillRect( 319, 300, 2, 178, black );  // center bot
+        CG_FillRect( 380, 239, 177, 2, black );  // right
+    }
+}
+
 //--------------------------------------
 static void CG_DrawBatteryCharge( void )
 {
@@ -1838,7 +1879,7 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 		return;
 	}
 
-	if ( cg.zoomMode > 0 && cg.zoomMode < 3 )
+	if ( cg.zoomMode )
 	{
 		//not while scoped
 		return;
@@ -2490,7 +2531,7 @@ static qboolean CG_RenderingFromMiscCamera()
 			// don't render other 2d stuff
 			return qtrue;
 		}
-		if ( !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname ))
+		if (vr->remote_droid)
 		{
 			//Render as if we are looking through a camera
 			CG_DrawPic( 0, 0, 640, 480, cgi_R_RegisterShader( "gfx/2d/workingCamera" ));
@@ -2573,7 +2614,11 @@ static void CG_Draw2D( void )
 		CGCam_DrawWideScreen();
 	}
 
-	if (cg.zoomMode)
+    if (cg.zoomMode == 4)
+    {
+        CG_DrawWeapReticle();
+    }
+	else if (cg.zoomMode != 0)
 	{
 		CG_DrawZoomBorders();
 	}
@@ -2806,16 +2851,27 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		CG_Error( "CG_DrawActive: Undefined stereoView" );
 	}
 
+	vr->remote_npc = !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname );
+	vr->remote_droid = vr->remote_npc &&
+			( !Q_stricmp( "mouse", g_entities[cg.snap->ps.viewEntity].NPC_type) ||
+				!Q_stricmp( "r2d2", g_entities[cg.snap->ps.viewEntity].NPC_type) ||
+				!Q_stricmp( "r5d2", g_entities[cg.snap->ps.viewEntity].NPC_type));
+
 	vr->remote_turret = (!Q_stricmp( "misc_panel_turret", g_entities[cg.snap->ps.viewEntity].classname ));
 	in_misccamera = ( !Q_stricmp( "misc_camera", g_entities[cg.snap->ps.viewEntity].classname ))
-			|| ( !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname )
-			|| vr->remote_turret);
+			|| vr->remote_droid
+			|| vr->remote_turret;
 	bool emplaced_gun = ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON );
 
 	cg.refdef.worldscale = cg_worldScale.value;
+
+	bool usingScope = (cg.zoomMode == 2 || cg.zoomMode == 4);
+	//Normal 1st person view angles
 	if (!in_camera &&
 		!in_misccamera &&
-		cg.zoomMode != 2 &&
+		!vr->remote_droid &&
+		!vr->remote_npc &&
+		!usingScope &&
 		!cg.renderingThirdPerson)
 	{
 		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
@@ -2824,7 +2880,17 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}
 
-	if (cg.zoomMode == 2)
+	//Controlling an NPC that isn't a droid
+	if (vr->remote_npc &&
+		!vr->remote_droid)
+	{
+		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
+		cg.refdef.viewangles[YAW] = cg.refdefViewAngles[YAW]; // Need to do this better.. results in laggy YAW, which is unpleasant
+		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+	}
+
+	//Sniper/E11 scope
+	if (usingScope)
 	{
 		cg.refdef.viewangles[ROLL] = vr->clientviewangles[ROLL];
 		cg.refdef.viewangles[PITCH] = vr->weaponangles[PITCH];
@@ -2833,6 +2899,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}
 
+	//Normal 3rd person view angles
 	if (!in_camera &&
 		!in_misccamera &&
 		cg.renderingThirdPerson)
@@ -2844,6 +2911,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}
 
+	//Immersive cinematic sequence 6DoF
 	if ((in_camera && vr->immersive_cinematics) || emplaced_gun || cg.renderingThirdPerson)
 	{
 		BG_ConvertFromVR(vr->hmdposition_offset, cg.refdef.vieworg, cg.refdef.vieworg);
@@ -2854,7 +2922,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	// offset vieworg appropriately if we're doing stereo separation
 	VectorCopy( cg.refdef.vieworg, baseOrg );
-	if ( separation != 0 && (!in_camera || vr->immersive_cinematics) && !in_misccamera && cg.zoomMode != 2 ) {
+	if ( separation != 0 && (!in_camera || vr->immersive_cinematics) && !in_misccamera && !usingScope ) {
 		VectorMA( cg.refdef.vieworg, -separation, cg.refdef.viewaxis[1], cg.refdef.vieworg );
 	}
 

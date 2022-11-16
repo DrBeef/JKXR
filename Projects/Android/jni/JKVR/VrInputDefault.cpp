@@ -237,20 +237,21 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         }
 
         //Should we trigger the disruptor scope?
-        if (cl.frame.ps.weapon == WP_DISRUPTOR &&
+        if ((cl.frame.ps.weapon == WP_DISRUPTOR ||
+                cl.frame.ps.weapon == WP_BLASTER) &&
             cl.frame.ps.stats[STAT_HEALTH] > 0)
         {
             if (vr.weapon_stabilised &&
                 VectorLength(vr.weaponoffset) < 0.24f &&
                 vr.cgzoommode == 0) {
-                sendButtonAction("disruptorscope", true);
+                sendButtonAction("enterscope", true);
             } else if ((VectorLength(vr.weaponoffset) >= 0.24f || !vr.weapon_stabilised) &&
-                vr.cgzoommode == 2) {
-                sendButtonActionSimple("exitzoom");
+                    (vr.cgzoommode == 2 || vr.cgzoommode == 4)) {
+                sendButtonActionSimple("exitscope");
             }
         }
 
-        if (vr.cgzoommode > 0)
+        if (vr.cgzoommode > 0 && vr.cgzoommode < 4)
         {
             if (between(-0.2f, primaryJoystickX, 0.2f)) {
                 if (cl.frame.ps.weapon == WP_DISRUPTOR)
@@ -399,7 +400,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                                   -degrees(atan2f(x, -z)), 0);
                     }
                 }
-                else if (vr.cgzoommode == 2)
+                else if (vr.cgzoommode == 2 || vr.cgzoommode == 4)
                 {
                     float x =
                             pOff->HeadPose.Pose.Position.x - vr.hmdposition[0];
@@ -724,7 +725,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     (!vr.third_person && vr_turn_mode->integer == 1);
 
             static int increaseSnap = true;
-            if (!vr.item_selector) {
+            if (!vr.item_selector && !vr.remote_npc) {
                 if (usingSnapTurn) {
                     if (primaryJoystickX > 0.7f) {
                         if (increaseSnap) {

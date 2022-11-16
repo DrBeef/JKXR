@@ -1411,7 +1411,7 @@ static qboolean	CG_CalcFov( void ) {
 		fov_x = vr ? vr->fov : cg_fov.value;
 
 		// Disable zooming when in third person
-		if ( cg.zoomMode && cg.zoomMode < 3 )//&& !cg.renderingThirdPerson ) // light amp goggles do none of the zoom silliness
+		if (( cg.zoomMode && cg.zoomMode < 3 ) || cg.zoomMode == 4)//&& !cg.renderingThirdPerson ) // light amp goggles do none of the zoom silliness
 		{
 			if ( !cg.zoomLocked )
 			{

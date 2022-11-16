@@ -149,6 +149,8 @@ typedef struct {
 	qhandle_t	shieldShader;
 	qhandle_t	boltShader;
 
+	qhandle_t	reticleShader;
+
 	// Disruptor zoom graphics
 	qhandle_t	disruptorMask;
 	qhandle_t	disruptorInsert;

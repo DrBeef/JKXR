@@ -2653,7 +2653,7 @@ void Cmd_UseInventory_f(gentity_t *ent);
 
 extern float cg_zoomFov;	//from cg_view.cpp
 
-void CG_ExitZoom_f( )
+void CG_ExitScope_f( )
 {
 	if ( cg.zoomMode )
 	{
@@ -2665,15 +2665,22 @@ void CG_ExitZoom_f( )
 	}
 }
 
-void CG_DisruptorScope_f( )
+void CG_EnterScope_f( )
 {
 	if ( cg.zoomMode == 0 || cg.zoomMode == 3 )
 	{
 		G_SoundOnEnt( pm->gent, CHAN_AUTO, "sound/weapons/disruptor/zoomstart.wav" );
 		// not already zooming, so do it now
-		cg.zoomMode = 2;
-		cg.zoomLocked = qfalse;
-		cg_zoomFov = 80.0f;//(cg.overrides.active&CG_OVERRIDE_FOV) ? cg.overrides.fov : cg_fov.value;
+		if (cg.weaponSelect == WP_DISRUPTOR) {
+			cg.zoomMode = 2;
+			cg_zoomFov = 80.0f;
+			cg.zoomLocked = qfalse;
+		} else {
+			//Our specially created E11 Blaster scope
+			cg.zoomMode = 4;
+			cg_zoomFov = 30.0f;
+			cg.zoomLocked = qtrue;
+		}
 	}
 }
 

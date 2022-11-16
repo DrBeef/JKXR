@@ -1309,6 +1309,9 @@ static void CG_RegisterGraphics( void ) {
 
 	cgs.media.boltShader			= cgi_R_RegisterShader( "gfx/misc/blueLine" );
 
+	cgs.media.reticleShader = cgi_R_RegisterShader( "gfx/weapon/scope" );
+
+
 	// FIXME: do these conditionally
 	cgi_R_RegisterShader( "gfx/2d/workingCamera" );
 	cgi_R_RegisterShader( "gfx/2d/brokenCamera" );
