@@ -1334,6 +1334,8 @@ void JKVR_Init()
     vr_two_handed_weapons = Cvar_Get ("vr_two_handed_weapons", "1", CVAR_ARCHIVE);
 	vr_force_motion_controlled = Cvar_Get ("vr_force_motion_controlled", "1", CVAR_ARCHIVE);
 	vr_crouch_toggle = Cvar_Get ("vr_crouch_toggle", "0", CVAR_ARCHIVE);
+	vr_irl_crouch_enabled = Cvar_Get ("vr_irl_crouch_enabled", "0", CVAR_ARCHIVE);
+	vr_irl_crouch_to_stand_ratio = Cvar_Get ("vr_irl_crouch_to_stand_ratio", "0.65", CVAR_ARCHIVE);
 	vr_saber_block_debounce_time = Cvar_Get ("vr_saber_block_debounce_time", "200", CVAR_ARCHIVE);
 
 	cvar_t *expanded_menu_enabled = Cvar_Get ("expanded_menu_enabled", "0", CVAR_ARCHIVE);
@@ -1697,6 +1699,13 @@ void JKVR_getHMDOrientation() {//Get orientation
 	setHMDPosition(positionHmd.x, positionHmd.y, positionHmd.z);
 
 	updateHMDOrientation();
+
+	// Max-height is set only once on start, or after re-calibration
+	// (ignore too low value which is sometimes provided on start)
+	if (!vr.maxHeight || vr.maxHeight < 1.0) {
+		vr.maxHeight = positionHmd.y;
+	}
+	vr.curHeight = positionHmd.y;
 
 	///ALOGV("        HMD-Position: %f, %f, %f", positionHmd.x, positionHmd.y, positionHmd.z);
 }

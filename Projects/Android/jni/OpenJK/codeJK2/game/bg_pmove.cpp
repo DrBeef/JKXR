@@ -3525,6 +3525,74 @@ static void PM_CheckDuck (void)
 		pm->ps->pm_flags |= PMF_DUCKED;
 		return;
 	}
+
+	// IRL Crouch
+	cvar_t *vr_irl_crouch_enabled = gi.cvar("vr_irl_crouch_enabled", "0", CVAR_ARCHIVE); // defined in VrCvars.h
+	if (vr && !pm->ps->clientNum && vr_irl_crouch_enabled->integer && (!cg.renderingThirdPerson || vr_irl_crouch_enabled->integer > 1)) {
+		// In-game view height always matches full stand height
+		// (we are crouching IRL, no need to artificially lower view)
+		pm->ps->viewheight = standheight + STANDARD_VIEWHEIGHT_OFFSET;
+
+		// Compute in-game height based on HMD height above floor
+		// (adjust height only when crouching, ignore IRL jumps)
+		int computedHeight = standheight;
+		if (crouchheight < standheight && vr->curHeight < vr->maxHeight) {
+			// Count minimum IRL crouch height based on maximum IRL height
+			cvar_t *vr_irl_crouch_to_stand_ratio = gi.cvar("vr_irl_crouch_to_stand_ratio", "0.65", CVAR_ARCHIVE); // defined in VrCvars.h
+			float minHeight = vr->maxHeight * vr_irl_crouch_to_stand_ratio->value;
+			if (vr->curHeight < minHeight) { // Do not allow to crawl (set min height)
+				computedHeight = crouchheight;
+			} else {
+				float heightRatio = (vr->curHeight - minHeight) / (vr->maxHeight - minHeight);
+				computedHeight = crouchheight + (int)(heightRatio * (standheight - crouchheight));
+			}
+		}
+
+		// When in the air, move origin (we are lifting or dropping legs)
+		bool liftingLegs = computedHeight < oldHeight;
+		if (pm->ps->groundEntityNum == ENTITYNUM_NONE) {
+			pm->ps->origin[2] += oldHeight - computedHeight;
+			// Compensate view height
+			pm->ps->viewheight -= oldHeight - computedHeight;
+		}
+
+		// Adjust height based on where are you standing
+		// (cannot stand up if there is no place, find nearest possible height)
+		for (int i = computedHeight; i > 0; i--) {
+			pm->maxs[2] = i;
+			pm->trace( &trace, pm->ps->origin, pm->mins, pm->maxs, pm->ps->origin, pm->ps->clientNum, pm->tracemask, G2_NOCOLLIDE, 0 );
+			if ( !trace.allsolid ) {
+				break;
+			} else if (pm->ps->groundEntityNum == ENTITYNUM_NONE) {
+				// When in the air, adjust origin (we are lifting or dropping legs)
+				if (liftingLegs) {
+					pm->ps->origin[2]--;
+					// Compensate view height
+					pm->ps->viewheight++;
+				} else {
+					pm->ps->origin[2]++;
+					// Compensate view height
+					pm->ps->viewheight--;
+                }
+			} else {
+				// Lower view height to not see through ceiling
+				// (in case you stand up IRL in tight place)
+				pm->ps->viewheight--;
+			}
+		}
+
+		// Toggle duck flag based on in-game height (need to be at least half-way crouched)
+		if (pm->maxs[2] < crouchheight + (standheight - crouchheight)/2) {
+			//Com_Printf( "CROUCHING: %.2f/%.2f -> %i ->%i\n", vr->curHeight, vr->maxHeight, computedHeight, (int) pm->maxs[2] );
+			pm->ps->pm_flags |= PMF_DUCKED;
+		} else {
+			//Com_Printf( "STANDING: %.2f/%.2f -> %i -> %i\n", vr->curHeight, vr->maxHeight, computedHeight, (int) pm->maxs[2] );
+			pm->ps->pm_flags &= ~PMF_DUCKED;
+		}
+
+		return;
+	}
+
 	if ( pm->cmd.upmove < 0 )
 	{	// trying to duck
 		pm->maxs[2] = crouchheight;

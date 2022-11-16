@@ -67,6 +67,9 @@ typedef struct {
     vec3_t offhandposition;
     vec3_t offhandoffset;
 
+    float   maxHeight;
+    float   curHeight;
+
     //////////////////////////////////////
     //    Test stuff for weapon alignment
     //////////////////////////////////////

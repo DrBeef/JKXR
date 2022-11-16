@@ -3,7 +3,7 @@ CONFIG W:\bin\striped.cfg
 ID 100
 REFERENCE MENUS_VR
 DESCRIPTION "VR Menu Localizations"
-COUNT 114
+COUNT 117
 INDEX 0
 {
    REFERENCE COMMON_CONTROLS_ITEM
@@ -573,4 +573,19 @@ INDEX 113
 {
    REFERENCE CROUCH_TOGGLE_DESC
    TEXT_LANGUAGE1 "Turn on to enable crouch toggle."
+}
+INDEX 114
+{
+   REFERENCE CROUCH_IRL_ITEM
+   TEXT_LANGUAGE1 "IRL Crouch:"
+}
+INDEX 115
+{
+   REFERENCE CROUCH_IRL_DESC
+   TEXT_LANGUAGE1 "Crouch IRL to crouch in game (use crouch button to recalibrate standing height)."
+}
+INDEX 116
+{
+   REFERENCE CROUCH_IRL_1ST_PERSON
+   TEXT_LANGUAGE1 "1st Person"
 }

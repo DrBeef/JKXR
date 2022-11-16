@@ -34,6 +34,8 @@ cvar_t	*vr_force_velocity_trigger;
 cvar_t	*vr_two_handed_weapons;
 cvar_t	*vr_force_motion_controlled;
 cvar_t	*vr_crouch_toggle;
+cvar_t  *vr_irl_crouch_enabled;
+cvar_t  *vr_irl_crouch_to_stand_ratio;
 cvar_t	*vr_saber_block_debounce_time;
 
 ovrInputStateTrackedRemote leftTrackedRemoteState_old;

@@ -662,6 +662,9 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 {
                     sendButtonAction("+movedown", (secondaryButtonsNew & secondaryThumb));
                 }
+
+                // Reset max height for IRL crouch
+                vr.maxHeight = 0;
             }
 
             //Use

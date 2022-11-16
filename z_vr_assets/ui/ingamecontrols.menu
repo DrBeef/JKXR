@@ -1051,7 +1051,7 @@
 			type				ITEM_TYPE_SLIDER
 			text				@MENUS_VR_MOVEMENT_SPEED_ITEM
 			cvarfloat		"vr_movement_multiplier" 0 0.4 1.2
-			rect				305 191 300 20
+			rect				305 171 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1068,12 +1068,12 @@
 		
 			mouseenter 
 			{ 
-				show			highlight2
+				show			highlight1
 			}
 
 			mouseexit 
 			{ 
-				hide			highlight2
+				hide			highlight1
 			}			
 		}
 
@@ -1089,7 +1089,7 @@
 				@MENUS_VR_DIRECTION_MODE_CONTROLLER 0  
 				@MENUS_VR_DIRECTION_MODE_HMD 1 
 			}
-			rect				305 211 300 20
+			rect				305 191 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1106,12 +1106,12 @@
 
 			mouseenter 
 			{ 
-				show			highlight3
+				show			highlight2
 			}
 
 			mouseexit 
 			{ 
-				hide			highlight3
+				hide			highlight2
 			}			
 
 		}
@@ -1129,7 +1129,7 @@
 				@MENUS_VR_SMOOTH_TURN_3RD_PERSON 1
 				@MENUS0_YES 2
 			}
-			rect				305 231 300 20
+			rect				305 211 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151 
 			textaligny			-2
@@ -1139,6 +1139,44 @@
 			visible			0
 			// appearance_slot		3
 			descText			@MENUS_VR_SMOOTH_TURN_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight3
+			}
+			mouseexit 
+			{ 
+				hide			highlight3
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_TURN_ANGLE_ITEM
+			cvar				"vr_turn_angle"
+			cvarFloatList		
+			{ 
+				@MENUS_VR_TURN_ANGLE_30DEGREES 30  
+				@MENUS_VR_TURN_ANGLE_45DEGREES 45
+				@MENUS_VR_TURN_ANGLE_90DEGREES 90
+			}
+			rect				305 231 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151 
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0 
+			// appearance_slot		4
+			descText			@MENUS_VR_TURN_ANGLE_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1158,15 +1196,9 @@
 		{
 			name				none
 			group				comfortcontrols
-			type				ITEM_TYPE_MULTI
-			text				@MENUS_VR_TURN_ANGLE_ITEM
-			cvar				"vr_turn_angle"
-			cvarFloatList		
-			{ 
-				@MENUS_VR_TURN_ANGLE_30DEGREES 30  
-				@MENUS_VR_TURN_ANGLE_45DEGREES 45
-				@MENUS_VR_TURN_ANGLE_90DEGREES 90
-			}
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_SWITCH_STICKS_ITEM
+			cvar				"vr_switch_sticks"
 			rect				305 251 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151 
@@ -1175,8 +1207,8 @@
 			textscale			0.8
 			forecolor			1 1 1 1
 			visible			0 
-			// appearance_slot		4
-			descText			@MENUS_VR_TURN_ANGLE_DESC
+			// appearance_slot		5
+			descText			@MENUS_VR_SWITCH_STICKS_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1196,9 +1228,14 @@
 		{
 			name				none
 			group				comfortcontrols
-			type				ITEM_TYPE_YESNO
-			text				@MENUS_VR_SWITCH_STICKS_ITEM
-			cvar				"vr_switch_sticks"
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_LEFT_HANDED_ITEM
+			cvar				"vr_control_scheme"
+			cvarFloatList		
+			{ 
+				@MENUS0_NO 0
+				@MENUS0_YES 10
+			}
 			rect				305 271 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151 
@@ -1208,7 +1245,7 @@
 			forecolor			1 1 1 1
 			visible			0 
 			// appearance_slot		5
-			descText			@MENUS_VR_SWITCH_STICKS_DESC
+			descText			@MENUS_VR_LEFT_HANDED_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1228,47 +1265,10 @@
 		{
 			name				none
 			group				comfortcontrols
-			type				ITEM_TYPE_MULTI
-			text				@MENUS_VR_LEFT_HANDED_ITEM
-			cvar				"vr_control_scheme"
-			cvarFloatList		
-			{ 
-				@MENUS0_NO 0
-				@MENUS0_YES 10
-			}
-			rect				305 291 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151 
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0 
-			// appearance_slot		5
-			descText			@MENUS_VR_LEFT_HANDED_DESC
-			action 
-			{ 
-				play			sound/interface/button1
-			}
-
-			mouseenter 
-			{
-				show			highlight7
-			}
-			mouseexit 
-			{ 
-				hide			highlight7
-			}
-		}
-
-		itemDef 
-		{
-			name				none
-			group				comfortcontrols
 			type				ITEM_TYPE_YESNO
 			text				@MENUS_VR_IMMERSIVE_CINEMATICS_ITEM
 			cvar				"vr_immersive_cinematics"
-			rect				305 311 300 20
+			rect				305 291 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1278,6 +1278,45 @@
 			visible			0
 			// appearance_slot		1
 			descText			@MENUS_VR_IMMERSIVE_CINEMATICS_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+		
+			mouseenter 
+			{ 
+				show			highlight7
+			}
+
+			mouseexit 
+			{ 
+				hide			highlight7
+			}			
+		}
+
+		itemDef 
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_SCREEN_DISTANCE_ITEM
+			cvar				"vr_screen_dist"
+			cvarFloatList		
+			{ 
+				@MENUS_VR_SCREEN_DISTANCE_NEAR 1.5  
+				@MENUS_VR_SCREEN_DISTANCE_MEDIUM 2.5
+				@MENUS_VR_SCREEN_DISTANCE_FAR 3.5
+			}
+			rect				305 311 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			@MENUS_VR_SCREEN_DISTANCE_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1298,15 +1337,9 @@
 		{
 			name				none
 			group				comfortcontrols
-			type				ITEM_TYPE_MULTI
-			text				@MENUS_VR_SCREEN_DISTANCE_ITEM
-			cvar				"vr_screen_dist"
-			cvarFloatList		
-			{ 
-				@MENUS_VR_SCREEN_DISTANCE_NEAR 1.5  
-				@MENUS_VR_SCREEN_DISTANCE_MEDIUM 2.5
-				@MENUS_VR_SCREEN_DISTANCE_FAR 3.5
-			}
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_HEIGHT_ADJUST_ITEM
+			cvarfloat 	"cg_heightAdjust" 0 0 1
 			rect				305 331 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
@@ -1316,7 +1349,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			@MENUS_VR_SCREEN_DISTANCE_DESC
+			descText			@MENUS_VR_HEIGHT_ADJUST_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1337,9 +1370,9 @@
 		{
 			name				none
 			group				comfortcontrols
-			type				ITEM_TYPE_SLIDER
-			text				@MENUS_VR_HEIGHT_ADJUST_ITEM
-			cvarfloat 	"cg_heightAdjust" 0 0 1
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_CROUCH_TOGGLE_ITEM
+			cvar				"vr_crouch_toggle"
 			rect				305 351 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
@@ -1349,7 +1382,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			@MENUS_VR_HEIGHT_ADJUST_DESC
+			descText			@MENUS_VR_CROUCH_TOGGLE_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1370,33 +1403,38 @@
 		{
 			name				none
 			group				comfortcontrols
-			type				ITEM_TYPE_YESNO
-			text				@MENUS_VR_CROUCH_TOGGLE_ITEM
-			cvar				"vr_crouch_toggle"
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_CROUCH_IRL_ITEM
+			cvar				"vr_irl_crouch_enabled"
+			cvarFloatList		
+			{ 
+				@MENUS0_NO 0
+				@MENUS_VR_CROUCH_IRL_1ST_PERSON 1
+				@MENUS0_YES 2
+			}
 			rect				305 371 300 20
 			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
+			textalignx			151 
 			textaligny			-2
 			font				2
 			textscale			0.8
 			forecolor			1 1 1 1
 			visible			0
-			// appearance_slot		1
-			descText			@MENUS_VR_CROUCH_TOGGLE_DESC
+			// appearance_slot		3
+			descText			@MENUS_VR_CROUCH_IRL_DESC
 			action 
 			{ 
 				play			sound/interface/button1
 			}
-		
+
 			mouseenter 
-			{ 
+			{
 				show			highlight11
 			}
-
 			mouseexit 
 			{ 
 				hide			highlight11
-			}			
+			}
 		}
 
 

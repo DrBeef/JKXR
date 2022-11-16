@@ -14,5 +14,7 @@ extern cvar_t   *vr_force_velocity_trigger;
 extern cvar_t   *vr_two_handed_weapons;
 extern cvar_t   *vr_force_motion_controlled;
 extern cvar_t   *vr_crouch_toggle;
+extern cvar_t   *vr_irl_crouch_enabled;
+extern cvar_t   *vr_irl_crouch_to_stand_ratio;
 extern cvar_t   *vr_saber_block_debounce_time;
 
