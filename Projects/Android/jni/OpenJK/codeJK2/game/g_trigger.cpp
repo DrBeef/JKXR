@@ -25,6 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_functions.h"
 #include "b_local.h"
 #include "anims.h"
+#include "bg_local.h"
 
 #define ENTDIST_PLAYER	1
 #define ENTDIST_NPC		2
@@ -228,7 +229,16 @@ void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace )
 
 		if ( other->client )
 		{
-			AngleVectors( other->client->ps.viewangles, forward, NULL, NULL );
+			if (other->client->ps.clientNum == 0)
+			{
+				vec3_t origin, angles;
+				BG_CalculateVRWeaponPosition(origin, angles);
+				AngleVectors( angles, forward, NULL, NULL );
+			}
+			else
+			{
+				AngleVectors( other->client->ps.viewangles, forward, NULL, NULL );
+			}
 		}
 		else
 		{

@@ -230,6 +230,8 @@ void G_PlayEffect( const char *name,  const int modelIndex, const int boltIndex,
 
 extern void cgi_S_StartSound( vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfx );
 #include "../cgame/cg_media.h"	//access to cgs
+#include "bg_local.h"
+
 extern void CG_TryPlayCustomSound( vec3_t origin, int entityNum, soundChannel_t channel, const char *soundName, int customSoundSet );
 //NOTE: Do NOT Try to use this before the cgame DLL is valid, it will NOT work!
 void G_SoundOnEnt (gentity_t *ent, soundChannel_t channel, const char *soundPath)
@@ -1267,22 +1269,29 @@ Try and use an entity in the world, directly ahead of us
 
 #define USE_DISTANCE	64.0f
 
-void TryUse( gentity_t *ent )
-{
-	gentity_t	*target;
-	trace_t		trace;
-	vec3_t		src, dest, vf;
+void TryUse( gentity_t *ent ) {
+	gentity_t *target;
+	trace_t trace;
+	vec3_t src, dest, vf;
 
-	if ( ent->s.number == 0 && ent->client->NPC_class == CLASS_ATST )
-	{//a player trying to get out of his ATST
-		GEntity_UseFunc( ent->activator, ent, ent );
+	if (ent->s.number == 0 &&
+		ent->client->NPC_class == CLASS_ATST) {//a player trying to get out of his ATST
+		GEntity_UseFunc(ent->activator, ent, ent);
 		return;
 	}
 	//FIXME: this does not match where the new accurate crosshair aims...
 	//cg.refdef.vieworg, basically
-	VectorCopy( ent->client->renderInfo.eyePoint, src );
+	if (ent->client->ps.clientNum == 0) {
+		vec3_t angles;
+		BG_CalculateVRWeaponPosition(src, angles);
+		AngleVectors(angles, vf, NULL, NULL);
+	} else {
+		VectorCopy(ent->client->renderInfo.eyePoint, src);
 
-	AngleVectors( ent->client->ps.viewangles, vf, NULL, NULL );//ent->client->renderInfo.eyeAngles was cg.refdef.viewangles, basically
+		AngleVectors(ent->client->ps.viewangles, vf, NULL,
+					 NULL);//ent->client->renderInfo.eyeAngles was cg.refdef.viewangles, basically
+	}
+
 	//extend to find end of use trace
 	VectorMA( src, USE_DISTANCE, vf, dest );
 

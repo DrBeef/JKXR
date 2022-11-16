@@ -414,6 +414,9 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                         VectorSet(vr.weaponangles, -degrees(atanf(y / zxDist)),
                                   -degrees(atan2f(x, -z)), vr.weaponangles[ROLL] /
                                                            2.0f); //Dampen roll on stabilised weapon
+
+                        VectorCopy(vr.hmdposition, vr.weaponposition);
+                        VectorClear(vr.weaponoffset);
                         vr.weaponposition[1] += 0.1;
                     }
                 }
@@ -585,7 +588,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             if ((primaryButtonsNew & primaryButton2) != (primaryButtonsOld & primaryButton2)) {
                 if (vr.cgzoommode)
                 {
-                    sendButtonActionSimple("exitzoom");
+                    sendButtonActionSimple("exitscope");
                 }
                 else if (cl.frame.ps.weapon == WP_SABER && vr.velocitytriggered)
                 {
