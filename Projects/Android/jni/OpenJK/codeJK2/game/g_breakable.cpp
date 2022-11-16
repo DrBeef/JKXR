@@ -1054,7 +1054,9 @@ void funcGlassUse( gentity_t *self, gentity_t *other, gentity_t *activator )
 
 	self->splashRadius = 40; // ?? some random number, maybe it's ok?
 
-	funcGlassDie( self, other, activator, self->health, MOD_UNKNOWN );
+	if (self->takedamage) {
+		funcGlassDie(self, other, activator, self->health, MOD_UNKNOWN);
+	}
 }
 
 //-----------------------------------------------------
