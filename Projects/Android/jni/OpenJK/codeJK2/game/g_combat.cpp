@@ -5210,6 +5210,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 						targ->health = 1;
 					}
 				}
+				else if ( !alreadyDead && targ->health <=0 && targ->client->ps.inventory[INV_BACTA_CANISTER] && cg_autoUseBacta.integer)
+				{
+					targ->health = 25;
+					targ->client->ps.inventory[INV_BACTA_CANISTER]--;
+					G_SoundOnEnt( targ, CHAN_VOICE, va( "sound/weapons/force/heal%d.mp3", Q_irand( 1, 4 ) ) );
+				}
 				else if ( targ->health < 1 && attacker->client )
 				{	// The player or NPC just killed an enemy so increment the kills counter
 					attacker->client->ps.persistant[PERS_ENEMIES_KILLED]++;
@@ -5265,6 +5271,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 
 							targ->health = 1;
 						}
+					}
+					else if ( !alreadyDead && targ->health <=0 && targ->client->ps.inventory[INV_BACTA_CANISTER] && cg_autoUseBacta.integer)
+					{
+						targ->health = 25;
+						targ->client->ps.inventory[INV_BACTA_CANISTER]--;
+						G_SoundOnEnt( targ, CHAN_VOICE, va( "sound/weapons/force/heal%d.mp3", Q_irand( 1, 4 ) ) );
 					}
 					else if ( targ->health < 0 )
 					{

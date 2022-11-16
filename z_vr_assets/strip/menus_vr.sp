@@ -3,7 +3,7 @@ CONFIG W:\bin\striped.cfg
 ID 100
 REFERENCE MENUS_VR
 DESCRIPTION "VR Menu Localizations"
-COUNT 117
+COUNT 119
 INDEX 0
 {
    REFERENCE COMMON_CONTROLS_ITEM
@@ -588,4 +588,14 @@ INDEX 116
 {
    REFERENCE CROUCH_IRL_1ST_PERSON
    TEXT_LANGUAGE1 "1st Person"
+}
+INDEX 117
+{
+   REFERENCE AUTO_USE_BACTA_ITEM
+   TEXT_LANGUAGE1 "Auto Use Bacta:"
+}
+INDEX 118
+{
+   REFERENCE AUTO_USE_BACTA_DESC
+   TEXT_LANGUAGE1 "When enabled, automatically uses bacta canister before dying."
 }

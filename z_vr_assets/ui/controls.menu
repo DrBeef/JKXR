@@ -1740,8 +1740,8 @@
 			name				none
 			group				invcontrols
 			type				ITEM_TYPE_YESNO
-			text				"Placeholder:"
-			cvar				"place_holder"
+			text				@MENUS_VR_AUTO_USE_BACTA_ITEM
+			cvar				"cg_autoUseBacta"
 			rect				305 191 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
@@ -1751,7 +1751,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		1
-			descText			"Item placeholder."
+			descText			@MENUS_VR_AUTO_USE_BACTA_DESC
 			action 
 			{ 
 				play			sound/interface/button1
