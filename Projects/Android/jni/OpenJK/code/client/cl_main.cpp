@@ -841,6 +841,8 @@ void CL_Frame ( int msec,float fractionMsec ) {
 
 	JKVR_processHaptics();
 
+	//trigger frame tick for haptics
+	JKVR_HapticEvent("frame_tick", 0, 0, 0, 0, 0);
 
 	// see if we need to update any userinfo
 	CL_CheckUserinfo();

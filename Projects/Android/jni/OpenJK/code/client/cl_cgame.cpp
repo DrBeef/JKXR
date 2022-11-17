@@ -467,6 +467,9 @@ cgameImport_t CL_ConvertJK2SysCall( cgameJK2Import_t import )
 		case CG_CVAR_GET_JK2:
 			return CG_CVAR_GET;
 			break;
+		case CG_HAPTICEVENT_JK2:
+			return CG_HAPTICEVENT;
+			break;
 		case CG_ARGC_JK2:
 			return CG_ARGC;
 			break;
@@ -1378,6 +1381,9 @@ Ghoul2 Insert End
 		return strlen(text);
 #endif
 
+	case CG_HAPTICEVENT:
+		JKVR_HapticEvent( (const char*)VMA(1), args[2], args[3], args[4], VMF(5), VMF(6) );
+		return 0;
 	default:
 		Com_Error( ERR_DROP, "Bad cgame system trap: %ld", (long int) args[0] );
 	}

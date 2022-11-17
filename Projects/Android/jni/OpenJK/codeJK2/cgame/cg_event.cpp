@@ -478,6 +478,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			// show icon and name on status bar
 			if ( es->number == cg.snap->ps.clientNum ) {
 				CG_ItemPickup( index, bHadItem );
+				cgi_HapticEvent("pickup_weapon", 0, 0, 80, 0, 0);
 			}
 		}
 		break;
@@ -510,6 +511,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				}
 			}
 		}
+
+		cgi_HapticEvent("weapon_switch", 0, 0, 100, 0, 0);
 
 		// FIXME: if it happens that you don't want the saber to play the switch sounds, feel free to modify this bit.
 		if ( weaponData[cg.weaponSelect].selectSnd[0] )
@@ -564,7 +567,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			cg.powerupActive = PW_BATTLESUIT;
 			cg.powerupTime = cg.time;
 		}
-		//cgi_S_StartSound (NULL, es->number, CHAN_ITEM, cgs.media.invulnoProtectSound );
+		if ( clientNum == cg.snap->ps.clientNum ) {
+			cgi_HapticEvent("decontaminate", 0, 0, 100, 0, 0);
+		}
+
+			//cgi_S_StartSound (NULL, es->number, CHAN_ITEM, cgs.media.invulnoProtectSound );
 		break;
 
 	//=================================================================
@@ -766,6 +773,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			return;
 		}
 		*/
+		if ( clientNum == cg.snap->ps.clientNum ) {
+			cgi_HapticEvent("fireball", 0, 0, 100, 0, 0);
+		}
 		CG_TryPlayCustomSound( NULL, es->number, CHAN_VOICE, va("*death%i.wav", event - EV_DEATH1 + 1), CS_BASIC );
 		break;
 

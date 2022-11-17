@@ -848,16 +848,23 @@ JKVR_Vibrate
 float vibration_channel_duration[2] = {0.0f, 0.0f};
 float vibration_channel_intensity[2] = {0.0f, 0.0f};
 
-void JKVR_Vibrate( int duration, int channel, float intensity )
+void JKVR_Vibrate( int duration, int chan, float intensity )
 {
-	if (vibration_channel_duration[channel] > 0.0f)
-		return;
+	for (int i = 0; i < 2; ++i)
+	{
+		int channel = (i + 1) & chan;
+		if (channel)
+		{
+			if (vibration_channel_duration[channel-1] > 0.0f)
+				return;
 
-	if (vibration_channel_duration[channel] == -1.0f &&	duration != 0.0f)
-		return;
+			if (vibration_channel_duration[channel-1] == -1.0f && duration != 0.0f)
+				return;
 
-	vibration_channel_duration[channel] = duration;
-	vibration_channel_intensity[channel] = intensity;
+			vibration_channel_duration[channel-1] = duration;
+			vibration_channel_intensity[channel-1] = intensity * vr_haptic_intensity->value;
+		}
+	}
 }
 
 void JKVR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side, float *up,
@@ -1337,6 +1344,7 @@ void JKVR_Init()
 	vr_irl_crouch_enabled = Cvar_Get ("vr_irl_crouch_enabled", "0", CVAR_ARCHIVE);
 	vr_irl_crouch_to_stand_ratio = Cvar_Get ("vr_irl_crouch_to_stand_ratio", "0.65", CVAR_ARCHIVE);
 	vr_saber_block_debounce_time = Cvar_Get ("vr_saber_block_debounce_time", "200", CVAR_ARCHIVE);
+	vr_haptic_intensity = Cvar_Get ("vr_haptic_intensity", "1.0", CVAR_ARCHIVE);
 
 	cvar_t *expanded_menu_enabled = Cvar_Get ("expanded_menu_enabled", "0", CVAR_ARCHIVE);
 	if (FS_FileExists("expanded_menu.pk3")) {
@@ -1636,7 +1644,7 @@ void JKVR_processHaptics() {
 	for (int i = 0; i < 2; ++i) {
 		if (vibration_channel_duration[i] > 0.0f ||
 			vibration_channel_duration[i] == -1.0f) {
-			vrapi_SetHapticVibrationSimple(gAppState.Ovr, controllerIDs[i],
+			vrapi_SetHapticVibrationSimple(gAppState.Ovr, controllerIDs[1 - i],
 										   vibration_channel_intensity[i]);
 
 			if (vibration_channel_duration[i] != -1.0f) {
@@ -1648,8 +1656,70 @@ void JKVR_processHaptics() {
 				}
 			}
 		} else {
-			vrapi_SetHapticVibrationSimple(gAppState.Ovr, controllerIDs[i], 0.0f);
+			vrapi_SetHapticVibrationSimple(gAppState.Ovr, controllerIDs[1 - i], 0.0f);
 		}
+	}
+}
+
+void JKVR_HapticEvent(const char* event, int position, int flags, int intensity, float angle, float yHeight )
+{
+	if (vr_haptic_intensity->value == 0.0f)
+	{
+		return;
+	}
+
+//	engine_t* engine = VR_GetEngine();
+//	jstring StringArg1 = (*(engine->java.Env))->NewStringUTF(engine->java.Env, event);
+//	(*(engine->java.Env))->CallVoidMethod(engine->java.Env, engine->java.ActivityObject, android_haptic_event, StringArg1, position, flags, (int)(intensity * vr_hapticIntensity->value), angle, yHeight);
+
+	//Controller Haptic Support
+	int weaponFireChannel = vr.weapon_stabilised ? 3 : (vr_control_scheme->integer ? 2 : 1);
+	if (flags != 0)
+	{
+		weaponFireChannel = flags;
+	}
+	if (strcmp(event, "pickup_shield") == 0 ||
+		strcmp(event, "pickup_weapon") == 0 ||
+		strstr(event, "pickup_item") != NULL)
+	{
+		JKVR_Vibrate(100, 3, 1.0);
+	}
+	else if (strcmp(event, "weapon_switch") == 0)
+	{
+		JKVR_Vibrate(250, vr_control_scheme->integer ? 2 : 1, 0.8);
+	}
+	else if (strcmp(event, "shotgun") == 0 || strcmp(event, "fireball") == 0)
+	{
+		JKVR_Vibrate(400, 3, 1.0);
+	}
+	else if (strcmp(event, "bullet") == 0)
+	{
+		JKVR_Vibrate(150, 3, 1.0);
+	}
+	else if (strcmp(event, "chainsaw_fire") == 0 ||
+			 strcmp(event, "RTCWQuest:fire_tesla") == 0)
+	{
+		JKVR_Vibrate(500, weaponFireChannel, 1.0);
+	}
+	else if (strcmp(event, "machinegun_fire") == 0 || strcmp(event, "plasmagun_fire") == 0)
+	{
+		JKVR_Vibrate(90, weaponFireChannel, 0.8);
+	}
+	else if (strcmp(event, "shotgun_fire") == 0)
+	{
+		JKVR_Vibrate(250, weaponFireChannel, 1.0);
+	}
+	else if (strcmp(event, "rocket_fire") == 0 ||
+			 strcmp(event, "RTCWQuest:fire_sniper") == 0 ||
+			 strcmp(event, "bfg_fire") == 0 ||
+			 strcmp(event, "handgrenade_fire") == 0 )
+	{
+		JKVR_Vibrate(400, weaponFireChannel, 1.0);
+	}
+	else if (strcmp(event, "selector_icon") == 0)
+	{
+		//Quick blip
+		JKVR_Vibrate(50, flags, 1.0);
 	}
 }
 

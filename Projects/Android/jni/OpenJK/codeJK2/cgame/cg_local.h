@@ -972,6 +972,9 @@ void	cgi_Cvar_Set( const char *var_name, const char *value );
 char*	cgi_Cvar_Get( const char *var_name );
 
 
+//Haptics
+int cgi_HapticEvent( char *description, int position, int channel, int intensity, float yaw, float height);
+
 // ServerCommand and ConsoleCommand parameter access
 int		cgi_Argc( void );
 void	cgi_Argv( int n, char *buffer, int bufferLength );

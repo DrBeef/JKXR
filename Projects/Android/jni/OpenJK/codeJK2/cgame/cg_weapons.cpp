@@ -3040,7 +3040,9 @@ void CG_DrawItemSelector( void )
 						selectable) {
 						if (cg.itemSelectorSelection != itemId) {
 							cg.itemSelectorSelection = itemId;
-							//trap_HapticEvent("selector_icon", 0, 0, 100, 0, 0);
+
+							cgi_HapticEvent("selector_icon", 0, vr->right_handed ?
+								((cg.itemSelectorType == 3) ? 2 : 1) : ((cg.itemSelectorType == 3) ? 1 : 2), 100, 0, 0);
 						}
 
 						selected = qtrue;
@@ -3231,51 +3233,46 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire )
 		}
 	}
 
-	// Do overcharge sound that get's added to the top
-/*	if (( ent->powerups & ( 1<<PW_WEAPON_OVERCHARGE )))
+	//Are we the player?
+	if (cent->gent->client->ps.clientNum == 0)
 	{
-		if ( alt_fire )
-		{
-			switch( ent->weapon )
-			{
-			case WP_THERMAL:
-			case WP_DET_PACK:
-			case WP_TRIP_MINE:
-			case WP_ROCKET_LAUNCHER:
-			case WP_FLECHETTE:
-				// these weapon fires don't overcharge
-				break;
+		int position = vr->weapon_stabilised ? 4 : (vr->right_handed ? 1 : 2);
 
+		//Haptics
+		switch (ent->weapon) {
+			case WP_SABER:
+				cgi_HapticEvent("chainsaw_fire", position, 0, 50, 0, 0);
+				break;
+			case WP_BRYAR_PISTOL:
+			case WP_BOWCASTER:
 			case WP_BLASTER:
-				cgi_S_StartSound( NULL, ent->number, CHAN_AUTO, cgs.media.overchargeFastSound );
+				cgi_HapticEvent("machinegun_fire", position, 0, 100, 0, 0);
 				break;
-
-			default:
-				cgi_S_StartSound( NULL, ent->number, CHAN_AUTO, cgs.media.overchargeSlowSound );
+			case WP_BLASTER_PISTOL:
+				cgi_HapticEvent("shotgun_fire", position, 0, 100, 0, 0);
 				break;
-			}
-		}
-		else
-		{
-			switch( ent->weapon )
-			{
 			case WP_THERMAL:
 			case WP_DET_PACK:
 			case WP_TRIP_MINE:
+				cgi_HapticEvent("handgrenade_fire", position, 0, 80, 0, 0);
+				break;
 			case WP_ROCKET_LAUNCHER:
-				// these weapon fires don't overcharge
+				cgi_HapticEvent("rocket_fire", position, 0, 100, 0, 0);
 				break;
-
+			case WP_DISRUPTOR:
+				cgi_HapticEvent("RTCWQuest:fire_sniper", position, 0, 100, 0, 0);
+				break;
+			case WP_FLECHETTE:
 			case WP_REPEATER:
-				cgi_S_StartSound( NULL, ent->number, CHAN_AUTO, cgs.media.overchargeFastSound );
+				cgi_HapticEvent("plasmagun_fire", position, 0, 100, 0, 0);
 				break;
-
-			default:
-				cgi_S_StartSound( NULL, ent->number, CHAN_AUTO, cgs.media.overchargeSlowSound );
+			case WP_DEMP2:
+			case WP_EMPLACED_GUN:
+				cgi_HapticEvent("bfg_fire", position, 0, 100, 0, 0);
 				break;
-			}
 		}
-	}*/
+
+	}
 }
 
 /*

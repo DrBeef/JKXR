@@ -204,6 +204,13 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 	cg.damageValue = kick;
 	cg.v_dmg_time = cg.time + DAMAGE_TIME;
 	cg.damageTime = cg.snap->serverTime;
+
+	if (damage > 30)
+	{
+		cgi_HapticEvent("shotgun", 0, 0, 100, yaw, 0);
+	} else {
+		cgi_HapticEvent("bullet", 0, 0, 100, yaw, 0);
+	}
 }
 
 

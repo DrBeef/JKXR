@@ -17,4 +17,5 @@ extern cvar_t   *vr_crouch_toggle;
 extern cvar_t   *vr_irl_crouch_enabled;
 extern cvar_t   *vr_irl_crouch_to_stand_ratio;
 extern cvar_t   *vr_saber_block_debounce_time;
+extern cvar_t   *vr_haptic_intensity;
 

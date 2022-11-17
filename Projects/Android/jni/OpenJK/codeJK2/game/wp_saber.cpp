@@ -5716,6 +5716,11 @@ void ForceThrowEx( gentity_t *self, qboolean pull, qboolean aimByViewAngles )
 			parts = SETANIM_BOTH;
 		}
 	}
+
+	//Handle this here so it is refreshed on every frame, not just when the lightning gun is first fired
+	cgi_HapticEvent("RTCWQuest:fire_tesla", 0, (vr->right_handed ? 2 : 1), 100, 0, 0);
+
+
 	NPC_SetAnim( self, parts, anim, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD|SETANIM_FLAG_RESTART );
 	self->client->ps.saberMove = self->client->ps.saberBounceMove = LS_READY;//don't finish whatever saber anim you may have been in
 	self->client->ps.saberBlocked = BLOCKED_NONE;
@@ -7325,6 +7330,10 @@ void ForceShootLightning( gentity_t *self )
 	}
 
 	VectorNormalize( forward );
+
+	//Handle this here so it is refreshed on every frame, not just when the lightning gun is first fired
+	cgi_HapticEvent("RTCWQuest:fire_tesla", 0, (vr->right_handed ? 2 : 1), 100, 0, 0);
+
 
 	//FIXME: if lightning hits water, do water-only-flagged radius damage from that point
 	if ( self->client->ps.forcePowerLevel[FP_LIGHTNING] > FORCE_LEVEL_2 )
