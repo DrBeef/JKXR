@@ -80,6 +80,12 @@ void CalcEntitySpot ( const gentity_t *ent, const spot_t spot, vec3_t point )
 			if ( ent->client->NPC_class == CLASS_ATST )
 			{//adjust up some
 				point[2] += 28;//magic number :)
+			} else if (!ent->client->ps.clientNum) {
+				// When IRL crouch is used, view height is higher than model height
+				// We need to lower "point" else enemies will be aiming into empty space
+				int viewHeight = ent->client->ps.viewheight - STANDARD_VIEWHEIGHT_OFFSET;
+				int realHeight = ent->maxs[2];
+				point[2] -= viewHeight - realHeight;
 			}
 			if ( ent->NPC )
 			{//always aim from the center of my bbox, so we don't wiggle when we lean forward or backwards
@@ -116,6 +122,12 @@ void CalcEntitySpot ( const gentity_t *ent, const spot_t spot, vec3_t point )
 			if ( ent->client->NPC_class == CLASS_ATST )
 			{//adjust up some
 				point[2] += 28;//magic number :)
+			} else if (!ent->client->ps.clientNum) {
+				// When IRL crouch is used, view height is higher than model height
+				// We need to lower "point" else enemies will be aiming into empty space
+				int viewHeight = ent->client->ps.viewheight - STANDARD_VIEWHEIGHT_OFFSET;
+				int realHeight = ent->maxs[2];
+				point[2] -= viewHeight - realHeight;
 			}
 			if ( ent->NPC )
 			{//always aim from the center of my bbox, so we don't wiggle when we lean forward or backwards
