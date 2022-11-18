@@ -2004,6 +2004,12 @@ wasForceSpeed=isForceSpeed;
 		cgi_CM_SnapPVS( cg.refdef.vieworg, cg.snap->areamask );
 	}
 
+	if (cg.predicted_player_state.stats[STAT_HEALTH] > 0 &&
+			cg.predicted_player_state.stats[STAT_HEALTH] < 40)
+	{
+		cgi_HapticEvent("heartbeat", 0, 0, cg.predicted_player_state.stats[STAT_HEALTH], 0, 0);
+	}
+
 	if (vr->item_selector)
 	{
 		CG_DrawItemSelector();

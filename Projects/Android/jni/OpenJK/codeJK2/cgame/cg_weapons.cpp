@@ -3241,7 +3241,7 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire )
 		//Haptics
 		switch (ent->weapon) {
 			case WP_SABER:
-				cgi_HapticEvent("chainsaw_fire", position, 0, 50, 0, 0);
+				cgi_HapticEvent("chainsaw_fire", position, 0, 40, 0, 0);
 				break;
 			case WP_BRYAR_PISTOL:
 			case WP_BOWCASTER:

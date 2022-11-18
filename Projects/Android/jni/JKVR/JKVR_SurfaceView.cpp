@@ -1661,6 +1661,59 @@ void JKVR_processHaptics() {
 	}
 }
 
+extern "C" {
+void jni_haptic_event(const char *event, int position, int flags, int intensity, float angle,
+					  float yHeight);
+void jni_haptic_updateevent(const char *event, int intensity, float angle);
+void jni_haptic_stopevent(const char *event);
+void jni_haptic_endframe();
+void jni_haptic_enable();
+void jni_haptic_disable();
+};
+
+void JKVR_ExternalHapticEvent(const char* event, int position, int flags, int intensity, float angle, float yHeight )
+{
+	jni_haptic_event(event, position, flags, intensity, angle, yHeight);
+}
+
+void JKVR_HapticUpdateEvent(const char* event, int intensity, float angle )
+{
+	jni_haptic_updateevent(event, intensity, angle);
+}
+
+void JKVR_HapticEndFrame()
+{
+	jni_haptic_endframe();
+}
+
+void JKVR_HapticStopEvent(const char* event)
+{
+	jni_haptic_stopevent(event);
+}
+
+void JKVR_HapticEnable()
+{
+	static bool firstTime = true;
+	if (firstTime) {
+		jni_haptic_enable();
+		firstTime = false;
+		jni_haptic_event("fire_pistol", 0, 0, 100, 0, 0);
+	}
+}
+
+void JKVR_HapticDisable()
+{
+	jni_haptic_disable();
+}
+
+/*
+ *  event - name of event
+ *  position - for the use of external haptics providers to indicate which bit of haptic hardware should be triggered
+ *  flags - a way for the code to specify which controller to produce haptics on, if 0 then weaponFireChannel is calculated in this function
+ *  intensity - 0-100
+ *  angle - yaw angle (again for external haptics devices) to place the feedback correctly
+ *  yHeight - for external haptics devices to place the feedback correctly
+ */
 void JKVR_HapticEvent(const char* event, int position, int flags, int intensity, float angle, float yHeight )
 {
 	if (vr_haptic_intensity->value == 0.0f)
@@ -1668,9 +1721,8 @@ void JKVR_HapticEvent(const char* event, int position, int flags, int intensity,
 		return;
 	}
 
-//	engine_t* engine = VR_GetEngine();
-//	jstring StringArg1 = (*(engine->java.Env))->NewStringUTF(engine->java.Env, event);
-//	(*(engine->java.Env))->CallVoidMethod(engine->java.Env, engine->java.ActivityObject, android_haptic_event, StringArg1, position, flags, (int)(intensity * vr_hapticIntensity->value), angle, yHeight);
+	//Pass on to any external services
+	JKVR_ExternalHapticEvent(event, position, flags, intensity, angle, yHeight);
 
 	//Controller Haptic Support
 	int weaponFireChannel = vr.weapon_stabilised ? 3 : (vr_control_scheme->integer ? 2 : 1);
@@ -1977,6 +2029,94 @@ void jni_shutdown()
 	return env->CallVoidMethod(jniCallbackObj, android_shutdown);
 }
 
+jmethodID android_haptic_event;
+jmethodID android_haptic_updateevent;
+jmethodID android_haptic_stopevent;
+jmethodID android_haptic_endframe;
+jmethodID android_haptic_enable;
+jmethodID android_haptic_disable;
+
+void jni_haptic_event(const char* event, int position, int flags, int intensity, float angle, float yHeight)
+{
+	JNIEnv *env;
+	jobject tmp;
+	if ((jVM->GetEnv((void**) &env, JNI_VERSION_1_4))<0)
+	{
+		jVM->AttachCurrentThread(&env, NULL);
+	}
+
+	jstring StringArg1 = env->NewStringUTF(event);
+
+	return env->CallVoidMethod(jniCallbackObj, android_haptic_event, StringArg1, position, flags, intensity, angle, yHeight);
+}
+
+void jni_haptic_updateevent(const char* event, int intensity, float angle)
+{
+	JNIEnv *env;
+	jobject tmp;
+	if ((jVM->GetEnv((void**) &env, JNI_VERSION_1_4))<0)
+	{
+		jVM->AttachCurrentThread(&env, NULL);
+	}
+
+	jstring StringArg1 = env->NewStringUTF(event);
+
+	return env->CallVoidMethod(jniCallbackObj, android_haptic_updateevent, StringArg1, intensity, angle);
+}
+
+void jni_haptic_stopevent(const char* event)
+{
+	ALOGV("Calling: jni_haptic_stopevent");
+	JNIEnv *env;
+	jobject tmp;
+	if ((jVM->GetEnv((void**) &env, JNI_VERSION_1_4))<0)
+	{
+		jVM->AttachCurrentThread(&env, NULL);
+	}
+
+	jstring StringArg1 = env->NewStringUTF(event);
+
+	return env->CallVoidMethod(jniCallbackObj, android_haptic_stopevent, StringArg1);
+}
+
+void jni_haptic_endframe()
+{
+	JNIEnv *env;
+	jobject tmp;
+	if ((jVM->GetEnv((void**) &env, JNI_VERSION_1_4))<0)
+	{
+		jVM->AttachCurrentThread(&env, NULL);
+	}
+
+	return env->CallVoidMethod(jniCallbackObj, android_haptic_endframe);
+}
+
+void jni_haptic_enable()
+{
+	ALOGV("Calling: jni_haptic_enable");
+	JNIEnv *env;
+	jobject tmp;
+	if ((jVM->GetEnv((void**) &env, JNI_VERSION_1_4))<0)
+	{
+		jVM->AttachCurrentThread(&env, NULL);
+	}
+
+	return env->CallVoidMethod(jniCallbackObj, android_haptic_enable);
+}
+
+void jni_haptic_disable()
+{
+	ALOGV("Calling: jni_haptic_disable");
+	JNIEnv *env;
+	jobject tmp;
+	if ((jVM->GetEnv((void**) &env, JNI_VERSION_1_4))<0)
+	{
+		jVM->AttachCurrentThread(&env, NULL);
+	}
+
+	return env->CallVoidMethod(jniCallbackObj, android_haptic_disable);
+}
+
 int JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	JNIEnv *env;
@@ -2074,6 +2214,12 @@ JNIEXPORT void JNICALL Java_com_drbeef_jkquest_GLES3JNILib_onStart( JNIEnv * env
 	jclass callbackClass = env->GetObjectClass( jniCallbackObj);
 
 	android_shutdown = env->GetMethodID(callbackClass,"shutdown","()V");
+	android_haptic_event = env->GetMethodID(callbackClass, "haptic_event", "(Ljava/lang/String;IIIFF)V");
+	android_haptic_updateevent = env->GetMethodID(callbackClass, "haptic_updateevent", "(Ljava/lang/String;IF)V");
+	android_haptic_stopevent = env->GetMethodID(callbackClass, "haptic_stopevent", "(Ljava/lang/String;)V");
+	android_haptic_endframe = env->GetMethodID(callbackClass, "haptic_endframe", "()V");
+	android_haptic_enable = env->GetMethodID(callbackClass, "haptic_enable", "()V");
+	android_haptic_disable = env->GetMethodID(callbackClass, "haptic_disable", "()V");
 
 	ovrAppThread * appThread = (ovrAppThread *)((size_t)handle);
 	ovrMessage message;

@@ -4792,7 +4792,9 @@ Ghoul2 Insert End
     {
 		cvar_t *vr_saber_block_debounce_time = gi.cvar("vr_saber_block_debounce_time", "200", CVAR_ARCHIVE); // defined in VrCvars.h
 		vr->saberBlockDebounce = cg.time + vr_saber_block_debounce_time->integer;
-    }
+
+		cgi_HapticEvent("shotgun_fire", 0, 0, 100, 0, 0);
+	}
 
 	if (CG_getPlayer1stPersonSaber(cent) &&
 			cent->gent->client->ps.saberLockEnemy != ENTITYNUM_NONE)
