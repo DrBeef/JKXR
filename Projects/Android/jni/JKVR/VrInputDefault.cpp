@@ -383,16 +383,23 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 }
             }
 
+            vec3_t offhandPositionAverage;
+            VectorClear(offhandPositionAverage);
+            for (int i = 0; i < 5; ++i)
+            {
+                VectorAdd(offhandPositionAverage, vr.offhandposition[i], offhandPositionAverage);
+            }
+            VectorScale(offhandPositionAverage, 0.2f, offhandPositionAverage);
             if (vr.weapon_stabilised) {
                 if (vr_virtual_stock->integer == 1) {
                     //offset to the appropriate eye a little bit
                     vec2_t xy;
                     rotateAboutOrigin(Cvar_VariableValue("cg_stereoSeparation") / 2.0f, 0.0f,
                                       -vr.hmdorientation[YAW], xy);
-                    float x = pOff->HeadPose.Pose.Position.x - (vr.hmdposition[0] + xy[0]);
-                    float y = pOff->HeadPose.Pose.Position.y -
+                    float x = offhandPositionAverage[0] - (vr.hmdposition[0] + xy[0]);
+                    float y = offhandPositionAverage[1] -
                               (vr.hmdposition[1] - 0.1f); // Use a point lower
-                    float z = pOff->HeadPose.Pose.Position.z - (vr.hmdposition[2] + xy[1]);
+                    float z = offhandPositionAverage[2] - (vr.hmdposition[2] + xy[1]);
                     float zxDist = length(x, z);
 
                     if (zxDist != 0.0f && z != 0.0f) {
@@ -403,11 +410,11 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 else if (vr.cgzoommode == 2 || vr.cgzoommode == 4)
                 {
                     float x =
-                            pOff->HeadPose.Pose.Position.x - vr.hmdposition[0];
+                            offhandPositionAverage[0] - vr.hmdposition[0];
                     float y =
-                            pOff->HeadPose.Pose.Position.y - (vr.hmdposition[1] - 0.1f);
+                            offhandPositionAverage[1] - (vr.hmdposition[1] - 0.1f);
                     float z =
-                            pOff->HeadPose.Pose.Position.z - vr.hmdposition[2];
+                            offhandPositionAverage[2] - vr.hmdposition[2];
                     float zxDist = length(x, z);
 
                     if (zxDist != 0.0f && z != 0.0f) {
@@ -472,9 +479,13 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
             //off-hand stuff (done here as I reference it in the save state thing
             {
-                vr.offhandposition[0] = pOff->HeadPose.Pose.Position.x;
-                vr.offhandposition[1] = pOff->HeadPose.Pose.Position.y;
-                vr.offhandposition[2] = pOff->HeadPose.Pose.Position.z;
+                for (int i = 4; i > 0; --i)
+                {
+                    VectorCopy(vr.offhandposition[i-1], vr.offhandposition[i]);
+                }
+                vr.offhandposition[0][0] = pOff->HeadPose.Pose.Position.x;
+                vr.offhandposition[0][1] = pOff->HeadPose.Pose.Position.y;
+                vr.offhandposition[0][2] = pOff->HeadPose.Pose.Position.z;
 
                 vr.offhandoffset[0] = pOff->HeadPose.Pose.Position.x - vr.hmdposition[0];
                 vr.offhandoffset[1] = pOff->HeadPose.Pose.Position.y - vr.hmdposition[1];
@@ -731,7 +742,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                     (!vr.third_person && vr_turn_mode->integer == 1);
 
             static int increaseSnap = true;
-            if (!vr.item_selector && !vr.remote_npc) {
+            if (!vr.item_selector) {
                 if (usingSnapTurn) {
                     if (primaryJoystickX > 0.7f) {
                         if (increaseSnap) {
@@ -786,7 +797,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             {
                 if (!vr.secondaryVelocityTriggeredAttack)
                 {
-                    VectorCopy(vr.offhandposition, vr.secondaryVelocityTriggerLocation);
+                    VectorCopy(vr.offhandposition[0], vr.secondaryVelocityTriggerLocation);
                     vr.secondaryVelocityTriggeredAttack = true;
                 }
             }
@@ -796,7 +807,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 {
                     vec3_t start, end;
                     VectorSubtract(vr.secondaryVelocityTriggerLocation, vr.hmdposition, start);
-                    VectorSubtract(vr.offhandposition, vr.hmdposition, end);
+                    VectorSubtract(vr.offhandposition[0], vr.hmdposition, end);
                     float deltaLength = VectorLength(end) - VectorLength(start);
                     if (fabs(deltaLength) > 0.2f) {
                         if (deltaLength < 0) {

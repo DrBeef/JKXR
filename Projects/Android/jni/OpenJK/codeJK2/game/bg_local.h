@@ -79,6 +79,7 @@ qboolean	PM_SlideMove( float gravity );
 void		PM_StepSlideMove( float gravity );
 
 void rotateAboutOrigin(float x, float y, float rotation, vec2_t out);
+bool BG_UseVRPosition( gentity_t *ent );
 void BG_CalculateVRWeaponPosition( vec3_t origin, vec3_t angles );
 void BG_CalculateVRSaberPosition( vec3_t origin, vec3_t angles );
 void BG_CalculateVROffHandPosition( vec3_t origin, vec3_t angles );

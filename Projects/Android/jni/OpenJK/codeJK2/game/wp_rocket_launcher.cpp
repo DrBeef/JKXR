@@ -153,7 +153,7 @@ void WP_FireRocket( gentity_t *ent, qboolean alt_fire )
 	}
 
 	vec3_t	angs, forward;
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(start, angs);
 		AngleVectors(angs, forward, NULL, NULL);

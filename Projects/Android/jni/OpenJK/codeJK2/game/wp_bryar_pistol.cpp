@@ -41,7 +41,7 @@ void WP_FireBryarPistol( gentity_t *ent, qboolean alt_fire )
 	int		damage = !alt_fire ? weaponData[ent->s.weapon].damage : weaponData[ent->s.weapon].altDamage;
 
 	vec3_t	angs, forward;
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(wpMuzzle, angs);
 		AngleVectors(angs, forward, NULL, NULL);

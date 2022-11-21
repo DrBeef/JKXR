@@ -283,7 +283,7 @@ gentity_t *WP_FireThermalDetonator( gentity_t *ent, qboolean alt_fire )
 	bolt = G_Spawn();
 
 	bool realThrow = false;
-	if ( ent->client && !ent->NPC && ent->client->ps.clientNum == 0)
+	if ( BG_UseVRPosition(ent) )
 	{
 		vec3_t	angs;
 		BG_CalculateVRWeaponPosition(start, angs);

@@ -60,7 +60,7 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 	}
 
 	vec3_t	angs, forward;
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(muzzle, angs);
 		AngleVectors(angs, forward, NULL, NULL);
@@ -168,7 +168,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 	qboolean	hitDodged = qfalse, fullCharge = qfalse;
 
 	vec3_t	angs, forward;
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(muzzle, angs);
 		AngleVectors(angs, forward, NULL, NULL);
@@ -371,7 +371,7 @@ void WP_FireDisruptor( gentity_t *ent, qboolean alt_fire )
 	}
 
 	vec3_t	angs, forward;
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(muzzle, angs);
 		AngleVectors(angs, forward, NULL, NULL);

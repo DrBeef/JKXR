@@ -258,7 +258,7 @@ static void WP_FireConcussion( gentity_t *ent )
 	float	vel = CONC_VELOCITY;
 
 	vec3_t	angs, forward;
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(muzzle, angs);
 		AngleVectors(angs, forward, NULL, NULL);

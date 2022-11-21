@@ -1885,7 +1885,7 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 		return;
 	}
 
-	if ( cg.snap->ps.viewEntity > 0 && cg.snap->ps.viewEntity < ENTITYNUM_WORLD )
+	if ( in_misccamera )
 	{
 		//Not while viewing from another entity (such as a camera)
 		return;
@@ -2851,11 +2851,13 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		CG_Error( "CG_DrawActive: Undefined stereoView" );
 	}
 
+	char modelName[256];
+	Q_strncpyz(modelName, g_entities[cg.snap->ps.viewEntity].NPC_type, sizeof modelName);
+
 	vr->remote_npc = !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname );
 	vr->remote_droid = vr->remote_npc &&
-			( !Q_stricmp( "mouse", g_entities[cg.snap->ps.viewEntity].NPC_type) ||
-				!Q_stricmp( "r2d2", g_entities[cg.snap->ps.viewEntity].NPC_type) ||
-				!Q_stricmp( "r5d2", g_entities[cg.snap->ps.viewEntity].NPC_type));
+			( !Q_stricmp( "gonk", modelName ) || !Q_stricmp( "seeker", modelName ) || !Q_stricmp( "remote", modelName )
+			  || !Q_strncmp( "r2d2", modelName, 4 ) || !Q_strncmp( "r5d2", modelName, 4 ) || !Q_stricmp( "mouse", modelName ) );
 
 	vr->remote_turret = (!Q_stricmp( "misc_panel_turret", g_entities[cg.snap->ps.viewEntity].classname ));
 	in_misccamera = ( !Q_stricmp( "misc_camera", g_entities[cg.snap->ps.viewEntity].classname ))
@@ -2885,7 +2887,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		!vr->remote_droid)
 	{
 		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
-		cg.refdef.viewangles[YAW] = cg.refdefViewAngles[YAW]; // Need to do this better.. results in laggy YAW, which is unpleasant
+		cg.refdef.viewangles[YAW] = cg.refdefViewAngles[YAW];
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}
 
@@ -2894,7 +2896,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	{
 		cg.refdef.viewangles[ROLL] = vr->clientviewangles[ROLL];
 		cg.refdef.viewangles[PITCH] = vr->weaponangles[PITCH];
-		cg.refdef.viewangles[YAW] = (vr->clientviewangles[YAW] - vr->hmdorientation[YAW])
+		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW]
 				+ vr->weaponangles[YAW] + SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}

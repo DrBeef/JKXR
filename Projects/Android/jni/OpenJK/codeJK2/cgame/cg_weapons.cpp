@@ -2787,7 +2787,7 @@ void CG_DrawItemSelector( void )
 		if (vr->item_selector == 2)
 		{
 			cg.itemSelectorType = 3;
-			VectorCopy(vr->offhandposition, cg.itemSelectorOrigin);
+			VectorCopy(vr->offhandposition[0], cg.itemSelectorOrigin);
 			VectorCopy(vr->offhandoffset, cg.itemSelectorOffset);
 		}
 		else {
@@ -2812,7 +2812,7 @@ void CG_DrawItemSelector( void )
 	if (cg.itemSelectorType == 3)
 	{
 		BG_CalculateVROffHandPosition(controllerOrigin, controllerAngles);
-		VectorSubtract(vr->offhandposition, cg.itemSelectorOrigin, controllerOffset);
+		VectorSubtract(vr->offhandposition[0], cg.itemSelectorOrigin, controllerOffset);
 	}
 	else
 	{

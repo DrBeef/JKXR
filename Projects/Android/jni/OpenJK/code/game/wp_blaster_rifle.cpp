@@ -119,7 +119,7 @@ void WP_FireBlaster( gentity_t *ent, qboolean alt_fire )
 {
 	vec3_t	dir, angs;
 
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(muzzle, angs);
 	}

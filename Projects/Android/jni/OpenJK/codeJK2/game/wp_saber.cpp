@@ -8197,7 +8197,7 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 					self->client->ps.forceGripEntityInitialDist == ENTITYNUM_NONE)
 				{
 					vec3_t diff;
-					VectorSubtract(vr->offhandposition, vr->hmdposition, diff);
+					VectorSubtract(vr->offhandposition[0], vr->hmdposition, diff);
 					self->client->ps.forceGripEntityInitialDist = VectorLength(diff);
 				}
 
@@ -8216,7 +8216,7 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 				{//carry
 					if (isFirstPersonPlayer) {
 						vec3_t diff;
-						VectorSubtract(vr->offhandposition, vr->hmdposition, diff);
+						VectorSubtract(vr->offhandposition[0], vr->hmdposition, diff);
 						float length = VectorLength(diff);
 						float movedLength = (length - self->client->ps.forceGripEntityInitialDist) * cg_worldScale.value;
 						if (fabs(movedLength) > 1.0f) {

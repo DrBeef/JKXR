@@ -93,9 +93,9 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
         float controllerYawHeading = 0.0f;
         //off-hand stuff
         {
-            vr.offhandposition[0] = pOffTracking->HeadPose.Pose.Position.x;
-            vr.offhandposition[1] = pOffTracking->HeadPose.Pose.Position.y;
-            vr.offhandposition[2] = pOffTracking->HeadPose.Pose.Position.z;
+            vr.offhandposition[0][0] = pOffTracking->HeadPose.Pose.Position.x;
+            vr.offhandposition[0][1] = pOffTracking->HeadPose.Pose.Position.y;
+            vr.offhandposition[0][2] = pOffTracking->HeadPose.Pose.Position.z;
 
             vr.offhandoffset[0] = pOffTracking->HeadPose.Pose.Position.x - vr.hmdposition[0];
             vr.offhandoffset[1] = pOffTracking->HeadPose.Pose.Position.y - vr.hmdposition[1];

@@ -43,7 +43,7 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 
 
 	vec3_t	forward;
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(start, angs);
 		AngleVectors(angs, forward, NULL, NULL);

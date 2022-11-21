@@ -37,7 +37,7 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	G_Sound( ent, G_SoundIndex( "sound/weapons/baton/fire" ));
 
 	vec3_t	angs, forward;
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(muzzle, angs);
 		AngleVectors(angs, forward, NULL, NULL);

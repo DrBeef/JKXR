@@ -757,7 +757,7 @@ void BG_CalculateVRPositionInWorld( const vec3_t in_position,  vec3_t in_offset,
 
 void BG_CalculateVROffHandPosition( vec3_t origin, vec3_t angles )
 {
-	BG_CalculateVRPositionInWorld(vr->offhandposition, vr->offhandoffset, vr->offhandangles, origin, angles);
+	BG_CalculateVRPositionInWorld(vr->offhandposition[0], vr->offhandoffset, vr->offhandangles, origin, angles);
 }
 
 void BG_CalculateVRWeaponPosition( vec3_t origin, vec3_t angles )
@@ -768,6 +768,11 @@ void BG_CalculateVRWeaponPosition( vec3_t origin, vec3_t angles )
 void BG_CalculateVRSaberPosition( vec3_t origin, vec3_t angles )
 {
 	BG_CalculateVRPositionInWorld(vr->weaponposition, vr->weaponoffset, vr->weaponangles_saber, origin, angles);
+}
+
+bool BG_UseVRPosition( gentity_t *ent )
+{
+	return ( ent->client && (!ent->NPC || ent->client->ps.clientNum == 0 || ent->client->ps.clientNum == cg_entities[0].gent->client->ps.viewEntity));
 }
 
 /*

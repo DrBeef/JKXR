@@ -87,7 +87,7 @@ static void WP_RepeaterAltFire( gentity_t *ent )
 	gentity_t *missile = NULL;
 
 	vec3_t	forward, start, angs;
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(start, angs);
 		AngleVectors(angs, forward, NULL, NULL);
@@ -160,7 +160,7 @@ void WP_FireRepeater( gentity_t *ent, qboolean alt_fire )
 	vec3_t	dir, angs;
 
 	vec3_t	forward, start;
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(start, angs);
 	}

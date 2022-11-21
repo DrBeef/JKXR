@@ -58,7 +58,7 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 	for ( int i = 0; i < FLECHETTE_SHOTS; i++ )
 	{
 		vec3_t	angs;
-		if ( ent->client && !ent->NPC)
+		if ( BG_UseVRPosition(ent))
 		{
 			BG_CalculateVRWeaponPosition(muzzle, angs);
 		}

@@ -41,7 +41,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 	vec3_t		angs, forward, dir, start;
 	gentity_t	*missile;
 
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(wpMuzzle, angs);
 		AngleVectors(angs, forward, NULL, NULL);
@@ -144,7 +144,7 @@ static void WP_BowcasterAltFire( gentity_t *ent )
 	vec3_t	start, forward, angs;
 	int		damage	= weaponData[WP_BOWCASTER].altDamage;
 
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(start, angs);
 		AngleVectors(angs, forward, NULL, NULL);

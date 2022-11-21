@@ -888,7 +888,7 @@ void JKVR_GetMove(float *forward, float *side, float *pos_forward, float *pos_si
 		*up = 0.0f;
 		*side = 0.0f;
 		*pos_side = 0.0f;
-		*yaw = vr.snapTurn + vr.weaponangles[YAW];
+		*yaw = vr.snapTurn;
 		*pitch = vr.weaponangles[PITCH];
 		*roll = vr.hmdorientation[ROLL];
 	}
@@ -898,7 +898,7 @@ void JKVR_GetMove(float *forward, float *side, float *pos_forward, float *pos_si
 		*up = 0.0f;
 		*side = remote_movementSideways;
 		*pos_side = 0.0f;
-		*yaw = vr.hmdorientation[YAW] - vr.hmdorientation_first[YAW];
+		*yaw = vr.snapTurn + vr.hmdorientation[YAW] - vr.hmdorientation_first[YAW];
 		*pitch = vr.hmdorientation[PITCH];
 		*roll = 0.0f;
 	}

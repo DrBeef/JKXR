@@ -40,7 +40,7 @@ static void WP_DEMP2_MainFire( gentity_t *ent )
 	vec3_t	start, angs, forward;
 	int		damage	= weaponData[WP_DEMP2].damage;
 
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(start, angs);
 		AngleVectors(angs, forward, NULL, NULL);
@@ -211,7 +211,7 @@ static void WP_DEMP2_AltFire( gentity_t *ent )
 	vec3_t	start, angs, forward;
 	trace_t	tr;
 
-	if ( ent->client && !ent->NPC)
+	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(start, angs);
 		AngleVectors(angs, forward, NULL, NULL);

@@ -29,6 +29,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "Q3_Interface.h"
 #include "wp_saber.h"
 #include "g_icarus.h"
+#include <JKVR/VrClientInfo.h>
 
 #ifdef _DEBUG
 	#include <float.h>
@@ -216,6 +217,8 @@ void G_SetViewEntity( gentity_t *self, gentity_t *viewEntity )
 	{
 		//vec3_t	clear = {0,0,0};
 		CG_SetClientViewAngles( viewEntity->client->ps.viewangles, qtrue );
+		vr->snapTurn = 0;
+
 		//SetClientViewAngle( self, viewEntity->client->ps.viewangles );
 		//SetClientViewAngle( viewEntity, clear );
 		/*
