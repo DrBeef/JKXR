@@ -64,8 +64,8 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
     int primaryButton2;
     int secondaryButton1;
     int secondaryButton2;
-    int primaryThumb = vr_control_scheme->value == RIGHT_HANDED_DEFAULT ? ovrButton_RThumb : ovrButton_LThumb;
-    int secondaryThumb = vr_control_scheme->value == RIGHT_HANDED_DEFAULT ? ovrButton_LThumb : ovrButton_RThumb;
+    int primaryThumb = (vr_control_scheme->integer == RIGHT_HANDED_DEFAULT || vr_switch_sticks->integer) ? ovrButton_RThumb : ovrButton_LThumb;
+    int secondaryThumb = (vr_control_scheme->integer == RIGHT_HANDED_DEFAULT || vr_switch_sticks->integer) ? ovrButton_LThumb : ovrButton_RThumb;
     if (vr_switch_sticks->integer)
     {
         //
