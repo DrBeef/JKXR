@@ -18,6 +18,7 @@ typedef struct {
     bool weapon_stabilised;
     bool right_handed;
     bool player_moving;
+    int move_speed; // 0 (default) = Comfortable (75%) , 1 = Full (100%), 2 = Walk (50%)
     bool crouched;
     int cgzoommode;
     int saberBlockDebounce; // Amount of time after player is blocked that the saber position is fixed

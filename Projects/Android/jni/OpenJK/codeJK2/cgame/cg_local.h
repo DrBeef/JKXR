@@ -457,6 +457,9 @@ typedef struct {
 	vec3_t		itemSelectorOrigin;
 	vec3_t		itemSelectorOffset;
 
+	int			moveSpeedSelect;
+	int			moveSpeedSelectTime;
+
 	int			inventorySelect;		// Current inventory item chosen
 	int			inventorySelectTime;
 

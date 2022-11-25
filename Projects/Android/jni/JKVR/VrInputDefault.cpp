@@ -704,18 +704,20 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
             //Move a lot slower if scope is engaged
             remote_movementSideways =
-                    v[0] * vr_movement_multiplier->value;
+                    v[0] * (vr.move_speed == 0 ? 0.75f : (vr.move_speed == 1 ? 1.0f : 0.5f));
             remote_movementForward =
-                    v[1] * vr_movement_multiplier->value;
+                    v[1] * (vr.move_speed == 0 ? 0.75f : (vr.move_speed == 1 ? 1.0f : 0.5f));
             ALOGV("        remote_movementSideways: %f, remote_movementForward: %f",
                   remote_movementSideways,
                   remote_movementForward);
 
 
             if (!canUseQuickSave) {
-                if ((secondaryButtonsNew & secondaryButton1) !=
-                    (secondaryButtonsOld & secondaryButton1)) {
+                if (((secondaryButtonsNew & secondaryButton1) !=
+                    (secondaryButtonsOld & secondaryButton1)) &&
+                        (secondaryButtonsNew & secondaryButton1)) {
                     //Toggle walk/run somehow?!
+                    vr.move_speed = (++vr.move_speed) % 3;
                 }
             }
 

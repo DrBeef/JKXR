@@ -1428,6 +1428,33 @@ int CG_WeaponCheck( int weaponIndex )
 
 /*
 ===================
+CG_DrawMoveSpeedIcon
+===================
+*/
+void CG_DrawMoveSpeedIcon(void) {
+	if ((cg.zoomMode != 0) || !(cg_drawHUD.integer)) {
+		return;
+	}
+
+	if ((cg.snap->ps.viewEntity > 0 && cg.snap->ps.viewEntity < ENTITYNUM_WORLD)) {
+		return;
+	}
+
+	if (cg.moveSpeedSelect != vr->move_speed)
+	{
+		cg.moveSpeedSelect = vr->move_speed;
+		cg.moveSpeedSelectTime = cg.time;
+	}
+
+	if (((cg.moveSpeedSelectTime+WEAPON_SELECT_TIME)>cg.time)) {
+		cgi_R_SetColor(colorTable[CT_WHITE]);
+		CG_DrawPic(96, 64, 48, 64, cgs.media.iconMoveSpeed[cg.moveSpeedSelect]);
+	}
+}
+
+
+/*
+===================
 CG_DrawIconBackground
 ===================
 */

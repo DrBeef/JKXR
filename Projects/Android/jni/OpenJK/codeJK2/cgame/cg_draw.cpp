@@ -34,6 +34,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "FxUtil.h"
 
 void CG_DrawIconBackground(void);
+void CG_DrawMoveSpeedIcon(void);
 void CG_DrawMissionInformation( void );
 void CG_DrawInventorySelect( void );
 void CG_DrawForceSelect( void );
@@ -2744,6 +2745,8 @@ static void CG_Draw2D( void )
 		{
 			CG_DrawIconBackground();
 		}
+
+		CG_DrawMoveSpeedIcon();
 
 		CG_DrawWeaponSelect();
 

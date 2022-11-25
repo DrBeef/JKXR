@@ -103,6 +103,8 @@ typedef struct {
 	qhandle_t	turretComputerOverlayShader;
 	qhandle_t	turretCrossHairShader;
 
+	qhandle_t	iconMoveSpeed[3];
+
 	int			currentDataPadIconBackground;
 
 //Chunks
