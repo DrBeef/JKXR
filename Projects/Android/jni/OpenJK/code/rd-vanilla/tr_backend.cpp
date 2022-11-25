@@ -495,7 +495,8 @@ static void RB_BeginDrawingView (void) {
 	}
 	else
 	{
-		if ( !( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) && !g_bRenderGlowingObjects )
+		if ((!hasskybox || r_fastsky->integer) &&
+			!( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) && !g_bRenderGlowingObjects )
 		{
 			if (tr.world && tr.world->globalFog != -1)
 			{

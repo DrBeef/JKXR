@@ -845,6 +845,8 @@ void RB_StageIteratorSky( void ) {
 		return;
 	}
 
+	hasskybox = 1;
+
 	// go through all the polygons and project them onto
 	// the sky box to see which blocks on each side need
 	// to be drawn

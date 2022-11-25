@@ -1342,6 +1342,7 @@ void RE_LoadWorldMap_Actual( const char *name, world_t &worldData, int index ) {
 	if (!index)
 	{
 		skyboxportal = 0;
+		hasskybox = 0;
 
 		tr.sunDirection[0] = 0.45f;
 		tr.sunDirection[1] = 0.3f;

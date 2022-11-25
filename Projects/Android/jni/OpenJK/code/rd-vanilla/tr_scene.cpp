@@ -42,6 +42,7 @@ int			r_numpolyverts;
 
 int			skyboxportal;
 int			drawskyboxportal;
+int 		hasskybox; // Used to indicate whether the BSP contains a skybox (if not, then use fog colour if applicable)
 
 /*
 ====================

@@ -92,6 +92,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 extern int	skyboxportal;
 extern int	drawskyboxportal;
+extern int	hasskybox;
 
 typedef byte color4ub_t[4];
 
