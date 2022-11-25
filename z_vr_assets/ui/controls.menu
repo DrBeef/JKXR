@@ -1580,6 +1580,46 @@
 
 		}
 
+		itemDef
+		{
+			name				none
+			group				weaponcontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_SABER_3RD_PERSON_ITEM
+			cvar				"vr_saber_3rdperson_mode"
+			cvarFloatList
+			{
+				@MENUS_VR_SABER_3RD_PERSON_DISABLED 0
+				@MENUS_VR_SABER_3RD_PERSON_MANUAL 1
+				@MENUS_VR_SABER_3RD_PERSON_AUTO 2
+			}
+			rect				305 291 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		1
+			descText			@MENUS_VR_SABER_3RD_PERSON_DESC
+			action
+			{
+				play			sound/interface/button1
+			}
+
+			mouseenter
+			{
+				show			highlight7
+			}
+
+			mouseexit
+			{
+				hide			highlight7
+			}
+
+		}
+
 
 
 		//----------------------------------------------------------------------------------------------

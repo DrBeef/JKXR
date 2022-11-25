@@ -18,4 +18,5 @@ extern cvar_t   *vr_irl_crouch_to_stand_ratio;
 extern cvar_t   *vr_saber_block_debounce_time;
 extern cvar_t   *vr_haptic_intensity;
 extern cvar_t   *vr_comfort_vignette;
+extern cvar_t   *vr_saber_3rdperson_mode;
 

@@ -267,18 +267,32 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         }
         else if (cl.frame.ps.weapon == WP_SABER)
         {
-            int mode = (int)Cvar_VariableValue("cg_thirdPerson");
-            static bool switched = false;
-            if (between(-0.2f, primaryJoystickX, 0.2f) &&
-                (between(0.8f, pPrimaryJoystick->y, 1.0f) ||
-                 between(-1.0f, pPrimaryJoystick->y, -0.8f))) {
-                if (!switched) {
-                    mode = 1 - mode;
-                    sendButtonActionSimple(va("cg_thirdPerson %i", mode));
-                    switched = true;
+            if (vr_saber_3rdperson_mode->integer == 2) {
+                int mode = (int)Cvar_VariableValue("cg_thirdPerson");
+                if (!mode)
+                {
+                    sendButtonActionSimple("cg_thirdPerson 1");
+                }
+            } else if (vr_saber_3rdperson_mode->integer == 1) {
+                int mode = (int) Cvar_VariableValue("cg_thirdPerson");
+                static bool switched = false;
+                if (between(-0.2f, primaryJoystickX, 0.2f) &&
+                    (between(0.8f, pPrimaryJoystick->y, 1.0f) ||
+                     between(-1.0f, pPrimaryJoystick->y, -0.8f))) {
+                    if (!switched) {
+                        mode = 1 - mode;
+                        sendButtonActionSimple(va("cg_thirdPerson %i", mode));
+                        switched = true;
+                    }
+                } else {
+                    switched = false;
                 }
             } else {
-                switched = false;
+                int mode = (int)Cvar_VariableValue("cg_thirdPerson");
+                if (mode != 0)
+                {
+                    sendButtonActionSimple("cg_thirdPerson 0");
+                }
             }
         }
         else
