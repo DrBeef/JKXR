@@ -38,6 +38,7 @@ cvar_t  *vr_irl_crouch_enabled;
 cvar_t  *vr_irl_crouch_to_stand_ratio;
 cvar_t	*vr_saber_block_debounce_time;
 cvar_t	*vr_haptic_intensity;
+cvar_t  *vr_comfort_vignette;
 
 ovrInputStateTrackedRemote leftTrackedRemoteState_old;
 ovrInputStateTrackedRemote leftTrackedRemoteState_new;

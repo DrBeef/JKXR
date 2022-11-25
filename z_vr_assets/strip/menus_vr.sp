@@ -3,16 +3,16 @@ CONFIG W:\bin\striped.cfg
 ID 100
 REFERENCE MENUS_VR
 DESCRIPTION "VR Menu Localizations"
-COUNT 119
+COUNT 123
 INDEX 0
 {
    REFERENCE COMMON_CONTROLS_ITEM
-   TEXT_LANGUAGE1 "OBSOLETE Common"
+   TEXT_LANGUAGE1 "Common"
 }
 INDEX 1
 {
    REFERENCE COMMON_CONTROLS_DESC
-   TEXT_LANGUAGE1 "OBSOLETE Common controls configuration."
+   TEXT_LANGUAGE1 "Common controls configuration."
 }
 INDEX 2
 {
@@ -37,7 +37,7 @@ INDEX 5
 INDEX 6
 {
    REFERENCE COMFORT_CONTROLS_DESC
-   TEXT_LANGUAGE1 "Configure common controls and comfort options."
+   TEXT_LANGUAGE1 "Configure comfort options."
 }
 INDEX 7
 {
@@ -598,4 +598,24 @@ INDEX 118
 {
    REFERENCE AUTO_USE_BACTA_DESC
    TEXT_LANGUAGE1 "When enabled, automatically uses bacta canister before dying."
+}
+INDEX 119
+{
+   REFERENCE HAPTIC_INTENSITY_ITEM
+   TEXT_LANGUAGE1 "Haptic Intensity:"
+}
+INDEX 120
+{
+   REFERENCE HAPTIC_INTENSITY_DESC
+   TEXT_LANGUAGE1 "Adjust intensity of haptic feedback."
+}
+INDEX 121
+{
+   REFERENCE COMFORT_VIGNETTE_ITEM
+   TEXT_LANGUAGE1 "Comfort Vignette:"
+}
+INDEX 122
+{
+   REFERENCE COMFORT_VIGNETTE_DESC
+   TEXT_LANGUAGE1 "Adjust size of comfort vignette."
 }

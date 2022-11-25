@@ -2571,6 +2571,82 @@ static void CG_DrawZoomBorders( void )
 	CG_FillRect( 0, 480 - 80, 640, bar_height, modulate  );
 }
 
+
+/*
+==============
+CG_DrawVignette
+==============
+*/
+float currentComfortVignetteValue = 0.0f;
+float filteredViewYawDelta = 0.0f;
+
+static void CG_DrawVignette( void )
+{
+	playerState_t	*ps;
+	ps = &cg.snap->ps;
+
+	cvar_t *vr_comfort_vignette = gi.cvar("vr_comfort_vignette", "0.0", CVAR_ARCHIVE); // defined in VrCvars.h
+	if (vr_comfort_vignette->value <= 0.0f || vr_comfort_vignette->value > 1.0f || !cg.zoomMode == 0)
+	{
+		return;
+	}
+
+	bool isMoving = VectorLength(cg.predicted_player_state.velocity) > 30.0;
+	// When player is in the air, apply vignette (to prevent throbbing on top of jump)
+	bool isInAir = ps->groundEntityNum == ENTITYNUM_NONE;
+	cvar_t *vr_turn_mode = gi.cvar("vr_turn_mode", "0", CVAR_ARCHIVE); // defined in VrCvars.h
+	// Apply only for smooth turn
+	bool isTurning = (vr_turn_mode->integer == 2 || (vr_turn_mode->integer == 1 && vr->third_person));
+	if (isTurning) {
+		float yawDelta = fabsf(vr->clientview_yaw_delta);
+		if (yawDelta > 180)
+		{
+			yawDelta = fabs(yawDelta - 360);
+		}
+		filteredViewYawDelta = filteredViewYawDelta * 0.75f + yawDelta * 0.25f;
+		isTurning = filteredViewYawDelta > 1;
+	}
+
+	if (isMoving || isInAir || isTurning)
+	{
+		if (currentComfortVignetteValue <  vr_comfort_vignette->value)
+		{
+			currentComfortVignetteValue += vr_comfort_vignette->value * 0.05;
+			if (currentComfortVignetteValue > 1.0f)
+				currentComfortVignetteValue = 1.0f;
+		}
+	} else{
+		if (currentComfortVignetteValue >  0.0f)
+			currentComfortVignetteValue -= vr_comfort_vignette->value * 0.05;
+	}
+
+	if (currentComfortVignetteValue > 0.0f && currentComfortVignetteValue <= 1.0f)
+	{
+		int screenWidth = 640; //cg.refdef.width;
+		int screenHeight = 480; //cg.refdef.height;
+
+		int x = (int)(0 + currentComfortVignetteValue * screenWidth / 3.5f);
+		int w = (int)(screenWidth - 2 * x);
+		int y = (int)(0 + currentComfortVignetteValue * screenHeight / 3.5f);
+		int h = (int)(screenHeight - 2 * y);
+
+		vec4_t black = {0.0, 0.0, 0.0, 1};
+		cgi_R_SetColor( black );
+
+		// sides
+		cgi_R_DrawStretchPic( 0, 0, x, screenHeight, 0, 0, 1, 1, cgs.media.whiteShader );
+		cgi_R_DrawStretchPic( screenWidth - x, 0, x, screenHeight, 0, 0, 1, 1, cgs.media.whiteShader );
+		// top/bottom
+		cgi_R_DrawStretchPic( x, 0, screenWidth - x, y, 0, 0, 1, 1, cgs.media.whiteShader );
+		cgi_R_DrawStretchPic( x, screenHeight - y, screenWidth - x, y, 0, 0, 1, 1, cgs.media.whiteShader );
+		// vignette
+		cgi_R_DrawStretchPic( x, y, w, h, 0, 0, 1, 1, cgs.media.vignetteShader );
+
+		cgi_R_SetColor( NULL );
+	}
+}
+
+
 /*
 =================
 CG_Draw2D
@@ -2662,6 +2738,8 @@ static void CG_Draw2D( void )
 	// don't draw any status if dead
 	if ( cg.snap->ps.stats[STAT_HEALTH] > 0 ) 
 	{
+		CG_DrawVignette();
+
 		if ( !(cent->gent && cent->gent->s.eFlags & (EF_LOCKED_TO_WEAPON |EF_IN_ATST)))
 		{
 			CG_DrawIconBackground();

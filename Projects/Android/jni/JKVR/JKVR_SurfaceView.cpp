@@ -818,6 +818,11 @@ void updateHMDOrientation()
 	{
 		VectorCopy(vr.weaponangles, vr.weaponangles_first);
 	}
+
+	// View yaw delta
+	float clientview_yaw = vr.clientviewangles[YAW] - vr.hmdorientation[YAW];
+	vr.clientview_yaw_delta = vr.clientview_yaw_last - clientview_yaw;
+	vr.clientview_yaw_last = clientview_yaw;
 }
 
 void setHMDPosition( float x, float y, float z )
@@ -1345,6 +1350,7 @@ void JKVR_Init()
 	vr_irl_crouch_to_stand_ratio = Cvar_Get ("vr_irl_crouch_to_stand_ratio", "0.65", CVAR_ARCHIVE);
 	vr_saber_block_debounce_time = Cvar_Get ("vr_saber_block_debounce_time", "200", CVAR_ARCHIVE);
 	vr_haptic_intensity = Cvar_Get ("vr_haptic_intensity", "1.0", CVAR_ARCHIVE);
+	vr_comfort_vignette = Cvar_Get ("vr_comfort_vignette", "0.0", CVAR_ARCHIVE);
 
 	cvar_t *expanded_menu_enabled = Cvar_Get ("expanded_menu_enabled", "0", CVAR_ARCHIVE);
 	if (FS_FileExists("expanded_menu.pk3")) {

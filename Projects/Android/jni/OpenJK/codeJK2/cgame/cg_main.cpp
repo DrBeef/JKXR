@@ -1313,6 +1313,8 @@ static void CG_RegisterGraphics( void ) {
 
 	cgs.media.reticleShader = cgi_R_RegisterShader( "gfx/weapon/scope" );
 
+	cgs.media.vignetteShader = cgi_R_RegisterShaderNoMip( "gfx/vignette" );
+
 
 	// FIXME: do these conditionally
 	cgi_R_RegisterShader( "gfx/2d/workingCamera" );
