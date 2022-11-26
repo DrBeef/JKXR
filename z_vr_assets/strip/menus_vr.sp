@@ -42,12 +42,12 @@ INDEX 6
 INDEX 7
 {
    REFERENCE MOVEMENT_SPEED_ITEM
-   TEXT_LANGUAGE1 "Movement Speed:"
+   TEXT_LANGUAGE1 "OBSOLETE Movement Speed:"
 }
 INDEX 8
 {
    REFERENCE MOVEMENT_SPEED_DESC
-   TEXT_LANGUAGE1 "Sets player movement speed."
+   TEXT_LANGUAGE1 "OBSOLETE Sets player movement speed."
 }
 INDEX 9
 {
