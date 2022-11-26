@@ -32,6 +32,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "b_local.h"
 #include "anims.h"
 #include "../../code/rd-common/mdx_format.h"
+#include <JKVR/VrClientInfo.h>
 
 #define ACT_ACTIVE		qtrue
 #define ACT_INACTIVE	qfalse
@@ -1283,7 +1284,11 @@ void TryUse( gentity_t *ent ) {
 	//cg.refdef.vieworg, basically
 	if (ent->client->ps.clientNum == 0) {
 		vec3_t angles;
-		BG_CalculateVRWeaponPosition(src, angles);
+		if (vr->useGestureActive && gi.cvar("vr_gesture_triggered_use", "0", CVAR_ARCHIVE)->integer == 1) { // defined in VrCvars.h
+			BG_CalculateVROffHandPosition(src, angles);
+		} else {
+			BG_CalculateVRWeaponPosition(src, angles);
+		}
 		AngleVectors(angles, vf, NULL, NULL);
 	} else {
 		VectorCopy(ent->client->renderInfo.eyePoint, src);

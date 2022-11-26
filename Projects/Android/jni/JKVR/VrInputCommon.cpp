@@ -39,6 +39,8 @@ cvar_t	*vr_saber_block_debounce_time;
 cvar_t	*vr_haptic_intensity;
 cvar_t  *vr_comfort_vignette;
 cvar_t  *vr_saber_3rdperson_mode;
+cvar_t  *vr_gesture_triggered_use;
+cvar_t  *vr_gesture_triggered_use_threshold;
 
 ovrInputStateTrackedRemote leftTrackedRemoteState_old;
 ovrInputStateTrackedRemote leftTrackedRemoteState_new;
