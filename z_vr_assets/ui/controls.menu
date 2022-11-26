@@ -1114,48 +1114,15 @@
 		{
 			name				none
 			group				commoncontrols
-			type				ITEM_TYPE_SLIDER
-			text				@MENUS_VR_MOVEMENT_SPEED_ITEM
-			cvarfloat		"vr_movement_multiplier" 0 0.4 1.2
-			rect				305 191 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		1
-			descText			@MENUS_VR_MOVEMENT_SPEED_DESC
-			action 
-			{ 
-				play			sound/interface/button1
-			}
-
-			mouseenter
-			{ 
-				show			highlight2
-			}
-
-			mouseexit
-			{ 
-				hide			highlight2
-			}
-		}
-
-		itemDef
-		{
-			name				none
-			group				commoncontrols
 			type				ITEM_TYPE_MULTI
 			text				@MENUS_VR_DIRECTION_MODE_ITEM
 			cvar				"vr_walkdirection"
 			cvarFloatList
-			{ 
+			{
 				@MENUS_VR_DIRECTION_MODE_CONTROLLER 0
 				@MENUS_VR_DIRECTION_MODE_HMD 1
 			}
-			rect				305 211 300 20
+			rect				305 191 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1166,18 +1133,18 @@
 			// appearance_slot		1
 			descText			@MENUS_VR_DIRECTION_MODE_DESC
 			action
-			{ 
+			{
 				play			sound/interface/button1
 			}
 
 			mouseenter
-			{ 
-				show			highlight3
+			{
+				show			highlight2
 			}
 
 			mouseexit
-			{ 
-				hide			highlight3
+			{
+				hide			highlight2
 			}
 
 		}
@@ -1190,12 +1157,12 @@
 			text				@MENUS_VR_SMOOTH_TURN_ITEM
 			cvar				"vr_turn_mode"
 			cvarFloatList
-			{ 
+			{
 				@MENUS0_NO 0
 				@MENUS_VR_SMOOTH_TURN_3RD_PERSON 1
 				@MENUS0_YES 2
 			}
-			rect				305 231 300 20
+			rect				305 211 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1206,17 +1173,17 @@
 			// appearance_slot		3
 			descText			@MENUS_VR_SMOOTH_TURN_DESC
 			action
-			{ 
+			{
 				play			sound/interface/button1
 			}
 
 			mouseenter
 			{
-				show			highlight4
+				show			highlight3
 			}
 			mouseexit
-			{ 
-				hide			highlight4
+			{
+				hide			highlight3
 			}
 		}
 
@@ -1233,7 +1200,7 @@
 				@MENUS_VR_TURN_ANGLE_45DEGREES 45
 				@MENUS_VR_TURN_ANGLE_90DEGREES 90
 			}
-			rect				305 251 300 20
+			rect				305 231 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1244,17 +1211,17 @@
 			// appearance_slot		4
 			descText			@MENUS_VR_TURN_ANGLE_DESC
 			action
-			{ 
+			{
 				play			sound/interface/button1
 			}
 
 			mouseenter
 			{
-				show			highlight5
+				show			highlight4
 			}
 			mouseexit
-			{ 
-				hide			highlight5
+			{
+				hide			highlight4
 			}
 		}
 
@@ -1265,7 +1232,7 @@
 			type				ITEM_TYPE_YESNO
 			text				@MENUS_VR_SWITCH_STICKS_ITEM
 			cvar				"vr_switch_sticks"
-			rect				305 271 300 20
+			rect				305 251 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1276,7 +1243,44 @@
 			// appearance_slot		5
 			descText			@MENUS_VR_SWITCH_STICKS_DESC
 			action
+			{
+				play			sound/interface/button1
+			}
+
+			mouseenter
+			{
+				show			highlight5
+			}
+			mouseexit
+			{
+				hide			highlight5
+			}
+		}
+
+		itemDef
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_LEFT_HANDED_ITEM
+			cvar				"vr_control_scheme"
+			cvarFloatList
 			{ 
+				@MENUS0_NO 0
+				@MENUS0_YES 10
+			}
+			rect				305 271 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		5
+			descText			@MENUS_VR_LEFT_HANDED_DESC
+			action
+			{
 				play			sound/interface/button1
 			}
 
@@ -1294,47 +1298,10 @@
 		{
 			name				none
 			group				commoncontrols
-			type				ITEM_TYPE_MULTI
-			text				@MENUS_VR_LEFT_HANDED_ITEM
-			cvar				"vr_control_scheme"
-			cvarFloatList
-			{ 
-				@MENUS0_NO 0
-				@MENUS0_YES 10
-			}
-			rect				305 291 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
-			textaligny			-2
-			font				2
-			textscale			0.8
-			forecolor			1 1 1 1
-			visible			0
-			// appearance_slot		5
-			descText			@MENUS_VR_LEFT_HANDED_DESC
-			action
-			{
-				play			sound/interface/button1
-			}
-
-			mouseenter
-			{
-				show			highlight7
-			}
-			mouseexit
-			{ 
-				hide			highlight7
-			}
-		}
-
-		itemDef
-		{
-			name				none
-			group				commoncontrols
 			type				ITEM_TYPE_YESNO
 			text				@MENUS_VR_CROUCH_TOGGLE_ITEM
 			cvar				"vr_crouch_toggle"
-			rect				305 311 300 20
+			rect				305 291 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1345,18 +1312,18 @@
 			// appearance_slot		1
 			descText			@MENUS_VR_CROUCH_TOGGLE_DESC
 			action
-			{ 
+			{
 				play			sound/interface/button1
 			}
 		
 			mouseenter
-			{ 
-				show			highlight8
+			{
+				show			highlight7
 			}
 
 			mouseexit
-			{ 
-				hide			highlight8
+			{
+				hide			highlight7
 			}
 		}
 
@@ -1368,12 +1335,12 @@
 			text				@MENUS_VR_CROUCH_IRL_ITEM
 			cvar				"vr_irl_crouch_enabled"
 			cvarFloatList
-			{ 
+			{
 				@MENUS0_NO 0
 				@MENUS_VR_CROUCH_IRL_1ST_PERSON 1
 				@MENUS0_YES 2
 			}
-			rect				305 331 300 20
+			rect				305 311 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1384,17 +1351,17 @@
 			// appearance_slot		3
 			descText			@MENUS_VR_CROUCH_IRL_DESC
 			action
-			{ 
+			{
 				play			sound/interface/button1
 			}
 
 			mouseenter
 			{
-				show			highlight9
+				show			highlight8
 			}
 			mouseexit
-			{ 
-				hide			highlight9
+			{
+				hide			highlight8
 			}
 		}
 
