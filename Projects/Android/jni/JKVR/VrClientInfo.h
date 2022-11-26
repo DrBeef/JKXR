@@ -72,6 +72,7 @@ typedef struct {
 
     float   maxHeight;
     float   curHeight;
+    bool    useGestureActive;
 
     //////////////////////////////////////
     //    Test stuff for weapon alignment

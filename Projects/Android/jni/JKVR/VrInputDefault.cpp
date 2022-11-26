@@ -837,6 +837,33 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 }
             }
         }
+
+        // Process "use" gesture
+        if (vr_gesture_triggered_use->integer) {
+            float absoluteDistanceToHMD;
+            float verticalDistanceToHMD;
+            if (vr_gesture_triggered_use->integer == 1) {
+                // Gesture with off-hand
+                absoluteDistanceToHMD = distanceToHMDOff;
+                verticalDistanceToHMD = vr.offhandoffset[1];
+            } else {
+                // Gesture with dominant-hand
+                absoluteDistanceToHMD = distanceToHMD;
+                verticalDistanceToHMD = vr.weaponoffset[1];
+            }
+            float threshhold = vr_gesture_triggered_use_threshold->value;
+            // Hand must be extended and at least on waist level
+            // Com_Printf("DISTANCE: %.2f ; HEIGHT: %.2f\n", absoluteDistanceToHMD, verticalDistanceToHMD);
+            if (!vr.weapon_stabilised && absoluteDistanceToHMD > threshhold && verticalDistanceToHMD > -threshhold) {
+                if (!vr.useGestureActive) {
+                    vr.useGestureActive = true;
+                    sendButtonAction("+use", true);
+                }
+            } else if (vr.useGestureActive) {
+                vr.useGestureActive = false;
+                sendButtonAction("+use", false);
+            }
+        }
     }
 
 

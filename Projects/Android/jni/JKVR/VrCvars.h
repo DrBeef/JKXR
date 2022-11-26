@@ -19,4 +19,6 @@ extern cvar_t   *vr_saber_block_debounce_time;
 extern cvar_t   *vr_haptic_intensity;
 extern cvar_t   *vr_comfort_vignette;
 extern cvar_t   *vr_saber_3rdperson_mode;
+extern cvar_t   *vr_gesture_triggered_use;
+extern cvar_t   *vr_gesture_triggered_use_threshold;
 
