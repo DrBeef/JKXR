@@ -2916,7 +2916,6 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	vr->cgzoommode = cg.zoomMode;
 
-	cg.refdef.stereoView = stereoView;
 	switch ( stereoView ) {
 	case STEREO_CENTER:
 		separation = 0;

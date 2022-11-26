@@ -334,6 +334,8 @@ typedef struct {
 
 	int			timelimitWarnings;	// 5 min, 1 min, overtime
 
+	stereoFrame_t stereoView;
+
 	qboolean	renderingThirdPerson;		// during deaths, chasecams, etc
 
 	// prediction state

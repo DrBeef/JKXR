@@ -2007,7 +2007,11 @@ static qboolean cg_rangedFogging = qfalse; //so we know if we should go back to 
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 	qboolean	inwater = qfalse;
 
-	cg.time = serverTime;
+	if ( stereoView == STEREO_LEFT ) {
+		cg.time = serverTime;
+	}
+
+	cg.stereoView = stereoView;
 
 	// update cvars
 	CG_UpdateCvars();

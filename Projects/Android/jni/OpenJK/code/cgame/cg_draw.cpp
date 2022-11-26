@@ -4368,7 +4368,6 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	VectorNormalize( vright_n );
 	VectorNormalize( vup_n );
 
-	cg.refdef.stereoView = stereoView;
 	switch ( stereoView ) {
 	case STEREO_CENTER:
 		separation = 0;

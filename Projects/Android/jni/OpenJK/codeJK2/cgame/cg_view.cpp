@@ -1839,6 +1839,8 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		cg.time = serverTime;
 	}
 
+	cg.stereoView = stereoView;
+
 	// update cvars
 	CG_UpdateCvars();
 

@@ -211,7 +211,6 @@ typedef struct {
 
 	// text messages for deform text shaders
 //	char		text[MAX_RENDER_STRINGS][MAX_RENDER_STRING_LENGTH];
-    stereoFrame_t stereoView;
 	float worldscale;
 } refdef_t;
 
