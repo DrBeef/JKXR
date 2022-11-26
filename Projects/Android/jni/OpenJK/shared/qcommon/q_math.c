@@ -1302,6 +1302,28 @@ float DistanceHorizontalSquared( const vec3_t p1, const vec3_t p2 )
 	return v[0]*v[0] + v[1]*v[1];	//Leave off the z component
 }
 
+void VectorRotateAroundAxis( vec3_t in, vec3_t axis, float angle, vec3_t out ) {
+	// https://stackoverflow.com/a/67468546
+	vec3_t normAxis;
+	VectorNormalize2(axis, normAxis);
+	float dotProduct = DotProduct(normAxis, in);
+	vec3_t crossProduct;
+	CrossProduct(normAxis, in, crossProduct);
+	float angleRad = DEG2RAD(angle);
+	float cosA = cosf(angleRad);
+	float sinA = sinf(angleRad);
+
+	vec3_t tmp1;
+	VectorScale( in, cosA, tmp1 );
+	vec3_t tmp2;
+	VectorScale(crossProduct, sinA, tmp2);
+	vec3_t tmp3;
+	VectorScale(normAxis, dotProduct * (1 - cosA), tmp3);
+
+	VectorAdd(tmp1, tmp2, out);
+	VectorAdd(out, tmp3, out);
+}
+
 /*
 ================
 MakeNormalVectors

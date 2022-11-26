@@ -276,6 +276,7 @@ void VectorRotate( const vec3_t in, matrix3_t matrix, vec3_t out );
 void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
 void PerpendicularVector( vec3_t dst, const vec3_t src );
 float DotProductNormalize( const vec3_t inVec1, const vec3_t inVec2 );
+void VectorRotateAroundAxis( vec3_t vector, vec3_t axis, float angle, vec3_t out );
 
 #define VectorScaleVector(a,b,c)		(((c)[0]=(a)[0]*(b)[0]),((c)[1]=(a)[1]*(b)[1]),((c)[2]=(a)[2]*(b)[2]))
 #define VectorInverseScaleVector(a,b,c)	((c)[0]=(a)[0]/(b)[0],(c)[1]=(a)[1]/(b)[1],(c)[2]=(a)[2]/(b)[2])
