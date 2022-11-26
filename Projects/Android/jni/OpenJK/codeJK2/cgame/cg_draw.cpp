@@ -2931,18 +2931,31 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		CG_Error( "CG_DrawActive: Undefined stereoView" );
 	}
 
-	char modelName[256];
-	Q_strncpyz(modelName, g_entities[cg.snap->ps.viewEntity].NPC_type, sizeof modelName);
 
-	vr->remote_npc = !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname );
-	vr->remote_droid = vr->remote_npc &&
-			( !Q_stricmp( "gonk", modelName ) || !Q_stricmp( "seeker", modelName ) || !Q_stricmp( "remote", modelName )
-			  || !Q_strncmp( "r2d2", modelName, 4 ) || !Q_strncmp( "r5d2", modelName, 4 ) || !Q_stricmp( "mouse", modelName ) );
+    vr->remote_npc = !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname );
+    vr->remote_droid = false;
+    vr->remote_turret = false;
+    in_misccamera = false;
 
-	vr->remote_turret = (!Q_stricmp( "misc_panel_turret", g_entities[cg.snap->ps.viewEntity].classname ));
-	in_misccamera = ( !Q_stricmp( "misc_camera", g_entities[cg.snap->ps.viewEntity].classname ))
-			|| vr->remote_droid
-			|| vr->remote_turret;
+    if (cg.snap->ps.viewEntity) {
+
+        if (g_entities[cg.snap->ps.viewEntity].NPC_type) {
+            char modelName[256];
+            Q_strncpyz(modelName, g_entities[cg.snap->ps.viewEntity].NPC_type, sizeof modelName);
+
+            vr->remote_droid = vr->remote_npc &&
+                               (!Q_stricmp("gonk", modelName) || !Q_stricmp("seeker", modelName) ||
+                                !Q_stricmp("remote", modelName)
+                                || !Q_strncmp("r2d2", modelName, 4) ||
+                                !Q_strncmp("r5d2", modelName, 4) || !Q_stricmp("mouse", modelName));
+        }
+
+        vr->remote_turret = (!Q_stricmp("misc_panel_turret",
+                                        g_entities[cg.snap->ps.viewEntity].classname));
+        in_misccamera = (!Q_stricmp("misc_camera", g_entities[cg.snap->ps.viewEntity].classname))
+                        || vr->remote_droid
+                        || vr->remote_turret;
+    }
 	bool emplaced_gun = ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON );
 
 	cg.refdef.worldscale = cg_worldScale.value;
