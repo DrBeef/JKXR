@@ -4274,7 +4274,7 @@ void UI_GetVideoSetup ( void )
 	Cvar_Register ( NULL, "ui_r_picmip",				"0", CVAR_ROM );
 	Cvar_Register ( NULL, "ui_r_texturebits",			"0", CVAR_ROM );
 	Cvar_Register ( NULL, "ui_r_texturemode",			"0", CVAR_ROM );
-	Cvar_Register ( NULL, "ui_r_detailtextures",		"0", CVAR_ROM );
+	Cvar_Register ( NULL, "ui_r_detailtextures",		"1", CVAR_ROM );
 	Cvar_Register ( NULL, "ui_r_ext_compress_textures",	"0", CVAR_ROM );
 	Cvar_Register ( NULL, "ui_r_depthbits",				"24", CVAR_ROM );
 	Cvar_Register ( NULL, "ui_r_subdivisions",			"0", CVAR_ROM );
