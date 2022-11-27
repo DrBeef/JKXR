@@ -30,6 +30,7 @@ cvar_t	*vr_immersive_cinematics;
 cvar_t	*vr_screen_dist;
 cvar_t	*vr_weapon_velocity_trigger;
 cvar_t	*vr_force_velocity_trigger;
+cvar_t	*vr_force_distance_trigger;
 cvar_t	*vr_two_handed_weapons;
 cvar_t	*vr_force_motion_controlled;
 cvar_t	*vr_crouch_toggle;
