@@ -821,11 +821,15 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             {
                 if (vr.secondaryVelocityTriggeredAttack)
                 {
-                    vec3_t start, end;
-                    VectorSubtract(vr.secondaryVelocityTriggerLocation, vr.hmdposition, start);
-                    VectorSubtract(vr.offhandposition[0], vr.hmdposition, end);
+                    vec3_t start, end, chest;
+
+                    //Estimate that middle of chest is about 20cm below HMD
+                    VectorCopy(vr.hmdposition, chest);
+                    chest[1] -= 0.2f;
+                    VectorSubtract(vr.secondaryVelocityTriggerLocation, chest, start);
+                    VectorSubtract(vr.offhandposition[0], chest, end);
                     float deltaLength = VectorLength(end) - VectorLength(start);
-                    if (fabs(deltaLength) > 0.2f) {
+                    if (fabs(deltaLength) > vr_force_distance_trigger->value) {
                         if (deltaLength < 0) {
                             sendButtonActionSimple(va("useGivenForce %i", FP_PULL));
                         } else {
