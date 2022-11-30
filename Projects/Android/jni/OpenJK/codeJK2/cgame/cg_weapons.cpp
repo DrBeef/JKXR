@@ -2782,8 +2782,10 @@ void CG_ItemSelectorNext_f( void )
 	}
 
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
+
+    //Only show the stance selection if using saber and in third person
 	int selectors = ((cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) &&
-					 cent->currentState.weapon == WP_SABER) ? 3 : 2;
+					 cent->currentState.weapon == WP_SABER && cg_thirdPerson.integer) ? 3 : 2;
 	cg.itemSelectorType = (cg.itemSelectorType+1) % selectors;
 	cg.itemSelectorTime = cg.time;
 }
@@ -2796,8 +2798,10 @@ void CG_ItemSelectorPrev_f( void )
 	}
 
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
+
+    //Only show the stance selection if using saber and in third person
 	int selectors = ((cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) &&
-							 cent->currentState.weapon == WP_SABER) ? 3 : 2;
+							 cent->currentState.weapon == WP_SABER && cg_thirdPerson.integer) ? 3 : 2;
 	if (--cg.itemSelectorType < 0)
 		cg.itemSelectorType = selectors-1;
 	cg.itemSelectorTime = cg.time;

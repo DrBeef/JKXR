@@ -660,9 +660,8 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
                     (pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger)) {
 
-                    ALOGV("**WEAPON EVENT**  Not Grip Pushed %sattack",
-                          (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) ? "+" : "-");
-                    firing = (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger);
+                    firing = (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) &&
+                            !vr.item_selector;
                     sendButtonAction("+attack", firing);
                 }
 
@@ -858,7 +857,9 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             float threshhold = vr_gesture_triggered_use_threshold->value;
             // Hand must be extended and at least on waist level
             // Com_Printf("DISTANCE: %.2f ; HEIGHT: %.2f\n", absoluteDistanceToHMD, verticalDistanceToHMD);
-            if (!vr.weapon_stabilised && absoluteDistanceToHMD > threshhold && verticalDistanceToHMD > -threshhold) {
+            bool gestureUseAllowed = !vr.weapon_stabilised && !vr.cin_camera && !vr.misc_camera &&
+                                  !vr.remote_turret;
+            if (gestureUseAllowed && absoluteDistanceToHMD > threshhold && verticalDistanceToHMD > -threshhold) {
                 if (!vr.useGestureActive) {
                     vr.useGestureActive = true;
                     sendButtonAction("+use", true);
