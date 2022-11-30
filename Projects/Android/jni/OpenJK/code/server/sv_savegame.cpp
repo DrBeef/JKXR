@@ -26,7 +26,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #define JPEG_IMAGE_QUALITY 95
 
-//#define USE_LAST_SAVE_FROM_THIS_MAP	// enable this if you want to use the last explicity-loaded savegame from this map
+#define USE_LAST_SAVE_FROM_THIS_MAP	// enable this if you want to use the last explicity-loaded savegame from this map
 				 						//	when respawning after dying, else it'll just load "auto" regardless
 										//	(EF1 behaviour). I should maybe time/date check them though?
 
@@ -148,7 +148,7 @@ void SV_WipeGame_f(void)
 		return;
 	}
 	SG_WipeSavegame(Cmd_Argv(1));
-//	Com_Printf("%s has been wiped\n", Cmd_Argv(1));	// wurde gelöscht in german, but we've only got one string
+//	Com_Printf("%s has been wiped\n", Cmd_Argv(1));	// wurde gelï¿½scht in german, but we've only got one string
 //	Com_Printf("Ok\n"); // no localization of this
 }
 
@@ -247,7 +247,7 @@ void SV_LoadGame_f(void)
 				//
 				char *psMapNameOfLastSaveFileLoaded = SG_GetSaveGameMapName(sLastSaveFileLoaded);
 
-				if (!Q_stricmp(psMapName,psMapNameOfLastSaveFileLoaded)))
+				if (!Q_stricmp(psMapName,psMapNameOfLastSaveFileLoaded))
 				{
 					psFilename = sLastSaveFileLoaded;
 				}
@@ -1215,6 +1215,9 @@ qboolean SG_WriteSavegame(const char *psPathlessBaseName, qboolean qbAutosave)
 		psPathlessBaseName);
 
 	sv_testsave->integer = iPrevTestSave;
+	// Store current save as "last loaded" so that it is loaded after respawn instead of
+	// actually last loaded save (or checkpoint if load was not done since start of level)
+	::Q_strncpyz(::sLastSaveFileLoaded, psPathlessBaseName, sizeof(sLastSaveFileLoaded));
 	return qtrue;
 }
 
