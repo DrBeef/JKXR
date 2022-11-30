@@ -31,15 +31,10 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "mdx_format.h"
 #include "qgl.h"
 
-#if defined(_XBOX) || defined(HAVE_GLES)
-#define GL_INDEX_TYPE		GL_UNSIGNED_SHORT
-typedef unsigned short glIndex_t;
-#else
 #define GL_INDEX_TYPE		GL_UNSIGNED_INT
 typedef unsigned int glIndex_t;
-#endif
 
-//extern refimport_t ri;
+extern refimport_t ri;
 
 
 // 13 bits
@@ -435,7 +430,7 @@ typedef struct {
 } fogParms_t;
 
 
-typedef struct jk_shader_s {
+typedef struct shader_s {
 	char		name[MAX_QPATH];		// game path, including extension
 	int			lightmapIndex[MAXLIGHTMAPS];	// for a shader to match, both name and lightmapIndex must match
 	byte		styles[MAXLIGHTMAPS];
@@ -482,9 +477,9 @@ typedef struct jk_shader_s {
 	// True if this shader has a stage with glow in it (just an optimization).
 	bool hasGlow;
 
-//	struct jk_shader_s		*remappedShader;                  // current shader this one is remapped too
-	struct	jk_shader_s	*next;
-} jk_shader_t;
+//	struct shader_s		*remappedShader;                  // current shader this one is remapped too
+	struct	shader_s	*next;
+} shader_t;
 
 
 /*
@@ -513,7 +508,7 @@ Ghoul2 Insert End
 // skins allow models to be retextured without modifying the model file
 typedef struct {
 	char		name[MAX_QPATH];
-	jk_shader_t	*shader;
+	shader_t	*shader;
 } skinSurface_t;
 
 typedef struct skin_s {
@@ -534,7 +529,7 @@ typedef struct {
 	// for clipping distance in fog when outside
 	qboolean	hasSurface;
 	float		surface[4];
-} jk_fog_t;
+} fog_t;
 
 typedef struct {
 	orientationr_t	ori;
@@ -709,7 +704,7 @@ BRUSH MODELS
 
 typedef struct msurface_s {
 	int					viewCount;		// if == tr.viewCount, already added
-	struct jk_shader_s		*shader;
+	struct shader_s		*shader;
 	int					fogIndex;
 
 	surfaceType_t		*data;			// any of srf*_t
@@ -774,7 +769,7 @@ typedef struct {
 	msurface_t	**marksurfaces;
 
 	int			numfogs;
-	jk_fog_t		*fogs;
+	fog_t		*fogs;
 	int			globalFog;
 
 	int			startLightMapIndex;
@@ -907,7 +902,7 @@ typedef struct {
 #define FUNCTABLE_MASK		(FUNCTABLE_SIZE-1)
 
 
-// the renderer front end should never modify jk_glstate_t
+// the renderer front end should never modify glstate_t
 typedef struct {
 	int			currenttextures[2];
 	int			currenttmu;
@@ -915,7 +910,7 @@ typedef struct {
 	int			texEnv[2];
 	int			faceCulling;
 	uint32_t	glStateBits;
-} jk_glstate_t;
+} glstate_t;
 
 
 typedef struct {
@@ -1000,12 +995,12 @@ typedef struct {
 	// Image used to downsample and blur scene to.	- AReis
 	GLuint					blurImage;
 
-	jk_shader_t				*defaultShader;
-	jk_shader_t				*shadowShader;
-	jk_shader_t				*distortionShader;
-	jk_shader_t				*projectionShadowShader;
+	shader_t				*defaultShader;
+	shader_t				*shadowShader;
+	shader_t				*distortionShader;
+	shader_t				*projectionShadowShader;
 
-	jk_shader_t				*sunShader;
+	shader_t				*sunShader;
 
 	int						numLightmaps;
 	image_t					*lightmaps[MAX_LIGHTMAPS];
@@ -1051,8 +1046,8 @@ typedef struct {
 	// shader indexes from drawsurfs will be looked up in sortedShaders[]
 	// lower indexed sortedShaders must be rendered first (opaque surfaces before translucent)
 	int						numShaders;
-	jk_shader_t				*shaders[MAX_SHADERS];
-	jk_shader_t				*sortedShaders[MAX_SHADERS];
+	shader_t				*shaders[MAX_SHADERS];
+	shader_t				*sortedShaders[MAX_SHADERS];
 	int						iNumDeniedShaders;	// used for error-messages only
 
 	int						numSkins;
@@ -1081,7 +1076,7 @@ void	 R_Images_DeleteImage(image_t *pImage);
 extern backEndState_t	backEnd;
 extern trGlobals_t	tr;
 extern glconfig_t	glConfig;		// outside of TR since it shouldn't be cleared during ref re-init
-extern jk_glstate_t	glState;		// outside of TR since it shouldn't be cleared during ref re-init
+extern glstate_t	glState;		// outside of TR since it shouldn't be cleared during ref re-init
 extern window_t		window;
 
 
@@ -1241,10 +1236,10 @@ void R_AddLightningBoltSurfaces( trRefEntity_t *e );
 
 void R_AddPolygonSurfaces( void );
 
-void R_DecomposeSort( unsigned sort, int *entityNum, jk_shader_t **shader,
+void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader,
 					 int *fogNum, int *dlightMap );
 
-void R_AddDrawSurf( const surfaceType_t *surface, const jk_shader_t *shader, int fogIndex, int dlightMap );
+void R_AddDrawSurf( const surfaceType_t *surface, const shader_t *shader, int fogIndex, int dlightMap );
 
 
 #define	CULL_IN		0		// completely unclipped
@@ -1314,7 +1309,7 @@ void	RE_GetScreenShot(byte *data, int w, int h);
 byte*	RE_TempRawImage_ReadFromFile(const char *psLocalFilename, int *piWidth, int *piHeight, byte *pbReSampleBuffer, qboolean qbVertFlip);
 void	RE_TempRawImage_CleanUp();
 
-void		RE_BeginRegistration( glconfig_t *glconfig, intptr_t pVrClientInfo );
+void		RE_BeginRegistration( glconfig_t *glconfig );
 void		RE_LoadWorldMap( const char *mapname );
 void		RE_SetWorldVisData( const byte *vis );
 qhandle_t	RE_RegisterModel( const char *name );
@@ -1338,8 +1333,7 @@ model_t		*R_AllocModel( void );
 void    	R_Init( void );
 image_t		*R_FindImageFile( const char *name, qboolean mipmap, qboolean allowPicmip, qboolean allowTC, int glWrapClampMode );
 
-image_t *R_CreateImage( const char *name, const byte *pic, int width, int height,
-						GLenum format, qboolean mipmap, qboolean allowPicmip, qboolean allowTC, int glWrapClampMode, bool bRectangle = false );
+image_t		*R_CreateImage( const char *name, const byte *pic, int width, int height, GLenum format, qboolean mipmap, qboolean allowPicmip, qboolean allowTC, int wrapClampMode);
 
 qboolean	R_GetModeInfo( int *width, int *height, int mode );
 
@@ -1373,17 +1367,16 @@ extern	const byte	stylesDefault[MAXLIGHTMAPS];
 qhandle_t		 RE_RegisterShader( const char *name );
 qhandle_t		 RE_RegisterShaderNoMip( const char *name );
 
-jk_shader_t	*R_FindShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage );
-jk_shader_t	*R_GetShaderByHandle( qhandle_t hShader );
+shader_t	*R_FindShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage );
+shader_t	*R_GetShaderByHandle( qhandle_t hShader );
 void		R_InitShaders( void );
 void		R_ShaderList_f( void );
 
 //
 // tr_arb.c
 //
-#ifndef HAVE_GLES
 void ARB_InitGlowShaders( void );
-#endif
+
 
 /*
 ====================================================================
@@ -1424,7 +1417,7 @@ struct shaderCommands_s
 
 	stageVars_t	svars QALIGN(16);
 
-	jk_shader_t	*shader;
+	shader_t	*shader;
 	int			fogNum;
 
 	int			dlightBits;	// or together of all vertexDlightBits
@@ -1456,7 +1449,7 @@ extern	shaderCommands_t	tess;
 extern	color4ub_t	styleColors[MAX_LIGHT_STYLES];
 extern	bool		styleUpdated[MAX_LIGHT_STYLES];
 
-void RB_BeginSurface(jk_shader_t *shader, int fogNum );
+void RB_BeginSurface(shader_t *shader, int fogNum );
 void RB_EndSurface(void);
 void RB_CheckOverflow( int verts, int indexes );
 #define RB_CHECKOVERFLOW(v,i) if (tess.numVertexes + (v) >= SHADER_MAX_VERTEXES || tess.numIndexes + (i) >= SHADER_MAX_INDEXES ) {RB_CheckOverflow(v,i);}
@@ -1737,7 +1730,7 @@ typedef struct {
 
 typedef struct {
 	int		commandId;
-	jk_shader_t	*shader;
+	shader_t	*shader;
 	float	x, y;
 	float	w, h;
 	float	s1, t1;
@@ -1746,7 +1739,7 @@ typedef struct {
 
 typedef struct {
 	int		commandId;
-	jk_shader_t	*shader;
+	shader_t	*shader;
 	float	x, y;
 	float	w, h;
 	float	s1, t1;
@@ -1785,7 +1778,6 @@ typedef enum {
 	RC_DRAW_BUFFER,
 	RC_SWAP_BUFFERS,
 	RC_WORLD_EFFECTS,
-	RC_FLUSH
 } renderCommand_t;
 
 
@@ -1826,7 +1818,6 @@ void RE_LAGoggles( void );
 void RE_Scissor ( float x, float y, float w, float h);
 void RE_BeginFrame( stereoFrame_t stereoFrame );
 void RE_EndFrame( int *frontEndMsec, int *backEndMsec );
-void RE_SubmitStereoFrame(  );
 qboolean	RE_ProcessDissolve(void);
 qboolean	RE_InitDissolve(qboolean bForceCircularExtroWipe);
 

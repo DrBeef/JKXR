@@ -821,7 +821,7 @@ void RB_CalcFogTexCoords( float *st ) {
 	float		s, t;
 	float		eyeT;
 	qboolean	eyeOutside;
-	jk_fog_t		*fog;
+	fog_t		*fog;
 	vec3_t		localVec;
 	vec4_t		fogDistanceVector, fogDepthVector;
 
@@ -1056,12 +1056,6 @@ void RB_CalcSpecularAlpha( unsigned char *alphas ) {
 	normal = tess.normal[0];
 
 	alphas += 3;
-
-	//What the hell is this doing as a NaN?!?
-	if (Q_isnan(backEnd.ori.viewOrigin[0]))
-	{
-		return;
-	}
 
 	numVertexes = tess.numVertexes;
 	for (i = 0 ; i < numVertexes ; i++, v += 4, normal += 4, alphas += 4) {

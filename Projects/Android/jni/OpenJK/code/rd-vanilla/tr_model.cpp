@@ -30,7 +30,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "tr_local.h"
 #include "qcommon/matcomp.h"
 #include "../qcommon/sstring.h"
-#include <JKVR/VrClientInfo.h>
 
 #define	LL(x) x=LittleLong(x)
 #define	LS(x) x=LittleShort(x)
@@ -224,7 +223,7 @@ void *RE_RegisterModels_Malloc(int iSize, void *pvDiskBufferIfJustLoaded, const 
 			const char *const psShaderName	 =		   &((char*)ModelBin.pModelDiskImage)[iShaderNameOffset];
 				  int  *const piShaderPokePtr= (int *) &((char*)ModelBin.pModelDiskImage)[iShaderPokeOffset];
 
-			jk_shader_t *sh = R_FindShader( psShaderName, lightmapsNone, stylesDefault, qtrue );
+			shader_t *sh = R_FindShader( psShaderName, lightmapsNone, stylesDefault, qtrue );
 
 			if ( sh->defaultShader )
 			{
@@ -922,7 +921,7 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
         // register the shaders
         shader = (md3Shader_t *) ( (byte *)surf + surf->ofsShaders );
         for ( j = 0 ; j < surf->numShaders ; j++, shader++ ) {
-            jk_shader_t	*sh;
+            shader_t	*sh;
 
             sh = R_FindShader( shader->name, lightmapsNone, stylesDefault, qtrue );
 			if ( sh->defaultShader ) {
@@ -978,13 +977,12 @@ void CM_SetupShaderProperties(void);
 /*
 ** RE_BeginRegistration
 */
-void RE_BeginRegistration( glconfig_t *glconfigOut,  intptr_t pVrClientInfo ) {
+void RE_BeginRegistration( glconfig_t *glconfigOut ) {
 	ri.Hunk_ClearToMark();
 
 	R_Init();
 
 	*glconfigOut = glConfig;
-	vr = (vr_client_info_t*)pVrClientInfo;
 
 	R_IssuePendingRenderCommands();
 

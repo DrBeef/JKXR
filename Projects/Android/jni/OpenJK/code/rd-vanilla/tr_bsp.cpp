@@ -316,8 +316,8 @@ static	void R_LoadVisibility( lump_t *l, world_t &worldData ) {
 ShaderForShaderNum
 ===============
 */
-static jk_shader_t *ShaderForShaderNum( int shaderNum, const int *lightmapNum, const byte *lightmapStyles, const byte *vertexStyles, world_t &worldData ) {
-	jk_shader_t	*shader;
+static shader_t *ShaderForShaderNum( int shaderNum, const int *lightmapNum, const byte *lightmapStyles, const byte *vertexStyles, world_t &worldData ) {
+	shader_t	*shader;
 	dshader_t	*dsh;
 	const byte	*styles;
 
@@ -981,14 +981,14 @@ R_LoadFogs
 */
 static	void R_LoadFogs( lump_t *l, lump_t *brushesLump, lump_t *sidesLump, world_t &worldData, int index ) {
 	int			i;
-	jk_fog_t		*out;
+	fog_t		*out;
 	dfog_t		*fogs;
 	dbrush_t 	*brushes, *brush;
 	dbrushside_t	*sides;
 	int			count, brushesCount, sidesCount;
 	int			sideNum;
 	int			planeNum;
-	jk_shader_t	*shader;
+	shader_t	*shader;
 	float		d;
 	int			firstSide=0;
 	int			lightmaps[MAXLIGHTMAPS] = { LIGHTMAP_NONE } ;
@@ -1001,7 +1001,7 @@ static	void R_LoadFogs( lump_t *l, lump_t *brushesLump, lump_t *sidesLump, world
 
 	// create fog strucutres for them
 	worldData.numfogs = count + 1;
-	worldData.fogs = (jk_fog_t *)R_Hunk_Alloc ( (worldData.numfogs+1)*sizeof(*out), qtrue);
+	worldData.fogs = (fog_t *)R_Hunk_Alloc ( (worldData.numfogs+1)*sizeof(*out), qtrue);
 	worldData.globalFog = -1;
 	out = worldData.fogs + 1;
 
@@ -1342,7 +1342,6 @@ void RE_LoadWorldMap_Actual( const char *name, world_t &worldData, int index ) {
 	if (!index)
 	{
 		skyboxportal = 0;
-		hasskybox = 0;
 
 		tr.sunDirection[0] = 0.45f;
 		tr.sunDirection[1] = 0.3f;

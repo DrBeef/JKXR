@@ -242,7 +242,7 @@ R_ComputeFogNum
 */
 static int R_ComputeFogNum( md3Header_t *header, trRefEntity_t *ent ) {
 	int				i;
-	jk_fog_t			*fog;
+	fog_t			*fog;
 	md3Frame_t		*md3Frame;
 	vec3_t			localOrigin;
 
@@ -304,8 +304,8 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 	md3Header_t		*header = 0;
 	md3Surface_t	*surface = 0;
 	md3Shader_t		*md3Shader = 0;
-	jk_shader_t		*shader = 0;
-	jk_shader_t		*main_shader = 0;
+	shader_t		*shader = 0;
+	shader_t		*main_shader = 0;
 	int				cull;
 	int				lod;
 	int				fogNum;

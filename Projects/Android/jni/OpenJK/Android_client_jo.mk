@@ -23,7 +23,7 @@ LOCAL_STATIC_LIBRARIES := sigc libzip libpng libminizip
 LOCAL_SHARED_LIBRARIES := vrapi gl4es
 
 
-LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES) $(TOP_DIR) $(TOP_DIR)/JKVR $(GL4ES_PATH) $(GL4ES_PATH)/include $(JK3_CODE_PATH)/game $(SUPPORT_LIBS)/minizip/include $(JK3_CODE_PATH)/rd-vanilla $(JK3_CODE_PATH)/rd-common
+LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES) $(TOP_DIR) $(TOP_DIR)/JKVR $(GL4ES_PATH) $(GL4ES_PATH)/include $(JK3_CODE_PATH)/game $(SUPPORT_LIBS)/minizip/include $(JK3_CODE_PATH)/rd-gles $(JK3_CODE_PATH)/rd-common
 
 
 #############################################################################

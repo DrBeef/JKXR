@@ -27,15 +27,12 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../server/exe_headers.h"
 
 #include "tr_local.h"
-#include <JKVR/VrClientInfo.h>
 
 #if !defined(G2_H_INC)
 	#include "../ghoul2/G2.h"
 #endif
 
 trGlobals_t		tr;
-
-vr_client_info_t *vr;
 
 static float	s_flipMatrix[16] = {
 	// convert from our coordinate system (looking down X)
@@ -894,7 +891,7 @@ static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128
 	float shortest = 1000000000;
 	int entityNum;
 	int numTriangles;
-	jk_shader_t *shader;
+	shader_t *shader;
 	int		fogNum;
 	int dlighted;
 	vec4_t clip, eye;
@@ -1052,7 +1049,7 @@ See if a sprite is inside a fog volume
 */
 int R_SpriteFogNum( trRefEntity_t *ent ) {
 	int				i;
-	jk_fog_t			*fog;
+	fog_t			*fog;
 
 	if ( tr.refdef.rdflags & RDF_NOWORLDMODEL ) {
 		return 0;
@@ -1162,7 +1159,7 @@ static void R_RadixSort( drawSurf_t *source, int size )
 R_AddDrawSurf
 =================
 */
-void R_AddDrawSurf( const surfaceType_t *surface, const jk_shader_t *shader, int fogIndex, int dlightMap )
+void R_AddDrawSurf( const surfaceType_t *surface, const shader_t *shader, int fogIndex, int dlightMap )
 {
 	int			index;
 
@@ -1193,7 +1190,7 @@ void R_AddDrawSurf( const surfaceType_t *surface, const jk_shader_t *shader, int
 R_DecomposeSort
 =================
 */
-void R_DecomposeSort( unsigned sort, int *entityNum, jk_shader_t **shader,
+void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader,
 					 int *fogNum, int *dlightMap ) {
 	*fogNum = ( sort >> QSORT_FOGNUM_SHIFT ) & 31;
 	*shader = tr.sortedShaders[ ( sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1) ];
@@ -1207,7 +1204,7 @@ R_SortDrawSurfs
 =================
 */
 void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
-	jk_shader_t		*shader;
+	shader_t		*shader;
 	int				fogNum;
 	int				entityNum;
 	int				dlighted;
@@ -1263,7 +1260,7 @@ R_AddEntitySurfaces
 */
 void R_AddEntitySurfaces (void) {
 	trRefEntity_t	*ent;
-	jk_shader_t		*shader;
+	shader_t		*shader;
 
 	if ( !r_drawentities->integer ) {
 		return;
@@ -1409,36 +1406,22 @@ void R_DebugPolygon( int color, int numPoints, float *points ) {
 
 	// draw solid shade
 
-#ifdef HAVE_GLES
-	qglColor4f( color&1, (color>>1)&1, (color>>2)&1, 1.0f );
-	qglVertexPointer  ( 3, GL_FLOAT, 0, points );
-	qglDrawArrays( GL_TRIANGLE_FAN, 0, numPoints );
-#else
 	qglColor3f( color&1, (color>>1)&1, (color>>2)&1 );
 	qglBegin( GL_POLYGON );
 	for ( i = 0 ; i < numPoints ; i++ ) {
 		qglVertex3fv( points + i * 3 );
 	}
 	qglEnd();
-#endif
 
 	// draw wireframe outline
-#ifndef HAVE_GLES
 	GL_State( GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE );
-#endif
 	qglDepthRange( 0, 0 );
-#ifdef HAVE_GLES
-	qglColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-	qglVertexPointer  ( 3, GL_FLOAT, 0, points );
-	qglDrawArrays( GL_LINES, 0, numPoints );
-#else
 	qglColor3f( 1, 1, 1 );
 	qglBegin( GL_POLYGON );
 	for ( i = 0 ; i < numPoints ; i++ ) {
 		qglVertex3fv( points + i * 3 );
 	}
 	qglEnd();
-#endif
 	qglDepthRange( 0, 1 );
 }
 
@@ -1478,7 +1461,7 @@ void R_SetViewFogIndex (void)
 {
 	if ( tr.world->numfogs > 1 )
 	{//more than just the LA goggles
-		jk_fog_t *fog;
+		fog_t *fog;
 		int contents = ri.SV_PointContents( tr.refdef.vieworg, 0 );
 		if ( (contents&CONTENTS_FOG) )
 		{//only take a tr.refdef.fogIndex if the tr.refdef.vieworg is actually *in* that fog brush (assumption: checks pointcontents for any CONTENTS_FOG, not that particular brush...)

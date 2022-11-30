@@ -658,7 +658,7 @@ class CRenderSurface
 public:
 	int				surfaceNum;
 	surfaceInfo_v	&rootSList;
-	const jk_shader_t		*cust_shader;
+	const shader_t		*cust_shader;
 	int				fogNum;
 	qboolean		personalModel;
 	CBoneCache		*boneCache;
@@ -668,14 +668,14 @@ public:
 	int				lod;
 	boltInfo_v		&boltList;
 #ifdef _G2_GORE
-	jk_shader_t		*gore_shader;
+	shader_t		*gore_shader;
 	CGoreSet		*gore_set;
 #endif
 
 	CRenderSurface(
 		int				initsurfaceNum,
 		surfaceInfo_v	&initrootSList,
-		const jk_shader_t		*initcust_shader,
+		const shader_t		*initcust_shader,
 		int				initfogNum,
 		qboolean		initpersonalModel,
 		CBoneCache		*initboneCache,
@@ -685,7 +685,7 @@ public:
 		int				initlod,
 #ifdef _G2_GORE
 		boltInfo_v		&initboltList,
-		jk_shader_t		*initgore_shader,
+		shader_t		*initgore_shader,
 		CGoreSet		*initgore_set):
 #else
 		boltInfo_v		&initboltList):
@@ -786,7 +786,7 @@ R_AComputeFogNum
 static int R_GComputeFogNum( trRefEntity_t *ent ) {
 
 	int				i;
-	jk_fog_t			*fog;
+	fog_t			*fog;
 
 	if ( tr.refdef.rdflags & RDF_NOWORLDMODEL ) {
 		return 0;
@@ -2239,7 +2239,7 @@ void G2API_SetSurfaceOnOffFromSkin (CGhoul2Info *ghlInfo, qhandle_t renderSkin)
 void RenderSurfaces(CRenderSurface &RS)
 {
 	int			i;
-	const jk_shader_t	*shader = 0;
+	const shader_t	*shader = 0;
 	int			offFlags = 0;
 #ifdef _G2_GORE
 	bool		drawGore = true;
@@ -2385,7 +2385,7 @@ void RenderSurfaces(CRenderSurface &RS)
 								newSurf2->scale=1.0f;
 							}
 						}
-						jk_shader_t *gshader;
+						shader_t *gshader;
 						if ((*kcur).second.shader)
 						{
  							gshader=R_GetShaderByHandle((*kcur).second.shader);
@@ -2556,9 +2556,9 @@ R_AddGHOULSurfaces
 ==============
 */
 void R_AddGhoulSurfaces( trRefEntity_t *ent ) {
-	jk_shader_t		*cust_shader = 0;
+	shader_t		*cust_shader = 0;
 #ifdef _G2_GORE
-	jk_shader_t		*gore_shader = 0;
+	shader_t		*gore_shader = 0;
 #endif
 	int				fogNum = 0;
 	qboolean		personalModel;
@@ -3501,7 +3501,7 @@ qboolean R_LoadMDXM( model_t *mod, void *buffer, const char *mod_name, qboolean 
 	mdxmSurface_t		*surf;
 	int					version;
 	int					size;
-	jk_shader_t			*sh;
+	shader_t			*sh;
 	mdxmSurfHierarchy_t	*surfInfo;
 
 #ifdef Q3_BIG_ENDIAN

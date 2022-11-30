@@ -33,7 +33,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "tr_WorldEffects.h"
 
 glconfig_t	glConfig;
-jk_glstate_t	glState;
+glstate_t	glState;
 window_t	window;
 
 static void GfxInfo_f( void );
@@ -185,14 +185,6 @@ cvar_t	*com_buildScript;
 cvar_t	*r_environmentMapping;
 cvar_t *r_screenshotJpegQuality;
 
-void ( APIENTRY * qglMultiTexCoord2fARB )( GLenum texture, GLfloat s, GLfloat t );
-void ( APIENTRY * qglActiveTextureARB )( GLenum texture );
-void ( APIENTRY * qglClientActiveTextureARB )( GLenum texture );
-
-void ( APIENTRY * qglLockArraysEXT )( GLint, GLint );
-void ( APIENTRY * qglUnlockArraysEXT )( void );
-
-#ifndef HAVE_GLES
 #if !defined(__APPLE__)
 PFNGLSTENCILOPSEPARATEPROC qglStencilOpSeparate;
 #endif
@@ -215,7 +207,6 @@ PFNGLGETCOMBINEROUTPUTPARAMETERFVNVPROC qglGetCombinerOutputParameterfvNV;
 PFNGLGETCOMBINEROUTPUTPARAMETERIVNVPROC qglGetCombinerOutputParameterivNV;
 PFNGLGETFINALCOMBINERINPUTPARAMETERFVNVPROC qglGetFinalCombinerInputParameterfvNV;
 PFNGLGETFINALCOMBINERINPUTPARAMETERIVNVPROC qglGetFinalCombinerInputParameterivNV;
-#endif
 
 PFNGLPROGRAMSTRINGARBPROC qglProgramStringARB;
 PFNGLBINDPROGRAMARBPROC qglBindProgramARB;
@@ -237,10 +228,8 @@ PFNGLGETPROGRAMIVARBPROC qglGetProgramivARB;
 PFNGLGETPROGRAMSTRINGARBPROC qglGetProgramStringARB;
 PFNGLISPROGRAMARBPROC qglIsProgramARB;
 
-#ifndef HAVE_GLES
 PFNGLLOCKARRAYSEXTPROC qglLockArraysEXT;
 PFNGLUNLOCKARRAYSEXTPROC qglUnlockArraysEXT;
-#endif
 
 bool g_bTextureRectangleHack = false;
 
@@ -271,46 +260,16 @@ void R_Splash()
 		const float y1 = 240 - height / 2;
 		const float y2 = 240 + height / 2;
 
-#ifdef HAVE_GLES
-		//GLimp_EndFrame();
-	GLfloat tex[] = {
-	 0,0 ,
-	 1,0,
-	 0,1,
-	 1,1
-	};
-	GLfloat vtx[] = {
-	 x1, y1,
-	 x2, y1,
-	 x1, y2,
-	 x2, y2
-	};
-	GLboolean text = qglIsEnabled(GL_TEXTURE_COORD_ARRAY);
-	GLboolean glcol = qglIsEnabled(GL_COLOR_ARRAY);
-	if (glcol)
-		qglDisableClientState(GL_COLOR_ARRAY);
-	if (!text)
-		qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	qglEnableClientState( GL_VERTEX_ARRAY );
-	qglTexCoordPointer( 2, GL_FLOAT, 0, tex );
-	qglVertexPointer  ( 2, GL_FLOAT, 0, vtx );
-	qglDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
-	if (glcol)
-		qglDisableClientState(GL_COLOR_ARRAY);
-	if (!text)
-		qglDisableClientState( GL_TEXTURE_COORD_ARRAY );
-#else
 		qglBegin (GL_TRIANGLE_STRIP);
-		qglTexCoord2f( 0,  0 );
-		qglVertex2f(x1, y1);
-		qglTexCoord2f( 1 ,  0 );
-		qglVertex2f(x2, y1);
-		qglTexCoord2f( 0, 1 );
-		qglVertex2f(x1, y2);
-		qglTexCoord2f( 1, 1 );
-		qglVertex2f(x2, y2);
+			qglTexCoord2f( 0,  0 );
+			qglVertex2f(x1, y1);
+			qglTexCoord2f( 1 ,  0 );
+			qglVertex2f(x2, y1);
+			qglTexCoord2f( 0, 1 );
+			qglVertex2f(x1, y2);
+			qglTexCoord2f( 1, 1 );
+			qglVertex2f(x2, y2);
 		qglEnd();
-#endif
 	}
 
 	ri.WIN_Present( &window );
@@ -324,10 +283,6 @@ void R_Splash()
 
 static void GLW_InitTextureCompression( void )
 {
-	glConfig.textureCompression = TC_NONE;
-	return;
-
-
 	bool newer_tc, old_tc;
 	// Check for available tc methods.
 	newer_tc = ri.GL_ExtensionSupported("GL_ARB_texture_compression") && ri.GL_ExtensionSupported("GL_EXT_texture_compression_s3tc");
@@ -504,7 +459,6 @@ static void GLimp_InitExtensions( void )
 	glConfig.clampToEdgeAvailable = qtrue;
 	Com_Printf ("...using GL_EXT_texture_edge_clamp\n" );
 
-#ifndef HAVE_GLES
 	// GL_ARB_multitexture
 	qglMultiTexCoord2fARB = NULL;
 	qglActiveTextureARB = NULL;
@@ -569,7 +523,6 @@ static void GLimp_InitExtensions( void )
 	}
 
 	bool bNVRegisterCombiners = false;
-
 	// Register Combiners.
 	if ( ri.GL_ExtensionSupported( "GL_NV_register_combiners" ) )
 	{
@@ -617,7 +570,7 @@ static void GLimp_InitExtensions( void )
 		bNVRegisterCombiners = false;
 		Com_Printf ("...GL_NV_register_combiners not found\n" );
 	}
-#endif
+
 	// NOTE: Vertex and Fragment Programs are very dependant on each other - this is actually a
 	// good thing! So, just check to see which we support (one or the other) and load the shared
 	// function pointers. ARB rocks!
@@ -703,7 +656,6 @@ static void GLimp_InitExtensions( void )
 	// Find out how many general combiners they have.
 	#define GL_MAX_GENERAL_COMBINERS_NV       0x854D
 	GLint iNumGeneralCombiners = 0;
-	bool bNVRegisterCombiners = false;
 	if(bNVRegisterCombiners)
 		qglGetIntegerv( GL_MAX_GENERAL_COMBINERS_NV, &iNumGeneralCombiners );
 
@@ -722,13 +674,11 @@ static void GLimp_InitExtensions( void )
 	}
 
 #if !defined(__APPLE__)
-#ifndef HAVE_GLES
 	qglStencilOpSeparate = (PFNGLSTENCILOPSEPARATEPROC)ri.GL_GetProcAddress("glStencilOpSeparate");
 	if (qglStencilOpSeparate)
 	{
 		glConfig.doStencilShadowsInOneDrawcall = qtrue;
 	}
-#endif
 #else
 	glConfig.doStencilShadowsInOneDrawcall = qtrue;
 #endif
@@ -779,7 +729,7 @@ static void InitOpenGL( void )
 
 		// set default state
 		GL_SetDefaultState();
-		//R_Splash();	//get something on screen asap
+		R_Splash();	//get something on screen asap
 	}
 	else
 	{
@@ -1218,19 +1168,14 @@ void GL_SetDefaultState( void )
 	//
 	glState.glStateBits = GLS_DEPTHTEST_DISABLE | GLS_DEPTHMASK_TRUE;
 
-#ifndef HAVE_GLES
 	qglPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
-#endif
 	qglDepthMask( GL_TRUE );
 	qglDisable( GL_DEPTH_TEST );
 	qglEnable( GL_SCISSOR_TEST );
 	qglDisable( GL_CULL_FACE );
 	qglDisable( GL_BLEND );
-
-#ifdef HAVE_GLES
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-#endif
+	qglDisable( GL_ALPHA_TEST );
+	qglBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 }
 
 
@@ -1568,10 +1513,10 @@ void R_Register( void )
 	//
 
 	r_allowExtensions = ri.Cvar_Get( "r_allowExtensions", "1", CVAR_ARCHIVE_ND | CVAR_LATCH );
-	r_ext_compressed_textures = ri.Cvar_Get( "r_ext_compress_textures", "0", CVAR_ARCHIVE_ND | CVAR_LATCH );
+	r_ext_compressed_textures = ri.Cvar_Get( "r_ext_compress_textures", "1", CVAR_ARCHIVE_ND | CVAR_LATCH );
 	r_ext_compressed_lightmaps = ri.Cvar_Get( "r_ext_compress_lightmaps", "0", CVAR_ARCHIVE_ND | CVAR_LATCH );
 	r_ext_preferred_tc_method = ri.Cvar_Get( "r_ext_preferred_tc_method", "0", CVAR_ARCHIVE_ND | CVAR_LATCH );
-	r_ext_gamma_control = ri.Cvar_Get( "r_ext_gamma_control", "0", CVAR_ARCHIVE_ND | CVAR_LATCH );
+	r_ext_gamma_control = ri.Cvar_Get( "r_ext_gamma_control", "1", CVAR_ARCHIVE_ND | CVAR_LATCH );
 	r_ext_multitexture = ri.Cvar_Get( "r_ext_multitexture", "1", CVAR_ARCHIVE_ND | CVAR_LATCH );
 	r_ext_compiled_vertex_array = ri.Cvar_Get( "r_ext_compiled_vertex_array", "1", CVAR_ARCHIVE_ND | CVAR_LATCH);
 	r_ext_texture_env_add = ri.Cvar_Get( "r_ext_texture_env_add", "1", CVAR_ARCHIVE_ND | CVAR_LATCH);
@@ -1591,7 +1536,7 @@ void R_Register( void )
 	r_detailTextures = ri.Cvar_Get( "r_detailtextures", "1", CVAR_ARCHIVE_ND | CVAR_LATCH );
 	r_texturebits = ri.Cvar_Get( "r_texturebits", "0", CVAR_ARCHIVE_ND | CVAR_LATCH );
 	r_texturebitslm = ri.Cvar_Get( "r_texturebitslm", "0", CVAR_ARCHIVE_ND | CVAR_LATCH );
-	r_overBrightBits = ri.Cvar_Get ("r_overBrightBits", "1", CVAR_ARCHIVE_ND | CVAR_LATCH );
+	r_overBrightBits = ri.Cvar_Get ("r_overBrightBits", "0", CVAR_ARCHIVE_ND | CVAR_LATCH );
 	r_mapOverBrightBits = ri.Cvar_Get( "r_mapOverBrightBits", "0", CVAR_ARCHIVE_ND|CVAR_LATCH );
 	r_simpleMipMaps = ri.Cvar_Get( "r_simpleMipMaps", "1", CVAR_ARCHIVE_ND | CVAR_LATCH );
 	r_vertexLight = ri.Cvar_Get( "r_vertexLight", "0", CVAR_ARCHIVE | CVAR_LATCH );
@@ -1608,7 +1553,7 @@ void R_Register( void )
 	//
 	// archived variables that can change at any time
 	//
-	r_lodCurveError = ri.Cvar_Get( "r_lodCurveError", "1000", CVAR_ARCHIVE_ND );
+	r_lodCurveError = ri.Cvar_Get( "r_lodCurveError", "250", CVAR_ARCHIVE_ND );
 	r_lodbias = ri.Cvar_Get( "r_lodbias", "0", CVAR_ARCHIVE_ND );
 	r_flares = ri.Cvar_Get ("r_flares", "1", CVAR_ARCHIVE_ND );
 	r_lodscale = ri.Cvar_Get( "r_lodscale", "10", CVAR_ARCHIVE_ND );
@@ -1623,7 +1568,7 @@ void R_Register( void )
 //	r_dlightBacks = ri.Cvar_Get( "r_dlightBacks", "0", CVAR_ARCHIVE );
 	r_finish = ri.Cvar_Get ("r_finish", "0", CVAR_ARCHIVE_ND);
 	r_textureMode = ri.Cvar_Get( "r_textureMode", "GL_LINEAR_MIPMAP_LINEAR", CVAR_ARCHIVE );
-	r_gamma = ri.Cvar_Get( "r_gamma", "1.027344", CVAR_ARCHIVE_ND );
+	r_gamma = ri.Cvar_Get( "r_gamma", "1", CVAR_ARCHIVE_ND );
 	r_facePlaneCull = ri.Cvar_Get ("r_facePlaneCull", "1", CVAR_ARCHIVE_ND );
 
 	r_dlightStyle = ri.Cvar_Get ("r_dlightStyle", "1", CVAR_ARCHIVE_ND);
@@ -1686,7 +1631,7 @@ void R_Register( void )
 	r_offsetUnits = ri.Cvar_Get( "r_offsetunits", "-2", CVAR_CHEAT );
 	r_lockpvs = ri.Cvar_Get ("r_lockpvs", "0", CVAR_CHEAT);
 	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_CHEAT);
-	r_shadows = ri.Cvar_Get( "cg_shadows", "3", 0 );
+	r_shadows = ri.Cvar_Get( "cg_shadows", "1", 0 );
 	r_shadowRange = ri.Cvar_Get( "r_shadowRange", "1000", CVAR_ARCHIVE_ND );
 
 /*
@@ -1844,7 +1789,6 @@ void RE_Shutdown( qboolean destroyWindow, qboolean restarting ) {
 	for ( size_t i = 0; i < numCommands; i++ )
 		ri.Cmd_RemoveCommand( commands[i].cmd );
 
-#ifndef HAVE_GLES
 	if ( r_DynamicGlow && r_DynamicGlow->integer )
 	{
 		// Release the Glow Vertex Shader.
@@ -1877,7 +1821,6 @@ void RE_Shutdown( qboolean destroyWindow, qboolean restarting ) {
 		// Release the blur texture.
 		qglDeleteTextures( 1, &tr.blurImage );
 	}
-#endif
 
 	R_ShutdownWorldEffects();
 	R_ShutdownFonts();
@@ -2091,7 +2034,6 @@ extern "C" Q_EXPORT refexport_t* QDECL GetRefAPI ( int apiVersion, refimport_t *
 
 	REX(BeginFrame);
 	REX(EndFrame);
-	REX(SubmitStereoFrame);
 
 	REX(ProcessDissolve);
 	REX(InitDissolve);

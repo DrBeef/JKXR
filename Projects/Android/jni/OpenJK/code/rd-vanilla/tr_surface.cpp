@@ -1096,36 +1096,27 @@ static void RB_SurfaceBeam( void )
 
 	GL_State( GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE );
 
-	qglColor3f( 1, 0, 0 );
-
-#ifdef HAVE_GLES
-	GLboolean text = qglIsEnabled(GL_TEXTURE_COORD_ARRAY);
-	GLboolean glcol = qglIsEnabled(GL_COLOR_ARRAY);
-	if (glcol)
-		qglDisableClientState(GL_COLOR_ARRAY);
-	if (text)
-		qglDisableClientState( GL_TEXTURE_COORD_ARRAY );
-	GLfloat vtx[NUM_BEAM_SEGS*6+6];
-	for ( i = 0; i <= NUM_BEAM_SEGS; i++ ) {
-		memcpy(vtx+i*6, start_points[ i % NUM_BEAM_SEGS], sizeof(GLfloat)*3);
-		memcpy(vtx+i*6+3, end_points[ i % NUM_BEAM_SEGS], sizeof(GLfloat)*3);
+	switch(e->skinNum)
+	{
+	case 1://Green
+		qglColor3f( 0, 1, 0 );
+		break;
+	case 2://Blue
+		qglColor3f( 0.5, 0.5, 1 );
+		break;
+	case 0://red
+	default:
+		qglColor3f( 1, 0, 0 );
+		break;
 	}
-	qglVertexPointer (3, GL_FLOAT, 0, vtx);
-	qglDrawArrays(GL_TRIANGLE_STRIP, 0, NUM_BEAM_SEGS*2+2);
-	if (glcol)
-		qglEnableClientState(GL_COLOR_ARRAY);
-	if (text)
-		qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-#else
+
 	qglBegin( GL_TRIANGLE_STRIP );
 	for ( i = 0; i <= NUM_BEAM_SEGS; i++ ) {
 		qglVertex3fv( start_points[ i % NUM_BEAM_SEGS] );
 		qglVertex3fv( end_points[ i % NUM_BEAM_SEGS] );
 	}
 	qglEnd();
-#endif
 }
-
 
 
 //------------------
@@ -1929,38 +1920,6 @@ static void RB_SurfaceAxis( void ) {
 	GL_Bind( tr.whiteImage );
 	GL_State( GLS_DEFAULT );
 	qglLineWidth( 3 );
-
-#ifdef HAVE_GLES
-	GLfloat col[] = {
-	  1,0,0, 1,
-	  1,0,0, 1,
-	  0,1,0, 1,
-	  0,1,0, 1,
-	  0,0,1, 1,
-	  0,0,1, 1
-	 };
-	 GLfloat vtx[] = {
-	  0,0,0,
-	  16,0,0,
-	  0,0,0,
-	  0,16,0,
-	  0,0,0,
-	  0,0,16
-	 };
-	GLboolean text = qglIsEnabled(GL_TEXTURE_COORD_ARRAY);
-	GLboolean glcol = qglIsEnabled(GL_COLOR_ARRAY);
-	if (text)
-		qglDisableClientState( GL_TEXTURE_COORD_ARRAY );
-	if (!glcol)
-		qglEnableClientState( GL_COLOR_ARRAY);
-	qglColorPointer( 4, GL_UNSIGNED_BYTE, 0, col );
-	qglVertexPointer (3, GL_FLOAT, 0, vtx);
-	qglDrawArrays(GL_LINES, 0, 6);
-	if (text)
-		qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	if (!glcol)
-		qglDisableClientState( GL_COLOR_ARRAY);
-#else
 	qglBegin( GL_LINES );
 	qglColor3f( 1,0,0 );
 	qglVertex3f( 0,0,0 );
@@ -1972,7 +1931,6 @@ static void RB_SurfaceAxis( void ) {
 	qglVertex3f( 0,0,0 );
 	qglVertex3f( 0,0,16 );
 	qglEnd();
-#endif
 	qglLineWidth( 1 );
 }
 
@@ -2040,7 +1998,7 @@ static bool RB_TestZFlare( vec3_t point) {
 	// if the point is off the screen, don't bother adding it
 	// calculate screen coordinates and depth
 	R_TransformModelToClip( point, backEnd.ori.modelMatrix,
-							backEnd.viewParms.projectionMatrix, eye, clip );
+		backEnd.viewParms.projectionMatrix, eye, clip );
 
 	// check to see if the point is completely off screen
 	for ( i = 0 ; i < 3 ; i++ ) {
@@ -2052,7 +2010,7 @@ static bool RB_TestZFlare( vec3_t point) {
 	R_TransformClipToWindow( clip, &backEnd.viewParms, normalized, window );
 
 	if ( window[0] < 0 || window[0] >= backEnd.viewParms.viewportWidth
-		 || window[1] < 0 || window[1] >= backEnd.viewParms.viewportHeight ) {
+		|| window[1] < 0 || window[1] >= backEnd.viewParms.viewportHeight ) {
 		return qfalse;	// shouldn't happen, since we check the clip[] above, except for FP rounding
 	}
 
@@ -2062,9 +2020,6 @@ static bool RB_TestZFlare( vec3_t point) {
 	float			screenZ;
 
 	// read back the z buffer contents
-#if defined(HAVE_GLES)
-	depth = 0.0f;
-#else
 	if ( r_flares->integer !=1 ) {	//skipping the the z-test
 		return true;
 	}
@@ -2072,10 +2027,9 @@ static bool RB_TestZFlare( vec3_t point) {
 	// don't bother with another sync
 	glState.finishCalled = qfalse;
 	qglReadPixels( backEnd.viewParms.viewportX + window[0],backEnd.viewParms.viewportY + window[1], 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth );
-#endif
 
 	screenZ = backEnd.viewParms.projectionMatrix[14] /
-			  ( ( 2*depth - 1 ) * backEnd.viewParms.projectionMatrix[11] - backEnd.viewParms.projectionMatrix[10] );
+		( ( 2*depth - 1 ) * backEnd.viewParms.projectionMatrix[11] - backEnd.viewParms.projectionMatrix[10] );
 
 	visible = ( -eye[2] - -screenZ ) < 24;
 	return visible;
@@ -2138,11 +2092,7 @@ void RB_SurfaceFlare( srfFlare_t *surf ) {
 void RB_SurfaceDisplayList( srfDisplayList_t *surf ) {
 	// all appropriate state must be set in RB_BeginSurface
 	// this isn't implemented yet...
-#ifdef HAVE_GLES
-	assert(0);
-#else
 	qglCallList( surf->listNum );
-#endif
 }
 
 void RB_SurfaceSkip( void *surf ) {
