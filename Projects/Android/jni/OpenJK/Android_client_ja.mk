@@ -20,10 +20,10 @@ LOCAL_LDLIBS +=  -lGLESv3 -landroid -lEGL -llog -lz -lOpenSLES
 LOCAL_LDLIBS += -fuse-ld=bfd 
 
 LOCAL_STATIC_LIBRARIES := sigc libzip libpng libminizip
-LOCAL_SHARED_LIBRARIES := vrapi gl4es
+LOCAL_SHARED_LIBRARIES := openxr_loader gl4es
 
 
-LOCAL_C_INCLUDES :=  $(JK3_BASE_C_INCLUDES) $(TOP_DIR) $(TOP_DIR)/JKVR $(GL4ES_PATH) $(GL4ES_PATH)/include $(JK3_CODE_PATH)/game $(SUPPORT_LIBS)/minizip/include $(JK3_CODE_PATH)/rd-gles $(JK3_CODE_PATH)/rd-common
+LOCAL_C_INCLUDES := $(JK3_BASE_C_INCLUDES) $(TOP_DIR) $(TOP_DIR)/JKVR $(GL4ES_PATH) $(GL4ES_PATH)/include $(JK3_CODE_PATH)/game $(SUPPORT_LIBS)/minizip/include $(JK3_CODE_PATH)/rd-gles $(JK3_CODE_PATH)/rd-common
 
 
 #############################################################################
@@ -124,11 +124,11 @@ JK3_SRC = \
 
 
 JKVR_SRC_FILES :=  ${TOP_DIR}/JKVR/JKVR_SurfaceView.cpp \
-       ${TOP_DIR}/JKVR/VrCompositor.cpp \
        ${TOP_DIR}/JKVR/VrInputCommon.cpp \
-       ${TOP_DIR}/JKVR/VrInputWeaponAlign.cpp \
        ${TOP_DIR}/JKVR/VrInputDefault.cpp \
        ${TOP_DIR}/JKVR/argtable3.c
+#       ${TOP_DIR}/JKVR/VrCompositor.cpp \
+#       ${TOP_DIR}/JKVR/VrInputWeaponAlign.cpp \
 
 LOCAL_SRC_FILES += $(JK3_SRC) $(JKVR_SRC_FILES)
 
@@ -137,7 +137,7 @@ include $(BUILD_SHARED_LIBRARY)
 
 
 
-$(call import-module,VrApi/Projects/AndroidPrebuilt/jni)
+$(call import-module,OpenXR/Projects/AndroidPrebuilt/jni)
 
 
 

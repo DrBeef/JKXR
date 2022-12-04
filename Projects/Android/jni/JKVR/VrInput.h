@@ -6,15 +6,13 @@
 
 #define STABILISATION_DISTANCE   0.28
 
+
 extern ovrInputStateTrackedRemote leftTrackedRemoteState_old;
 extern ovrInputStateTrackedRemote leftTrackedRemoteState_new;
-extern ovrTracking leftRemoteTracking_new;
+extern ovrTrackedController leftRemoteTracking_new;
 extern ovrInputStateTrackedRemote rightTrackedRemoteState_old;
 extern ovrInputStateTrackedRemote rightTrackedRemoteState_new;
-extern ovrTracking rightRemoteTracking_new;
-extern ovrInputStateGamepad footTrackedRemoteState_old;
-extern ovrInputStateGamepad footTrackedRemoteState_new;
-extern ovrDeviceID controllerIDs[2];
+extern ovrTrackedController rightRemoteTracking_new;
 
 extern float remote_movementSideways;
 extern float remote_movementForward;
@@ -25,15 +23,12 @@ extern float positional_movementForward;
 void sendButtonAction(const char* action, long buttonDown);
 void sendButtonActionSimple(const char* action);
 
-void acquireTrackedRemotesData(ovrMobile *Ovr, double displayTime);
-
-void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateGamepad *pFootTrackingOld,
-                          ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
-                          ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
+void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTrackedController* pDominantTracking,
+                          ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTrackedController* pOffTracking,
                           int domButton1, int domButton2, int offButton1, int offButton2 );
 
-void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
-                          ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
+void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTrackedController* pDominantTracking,
+                          ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTrackedController* pOffTracking,
                           int domButton1, int domButton2, int offButton1, int offButton2 );
 
 
