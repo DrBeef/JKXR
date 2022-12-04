@@ -53,17 +53,6 @@ ovrFramebuffer
 ================================================================================
 */
 
-typedef struct
-{
-	int						Width;
-	int						Height;
-	int						Multisamples;
-	int						TextureSwapChainLength;
-	int						TextureSwapChainIndex;
-	ovrTextureSwapChain *	ColorTextureSwapChain;
-	GLuint *				DepthBuffers;
-	GLuint *				FrameBuffers;
-} ovrFramebuffer;
 
 void ovrFramebuffer_SetCurrent( ovrFramebuffer * frameBuffer );
 void ovrFramebuffer_Destroy( ovrFramebuffer * frameBuffer );
@@ -72,47 +61,31 @@ void ovrFramebuffer_Resolve( ovrFramebuffer * frameBuffer );
 void ovrFramebuffer_Advance( ovrFramebuffer * frameBuffer );
 void ovrFramebuffer_ClearEdgeTexels( ovrFramebuffer * frameBuffer );
 
-/*
-================================================================================
 
-ovrRenderer
+XrView* projections;
+GLboolean stageSupported = GL_FALSE;
 
-================================================================================
-*/
+void VR_UpdateStageBounds(ovrApp* pappState) {
+	XrExtent2Df stageBounds = {};
 
-typedef struct
-{
-	ovrFramebuffer	FrameBuffer[VRAPI_FRAME_LAYER_EYE_MAX];
-	ovrMatrix4f		ProjectionMatrix;
-	int				NumBuffers;
-} ovrRenderer;
+	XrResult result;
+	OXR(result = xrGetReferenceSpaceBoundsRect(
+			pappState->Session, XR_REFERENCE_SPACE_TYPE_STAGE, &stageBounds));
+	if (result != XR_SUCCESS) {
+		ALOGV("Stage bounds query failed: using small defaults");
+		stageBounds.width = 1.0f;
+		stageBounds.height = 1.0f;
 
+		pappState->CurrentSpace = pappState->FakeStageSpace;
+	}
+
+	ALOGV("Stage bounds: width = %f, depth %f", stageBounds.width, stageBounds.height);
+}
 
 void ovrRenderer_Clear( ovrRenderer * renderer );
-void ovrRenderer_Create( int width, int height, ovrRenderer * renderer, const ovrJava * java );
+void ovrRenderer_Create(XrSession session, int width, int height, ovrRenderer * renderer );
 void ovrRenderer_Destroy( ovrRenderer * renderer );
 
-
-/*
-================================================================================
-
-renderState
-
-================================================================================
-*/
-
-typedef struct
-{
-    GLint					VertexBuffer;
-    GLint					IndexBuffer;
-    GLint					VertexArrayObject;
-    GLint	                Program;
-    GLint	                VertexShader;
-    GLint	                FragmentShader;
-} renderState;
-
-void getCurrentRenderState( renderState * state);
-void restoreRenderState( renderState * state );
 
 /*
 ================================================================================
@@ -186,26 +159,8 @@ typedef struct
 } ovrScene;
 
 void ovrScene_Clear( ovrScene * scene );
-void ovrScene_Create( int width, int height, ovrScene * scene, const ovrJava * java );
+void ovrScene_Create( int width, int height, ovrScene * scene );
 void ovrScene_Destroy( ovrScene * scene );
 
-/*
-================================================================================
-
-ovrRenderer
-
-================================================================================
-*/
-
-ovrLayerProjection2 ovrRenderer_RenderGroundPlaneToEyeBuffer( ovrRenderer * renderer, const ovrJava * java,
-	const ovrScene * scene, const ovrTracking2 * tracking );
-	
-ovrLayerProjection2 ovrRenderer_RenderToEyeBuffer( ovrRenderer * renderer, const ovrJava * java,
-	const ovrTracking2 * tracking );
-
-ovrLayerCylinder2 BuildCylinderLayer( ovrRenderer * cylinderRenderer,
-	const int textureWidth, const int textureHeight,
-	const ovrTracking2 * tracking, float rotateYaw );
-;
 
 

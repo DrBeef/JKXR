@@ -14,51 +14,21 @@ Filename	:	VrCompositor.c
 #include <android/log.h>
 #include <android/window.h>				// for AWINDOW_FLAG_KEEP_SCREEN_ON
 
+
+//OpenXR
+#define XR_USE_GRAPHICS_API_OPENGL_ES 1
+#define XR_USE_PLATFORM_ANDROID 1
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #include <GLES3/gl3.h>
 #include <GLES3/gl3ext.h>
-#include <GLES/gl2ext.h>
-
-
-
-#include <VrApi.h>
-#include <VrApi_Helpers.h>
+#include <jni.h>
+#include <openxr/openxr.h>
+#include <openxr/openxr_platform.h>
+#include <openxr/openxr_oculus.h>
+#include <openxr/openxr_oculus_helpers.h>
 
 #include "VrCompositor.h"
-
-
-
-/*
-================================================================================
-
-renderState
-
-================================================================================
-*/
-
-
-void getCurrentRenderState( renderState * state)
-{
-	state->VertexBuffer = 0;
-	state->IndexBuffer = 0;
-	state->VertexArrayObject = 0;
-	state->Program = 0;
-
-    glGetIntegerv(GL_ARRAY_BUFFER, &state->VertexBuffer );
-	glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER, &state->IndexBuffer );
-    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &state->VertexArrayObject );
-	glGetIntegerv(GL_CURRENT_PROGRAM, &state->Program );
-}
-
-void restoreRenderState( renderState * state )
-{
-    GL( glUseProgram( state->Program ) );
-    GL( glBindVertexArray( state->VertexArrayObject ) );
-	GL( glBindBuffer( GL_ARRAY_BUFFER, state->VertexBuffer ) );
-	GL( glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, state->IndexBuffer ) );
-}
-
 
 /*
 ================================================================================
@@ -82,7 +52,7 @@ bool ovrScene_IsCreated( ovrScene * scene )
 	return scene->CreatedScene;
 }
 
-void ovrScene_Create( int width, int height, ovrScene * scene, const ovrJava * java )
+void ovrScene_Create( int width, int height, ovrScene * scene )
 {
 	// Create Cylinder renderer
 	{
@@ -90,7 +60,7 @@ void ovrScene_Create( int width, int height, ovrScene * scene, const ovrJava * j
 		scene->CylinderHeight = height;
 		
 		//Create cylinder renderer
-		ovrRenderer_Create( width, height, &scene->CylinderRenderer, java );
+		ovrRenderer_Create( width, height, &scene->CylinderRenderer );
 	}
 	
 	scene->CreatedScene = true;

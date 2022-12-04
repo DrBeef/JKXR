@@ -1,7 +1,18 @@
 #if !defined(vrcommon_h)
 #define vrcommon_h
 
-#include <VrApi_Input.h>
+//OpenXR
+#define XR_USE_GRAPHICS_API_OPENGL_ES 1
+#define XR_USE_PLATFORM_ANDROID 1
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+#include <GLES3/gl3.h>
+#include <GLES3/gl3ext.h>
+#include <jni.h>
+#include <openxr/openxr.h>
+#include <openxr/openxr_platform.h>
+#include <openxr/openxr_oculus.h>
+#include <openxr/openxr_oculus_helpers.h>
 
 #include <android/log.h>
 
@@ -25,23 +36,158 @@
 #endif
 
 
+enum { ovrMaxLayerCount = 1 };
+enum { ovrMaxNumEyes = 2 };
+
+typedef enum xrButton_ {
+    xrButton_A = 0x00000001, // Set for trigger pulled on the Gear VR and Go Controllers
+    xrButton_B = 0x00000002,
+    xrButton_RThumb = 0x00000004,
+    xrButton_RShoulder = 0x00000008,
+    xrButton_X = 0x00000100,
+    xrButton_Y = 0x00000200,
+    xrButton_LThumb = 0x00000400,
+    xrButton_LShoulder = 0x00000800,
+    xrButton_Up = 0x00010000,
+    xrButton_Down = 0x00020000,
+    xrButton_Left = 0x00040000,
+    xrButton_Right = 0x00080000,
+    xrButton_Enter = 0x00100000,
+    xrButton_Back = 0x00200000,
+    xrButton_GripTrigger = 0x04000000,
+    xrButton_Trigger = 0x20000000,
+    xrButton_Joystick = 0x80000000,
+    xrButton_EnumSize = 0x7fffffff
+} xrButton;
+
+typedef struct ovrInputStateTrackedRemote_ {
+    uint32_t Buttons;
+    float IndexTrigger;
+    float GripTrigger;
+    XrVector2f Joystick;
+} ovrInputStateTrackedRemote;
+
+typedef struct {
+    GLboolean Active;
+    XrPosef Pose;
+    XrSpaceVelocity Velocity;
+} ovrTrackedController;
+
 typedef enum control_scheme {
     RIGHT_HANDED_DEFAULT = 0,
     LEFT_HANDED_DEFAULT = 10,
     WEAPON_ALIGN = 99
 } control_scheme_t;
 
+typedef struct {
+    float M[4][4];
+} ovrMatrix4f;
+
+
+typedef struct {
+    XrSwapchain Handle;
+    uint32_t Width;
+    uint32_t Height;
+} ovrSwapChain;
+
+typedef struct {
+    int Width;
+    int Height;
+    uint32_t TextureSwapChainLength;
+    uint32_t TextureSwapChainIndex;
+    ovrSwapChain ColorSwapChain;
+    XrSwapchainImageOpenGLESKHR* ColorSwapChainImage;
+    GLuint* DepthBuffers;
+    GLuint* FrameBuffers;
+} ovrFramebuffer;
+
+
+/*
+================================================================================
+
+ovrRenderer
+
+================================================================================
+*/
+
+typedef struct
+{
+    ovrFramebuffer	FrameBuffer[ovrMaxNumEyes];
+    ovrMatrix4f		ProjectionMatrix;
+    int				NumBuffers;
+} ovrRenderer;
+
+/*
+================================================================================
+
+ovrApp
+
+================================================================================
+*/
+
+typedef union {
+    XrCompositionLayerProjection Projection;
+    XrCompositionLayerCylinderKHR Cylinder;
+} ovrCompositorLayer_Union;
+
+#define GL(func) func;
+#define OXR(func) func;
+
+typedef struct
+{
+    bool				Resumed;
+    bool				Focused;
+
+    XrInstance Instance;
+    XrSession Session;
+    XrViewConfigurationProperties ViewportConfig;
+    XrViewConfigurationView ViewConfigurationView[ovrMaxNumEyes];
+    XrSystemId SystemId;
+    XrSpace HeadSpace;
+    XrSpace StageSpace;
+    XrSpace FakeStageSpace;
+    XrSpace CurrentSpace;
+    GLboolean SessionActive;
+
+    float* SupportedDisplayRefreshRates;
+    uint32_t RequestedDisplayRefreshRateIndex;
+    uint32_t NumSupportedDisplayRefreshRates;
+    PFN_xrGetDisplayRefreshRateFB pfnGetDisplayRefreshRate;
+    PFN_xrRequestDisplayRefreshRateFB pfnRequestDisplayRefreshRate;
+
+    long long			FrameIndex;
+    double 				DisplayTime;
+    int					SwapInterval;
+    int					CpuLevel;
+    int					GpuLevel;
+    int					MainThreadTid;
+    int					RenderThreadTid;
+    ovrCompositorLayer_Union		Layers[ovrMaxLayerCount];
+    int					LayerCount;
+    ovrRenderer			Renderer;
+    ovrTrackedController TrackedController[2];
+} ovrApp;
+
+
 extern bool openjk_initialised;
 extern long long global_time;
-extern ovrTracking2 tracking;
 extern int ducked;
 extern vr_client_info_t vr;
 
-#define DUCK_NOTDUCKED 0
-#define DUCK_BUTTON 1
-#define DUCK_CROUCHED 2
+void ovrTrackedController_Clear(ovrTrackedController* controller);
 
+ovrMatrix4f ovrMatrix4f_Multiply(const ovrMatrix4f* a, const ovrMatrix4f* b);
+ovrMatrix4f ovrMatrix4f_CreateRotation(const float radiansX, const float radiansY, const float radiansZ);
+ovrMatrix4f ovrMatrix4f_CreateFromQuaternion(const XrQuaternionf* q);
+ovrMatrix4f ovrMatrix4f_CreateProjectionFov(
+        const float fovDegreesX,
+        const float fovDegreesY,
+        const float offsetX,
+        const float offsetY,
+        const float nearZ,
+        const float farZ);
 
+XrVector4f XrVector4f_MultiplyMatrix4f(const ovrMatrix4f* a, const XrVector4f* v);
 
 float radians(float deg);
 float degrees(float rad);
@@ -51,7 +197,7 @@ float length(float x, float y);
 float nonLinearFilter(float in);
 bool between(float min, float val, float max);
 void rotateAboutOrigin(float v1, float v2, float rotation, vec2_t out);
-void QuatToYawPitchRoll(ovrQuatf q, vec3_t rotation, vec3_t out);
+void QuatToYawPitchRoll(XrQuaternionf q, vec3_t rotation, vec3_t out);
 void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteState, ovrInputStateTrackedRemote * prevTrackedRemoteState, uint32_t button, int key);
 void interactWithTouchScreen(bool reset, ovrInputStateTrackedRemote *newState, ovrInputStateTrackedRemote *oldState);
 int GetRefresh();

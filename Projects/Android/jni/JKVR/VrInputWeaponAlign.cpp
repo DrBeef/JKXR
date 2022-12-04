@@ -23,8 +23,8 @@ cvar_t	*sv_cheats;
 
 void CG_CenterPrint( const char *str, int y, int charWidth );
 
-void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
-                          ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
+void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTrackedController* pDominantTracking,
+                          ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTrackedController* pOffTracking,
                           int domButton1, int domButton2, int offButton1, int offButton2 )
 
 {
@@ -49,9 +49,9 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
         //Set gun angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
         vec3_t rotation = {0};
         rotation[PITCH] = 10;
-        QuatToYawPitchRoll(pDominantTracking->HeadPose.Pose.Orientation, rotation, vr.weaponangles_saber);
+        QuatToYawPitchRoll(pDominantTracking->Pose.orientation, rotation, vr.weaponangles_saber);
         rotation[PITCH] = vr_weapon_pitchadjust->value;
-        QuatToYawPitchRoll(pDominantTracking->HeadPose.Pose.Orientation, rotation, vr.weaponangles);
+        QuatToYawPitchRoll(pDominantTracking->Pose.orientation, rotation, vr.weaponangles);
 
         VectorSubtract(vr.weaponangles_last, vr.weaponangles, vr.weaponangles_delta);
         VectorCopy(vr.weaponangles, vr.weaponangles_last);
@@ -62,7 +62,7 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
     }
 
     //Menu button
-	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, A_ESCAPE);
+	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, xrButton_Enter, A_ESCAPE);
 
     static bool resetCursor = qtrue;
     if ( JKVR_useScreenLayer() )
@@ -71,7 +71,7 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
         resetCursor = qfalse;
 
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton1, A_MOUSE1);
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, ovrButton_Trigger, A_MOUSE1);
+        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, xrButton_Trigger, A_MOUSE1);
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, A_ESCAPE);
     }
     else
@@ -80,36 +80,36 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
 
         //dominant hand stuff first
         {
-            vr.weaponposition[0] = pDominantTracking->HeadPose.Pose.Position.x;
-            vr.weaponposition[1] = pDominantTracking->HeadPose.Pose.Position.y;
-            vr.weaponposition[2] = pDominantTracking->HeadPose.Pose.Position.z;
+            vr.weaponposition[0] = pDominantTracking->Pose.position.x;
+            vr.weaponposition[1] = pDominantTracking->Pose.position.y;
+            vr.weaponposition[2] = pDominantTracking->Pose.position.z;
 			///Weapon location relative to view
-            vr.weaponoffset[0] = pDominantTracking->HeadPose.Pose.Position.x - vr.hmdposition[0];
-            vr.weaponoffset[1] = pDominantTracking->HeadPose.Pose.Position.y - vr.hmdposition[1];
-            vr.weaponoffset[2] = pDominantTracking->HeadPose.Pose.Position.z - vr.hmdposition[2];
+            vr.weaponoffset[0] = pDominantTracking->Pose.position.x - vr.hmdposition[0];
+            vr.weaponoffset[1] = pDominantTracking->Pose.position.y - vr.hmdposition[1];
+            vr.weaponoffset[2] = pDominantTracking->Pose.position.z - vr.hmdposition[2];
             vr.weaponoffset_timestamp = Sys_Milliseconds( );
         }
 
         float controllerYawHeading = 0.0f;
         //off-hand stuff
         {
-            vr.offhandposition[0][0] = pOffTracking->HeadPose.Pose.Position.x;
-            vr.offhandposition[0][1] = pOffTracking->HeadPose.Pose.Position.y;
-            vr.offhandposition[0][2] = pOffTracking->HeadPose.Pose.Position.z;
+            vr.offhandposition[0][0] = pOffTracking->Pose.position.x;
+            vr.offhandposition[0][1] = pOffTracking->Pose.position.y;
+            vr.offhandposition[0][2] = pOffTracking->Pose.position.z;
 
-            vr.offhandoffset[0] = pOffTracking->HeadPose.Pose.Position.x - vr.hmdposition[0];
-            vr.offhandoffset[1] = pOffTracking->HeadPose.Pose.Position.y - vr.hmdposition[1];
-            vr.offhandoffset[2] = pOffTracking->HeadPose.Pose.Position.z - vr.hmdposition[2];
+            vr.offhandoffset[0] = pOffTracking->Pose.position.x - vr.hmdposition[0];
+            vr.offhandoffset[1] = pOffTracking->Pose.position.y - vr.hmdposition[1];
+            vr.offhandoffset[2] = pOffTracking->Pose.position.z - vr.hmdposition[2];
 
             vec3_t rotation = {0};
-            QuatToYawPitchRoll(pOffTracking->HeadPose.Pose.Orientation, rotation, vr.offhandangles);
+            QuatToYawPitchRoll(pOffTracking->Pose.orientation, rotation, vr.offhandangles);
         }
 
 
         ALOGV("        Right-Controller-Position: %f, %f, %f",
-              pDominantTracking->HeadPose.Pose.Position.x,
-              pDominantTracking->HeadPose.Pose.Position.y,
-              pDominantTracking->HeadPose.Pose.Position.z);
+              pDominantTracking->Pose.position.x,
+              pDominantTracking->Pose.position.y,
+              pDominantTracking->Pose.position.z);
 
         //This section corrects for the fact that the controller actually controls direction of movement, but we want to move relative to the direction the
         //player is facing for positional tracking
@@ -124,16 +124,16 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
               positional_movementForward);
 
         dominantGripPushed = (pDominantTrackedRemoteNew->Buttons &
-                              ovrButton_GripTrigger) != 0;
+                              xrButton_GripTrigger) != 0;
 
         //We need to record if we have started firing primary so that releasing trigger will stop firing, if user has pushed grip
         //in meantime, then it wouldn't stop the gun firing and it would get stuck
         if (dominantGripPushed)
         {
             //Fire Secondary
-            if (((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
-                (pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger))
-                && (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger))
+            if (((pDominantTrackedRemoteNew->Buttons & xrButton_Trigger) !=
+                (pDominantTrackedRemoteOld->Buttons & xrButton_Trigger))
+                && (pDominantTrackedRemoteNew->Buttons & xrButton_Trigger))
             {
                 sendButtonActionSimple("weapalt");
             }
@@ -142,15 +142,15 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
         {
             //Fire Primary
             if (!vr.velocitytriggered && // Don't fire velocity triggered weapons
-                (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
-                (pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger)) {
+                (pDominantTrackedRemoteNew->Buttons & xrButton_Trigger) !=
+                (pDominantTrackedRemoteOld->Buttons & xrButton_Trigger)) {
 
-                sendButtonAction("+attack", (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger));
+                sendButtonAction("+attack", (pDominantTrackedRemoteNew->Buttons & xrButton_Trigger));
             }
         }
 
-        bool offhandGripPushed = (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger);
-        if ( (offhandGripPushed != (pOffTrackedRemoteOld->Buttons & ovrButton_GripTrigger)) &&
+        bool offhandGripPushed = (pOffTrackedRemoteNew->Buttons & xrButton_GripTrigger);
+        if ( (offhandGripPushed != (pOffTrackedRemoteOld->Buttons & xrButton_GripTrigger)) &&
              offhandGripPushed)
 #ifndef DEBUG
         {
@@ -218,9 +218,9 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
             itemSwitched = false;
         }
 
-        if (((pDominantTrackedRemoteNew->Buttons & ovrButton_Joystick) !=
-            (pDominantTrackedRemoteOld->Buttons & ovrButton_Joystick)) &&
-                (pDominantTrackedRemoteOld->Buttons & ovrButton_Joystick))
+        if (((pDominantTrackedRemoteNew->Buttons & xrButton_Joystick) !=
+            (pDominantTrackedRemoteOld->Buttons & xrButton_Joystick)) &&
+                (pDominantTrackedRemoteOld->Buttons & xrButton_Joystick))
         {
             *(items[item_index]) = 0.0;
         }

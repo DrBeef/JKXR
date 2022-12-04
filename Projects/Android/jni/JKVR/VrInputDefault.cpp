@@ -7,12 +7,6 @@ Authors		:	Simon Brown
 
 *************************************************************************************/
 
-#include <VrApi.h>
-#include <VrApi_Helpers.h>
-#include <VrApi_SystemUtils.h>
-#include <VrApi_Input.h>
-#include <VrApi_Types.h>
-
 #include <android/keycodes.h>
 
 #include "VrInput.h"
@@ -35,9 +29,8 @@ static inline float AngleBetweenVectors(const vec3_t a, const vec3_t b)
     return degrees(acosf(DotProduct(a, b)/(VectorLength(a) * VectorLength(b))));
 }
 
-void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateGamepad *pFootTrackingOld,
-                          ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTracking* pDominantTracking,
-                          ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTracking* pOffTracking,
+void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTrackedController* pDominantTracking,
+                          ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTrackedController* pOffTracking,
                           int domButton1, int domButton2, int offButton1, int offButton2 )
 
 {
@@ -50,12 +43,12 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
     static bool canUseQuickSave = false;
 
     //Need this for the touch screen
-    ovrTracking * pWeapon = pDominantTracking;
-    ovrTracking * pOff = pOffTracking;
+    ovrTrackedController * pWeapon = pDominantTracking;
+    ovrTrackedController * pOff = pOffTracking;
 
     //All this to allow stick and button switching!
-    ovrVector2f *pPrimaryJoystick;
-    ovrVector2f *pSecondaryJoystick;
+    XrVector2f *pPrimaryJoystick;
+    XrVector2f *pSecondaryJoystick;
     uint32_t primaryButtonsNew;
     uint32_t primaryButtonsOld;
     uint32_t secondaryButtonsNew;
@@ -64,8 +57,8 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
     int primaryButton2;
     int secondaryButton1;
     int secondaryButton2;
-    int primaryThumb = (vr_control_scheme->integer == RIGHT_HANDED_DEFAULT || vr_switch_sticks->integer) ? ovrButton_RThumb : ovrButton_LThumb;
-    int secondaryThumb = (vr_control_scheme->integer == RIGHT_HANDED_DEFAULT || vr_switch_sticks->integer) ? ovrButton_LThumb : ovrButton_RThumb;
+    int primaryThumb = (vr_control_scheme->integer == RIGHT_HANDED_DEFAULT || vr_switch_sticks->integer) ? xrButton_RThumb : xrButton_LThumb;
+    int secondaryThumb = (vr_control_scheme->integer == RIGHT_HANDED_DEFAULT || vr_switch_sticks->integer) ? xrButton_LThumb : xrButton_RThumb;
     if (vr_switch_sticks->integer)
     {
         //
@@ -105,10 +98,10 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         //if we are in saber block debounce, don't update the angles
         if (vr.saberBlockDebounce < cl.serverTime) {
             rotation[PITCH] = 45;
-            QuatToYawPitchRoll(pWeapon->HeadPose.Pose.Orientation, rotation, vr.weaponangles_saber);
+            QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles_saber);
         }
         rotation[PITCH] = vr_weapon_pitchadjust->value;
-        QuatToYawPitchRoll(pWeapon->HeadPose.Pose.Orientation, rotation, vr.weaponangles);
+        QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles);
 
         VectorSubtract(vr.weaponangles_last, vr.weaponangles, vr.weaponangles_delta);
         VectorCopy(vr.weaponangles, vr.weaponangles_last);
@@ -119,14 +112,14 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         //GB Also set offhand angles just in case we want to use those.
         vec3_t rotation_off = {0};
         rotation_off[PITCH] = vr_weapon_pitchadjust->value;
-        QuatToYawPitchRoll(pOff->HeadPose.Pose.Orientation, rotation_off, vr.offhandangles);
+        QuatToYawPitchRoll(pOff->Pose.orientation, rotation_off, vr.offhandangles);
 
         VectorSubtract(vr.offhandangles_last, vr.offhandangles, vr.offhandangles_delta);
         VectorCopy(vr.offhandangles, vr.offhandangles_last);
     }
 
     //Menu button
-	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, ovrButton_Enter, A_ESCAPE);
+	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, xrButton_Enter, A_ESCAPE);
 
     static bool resetCursor = qtrue;
     if ( JKVR_useScreenLayer() && !vr.misc_camera /*bit of a fiddle, but if we are in a misc camera, we are in the game and shouldn't be in here*/)
@@ -135,7 +128,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         resetCursor = qfalse;
 
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton1, A_MOUSE1);
-        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, ovrButton_Trigger, A_MOUSE1);
+        handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, xrButton_Trigger, A_MOUSE1);
         handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, A_ESCAPE);
 
         //To skip flatscreen cinematic
@@ -148,22 +141,22 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
     {
         resetCursor = qtrue;
 
-        float distance = sqrtf(powf(pOff->HeadPose.Pose.Position.x - pWeapon->HeadPose.Pose.Position.x, 2) +
-                               powf(pOff->HeadPose.Pose.Position.y - pWeapon->HeadPose.Pose.Position.y, 2) +
-                               powf(pOff->HeadPose.Pose.Position.z - pWeapon->HeadPose.Pose.Position.z, 2));
+        float distance = sqrtf(powf(pOff->Pose.position.x - pWeapon->Pose.position.x, 2) +
+                               powf(pOff->Pose.position.y - pWeapon->Pose.position.y, 2) +
+                               powf(pOff->Pose.position.z - pWeapon->Pose.position.z, 2));
 
-        float distanceToHMD = sqrtf(powf(vr.hmdposition[0] - pWeapon->HeadPose.Pose.Position.x, 2) +
-                                    powf(vr.hmdposition[1] - pWeapon->HeadPose.Pose.Position.y, 2) +
-                                    powf(vr.hmdposition[2] - pWeapon->HeadPose.Pose.Position.z, 2));
+        float distanceToHMD = sqrtf(powf(vr.hmdposition[0] - pWeapon->Pose.position.x, 2) +
+                                    powf(vr.hmdposition[1] - pWeapon->Pose.position.y, 2) +
+                                    powf(vr.hmdposition[2] - pWeapon->Pose.position.z, 2));
 
-        float distanceToHMDOff = sqrtf(powf(vr.hmdposition[0] - pOff->HeadPose.Pose.Position.x, 2) +
-                                    powf(vr.hmdposition[1] - pOff->HeadPose.Pose.Position.y, 2) +
-                                    powf(vr.hmdposition[2] - pOff->HeadPose.Pose.Position.z, 2));
+        float distanceToHMDOff = sqrtf(powf(vr.hmdposition[0] - pOff->Pose.position.x, 2) +
+                                    powf(vr.hmdposition[1] - pOff->Pose.position.y, 2) +
+                                    powf(vr.hmdposition[2] - pOff->Pose.position.z, 2));
 
 
         float controllerYawHeading = 0.0f;
         //Turn on weapon stabilisation?
-        bool offhandGripPushed = (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger);
+        bool offhandGripPushed = (pOffTrackedRemoteNew->Buttons & xrButton_GripTrigger);
         if (offhandGripPushed)
         {
             if (!vr.weapon_stabilised && vr.item_selector == 0 &&
@@ -189,7 +182,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
         }
 
         dominantGripPushed = (pDominantTrackedRemoteNew->Buttons &
-                              ovrButton_GripTrigger) != 0;
+                              xrButton_GripTrigger) != 0;
 
         //Do this early so we can suppress other button actions when item selector is up
         if (dominantGripPushed) {
@@ -315,23 +308,23 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             vr.weaponoffset_history_timestamp[0] = vr.weaponoffset_timestamp;
 
             if (vr.saberBlockDebounce < cl.serverTime) {
-                VectorSet(vr.weaponposition, pWeapon->HeadPose.Pose.Position.x,
-                          pWeapon->HeadPose.Pose.Position.y, pWeapon->HeadPose.Pose.Position.z);
+                VectorSet(vr.weaponposition, pWeapon->Pose.position.x,
+                          pWeapon->Pose.position.y, pWeapon->Pose.position.z);
 
                 ///Weapon location relative to view
-                VectorSet(vr.weaponoffset, pWeapon->HeadPose.Pose.Position.x,
-                          pWeapon->HeadPose.Pose.Position.y, pWeapon->HeadPose.Pose.Position.z);
+                VectorSet(vr.weaponoffset, pWeapon->Pose.position.x,
+                          pWeapon->Pose.position.y, pWeapon->Pose.position.z);
                 VectorSubtract(vr.weaponoffset, vr.hmdposition, vr.weaponoffset);
                 vr.weaponoffset_timestamp = Sys_Milliseconds();
             }
 
             vec3_t velocity;
-            VectorSet(velocity, pWeapon->HeadPose.LinearVelocity.x,
-                      pWeapon->HeadPose.LinearVelocity.y, pWeapon->HeadPose.LinearVelocity.z);
+            VectorSet(velocity, pWeapon->Velocity.linearVelocity.x,
+                      pWeapon->Velocity.linearVelocity.y, pWeapon->Velocity.linearVelocity.z);
             vr.primaryswingvelocity = VectorLength(velocity);
 
-            VectorSet(velocity, pOff->HeadPose.LinearVelocity.x,
-                      pOff->HeadPose.LinearVelocity.y, pOff->HeadPose.LinearVelocity.z);
+            VectorSet(velocity, pOff->Velocity.linearVelocity.x,
+                      pOff->Velocity.linearVelocity.y, pOff->Velocity.linearVelocity.z);
             vr.secondaryswingvelocity = VectorLength(velocity);
 
 
@@ -444,11 +437,11 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 else
                 {
                     float x =
-                            pOff->HeadPose.Pose.Position.x - pWeapon->HeadPose.Pose.Position.x;
+                            pOff->Pose.position.x - pWeapon->Pose.position.x;
                     float y =
-                            pOff->HeadPose.Pose.Position.y - pWeapon->HeadPose.Pose.Position.y;
+                            pOff->Pose.position.y - pWeapon->Pose.position.y;
                     float z =
-                            pOff->HeadPose.Pose.Position.z - pWeapon->HeadPose.Pose.Position.z;
+                            pOff->Pose.position.z - pWeapon->Pose.position.z;
                     float zxDist = length(x, z);
 
                     if (zxDist != 0.0f && z != 0.0f) {
@@ -466,9 +459,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             float weaponToDownAngle = 0, hmdToWeaponDotProduct = 0;
             static vec3_t downVector = {0.0, 0.0, -1.0};
 
-            bool bpTrackOk = pOffTracking->Status &
-                             VRAPI_TRACKING_STATUS_POSITION_TRACKED;                        // 1) Position must be tracked
-            if (bpTrackOk && (bpDistToHMDOk = distanceToHMD >= 0.2 && distanceToHMD <=
+            if ((bpDistToHMDOk = distanceToHMD >= 0.2 && distanceToHMD <=
                                                                       0.35)                       // 2) Weapon-to-HMD distance must be within <0.2-0.35> range
                 && (bpWeaponHeightOk = vr.weaponoffset[1] >= -0.10 && vr.weaponoffset[1] <=
                                                                       0.10)) // 3) Weapon height in relation to HMD must be within <-0.10, 0.10> range
@@ -497,16 +488,16 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 {
                     VectorCopy(vr.offhandposition[i-1], vr.offhandposition[i]);
                 }
-                vr.offhandposition[0][0] = pOff->HeadPose.Pose.Position.x;
-                vr.offhandposition[0][1] = pOff->HeadPose.Pose.Position.y;
-                vr.offhandposition[0][2] = pOff->HeadPose.Pose.Position.z;
+                vr.offhandposition[0][0] = pOff->Pose.position.x;
+                vr.offhandposition[0][1] = pOff->Pose.position.y;
+                vr.offhandposition[0][2] = pOff->Pose.position.z;
 
-                vr.offhandoffset[0] = pOff->HeadPose.Pose.Position.x - vr.hmdposition[0];
-                vr.offhandoffset[1] = pOff->HeadPose.Pose.Position.y - vr.hmdposition[1];
-                vr.offhandoffset[2] = pOff->HeadPose.Pose.Position.z - vr.hmdposition[2];
+                vr.offhandoffset[0] = pOff->Pose.position.x - vr.hmdposition[0];
+                vr.offhandoffset[1] = pOff->Pose.position.y - vr.hmdposition[1];
+                vr.offhandoffset[2] = pOff->Pose.position.z - vr.hmdposition[2];
 
                 vec3_t rotation = {0};
-                QuatToYawPitchRoll(pOff->HeadPose.Pose.Orientation, rotation, vr.offhandangles);
+                QuatToYawPitchRoll(pOff->Pose.orientation, rotation, vr.offhandangles);
 
                 if (vr_walkdirection->value == 0) {
                     controllerYawHeading = vr.offhandangles[YAW] - vr.hmdorientation[YAW];
@@ -521,7 +512,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             vec3_t offhandForwardXY = {};
             float hmdToOffhandDotProduct = 0;
             float offhandToDownAngle = 0;
-            if (bpTrackOk && (bpOffhandDistToHMDOk = distanceToHMDOff >= 0.2 &&
+            if ((bpOffhandDistToHMDOk = distanceToHMDOff >= 0.2 &&
                                                      distanceToHMDOff <=
                                                      0.35)   // 2) Off-to-HMD distance must be within <0.2-0.35> range
                 && (bpOffhandHeightOk = vr.offhandoffset[1] >= -0.10 && vr.offhandoffset[1] <=
@@ -641,11 +632,11 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 previous_throwing = throwing;
                 if (!throwing &&
                     vr.primaryVelocityTriggeredAttack &&
-                    (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger))
+                    (pDominantTrackedRemoteNew->Buttons & xrButton_Trigger))
                 {
                     throwing = true;
                 }
-                else if (throwing && !(pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger))
+                else if (throwing && !(pDominantTrackedRemoteNew->Buttons & xrButton_Trigger))
                 {
                     throwing = false;
                 }
@@ -657,10 +648,10 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             else if (!vr.velocitytriggered) // Don't fire velocity triggered weapons
             {
                 //Fire Primary - Doesn't trigger the saber
-                if ((pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
-                    (pDominantTrackedRemoteOld->Buttons & ovrButton_Trigger)) {
+                if ((pDominantTrackedRemoteNew->Buttons & xrButton_Trigger) !=
+                    (pDominantTrackedRemoteOld->Buttons & xrButton_Trigger)) {
 
-                    firing = (pDominantTrackedRemoteNew->Buttons & ovrButton_Trigger) &&
+                    firing = (pDominantTrackedRemoteNew->Buttons & xrButton_Trigger) &&
                             !vr.item_selector;
                     sendButtonAction("+attack", firing);
                 }
@@ -706,8 +697,8 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
             //Apply a filter and quadratic scaler so small movements are easier to make
             float dist = length(pSecondaryJoystick->x, pSecondaryJoystick->y);
             float nlf = nonLinearFilter(dist);
-            float x = (nlf * pSecondaryJoystick->x) + pFootTrackingNew->LeftJoystick.x;
-            float y = (nlf * pSecondaryJoystick->y) - pFootTrackingNew->LeftJoystick.y;
+            float x = (nlf * pSecondaryJoystick->x);
+            float y = (nlf * pSecondaryJoystick->y);
 
             vr.player_moving = (fabs(x) + fabs(y)) > 0.05f;
 
@@ -745,10 +736,10 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
             //Use Force - off hand trigger
             {
-                if ((pOffTrackedRemoteNew->Buttons & ovrButton_Trigger) !=
-                    (pOffTrackedRemoteOld->Buttons & ovrButton_Trigger))
+                if ((pOffTrackedRemoteNew->Buttons & xrButton_Trigger) !=
+                    (pOffTrackedRemoteOld->Buttons & xrButton_Trigger))
                 {
-                    sendButtonAction("+useforce", (pOffTrackedRemoteNew->Buttons & ovrButton_Trigger));
+                    sendButtonAction("+useforce", (pOffTrackedRemoteNew->Buttons & xrButton_Trigger));
                 }
             }
 

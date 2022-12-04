@@ -7,12 +7,6 @@ Authors		:	Simon Brown
 
 *************************************************************************************/
 
-#include <VrApi.h>
-#include <VrApi_Helpers.h>
-#include <VrApi_SystemUtils.h>
-#include <VrApi_Input.h>
-#include <VrApi_Types.h>
-
 #include "VrInput.h"
 
 #include <qcommon/qcommon.h>
@@ -45,13 +39,10 @@ cvar_t  *vr_use_gesture_boundary;
 
 ovrInputStateTrackedRemote leftTrackedRemoteState_old;
 ovrInputStateTrackedRemote leftTrackedRemoteState_new;
-ovrTracking leftRemoteTracking_new;
+ovrTrackedController leftRemoteTracking_new;
 ovrInputStateTrackedRemote rightTrackedRemoteState_old;
 ovrInputStateTrackedRemote rightTrackedRemoteState_new;
-ovrTracking rightRemoteTracking_new;
-ovrInputStateGamepad footTrackedRemoteState_old;
-ovrInputStateGamepad footTrackedRemoteState_new;
-ovrDeviceID controllerIDs[2];
+ovrTrackedController rightRemoteTracking_new;
 
 float remote_movementSideways;
 float remote_movementForward;
@@ -60,7 +51,6 @@ float positional_movementSideways;
 float positional_movementForward;
 bool openjk_initialised;
 long long global_time;
-ovrTracking2 tracking;
 int ducked;
 vr_client_info_t vr;
 
@@ -133,58 +123,6 @@ void sendButtonAction(const char* action, long buttonDown)
     Cbuf_AddText( command );
 }
 
-void acquireTrackedRemotesData(ovrMobile *Ovr, double displayTime) {//The amount of yaw changed by controller
-
-    for ( uint32_t i = 0; ; i++ ) {
-        ovrInputCapabilityHeader cap;
-        ovrResult result = vrapi_EnumerateInputDevices(Ovr, i, &cap);
-        if (result < 0) {
-            break;
-        }
-
-        if (cap.Type == ovrControllerType_Gamepad) {
-
-            ovrInputGamepadCapabilities remoteCaps;
-            remoteCaps.Header = cap;
-            if (vrapi_GetInputDeviceCapabilities(Ovr, &remoteCaps.Header) >= 0) {
-                // remote is connected
-                ovrInputStateGamepad remoteState;
-                remoteState.Header.ControllerType = ovrControllerType_Gamepad;
-                if ( vrapi_GetCurrentInputState( Ovr, cap.DeviceID, &remoteState.Header ) >= 0 )
-                {
-                    // act on device state returned in remoteState
-                    footTrackedRemoteState_new = remoteState;
-                }
-            }
-        }
-        else if (cap.Type == ovrControllerType_TrackedRemote) {
-            ovrTracking remoteTracking;
-            ovrInputStateTrackedRemote trackedRemoteState;
-            trackedRemoteState.Header.ControllerType = ovrControllerType_TrackedRemote;
-            result = vrapi_GetCurrentInputState(Ovr, cap.DeviceID, &trackedRemoteState.Header);
-
-            if (result == ovrSuccess) {
-                ovrInputTrackedRemoteCapabilities remoteCapabilities;
-                remoteCapabilities.Header = cap;
-                result = vrapi_GetInputDeviceCapabilities(Ovr, &remoteCapabilities.Header);
-
-                result = vrapi_GetInputTrackingState(Ovr, cap.DeviceID, displayTime,
-                                                     &remoteTracking);
-
-                if (remoteCapabilities.ControllerCapabilities & ovrControllerCaps_RightHand) {
-                    rightTrackedRemoteState_new = trackedRemoteState;
-                    rightRemoteTracking_new = remoteTracking;
-                    controllerIDs[1] = cap.DeviceID;
-                } else{
-                    leftTrackedRemoteState_new = trackedRemoteState;
-                    leftRemoteTracking_new = remoteTracking;
-                    controllerIDs[0] = cap.DeviceID;
-                }
-            }
-        }
-    }
-}
-
 void PortableMouseAbs(float x,float y);
 float clamp(float _min, float _val, float _max)
 {
@@ -202,4 +140,195 @@ void interactWithTouchScreen(bool reset, ovrInputStateTrackedRemote *newState, o
     float cursorY = (float)(vr.weaponangles[PITCH] / 90.0) + 0.5f;
 
     PortableMouseAbs(cursorX, cursorY);
+}
+
+
+/*
+================================================================================
+
+ovrMatrix4f
+
+================================================================================
+*/
+
+ovrMatrix4f ovrMatrix4f_CreateProjectionFov(
+        const float angleLeft,
+        const float angleRight,
+        const float angleUp,
+        const float angleDown,
+        const float nearZ,
+        const float farZ) {
+
+    const float tanAngleLeft = tanf(angleLeft);
+    const float tanAngleRight = tanf(angleRight);
+
+    const float tanAngleDown = tanf(angleDown);
+    const float tanAngleUp = tanf(angleUp);
+
+    const float tanAngleWidth = tanAngleRight - tanAngleLeft;
+
+    // Set to tanAngleDown - tanAngleUp for a clip space with positive Y
+    // down (Vulkan). Set to tanAngleUp - tanAngleDown for a clip space with
+    // positive Y up (OpenGL / D3D / Metal).
+    const float tanAngleHeight = tanAngleUp - tanAngleDown;
+
+    // Set to nearZ for a [-1,1] Z clip space (OpenGL / OpenGL ES).
+    // Set to zero for a [0,1] Z clip space (Vulkan / D3D / Metal).
+    const float offsetZ = nearZ;
+
+    ovrMatrix4f result;
+    if (farZ <= nearZ) {
+        // place the far plane at infinity
+        result.M[0][0] = 2 / tanAngleWidth;
+        result.M[0][1] = 0;
+        result.M[0][2] = (tanAngleRight + tanAngleLeft) / tanAngleWidth;
+        result.M[0][3] = 0;
+
+        result.M[1][0] = 0;
+        result.M[1][1] = 2 / tanAngleHeight;
+        result.M[1][2] = (tanAngleUp + tanAngleDown) / tanAngleHeight;
+        result.M[1][3] = 0;
+
+        result.M[2][0] = 0;
+        result.M[2][1] = 0;
+        result.M[2][2] = -1;
+        result.M[2][3] = -(nearZ + offsetZ);
+
+        result.M[3][0] = 0;
+        result.M[3][1] = 0;
+        result.M[3][2] = -1;
+        result.M[3][3] = 0;
+    } else {
+        // normal projection
+        result.M[0][0] = 2 / tanAngleWidth;
+        result.M[0][1] = 0;
+        result.M[0][2] = (tanAngleRight + tanAngleLeft) / tanAngleWidth;
+        result.M[0][3] = 0;
+
+        result.M[1][0] = 0;
+        result.M[1][1] = 2 / tanAngleHeight;
+        result.M[1][2] = (tanAngleUp + tanAngleDown) / tanAngleHeight;
+        result.M[1][3] = 0;
+
+        result.M[2][0] = 0;
+        result.M[2][1] = 0;
+        result.M[2][2] = -(farZ + offsetZ) / (farZ - nearZ);
+        result.M[2][3] = -(farZ * (nearZ + offsetZ)) / (farZ - nearZ);
+
+        result.M[3][0] = 0;
+        result.M[3][1] = 0;
+        result.M[3][2] = -1;
+        result.M[3][3] = 0;
+    }
+    return result;
+}
+
+ovrMatrix4f ovrMatrix4f_CreateFromQuaternion(const XrQuaternionf* q) {
+    const float ww = q->w * q->w;
+    const float xx = q->x * q->x;
+    const float yy = q->y * q->y;
+    const float zz = q->z * q->z;
+
+    ovrMatrix4f out;
+    out.M[0][0] = ww + xx - yy - zz;
+    out.M[0][1] = 2 * (q->x * q->y - q->w * q->z);
+    out.M[0][2] = 2 * (q->x * q->z + q->w * q->y);
+    out.M[0][3] = 0;
+
+    out.M[1][0] = 2 * (q->x * q->y + q->w * q->z);
+    out.M[1][1] = ww - xx + yy - zz;
+    out.M[1][2] = 2 * (q->y * q->z - q->w * q->x);
+    out.M[1][3] = 0;
+
+    out.M[2][0] = 2 * (q->x * q->z - q->w * q->y);
+    out.M[2][1] = 2 * (q->y * q->z + q->w * q->x);
+    out.M[2][2] = ww - xx - yy + zz;
+    out.M[2][3] = 0;
+
+    out.M[3][0] = 0;
+    out.M[3][1] = 0;
+    out.M[3][2] = 0;
+    out.M[3][3] = 1;
+    return out;
+}
+
+
+/// Use left-multiplication to accumulate transformations.
+ovrMatrix4f ovrMatrix4f_Multiply(const ovrMatrix4f* a, const ovrMatrix4f* b) {
+    ovrMatrix4f out;
+    out.M[0][0] = a->M[0][0] * b->M[0][0] + a->M[0][1] * b->M[1][0] + a->M[0][2] * b->M[2][0] +
+                  a->M[0][3] * b->M[3][0];
+    out.M[1][0] = a->M[1][0] * b->M[0][0] + a->M[1][1] * b->M[1][0] + a->M[1][2] * b->M[2][0] +
+                  a->M[1][3] * b->M[3][0];
+    out.M[2][0] = a->M[2][0] * b->M[0][0] + a->M[2][1] * b->M[1][0] + a->M[2][2] * b->M[2][0] +
+                  a->M[2][3] * b->M[3][0];
+    out.M[3][0] = a->M[3][0] * b->M[0][0] + a->M[3][1] * b->M[1][0] + a->M[3][2] * b->M[2][0] +
+                  a->M[3][3] * b->M[3][0];
+
+    out.M[0][1] = a->M[0][0] * b->M[0][1] + a->M[0][1] * b->M[1][1] + a->M[0][2] * b->M[2][1] +
+                  a->M[0][3] * b->M[3][1];
+    out.M[1][1] = a->M[1][0] * b->M[0][1] + a->M[1][1] * b->M[1][1] + a->M[1][2] * b->M[2][1] +
+                  a->M[1][3] * b->M[3][1];
+    out.M[2][1] = a->M[2][0] * b->M[0][1] + a->M[2][1] * b->M[1][1] + a->M[2][2] * b->M[2][1] +
+                  a->M[2][3] * b->M[3][1];
+    out.M[3][1] = a->M[3][0] * b->M[0][1] + a->M[3][1] * b->M[1][1] + a->M[3][2] * b->M[2][1] +
+                  a->M[3][3] * b->M[3][1];
+
+    out.M[0][2] = a->M[0][0] * b->M[0][2] + a->M[0][1] * b->M[1][2] + a->M[0][2] * b->M[2][2] +
+                  a->M[0][3] * b->M[3][2];
+    out.M[1][2] = a->M[1][0] * b->M[0][2] + a->M[1][1] * b->M[1][2] + a->M[1][2] * b->M[2][2] +
+                  a->M[1][3] * b->M[3][2];
+    out.M[2][2] = a->M[2][0] * b->M[0][2] + a->M[2][1] * b->M[1][2] + a->M[2][2] * b->M[2][2] +
+                  a->M[2][3] * b->M[3][2];
+    out.M[3][2] = a->M[3][0] * b->M[0][2] + a->M[3][1] * b->M[1][2] + a->M[3][2] * b->M[2][2] +
+                  a->M[3][3] * b->M[3][2];
+
+    out.M[0][3] = a->M[0][0] * b->M[0][3] + a->M[0][1] * b->M[1][3] + a->M[0][2] * b->M[2][3] +
+                  a->M[0][3] * b->M[3][3];
+    out.M[1][3] = a->M[1][0] * b->M[0][3] + a->M[1][1] * b->M[1][3] + a->M[1][2] * b->M[2][3] +
+                  a->M[1][3] * b->M[3][3];
+    out.M[2][3] = a->M[2][0] * b->M[0][3] + a->M[2][1] * b->M[1][3] + a->M[2][2] * b->M[2][3] +
+                  a->M[2][3] * b->M[3][3];
+    out.M[3][3] = a->M[3][0] * b->M[0][3] + a->M[3][1] * b->M[1][3] + a->M[3][2] * b->M[2][3] +
+                  a->M[3][3] * b->M[3][3];
+    return out;
+}
+
+ovrMatrix4f ovrMatrix4f_CreateRotation(const float radiansX, const float radiansY, const float radiansZ) {
+    const float sinX = sinf(radiansX);
+    const float cosX = cosf(radiansX);
+    const ovrMatrix4f rotationX = {
+            {{1, 0, 0, 0}, {0, cosX, -sinX, 0}, {0, sinX, cosX, 0}, {0, 0, 0, 1}}};
+    const float sinY = sinf(radiansY);
+    const float cosY = cosf(radiansY);
+    const ovrMatrix4f rotationY = {
+            {{cosY, 0, sinY, 0}, {0, 1, 0, 0}, {-sinY, 0, cosY, 0}, {0, 0, 0, 1}}};
+    const float sinZ = sinf(radiansZ);
+    const float cosZ = cosf(radiansZ);
+    const ovrMatrix4f rotationZ = {
+            {{cosZ, -sinZ, 0, 0}, {sinZ, cosZ, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}};
+    const ovrMatrix4f rotationXY = ovrMatrix4f_Multiply(&rotationY, &rotationX);
+    return ovrMatrix4f_Multiply(&rotationZ, &rotationXY);
+}
+
+XrVector4f XrVector4f_MultiplyMatrix4f(const ovrMatrix4f* a, const XrVector4f* v) {
+    XrVector4f out;
+    out.x = a->M[0][0] * v->x + a->M[0][1] * v->y + a->M[0][2] * v->z + a->M[0][3] * v->w;
+    out.y = a->M[1][0] * v->x + a->M[1][1] * v->y + a->M[1][2] * v->z + a->M[1][3] * v->w;
+    out.z = a->M[2][0] * v->x + a->M[2][1] * v->y + a->M[2][2] * v->z + a->M[2][3] * v->w;
+    out.w = a->M[3][0] * v->x + a->M[3][1] * v->y + a->M[3][2] * v->z + a->M[3][3] * v->w;
+    return out;
+}
+
+/*
+================================================================================
+
+ovrTrackedController
+
+================================================================================
+*/
+
+void ovrTrackedController_Clear(ovrTrackedController* controller) {
+    controller->Active = false;
+    controller->Pose = XrPosef_Identity();
 }

@@ -34,18 +34,10 @@ Copyright	:	Copyright 2015 Oculus VR, LLC. All Rights reserved.
 #define GL_GLEXT_PROTOTYPES
 #include <GLES/gl2ext.h>
 
-#include "VrApi.h"
-#include "VrApi_Helpers.h"
-#include "VrApi_SystemUtils.h"
-#include "VrApi_Input.h"
-#include "VrApi_Types.h"
-
 extern "C" {
 #include "src/gl/loader.h"
 }
 
-//#include <SDL2/SDL.h>
-//#include <SDL2/SDL_main.h>
 #include <client/client.h>
 
 #include "VrCompositor.h"
@@ -111,8 +103,16 @@ struct arg_end *end;
 char **argv;
 int argc=0;
 
-extern cvar_t	*r_lefthand;
-extern cvar_t   *cl_paused;
+
+const char* const requiredExtensionNames[] = {
+		XR_KHR_OPENGL_ES_ENABLE_EXTENSION_NAME,
+		XR_EXT_PERFORMANCE_SETTINGS_EXTENSION_NAME,
+		XR_KHR_ANDROID_THREAD_SETTINGS_EXTENSION_NAME,
+		XR_KHR_COMPOSITION_LAYER_CYLINDER_EXTENSION_NAME,
+		XR_FB_DISPLAY_REFRESH_RATE_EXTENSION_NAME};
+const uint32_t numRequiredExtensions =
+		sizeof(requiredExtensionNames) / sizeof(requiredExtensionNames[0]);
+
 
 /*
 ================================================================================
@@ -486,26 +486,25 @@ ovrFramebuffer
 */
 
 
-static void ovrFramebuffer_Clear( ovrFramebuffer * frameBuffer )
-{
+static void ovrFramebuffer_Clear(ovrFramebuffer* frameBuffer) {
 	frameBuffer->Width = 0;
 	frameBuffer->Height = 0;
-	frameBuffer->Multisamples = 0;
 	frameBuffer->TextureSwapChainLength = 0;
 	frameBuffer->TextureSwapChainIndex = 0;
-	frameBuffer->ColorTextureSwapChain = NULL;
+	frameBuffer->ColorSwapChain.Handle = XR_NULL_HANDLE;
+	frameBuffer->ColorSwapChain.Width = 0;
+	frameBuffer->ColorSwapChain.Height = 0;
+	frameBuffer->ColorSwapChainImage = NULL;
 	frameBuffer->DepthBuffers = NULL;
 	frameBuffer->FrameBuffers = NULL;
 }
 
-static bool ovrFramebuffer_Create( ovrFramebuffer * frameBuffer, const GLenum colorFormat, const int width, const int height, const int multisamples )
+static bool ovrFramebuffer_Create( XrSession session,
+								   ovrFramebuffer * frameBuffer, const GLenum colorFormat, const int width, const int height )
 {
 	frameBuffer->Width = width;
 	frameBuffer->Height = height;
-	frameBuffer->Multisamples = multisamples;
 
-	frameBuffer->ColorTextureSwapChain = vrapi_CreateTextureSwapChain3( VRAPI_TEXTURE_TYPE_2D, colorFormat, frameBuffer->Width, frameBuffer->Height, 1, 3 );
-	frameBuffer->TextureSwapChainLength = vrapi_GetTextureSwapChainLength( frameBuffer->ColorTextureSwapChain );
 	frameBuffer->DepthBuffers = (GLuint *)malloc( frameBuffer->TextureSwapChainLength * sizeof( GLuint ) );
 	frameBuffer->FrameBuffers = (GLuint *)malloc( frameBuffer->TextureSwapChainLength * sizeof( GLuint ) );
 
@@ -514,20 +513,56 @@ static bool ovrFramebuffer_Create( ovrFramebuffer * frameBuffer, const GLenum co
 	PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEEXTPROC glFramebufferTexture2DMultisampleEXT =
 			(PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEEXTPROC)eglGetProcAddress("glFramebufferTexture2DMultisampleEXT");
 
+	XrSwapchainCreateInfo swapChainCreateInfo;
+	memset(&swapChainCreateInfo, 0, sizeof(swapChainCreateInfo));
+	swapChainCreateInfo.type = XR_TYPE_SWAPCHAIN_CREATE_INFO;
+	swapChainCreateInfo.usageFlags = XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT;
+	swapChainCreateInfo.format = GL_RGBA8;
+	swapChainCreateInfo.sampleCount = 1;
+	swapChainCreateInfo.width = width;
+	swapChainCreateInfo.height = height;
+	swapChainCreateInfo.faceCount = 1;
+	swapChainCreateInfo.arraySize = 2;
+	swapChainCreateInfo.mipCount = 1;
+
+	frameBuffer->ColorSwapChain.Width = swapChainCreateInfo.width;
+	frameBuffer->ColorSwapChain.Height = swapChainCreateInfo.height;
+
+	// Create the swapchain.
+	OXR(xrCreateSwapchain(session, &swapChainCreateInfo, &frameBuffer->ColorSwapChain.Handle));
+	// Get the number of swapchain images.
+	OXR(xrEnumerateSwapchainImages(
+			frameBuffer->ColorSwapChain.Handle, 0, &frameBuffer->TextureSwapChainLength, NULL));
+	// Allocate the swapchain images array.
+	frameBuffer->ColorSwapChainImage = (XrSwapchainImageOpenGLESKHR*)malloc(
+			frameBuffer->TextureSwapChainLength * sizeof(XrSwapchainImageOpenGLESKHR));
+
+	// Populate the swapchain image array.
+	for (uint32_t i = 0; i < frameBuffer->TextureSwapChainLength; i++) {
+		frameBuffer->ColorSwapChainImage[i].type = XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_ES_KHR;
+		frameBuffer->ColorSwapChainImage[i].next = NULL;
+	}
+	OXR(xrEnumerateSwapchainImages(
+			frameBuffer->ColorSwapChain.Handle,
+			frameBuffer->TextureSwapChainLength,
+			&frameBuffer->TextureSwapChainLength,
+			(XrSwapchainImageBaseHeader*)frameBuffer->ColorSwapChainImage));
+
+
 	for ( int i = 0; i < frameBuffer->TextureSwapChainLength; i++ )
 	{
 		// Create the color buffer texture.
-		const GLuint colorTexture = vrapi_GetTextureSwapChainHandle( frameBuffer->ColorTextureSwapChain, i );
+		const GLuint colorTexture = frameBuffer->ColorSwapChainImage[i].image;
 
 		GL(glGenRenderbuffers(1, &frameBuffer->DepthBuffers[i]));
 		GL(glBindRenderbuffer(GL_RENDERBUFFER, frameBuffer->DepthBuffers[i]));
-		GL(glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER, multisamples, GL_DEPTH_COMPONENT24, width, height));
+		GL(glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER, 1, GL_DEPTH_COMPONENT24, width, height));
 		GL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
 
 		// Create the frame buffer.
 		GL(glGenFramebuffers(1, &frameBuffer->FrameBuffers[i]));
 		GL(glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer->FrameBuffers[i]));
-		GL(glFramebufferTexture2DMultisampleEXT(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0, multisamples));
+		GL(glFramebufferTexture2DMultisampleEXT(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0, 1));
 		GL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, frameBuffer->DepthBuffers[i]));
 
 		GL(GLenum renderFramebufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -653,12 +688,9 @@ void ovrRenderer_Clear( ovrRenderer * renderer )
 }
 
 
-void ovrRenderer_Create( int width, int height, ovrRenderer * renderer, const ovrJava * java )
+void ovrRenderer_Create( int width, int height, ovrRenderer * renderer )
 {
 	renderer->NumBuffers = VRAPI_FRAME_LAYER_EYE_MAX;
-
-	//Now using a symmetrical render target, based on the horizontal FOV
-    vr.fov = vrapi_GetSystemPropertyInt( java, VRAPI_SYS_PROP_SUGGESTED_EYE_FOV_DEGREES_Y);
 
 	// Create the render Textures.
 	for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
@@ -669,11 +701,6 @@ void ovrRenderer_Create( int width, int height, ovrRenderer * renderer, const ov
 							   height,
 							   NUM_MULTI_SAMPLES );
 	}
-
-	// Setup the projection matrix.
-	renderer->ProjectionMatrix = ovrMatrix4f_CreateProjectionFov(
-			vr.fov, vr.fov, 0.0f, 0.0f, 1.0f, 0.0f );
-
 }
 
 void ovrRenderer_Destroy( ovrRenderer * renderer )
@@ -766,34 +793,33 @@ void GetAnglesFromVectors(const ovrVector3f forward, const ovrVector3f right, co
 }
 
 
-void QuatToYawPitchRoll(ovrQuatf q, vec3_t rotation, vec3_t out) {
+void QuatToYawPitchRoll(XrQuaternionf q, vec3_t rotation, vec3_t out) {
 
-    ovrMatrix4f mat = ovrMatrix4f_CreateFromQuaternion( &q );
+	ovrMatrix4f mat = ovrMatrix4f_CreateFromQuaternion( &q );
 
-    if (rotation[0] != 0.0f || rotation[1] != 0.0f || rotation[2] != 0.0f)
-    {
-        ovrMatrix4f rot = ovrMatrix4f_CreateRotation(radians(rotation[0]), radians(rotation[1]), radians(rotation[2]));
-        mat = ovrMatrix4f_Multiply(&mat, &rot);
-    }
+	if (rotation[0] != 0.0f || rotation[1] != 0.0f || rotation[2] != 0.0f)
+	{
+		ovrMatrix4f rot = ovrMatrix4f_CreateRotation(radians(rotation[0]), radians(rotation[1]), radians(rotation[2]));
+		mat = ovrMatrix4f_Multiply(&mat, &rot);
+	}
 
-    ovrVector4f v1 = {0, 0, -1, 0};
-    ovrVector4f v2 = {1, 0, 0, 0};
-    ovrVector4f v3 = {0, 1, 0, 0};
+	XrVector4f v1 = {0, 0, -1, 0};
+	XrVector4f v2 = {1, 0, 0, 0};
+	XrVector4f v3 = {0, 1, 0, 0};
 
-    ovrVector4f forwardInVRSpace = ovrVector4f_MultiplyMatrix4f(&mat, &v1);
-    ovrVector4f rightInVRSpace = ovrVector4f_MultiplyMatrix4f(&mat, &v2);
-    ovrVector4f upInVRSpace = ovrVector4f_MultiplyMatrix4f(&mat, &v3);
+	XrVector4f forwardInVRSpace = XrVector4f_MultiplyMatrix4f(&mat, &v1);
+	XrVector4f rightInVRSpace = XrVector4f_MultiplyMatrix4f(&mat, &v2);
+	XrVector4f upInVRSpace = XrVector4f_MultiplyMatrix4f(&mat, &v3);
 
-    ovrVector3f forward = {-forwardInVRSpace.z, -forwardInVRSpace.x, forwardInVRSpace.y};
-    ovrVector3f right = {-rightInVRSpace.z, -rightInVRSpace.x, rightInVRSpace.y};
-    ovrVector3f up = {-upInVRSpace.z, -upInVRSpace.x, upInVRSpace.y};
+	XrVector3f forward = {-forwardInVRSpace.z, -forwardInVRSpace.x, forwardInVRSpace.y};
+	XrVector3f right = {-rightInVRSpace.z, -rightInVRSpace.x, rightInVRSpace.y};
+	XrVector3f up = {-upInVRSpace.z, -upInVRSpace.x, upInVRSpace.y};
 
-    ovrVector3f forwardNormal = normalizeVec(forward);
-    ovrVector3f rightNormal = normalizeVec(right);
-    ovrVector3f upNormal = normalizeVec(up);
+	XrVector3f forwardNormal = normalizeVec(forward);
+	XrVector3f rightNormal = normalizeVec(right);
+	XrVector3f upNormal = normalizeVec(up);
 
-    GetAnglesFromVectors(forwardNormal, rightNormal, upNormal, out);
-    return;
+	GetAnglesFromVectors(forwardNormal, rightNormal, upNormal, out);
 }
 
 void updateHMDOrientation()
@@ -938,52 +964,32 @@ ovrRenderThread
 */
 
 
-/*
-================================================================================
 
-ovrApp
-
-================================================================================
-*/
-
-typedef struct
-{
-	ovrJava				Java;
-	ovrEgl				Egl;
-	ANativeWindow *		NativeWindow;
-	bool				Resumed;
-	ovrMobile *			Ovr;
-    ovrScene			Scene;
-	long long			FrameIndex;
-	double 				DisplayTime;
-	int					SwapInterval;
-	int					CpuLevel;
-	int					GpuLevel;
-	int					MainThreadTid;
-	int					RenderThreadTid;
-	ovrLayer_Union2		Layers[ovrMaxLayerCount];
-	int					LayerCount;
-	ovrRenderer			Renderer;
-} ovrApp;
-
-static void ovrApp_Clear( ovrApp * app )
-{
-	app->Java.Vm = NULL;
-	app->Java.Env = NULL;
-	app->Java.ActivityObject = NULL;
-	app->Ovr = NULL;
-	app->FrameIndex = 1;
-	app->DisplayTime = 0;
+void ovrApp_Clear(ovrApp* app) {
+	app->Focused = false;
+	app->Instance = XR_NULL_HANDLE;
+	app->Session = XR_NULL_HANDLE;
+	memset(&app->ViewportConfig, 0, sizeof(XrViewConfigurationProperties));
+	memset(&app->ViewConfigurationView, 0, ovrMaxNumEyes * sizeof(XrViewConfigurationView));
+	app->SystemId = XR_NULL_SYSTEM_ID;
+	app->HeadSpace = XR_NULL_HANDLE;
+	app->StageSpace = XR_NULL_HANDLE;
+	app->FakeStageSpace = XR_NULL_HANDLE;
+	app->CurrentSpace = XR_NULL_HANDLE;
+	app->SessionActive = false;
+	app->SupportedDisplayRefreshRates = NULL;
+	app->RequestedDisplayRefreshRateIndex = 0;
+	app->NumSupportedDisplayRefreshRates = 0;
+	app->pfnGetDisplayRefreshRate = NULL;
+	app->pfnRequestDisplayRefreshRate = NULL;
 	app->SwapInterval = 1;
-	app->CpuLevel = 3;
-	app->GpuLevel = 3;
+	memset(app->Layers, 0, sizeof(ovrCompositorLayer_Union) * ovrMaxLayerCount);
+	app->LayerCount = 0;
 	app->MainThreadTid = 0;
 	app->RenderThreadTid = 0;
-
 	ovrEgl_Clear( &app->Egl );
-
 	ovrScene_Clear( &app->Scene );
-	ovrRenderer_Clear( &app->Renderer );
+	ovrRenderer_Clear(&app->Renderer);
 }
 
 static void ovrApp_PushBlackFinal( ovrApp * app )
@@ -1010,74 +1016,145 @@ static void ovrApp_PushBlackFinal( ovrApp * app )
 	vrapi_SubmitFrame2( app->Ovr, &frameDesc );
 }
 
-static void ovrApp_HandleVrModeChanges( ovrApp * app )
-{
-	if ( app->Resumed != false && app->NativeWindow != NULL )
-	{
-		if ( app->Ovr == NULL )
-		{
-			ovrModeParms parms = vrapi_DefaultModeParms( &app->Java );
-			// Must reset the FLAG_FULLSCREEN window flag when using a SurfaceView
-			parms.Flags |= VRAPI_MODE_FLAG_RESET_WINDOW_FULLSCREEN;
 
-			parms.Flags |= VRAPI_MODE_FLAG_NATIVE_WINDOW;
-			parms.Display = (size_t)app->Egl.Display;
-			parms.WindowSurface = (size_t)app->NativeWindow;
-			parms.ShareContext = (size_t)app->Egl.Context;
 
-			ALOGV( "        eglGetCurrentSurface( EGL_DRAW ) = %p", eglGetCurrentSurface( EGL_DRAW ) );
+void ovrApp_HandleSessionStateChanges(ovrApp* app, XrSessionState state) {
+	if (state == XR_SESSION_STATE_READY) {
+		assert(app->SessionActive == false);
 
-			ALOGV( "        vrapi_EnterVrMode()" );
+		XrSessionBeginInfo sessionBeginInfo;
+		memset(&sessionBeginInfo, 0, sizeof(sessionBeginInfo));
+		sessionBeginInfo.type = XR_TYPE_SESSION_BEGIN_INFO;
+		sessionBeginInfo.next = NULL;
+		sessionBeginInfo.primaryViewConfigurationType = app->ViewportConfig.viewConfigurationType;
 
-			app->Ovr = vrapi_EnterVrMode( &parms );
+		XrResult result;
+		OXR(result = xrBeginSession(app->Session, &sessionBeginInfo));
 
-			ALOGV( "        eglGetCurrentSurface( EGL_DRAW ) = %p", eglGetCurrentSurface( EGL_DRAW ) );
+		app->SessionActive = (result == XR_SUCCESS);
 
-			// If entering VR mode failed then the ANativeWindow was not valid.
-			if ( app->Ovr == NULL )
-			{
-				ALOGE( "Invalid ANativeWindow!" );
-				app->NativeWindow = NULL;
-			}
+		// Set session state once we have entered VR mode and have a valid session object.
+		if (app->SessionActive) {
+			XrPerfSettingsLevelEXT cpuPerfLevel = XR_PERF_SETTINGS_LEVEL_BOOST_EXT;
+			XrPerfSettingsLevelEXT gpuPerfLevel = XR_PERF_SETTINGS_LEVEL_BOOST_EXT;
 
-			// Set performance parameters once we have entered VR mode and have a valid ovrMobile.
-			if ( app->Ovr != NULL )
-			{
-                //AmmarkoV : Set our refresh rate..!
-                ovrResult result = vrapi_SetDisplayRefreshRate(app->Ovr, REFRESH);
-                if (result == ovrSuccess) { ALOGV("Changed refresh rate. %f Hz", REFRESH); } else
-                { ALOGV("Failed to change refresh rate to 90Hz Result=%d",result); }
+			PFN_xrPerfSettingsSetPerformanceLevelEXT pfnPerfSettingsSetPerformanceLevelEXT = NULL;
+			OXR(xrGetInstanceProcAddr(
+					app->Instance,
+					"xrPerfSettingsSetPerformanceLevelEXT",
+					(PFN_xrVoidFunction*)(&pfnPerfSettingsSetPerformanceLevelEXT)));
 
-                vrapi_SetClockLevels( app->Ovr, app->CpuLevel, app->GpuLevel );
-				ALOGV( "		vrapi_SetClockLevels( %d, %d )", app->CpuLevel, app->GpuLevel );
+			OXR(pfnPerfSettingsSetPerformanceLevelEXT(
+					app->Session, XR_PERF_SETTINGS_DOMAIN_CPU_EXT, cpuPerfLevel));
+			OXR(pfnPerfSettingsSetPerformanceLevelEXT(
+					app->Session, XR_PERF_SETTINGS_DOMAIN_GPU_EXT, gpuPerfLevel));
 
-                 vrapi_SetExtraLatencyMode(app->Ovr, VRAPI_EXTRA_LATENCY_MODE_ON);
-				ALOGV( "		vrapi_SetExtraLatencyMode( %d )", VRAPI_EXTRA_LATENCY_MODE_ON );
+			PFN_xrSetAndroidApplicationThreadKHR pfnSetAndroidApplicationThreadKHR = NULL;
+			OXR(xrGetInstanceProcAddr(
+					app->Instance,
+					"xrSetAndroidApplicationThreadKHR",
+					(PFN_xrVoidFunction*)(&pfnSetAndroidApplicationThreadKHR)));
 
-				vrapi_SetPerfThread( app->Ovr, VRAPI_PERF_THREAD_TYPE_MAIN, app->MainThreadTid );
+			OXR(pfnSetAndroidApplicationThreadKHR(
+					app->Session, XR_ANDROID_THREAD_TYPE_APPLICATION_MAIN_KHR, app->MainThreadTid));
+			OXR(pfnSetAndroidApplicationThreadKHR(
+					app->Session, XR_ANDROID_THREAD_TYPE_RENDERER_MAIN_KHR, app->RenderThreadTid));
+		}
+	} else if (state == XR_SESSION_STATE_STOPPING) {
+		assert(app->SessionActive);
 
-				ALOGV( "		vrapi_SetPerfThread( MAIN, %d )", app->MainThreadTid );
+		OXR(xrEndSession(app->Session));
+		app->SessionActive = false;
+	}
+}
 
-				vrapi_SetPerfThread( app->Ovr, VRAPI_PERF_THREAD_TYPE_RENDERER, app->RenderThreadTid );
+GLboolean ovrApp_HandleXrEvents(ovrApp* app) {
+	XrEventDataBuffer eventDataBuffer = {};
+	GLboolean recenter = GL_FALSE;
 
-				ALOGV( "		vrapi_SetPerfThread( RENDERER, %d )", app->RenderThreadTid );
-			}
+	// Poll for events
+	for (;;) {
+		XrEventDataBaseHeader* baseEventHeader = (XrEventDataBaseHeader*)(&eventDataBuffer);
+		baseEventHeader->type = XR_TYPE_EVENT_DATA_BUFFER;
+		baseEventHeader->next = NULL;
+		XrResult r;
+		OXR(r = xrPollEvent(app->Instance, &eventDataBuffer));
+		if (r != XR_SUCCESS) {
+			break;
+		}
+
+		switch (baseEventHeader->type) {
+			case XR_TYPE_EVENT_DATA_EVENTS_LOST:
+				ALOGV("xrPollEvent: received XR_TYPE_EVENT_DATA_EVENTS_LOST event");
+				break;
+			case XR_TYPE_EVENT_DATA_INSTANCE_LOSS_PENDING: {
+				const XrEventDataInstanceLossPending* instance_loss_pending_event =
+						(XrEventDataInstanceLossPending*)(baseEventHeader);
+				ALOGV(
+						"xrPollEvent: received XR_TYPE_EVENT_DATA_INSTANCE_LOSS_PENDING event: time %f",
+						FromXrTime(instance_loss_pending_event->lossTime));
+			} break;
+			case XR_TYPE_EVENT_DATA_INTERACTION_PROFILE_CHANGED:
+				ALOGV("xrPollEvent: received XR_TYPE_EVENT_DATA_INTERACTION_PROFILE_CHANGED event");
+				break;
+			case XR_TYPE_EVENT_DATA_PERF_SETTINGS_EXT: {
+				const XrEventDataPerfSettingsEXT* perf_settings_event =
+						(XrEventDataPerfSettingsEXT*)(baseEventHeader);
+				ALOGV(
+						"xrPollEvent: received XR_TYPE_EVENT_DATA_PERF_SETTINGS_EXT event: type %d subdomain %d : level %d -> level %d",
+						perf_settings_event->type,
+						perf_settings_event->subDomain,
+						perf_settings_event->fromLevel,
+						perf_settings_event->toLevel);
+			} break;
+			case XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB: {
+				const XrEventDataDisplayRefreshRateChangedFB* refresh_rate_changed_event =
+						(XrEventDataDisplayRefreshRateChangedFB*)(baseEventHeader);
+				ALOGV(
+						"xrPollEvent: received XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB event: fromRate %f -> toRate %f",
+						refresh_rate_changed_event->fromDisplayRefreshRate,
+						refresh_rate_changed_event->toDisplayRefreshRate);
+			} break;
+			case XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING: {
+				XrEventDataReferenceSpaceChangePending* ref_space_change_event =
+						(XrEventDataReferenceSpaceChangePending*)(baseEventHeader);
+				ALOGV(
+						"xrPollEvent: received XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING event: changed space: %d for session %p at time %f",
+						ref_space_change_event->referenceSpaceType,
+						(void*)ref_space_change_event->session,
+						FromXrTime(ref_space_change_event->changeTime));
+				recenter = GL_TRUE;
+			} break;
+			case XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED: {
+				const XrEventDataSessionStateChanged* session_state_changed_event =
+						(XrEventDataSessionStateChanged*)(baseEventHeader);
+				ALOGV(
+						"xrPollEvent: received XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED: %d for session %p at time %f",
+						session_state_changed_event->state,
+						(void*)session_state_changed_event->session,
+						FromXrTime(session_state_changed_event->time));
+
+				switch (session_state_changed_event->state) {
+					case XR_SESSION_STATE_FOCUSED:
+						app->Focused = true;
+						break;
+					case XR_SESSION_STATE_VISIBLE:
+						app->Focused = false;
+						break;
+					case XR_SESSION_STATE_READY:
+					case XR_SESSION_STATE_STOPPING:
+						ovrApp_HandleSessionStateChanges(app, session_state_changed_event->state);
+						break;
+					default:
+						break;
+				}
+			} break;
+			default:
+				ALOGV("xrPollEvent: Unknown event");
+				break;
 		}
 	}
-	else
-	{
-		if ( app->Ovr != NULL )
-		{
-			ALOGV( "        eglGetCurrentSurface( EGL_DRAW ) = %p", eglGetCurrentSurface( EGL_DRAW ) );
-
-			ALOGV( "        vrapi_LeaveVrMode()" );
-
-			vrapi_LeaveVrMode( app->Ovr );
-			app->Ovr = NULL;
-
-			ALOGV( "        eglGetCurrentSurface( EGL_DRAW ) = %p", eglGetCurrentSurface( EGL_DRAW ) );
-		}
-	}
+	return recenter;
 }
 
 
@@ -1448,7 +1525,7 @@ void JKVR_processMessageQueue() {
 			case MESSAGE_ON_SURFACE_DESTROYED:	{ gAppState.NativeWindow = NULL; break; }
 		}
 
-		ovrApp_HandleVrModeChanges( &gAppState );
+		ovrApp_HandleXrEvents(&gAppState);
 	}
 }
 
@@ -1492,6 +1569,226 @@ void GL_APIENTRYP VR_GLDebugLog(GLenum source,GLenum type,GLuint id,GLenum sever
 	}
 }
 
+void VR_GetResolution(int *pWidth, int *pHeight)
+{
+	static int width = 0;
+	static int height = 0;
+
+	// Enumerate the viewport configurations.
+	uint32_t viewportConfigTypeCount = 0;
+	OXR(xrEnumerateViewConfigurations(
+			gAppState.Instance, gAppState.SystemId, 0, &viewportConfigTypeCount, NULL));
+
+	XrViewConfigurationType* viewportConfigurationTypes =
+			(XrViewConfigurationType*)malloc(viewportConfigTypeCount * sizeof(XrViewConfigurationType));
+
+	OXR(xrEnumerateViewConfigurations(
+			gAppState.Instance,
+			gAppState.SystemId,
+			viewportConfigTypeCount,
+			&viewportConfigTypeCount,
+			viewportConfigurationTypes));
+
+	ALOGV("Available Viewport Configuration Types: %d", viewportConfigTypeCount);
+
+	for (uint32_t i = 0; i < viewportConfigTypeCount; i++) {
+		const XrViewConfigurationType viewportConfigType = viewportConfigurationTypes[i];
+
+		ALOGV(
+				"Viewport configuration type %d : %s",
+				viewportConfigType,
+				viewportConfigType == XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO ? "Selected" : "");
+
+		XrViewConfigurationProperties viewportConfig;
+		viewportConfig.type = XR_TYPE_VIEW_CONFIGURATION_PROPERTIES;
+		OXR(xrGetViewConfigurationProperties(
+				gAppState.Instance, gAppState.SystemId, viewportConfigType, &viewportConfig));
+		ALOGV(
+				"FovMutable=%s ConfigurationType %d",
+				viewportConfig.fovMutable ? "true" : "false",
+				viewportConfig.viewConfigurationType);
+
+		uint32_t viewCount;
+		OXR(xrEnumerateViewConfigurationViews(
+				gAppState.Instance, gAppState.SystemId, viewportConfigType, 0, &viewCount, NULL));
+
+		if (viewCount > 0) {
+			XrViewConfigurationView* elements =
+					(XrViewConfigurationView*)malloc(viewCount * sizeof(XrViewConfigurationView));
+
+			for (uint32_t e = 0; e < viewCount; e++) {
+				elements[e].type = XR_TYPE_VIEW_CONFIGURATION_VIEW;
+				elements[e].next = NULL;
+			}
+
+			OXR(xrEnumerateViewConfigurationViews(
+					gAppState.Instance,
+					gAppState.SystemId,
+					viewportConfigType,
+					viewCount,
+					&viewCount,
+					elements));
+
+			// Cache the view config properties for the selected config type.
+			if (viewportConfigType == XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO) {
+				assert(viewCount == ovrMaxNumEyes);
+				for (uint32_t e = 0; e < viewCount; e++) {
+					gAppState.ViewConfigurationView[e] = elements[e];
+				}
+			}
+
+			free(elements);
+		} else {
+			ALOGE("Empty viewport configuration type: %d", viewCount);
+		}
+	}
+
+	free(viewportConfigurationTypes);
+
+	*pWidth = width = gAppState.ViewConfigurationView[0].recommendedImageRectWidth;
+	*pHeight = height = gAppState.ViewConfigurationView[0].recommendedImageRectHeight;
+}
+
+void VR_EnterVR( ) {
+
+	if (gAppState.Session) {
+		Com_Printf("VR_EnterVR called with existing session");
+		return;
+	}
+
+	// Create the OpenXR Session.
+	XrGraphicsBindingOpenGLESAndroidKHR graphicsBindingAndroidGLES = {};
+	graphicsBindingAndroidGLES.type = XR_TYPE_GRAPHICS_BINDING_OPENGL_ES_ANDROID_KHR;
+	graphicsBindingAndroidGLES.next = NULL;
+	graphicsBindingAndroidGLES.display = eglGetCurrentDisplay();
+	graphicsBindingAndroidGLES.config = eglGetCurrentSurface(EGL_DRAW);
+	graphicsBindingAndroidGLES.context = eglGetCurrentContext();
+
+	XrSessionCreateInfo sessionCreateInfo = {};
+	memset(&sessionCreateInfo, 0, sizeof(sessionCreateInfo));
+	sessionCreateInfo.type = XR_TYPE_SESSION_CREATE_INFO;
+	sessionCreateInfo.next = &graphicsBindingAndroidGLES;
+	sessionCreateInfo.createFlags = 0;
+	sessionCreateInfo.systemId = gAppState.SystemId;
+
+	XrResult initResult;
+	OXR(initResult = xrCreateSession(gAppState.Instance, &sessionCreateInfo, &gAppState.Session));
+	if (initResult != XR_SUCCESS) {
+		ALOGE("Failed to create XR session: %d.", initResult);
+		exit(1);
+	}
+
+	// Create a space to the first path
+	XrReferenceSpaceCreateInfo spaceCreateInfo = {};
+	spaceCreateInfo.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
+	spaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_VIEW;
+	spaceCreateInfo.poseInReferenceSpace.orientation.w = 1.0f;
+	OXR(xrCreateReferenceSpace(gAppState.Session, &spaceCreateInfo, &gAppState.HeadSpace));
+}
+
+void VR_LeaveVR( ) {
+	if (gAppState.Session) {
+		OXR(xrDestroySpace(gAppState.HeadSpace));
+		// StageSpace is optional.
+		if (gAppState.StageSpace != XR_NULL_HANDLE) {
+			OXR(xrDestroySpace(gAppState.StageSpace));
+		}
+		OXR(xrDestroySpace(gAppState.FakeStageSpace));
+		gAppState.CurrentSpace = XR_NULL_HANDLE;
+		OXR(xrDestroySession(gAppState.Session));
+		gAppState.Session = NULL;
+	}
+}
+
+void VR_InitRenderer(  ) {
+	int eyeW, eyeH;
+	VR_GetResolution(&eyeW, &eyeH);
+
+	// Get the viewport configuration info for the chosen viewport configuration type.
+	gAppState.ViewportConfig.type = XR_TYPE_VIEW_CONFIGURATION_PROPERTIES;
+
+	OXR(xrGetViewConfigurationProperties(
+			gAppState.Instance, gAppState.SystemId, XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO, &gAppState.ViewportConfig));
+
+	// Get the supported display refresh rates for the system.
+	{
+		PFN_xrEnumerateDisplayRefreshRatesFB pfnxrEnumerateDisplayRefreshRatesFB = NULL;
+		OXR(xrGetInstanceProcAddr(
+				gAppState.Instance,
+				"xrEnumerateDisplayRefreshRatesFB",
+				(PFN_xrVoidFunction*)(&pfnxrEnumerateDisplayRefreshRatesFB)));
+
+		OXR(pfnxrEnumerateDisplayRefreshRatesFB(
+				gAppState.Session, 0, &gAppState.NumSupportedDisplayRefreshRates, NULL));
+
+		gAppState.SupportedDisplayRefreshRates =
+				(float*)malloc(gAppState.NumSupportedDisplayRefreshRates * sizeof(float));
+		OXR(pfnxrEnumerateDisplayRefreshRatesFB(
+				gAppState.Session,
+				gAppState.NumSupportedDisplayRefreshRates,
+				&gAppState.NumSupportedDisplayRefreshRates,
+				gAppState.SupportedDisplayRefreshRates));
+		ALOGV("Supported Refresh Rates:");
+		for (uint32_t i = 0; i < gAppState.NumSupportedDisplayRefreshRates; i++) {
+			ALOGV("%d:%f", i, gAppState.SupportedDisplayRefreshRates[i]);
+		}
+
+		OXR(xrGetInstanceProcAddr(
+				gAppState.Instance,
+				"xrGetDisplayRefreshRateFB",
+				(PFN_xrVoidFunction*)(&gAppState.pfnGetDisplayRefreshRate)));
+
+		float currentDisplayRefreshRate = 0.0f;
+		OXR(gAppState.pfnGetDisplayRefreshRate(gAppState.Session, &currentDisplayRefreshRate));
+		ALOGV("Current System Display Refresh Rate: %f", currentDisplayRefreshRate);
+
+		OXR(xrGetInstanceProcAddr(
+				gAppState.Instance,
+				"xrRequestDisplayRefreshRateFB",
+				(PFN_xrVoidFunction*)(&gAppState.pfnRequestDisplayRefreshRate)));
+
+		// Test requesting the system default.
+		OXR(gAppState.pfnRequestDisplayRefreshRate(gAppState.Session, 0.0f));
+		ALOGV("Requesting system default display refresh rate");
+	}
+
+	uint32_t numOutputSpaces = 0;
+	OXR(xrEnumerateReferenceSpaces(gAppState.Session, 0, &numOutputSpaces, NULL));
+
+	XrReferenceSpaceType* referenceSpaces =
+			(XrReferenceSpaceType*)malloc(numOutputSpaces * sizeof(XrReferenceSpaceType));
+
+	OXR(xrEnumerateReferenceSpaces(
+			gAppState.Session, numOutputSpaces, &numOutputSpaces, referenceSpaces));
+
+	for (uint32_t i = 0; i < numOutputSpaces; i++) {
+		if (referenceSpaces[i] == XR_REFERENCE_SPACE_TYPE_STAGE) {
+			stageSupported = GL_TRUE;
+			break;
+		}
+	}
+
+	free(referenceSpaces);
+
+	if (gAppState.CurrentSpace == XR_NULL_HANDLE) {
+		VR_Recenter(engine);
+	}
+
+	projections = (XrView*)(malloc(ovrMaxNumEyes * sizeof(XrView)));
+
+	ovrRenderer_Create(
+			gAppState.Session,
+			&gAppState.Renderer,
+			gAppState.ViewConfigurationView[0].recommendedImageRectWidth,
+			gAppState.ViewConfigurationView[0].recommendedImageRectHeight);
+}
+
+void VR_DestroyRenderer(  )
+{
+	ovrRenderer_Destroy(&gAppState.Renderer);
+	free(projections);
+}
+
 void * AppThreadFunction(void * parm ) {
 	gAppThread = (ovrAppThread *) parm;
 
@@ -1507,45 +1804,99 @@ void * AppThreadFunction(void * parm ) {
 	openjk_initialised = false;
 	vr_screen_dist = NULL;
 
-	const ovrInitParms initParms = vrapi_DefaultInitParms(&java);
-	int32_t initResult = vrapi_Initialize(&initParms);
-	if (initResult != VRAPI_INITIALIZE_SUCCESS) {
-		// If intialization failed, vrapi_* function calls will not be available.
-		exit(0);
-	}
-
 	ovrApp_Clear(&gAppState);
 	gAppState.Java = java;
 
-	// This app will handle android gamepad events itself.
-	vrapi_SetPropertyInt(&gAppState.Java, VRAPI_EAT_NATIVE_GAMEPAD_EVENTS, 0);
+
+	PFN_xrInitializeLoaderKHR xrInitializeLoaderKHR;
+	xrGetInstanceProcAddr(
+			XR_NULL_HANDLE, "xrInitializeLoaderKHR", (PFN_xrVoidFunction*)&xrInitializeLoaderKHR);
+	if (xrInitializeLoaderKHR != NULL) {
+		XrLoaderInitInfoAndroidKHR loaderInitializeInfoAndroid;
+		memset(&loaderInitializeInfoAndroid, 0, sizeof(loaderInitializeInfoAndroid));
+		loaderInitializeInfoAndroid.type = XR_TYPE_LOADER_INIT_INFO_ANDROID_KHR;
+		loaderInitializeInfoAndroid.next = NULL;
+		loaderInitializeInfoAndroid.applicationVM = java.Vm;
+		loaderInitializeInfoAndroid.applicationContext = java.ActivityObject;
+		xrInitializeLoaderKHR((XrLoaderInitInfoBaseHeaderKHR*)&loaderInitializeInfoAndroid);
+	}
+
+	// Create the OpenXR instance.
+	XrApplicationInfo appInfo;
+	memset(&appInfo, 0, sizeof(appInfo));
+	strcpy(appInfo.applicationName, "JKQUest");
+	appInfo.applicationVersion = 0;
+	strcpy(appInfo.engineName, "JKQuest");
+	appInfo.engineVersion = 0;
+	appInfo.apiVersion = XR_CURRENT_API_VERSION;
+
+	XrInstanceCreateInfo instanceCreateInfo;
+	memset(&instanceCreateInfo, 0, sizeof(instanceCreateInfo));
+	instanceCreateInfo.type = XR_TYPE_INSTANCE_CREATE_INFO;
+	instanceCreateInfo.next = NULL;
+	instanceCreateInfo.createFlags = 0;
+	instanceCreateInfo.applicationInfo = appInfo;
+	instanceCreateInfo.enabledApiLayerCount = 0;
+	instanceCreateInfo.enabledApiLayerNames = NULL;
+	instanceCreateInfo.enabledExtensionCount = numRequiredExtensions;
+	instanceCreateInfo.enabledExtensionNames = requiredExtensionNames;
+
+	XrResult initResult;
+	OXR(initResult = xrCreateInstance(&instanceCreateInfo, &gAppState.Instance));
+	if (initResult != XR_SUCCESS) {
+		ALOGE("Failed to create XR instance: %d.", initResult);
+		exit(1);
+	}
+
+	XrInstanceProperties instanceInfo;
+	instanceInfo.type = XR_TYPE_INSTANCE_PROPERTIES;
+	instanceInfo.next = NULL;
+	OXR(xrGetInstanceProperties(gAppState.Instance, &instanceInfo));
+	ALOGV(
+			"Runtime %s: Version : %u.%u.%u",
+			instanceInfo.runtimeName,
+			XR_VERSION_MAJOR(instanceInfo.runtimeVersion),
+			XR_VERSION_MINOR(instanceInfo.runtimeVersion),
+			XR_VERSION_PATCH(instanceInfo.runtimeVersion));
+
+	XrSystemGetInfo systemGetInfo;
+	memset(&systemGetInfo, 0, sizeof(systemGetInfo));
+	systemGetInfo.type = XR_TYPE_SYSTEM_GET_INFO;
+	systemGetInfo.next = NULL;
+	systemGetInfo.formFactor = XR_FORM_FACTOR_HEAD_MOUNTED_DISPLAY;
+
+	OXR(initResult = xrGetSystem(gAppState.Instance, &systemGetInfo, &gAppState.SystemId));
+	if (initResult != XR_SUCCESS) {
+		ALOGE("Failed to get system.");
+		exit(1);
+	}
+
+	// Get the graphics requirements.
+	PFN_xrGetOpenGLESGraphicsRequirementsKHR pfnGetOpenGLESGraphicsRequirementsKHR = NULL;
+	OXR(xrGetInstanceProcAddr(
+			vr_engine.appState.Instance,
+			"xrGetOpenGLESGraphicsRequirementsKHR",
+			(PFN_xrVoidFunction*)(&pfnGetOpenGLESGraphicsRequirementsKHR)));
+
+	XrGraphicsRequirementsOpenGLESKHR graphicsRequirements = {};
+	graphicsRequirements.type = XR_TYPE_GRAPHICS_REQUIREMENTS_OPENGL_ES_KHR;
+	OXR(pfnGetOpenGLESGraphicsRequirementsKHR(gAppState.Instance, gAppState.SystemId, &graphicsRequirements));
+
+
 
 	//Set device defaults
-    if (vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_DEVICE_TYPE) == VRAPI_DEVICE_TYPE_OCULUSQUEST)
-    {
-        if (SS_MULTIPLIER == 0.0f)
-        {
-            SS_MULTIPLIER = 1.0f;
-        }
-    }
-    else if (vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_DEVICE_TYPE) == VRAPI_DEVICE_TYPE_OCULUSQUEST2)
-    {
-        if (SS_MULTIPLIER == 0.0f)
-        {
-            //GB Override as refresh is now 72 by default as we decided a higher res is better as 90hz has stutters
-            SS_MULTIPLIER = 1.25f;
-        }
-        else if (SS_MULTIPLIER > 1.5f)
-		{
-			SS_MULTIPLIER = 1.5f;
-		}
-    } else {
-        //Don't know what headset this is!? abort
-        return NULL;
-    }
+	if (SS_MULTIPLIER == 0.0f)
+	{
+		//GB Override as refresh is now 72 by default as we decided a higher res is better as 90hz has stutters
+		SS_MULTIPLIER = 1.25f;
+	}
+	else if (SS_MULTIPLIER > 1.5f)
+	{
+		SS_MULTIPLIER = 1.5f;
+	}
 
 	//Using a symmetrical render target
-	m_height = m_width = (int)(vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_SUGGESTED_EYE_TEXTURE_WIDTH) *  SS_MULTIPLIER);
+	VR_GetResolution(m_height, m_width);
 
 	gAppState.CpuLevel = CPU_LEVEL;
 	gAppState.GpuLevel = GPU_LEVEL;
@@ -1560,17 +1911,9 @@ void * AppThreadFunction(void * parm ) {
 		JKVR_processMessageQueue();
 	}
 
-#ifdef ENABLE_GL_DEBUG
-	glEnable(GL_DEBUG_OUTPUT);
-	glDebugMessageCallback(reinterpret_cast<GLDEBUGPROC>(VR_GLDebugLog), 0);
-#endif
-
+	VR_EnterVR();
 	ovrRenderer_Create(m_width, m_height, &gAppState.Renderer, &java);
 
-	if ( gAppState.Ovr == NULL )
-	{
-		return NULL;
-	}
 
 	// Create the scene if not yet created.
 	ovrScene_Create( m_width, m_height, &gAppState.Scene, &java );
@@ -1823,8 +2166,8 @@ void JKVR_getHMDOrientation() {//Get orientation
 
 	// We extract Yaw, Pitch, Roll instead of directly using the orientation
 	// to allow "additional" yaw manipulation with mouse/controller.
-	const ovrQuatf quatHmd = tracking.HeadPose.Pose.Orientation;
-	const ovrVector3f positionHmd = tracking.HeadPose.Pose.Position;
+	const ovrQuatf quatHmd = tracking.Pose.orientation;
+	const ovrVector3f positionHmd = tracking.Pose.position;
 	vec3_t rotation = {0, 0, 0};
 	QuatToYawPitchRoll(quatHmd, rotation, vr.hmdorientation);
 	setHMDPosition(positionHmd.x, positionHmd.y, positionHmd.z);
@@ -1869,22 +2212,21 @@ void JKVR_getTrackedRemotesOrientation() {//Get info for tracked remotes
 	switch (vr_control_scheme->integer)
 	{
 		case RIGHT_HANDED_DEFAULT:
-			HandleInput_Default(&footTrackedRemoteState_new, &footTrackedRemoteState_old,
-			                    &rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
+			HandleInput_Default(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
 								&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
-								ovrButton_A, ovrButton_B, ovrButton_X, ovrButton_Y);
+								xrButton_A, xrButton_B, xrButton_X, xrButton_Y);
 			break;
 		case LEFT_HANDED_DEFAULT:
-			HandleInput_Default(&footTrackedRemoteState_new, &footTrackedRemoteState_old,
-			                    &leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
+			HandleInput_Default(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
 								&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
-								ovrButton_X, ovrButton_Y, ovrButton_A, ovrButton_B);
+								xrButton_X, xrButton_Y, xrButton_A, xrButton_B);
 			break;
-		case WEAPON_ALIGN:
+/*		case WEAPON_ALIGN:
 			HandleInput_WeaponAlign(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
 								&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
-								ovrButton_A, ovrButton_B, ovrButton_X, ovrButton_Y);
+								xrButton_A, xrButton_B, xrButton_X, xrButton_Y);
 			break;
+			*/
 	}
 }
 
