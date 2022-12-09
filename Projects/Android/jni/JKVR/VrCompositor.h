@@ -62,26 +62,6 @@ void ovrFramebuffer_Advance( ovrFramebuffer * frameBuffer );
 void ovrFramebuffer_ClearEdgeTexels( ovrFramebuffer * frameBuffer );
 
 
-XrView* projections;
-GLboolean stageSupported = GL_FALSE;
-
-void VR_UpdateStageBounds(ovrApp* pappState) {
-	XrExtent2Df stageBounds = {};
-
-	XrResult result;
-	OXR(result = xrGetReferenceSpaceBoundsRect(
-			pappState->Session, XR_REFERENCE_SPACE_TYPE_STAGE, &stageBounds));
-	if (result != XR_SUCCESS) {
-		ALOGV("Stage bounds query failed: using small defaults");
-		stageBounds.width = 1.0f;
-		stageBounds.height = 1.0f;
-
-		pappState->CurrentSpace = pappState->FakeStageSpace;
-	}
-
-	ALOGV("Stage bounds: width = %f, depth %f", stageBounds.width, stageBounds.height);
-}
-
 void ovrRenderer_Clear( ovrRenderer * renderer );
 void ovrRenderer_Create(XrSession session, int width, int height, ovrRenderer * renderer );
 void ovrRenderer_Destroy( ovrRenderer * renderer );

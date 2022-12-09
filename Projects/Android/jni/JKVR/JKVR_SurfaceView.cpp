@@ -40,7 +40,6 @@ extern "C" {
 
 #include <client/client.h>
 
-#include "VrCompositor.h"
 #include "VrInput.h"
 
 #if !defined( EGL_OPENGL_ES3_BIT_KHR )
@@ -102,6 +101,10 @@ struct arg_end *end;
 
 char **argv;
 int argc=0;
+
+
+XrView* projections;
+GLboolean stageSupported = GL_FALSE;
 
 
 const char* const requiredExtensionNames[] = {
@@ -307,17 +310,6 @@ ovrEgl
 ================================================================================
 */
 
-typedef struct
-{
-	EGLint		MajorVersion;
-	EGLint		MinorVersion;
-	EGLDisplay	Display;
-	EGLConfig	Config;
-	EGLSurface	TinySurface;
-	EGLSurface	MainSurface;
-	EGLContext	Context;
-} ovrEgl;
-
 static void ovrEgl_Clear( ovrEgl * egl )
 {
 	egl->MajorVersion = 0;
@@ -485,186 +477,245 @@ ovrFramebuffer
 ================================================================================
 */
 
-
 static void ovrFramebuffer_Clear(ovrFramebuffer* frameBuffer) {
-	frameBuffer->Width = 0;
-	frameBuffer->Height = 0;
-	frameBuffer->TextureSwapChainLength = 0;
-	frameBuffer->TextureSwapChainIndex = 0;
-	frameBuffer->ColorSwapChain.Handle = XR_NULL_HANDLE;
-	frameBuffer->ColorSwapChain.Width = 0;
-	frameBuffer->ColorSwapChain.Height = 0;
-	frameBuffer->ColorSwapChainImage = NULL;
-	frameBuffer->DepthBuffers = NULL;
-	frameBuffer->FrameBuffers = NULL;
+    frameBuffer->Width = 0;
+    frameBuffer->Height = 0;
+    frameBuffer->Multisamples = 0;
+    frameBuffer->TextureSwapChainLength = 0;
+    frameBuffer->TextureSwapChainIndex = 0;
+    frameBuffer->ColorSwapChain.Handle = XR_NULL_HANDLE;
+    frameBuffer->ColorSwapChain.Width = 0;
+    frameBuffer->ColorSwapChain.Height = 0;
+    frameBuffer->ColorSwapChainImage = NULL;
+    frameBuffer->DepthBuffers = NULL;
+    frameBuffer->FrameBuffers = NULL;
 }
 
-static bool ovrFramebuffer_Create( XrSession session,
-								   ovrFramebuffer * frameBuffer, const GLenum colorFormat, const int width, const int height )
-{
-	frameBuffer->Width = width;
-	frameBuffer->Height = height;
+static bool ovrFramebuffer_Create(
+        XrSession session,
+        ovrFramebuffer* frameBuffer,
+        const GLenum colorFormat,
+        const int width,
+        const int height,
+        const int multisamples) {
+    PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC glRenderbufferStorageMultisampleEXT =
+            (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC)eglGetProcAddress(
+                    "glRenderbufferStorageMultisampleEXT");
+    PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEEXTPROC glFramebufferTexture2DMultisampleEXT =
+            (PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEEXTPROC)eglGetProcAddress(
+                    "glFramebufferTexture2DMultisampleEXT");
 
-	frameBuffer->DepthBuffers = (GLuint *)malloc( frameBuffer->TextureSwapChainLength * sizeof( GLuint ) );
-	frameBuffer->FrameBuffers = (GLuint *)malloc( frameBuffer->TextureSwapChainLength * sizeof( GLuint ) );
+    frameBuffer->Width = width;
+    frameBuffer->Height = height;
+    frameBuffer->Multisamples = multisamples;
 
-	PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC glRenderbufferStorageMultisampleEXT =
-			(PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC)eglGetProcAddress("glRenderbufferStorageMultisampleEXT");
-	PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEEXTPROC glFramebufferTexture2DMultisampleEXT =
-			(PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEEXTPROC)eglGetProcAddress("glFramebufferTexture2DMultisampleEXT");
+    GLenum requestedGLFormat = colorFormat;
 
-	XrSwapchainCreateInfo swapChainCreateInfo;
-	memset(&swapChainCreateInfo, 0, sizeof(swapChainCreateInfo));
-	swapChainCreateInfo.type = XR_TYPE_SWAPCHAIN_CREATE_INFO;
-	swapChainCreateInfo.usageFlags = XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT;
-	swapChainCreateInfo.format = GL_RGBA8;
-	swapChainCreateInfo.sampleCount = 1;
-	swapChainCreateInfo.width = width;
-	swapChainCreateInfo.height = height;
-	swapChainCreateInfo.faceCount = 1;
-	swapChainCreateInfo.arraySize = 2;
-	swapChainCreateInfo.mipCount = 1;
+    // Get the number of supported formats.
+    uint32_t numInputFormats = 0;
+    uint32_t numOutputFormats = 0;
+    OXR(xrEnumerateSwapchainFormats(session, numInputFormats, &numOutputFormats, NULL));
 
-	frameBuffer->ColorSwapChain.Width = swapChainCreateInfo.width;
-	frameBuffer->ColorSwapChain.Height = swapChainCreateInfo.height;
+    // Allocate an array large enough to contain the supported formats.
+    numInputFormats = numOutputFormats;
+    int64_t* supportedFormats = (int64_t*)malloc(numOutputFormats * sizeof(int64_t));
+    if (supportedFormats != NULL) {
+        OXR(xrEnumerateSwapchainFormats(
+                session, numInputFormats, &numOutputFormats, supportedFormats));
+    }
 
-	// Create the swapchain.
-	OXR(xrCreateSwapchain(session, &swapChainCreateInfo, &frameBuffer->ColorSwapChain.Handle));
-	// Get the number of swapchain images.
-	OXR(xrEnumerateSwapchainImages(
-			frameBuffer->ColorSwapChain.Handle, 0, &frameBuffer->TextureSwapChainLength, NULL));
-	// Allocate the swapchain images array.
-	frameBuffer->ColorSwapChainImage = (XrSwapchainImageOpenGLESKHR*)malloc(
-			frameBuffer->TextureSwapChainLength * sizeof(XrSwapchainImageOpenGLESKHR));
+    // Verify the requested format is supported.
+    uint64_t selectedFormat = 0;
+    for (uint32_t i = 0; i < numOutputFormats; i++) {
+        if (supportedFormats[i] == requestedGLFormat) {
+            selectedFormat = supportedFormats[i];
+            break;
+        }
+    }
 
-	// Populate the swapchain image array.
-	for (uint32_t i = 0; i < frameBuffer->TextureSwapChainLength; i++) {
-		frameBuffer->ColorSwapChainImage[i].type = XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_ES_KHR;
-		frameBuffer->ColorSwapChainImage[i].next = NULL;
-	}
-	OXR(xrEnumerateSwapchainImages(
-			frameBuffer->ColorSwapChain.Handle,
-			frameBuffer->TextureSwapChainLength,
-			&frameBuffer->TextureSwapChainLength,
-			(XrSwapchainImageBaseHeader*)frameBuffer->ColorSwapChainImage));
+    free(supportedFormats);
 
+    if (selectedFormat == 0) {
+        ALOGE("Format not supported");
+    }
 
-	for ( int i = 0; i < frameBuffer->TextureSwapChainLength; i++ )
-	{
-		// Create the color buffer texture.
-		const GLuint colorTexture = frameBuffer->ColorSwapChainImage[i].image;
+    XrSwapchainCreateInfo swapChainCreateInfo;
+    memset(&swapChainCreateInfo, 0, sizeof(swapChainCreateInfo));
+    swapChainCreateInfo.type = XR_TYPE_SWAPCHAIN_CREATE_INFO;
+    swapChainCreateInfo.usageFlags =
+            XR_SWAPCHAIN_USAGE_SAMPLED_BIT | XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT;
+    swapChainCreateInfo.format = selectedFormat;
+    swapChainCreateInfo.sampleCount = 1;
+    swapChainCreateInfo.width = width;
+    swapChainCreateInfo.height = height;
+    swapChainCreateInfo.faceCount = 1;
+    swapChainCreateInfo.arraySize = 1;
+    swapChainCreateInfo.mipCount = 1;
 
-		GL(glGenRenderbuffers(1, &frameBuffer->DepthBuffers[i]));
-		GL(glBindRenderbuffer(GL_RENDERBUFFER, frameBuffer->DepthBuffers[i]));
-		GL(glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER, 1, GL_DEPTH_COMPONENT24, width, height));
-		GL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+    // Enable Foveation on this swapchain
+    XrSwapchainCreateInfoFoveationFB swapChainFoveationCreateInfo;
+    memset(&swapChainFoveationCreateInfo, 0, sizeof(swapChainFoveationCreateInfo));
+    swapChainFoveationCreateInfo.type = XR_TYPE_SWAPCHAIN_CREATE_INFO_FOVEATION_FB;
+    swapChainCreateInfo.next = &swapChainFoveationCreateInfo;
 
-		// Create the frame buffer.
-		GL(glGenFramebuffers(1, &frameBuffer->FrameBuffers[i]));
-		GL(glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer->FrameBuffers[i]));
-		GL(glFramebufferTexture2DMultisampleEXT(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0, 1));
-		GL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, frameBuffer->DepthBuffers[i]));
+    frameBuffer->ColorSwapChain.Width = swapChainCreateInfo.width;
+    frameBuffer->ColorSwapChain.Height = swapChainCreateInfo.height;
 
-		GL(GLenum renderFramebufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER));
-		GL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-		if (renderFramebufferStatus != GL_FRAMEBUFFER_COMPLETE)
-		{
-			ALOGE("OVRHelper::Incomplete frame buffer object: %s", GlFrameBufferStatusString(renderFramebufferStatus));
-			return false;
-		}
-	}
+    // Create the swapchain.
+    OXR(xrCreateSwapchain(session, &swapChainCreateInfo, &frameBuffer->ColorSwapChain.Handle));
+    // Get the number of swapchain images.
+    OXR(xrEnumerateSwapchainImages(
+            frameBuffer->ColorSwapChain.Handle, 0, &frameBuffer->TextureSwapChainLength, NULL));
+    // Allocate the swapchain images array.
+    frameBuffer->ColorSwapChainImage = (XrSwapchainImageOpenGLESKHR*)malloc(
+            frameBuffer->TextureSwapChainLength * sizeof(XrSwapchainImageOpenGLESKHR));
 
-	return true;
+    // Populate the swapchain image array.
+    for (uint32_t i = 0; i < frameBuffer->TextureSwapChainLength; i++) {
+        frameBuffer->ColorSwapChainImage[i].type = XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_ES_KHR;
+        frameBuffer->ColorSwapChainImage[i].next = NULL;
+    }
+    OXR(xrEnumerateSwapchainImages(
+            frameBuffer->ColorSwapChain.Handle,
+            frameBuffer->TextureSwapChainLength,
+            &frameBuffer->TextureSwapChainLength,
+            (XrSwapchainImageBaseHeader*)frameBuffer->ColorSwapChainImage));
+
+    frameBuffer->DepthBuffers =
+            (GLuint*)malloc(frameBuffer->TextureSwapChainLength * sizeof(GLuint));
+    frameBuffer->FrameBuffers =
+            (GLuint*)malloc(frameBuffer->TextureSwapChainLength * sizeof(GLuint));
+
+    for (uint32_t i = 0; i < frameBuffer->TextureSwapChainLength; i++) {
+        // Create the color buffer texture.
+        const GLuint colorTexture = frameBuffer->ColorSwapChainImage[i].image;
+
+        GLenum colorTextureTarget = GL_TEXTURE_2D;
+        GL(glBindTexture(colorTextureTarget, colorTexture));
+        GL(glTexParameteri(colorTextureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+        GL(glTexParameteri(colorTextureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+        GL(glTexParameteri(colorTextureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+        GL(glTexParameteri(colorTextureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+        GL(glBindTexture(colorTextureTarget, 0));
+
+        if (glRenderbufferStorageMultisampleEXT != NULL &&
+            glFramebufferTexture2DMultisampleEXT != NULL) {
+            // Create multisampled depth buffer.
+            GL(glGenRenderbuffers(1, &frameBuffer->DepthBuffers[i]));
+            GL(glBindRenderbuffer(GL_RENDERBUFFER, frameBuffer->DepthBuffers[i]));
+            GL(glRenderbufferStorageMultisampleEXT(
+                    GL_RENDERBUFFER, multisamples, GL_DEPTH_COMPONENT24, width, height));
+            GL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+
+            // Create the frame buffer.
+            // NOTE: glFramebufferTexture2DMultisampleEXT only works with GL_FRAMEBUFFER.
+            GL(glGenFramebuffers(1, &frameBuffer->FrameBuffers[i]));
+            GL(glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer->FrameBuffers[i]));
+            GL(glFramebufferTexture2DMultisampleEXT(
+                    GL_FRAMEBUFFER,
+                    GL_COLOR_ATTACHMENT0,
+                    GL_TEXTURE_2D,
+                    colorTexture,
+                    0,
+                    multisamples));
+            GL(glFramebufferRenderbuffer(
+                    GL_FRAMEBUFFER,
+                    GL_DEPTH_ATTACHMENT,
+                    GL_RENDERBUFFER,
+                    frameBuffer->DepthBuffers[i]));
+            GL(GLenum renderFramebufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER));
+            GL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+            if (renderFramebufferStatus != GL_FRAMEBUFFER_COMPLETE) {
+                ALOGE(
+                        "Incomplete frame buffer object: %s",
+                        GlFrameBufferStatusString(renderFramebufferStatus));
+                return false;
+            }
+        } else {
+            // Create depth buffer.
+            GL(glGenRenderbuffers(1, &frameBuffer->DepthBuffers[i]));
+            GL(glBindRenderbuffer(GL_RENDERBUFFER, frameBuffer->DepthBuffers[i]));
+            GL(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height));
+            GL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+
+            // Create the frame buffer.
+            GL(glGenFramebuffers(1, &frameBuffer->FrameBuffers[i]));
+            GL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frameBuffer->FrameBuffers[i]));
+            GL(glFramebufferRenderbuffer(
+                    GL_DRAW_FRAMEBUFFER,
+                    GL_DEPTH_ATTACHMENT,
+                    GL_RENDERBUFFER,
+                    frameBuffer->DepthBuffers[i]));
+            GL(glFramebufferTexture2D(
+                    GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0));
+            GL(GLenum renderFramebufferStatus = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
+            GL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
+            if (renderFramebufferStatus != GL_FRAMEBUFFER_COMPLETE) {
+                ALOGE(
+                        "Incomplete frame buffer object: %s",
+                        GlFrameBufferStatusString(renderFramebufferStatus));
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
-void ovrFramebuffer_Destroy( ovrFramebuffer * frameBuffer )
-{
-    //LOAD_GLES2(glDeleteFramebuffers);
-    //LOAD_GLES2(glDeleteRenderbuffers);
+void ovrFramebuffer_Destroy(ovrFramebuffer* frameBuffer) {
+    GL(glDeleteFramebuffers(frameBuffer->TextureSwapChainLength, frameBuffer->FrameBuffers));
+    GL(glDeleteRenderbuffers(frameBuffer->TextureSwapChainLength, frameBuffer->DepthBuffers));
+    OXR(xrDestroySwapchain(frameBuffer->ColorSwapChain.Handle));
+    free(frameBuffer->ColorSwapChainImage);
 
-	GL( glDeleteFramebuffers( frameBuffer->TextureSwapChainLength, frameBuffer->FrameBuffers ) );
-	GL( glDeleteRenderbuffers( frameBuffer->TextureSwapChainLength, frameBuffer->DepthBuffers ) );
+    free(frameBuffer->DepthBuffers);
+    free(frameBuffer->FrameBuffers);
 
-	vrapi_DestroyTextureSwapChain( frameBuffer->ColorTextureSwapChain );
-
-	free( frameBuffer->DepthBuffers );
-	free( frameBuffer->FrameBuffers );
-
-	ovrFramebuffer_Clear( frameBuffer );
+    ovrFramebuffer_Clear(frameBuffer);
 }
 
-void GPUWaitSync()
-{
-	GLsync syncBuff = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	GLenum status = glClientWaitSync(syncBuff, GL_SYNC_FLUSH_COMMANDS_BIT, 1000 * 1000 * 50); // Wait for a max of 50ms...
-	if (status != GL_CONDITION_SATISFIED)
-	{
-		LOGE("Error on glClientWaitSync: %d\n", status);
-	}
-	glDeleteSync(syncBuff);
+void ovrFramebuffer_SetCurrent(ovrFramebuffer* frameBuffer) {
+    GL(glBindFramebuffer(
+            GL_DRAW_FRAMEBUFFER, frameBuffer->FrameBuffers[frameBuffer->TextureSwapChainIndex]));
 }
 
-void ovrFramebuffer_SetCurrent( ovrFramebuffer * frameBuffer )
-{
-    //LOAD_GLES2(glBindFramebuffer);
-	GL( glBindFramebuffer( GL_DRAW_FRAMEBUFFER, frameBuffer->FrameBuffers[frameBuffer->TextureSwapChainIndex] ) );
+void ovrFramebuffer_SetNone() {
+    GL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
 }
 
-void ovrFramebuffer_SetNone()
-{
-    //LOAD_GLES2(glBindFramebuffer);
-	GL( glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 ) );
+void ovrFramebuffer_Resolve(ovrFramebuffer* frameBuffer) {
+    // Discard the depth buffer, so the tiler won't need to write it back out to memory.
+    const GLenum depthAttachment[1] = {GL_DEPTH_ATTACHMENT};
+    glInvalidateFramebuffer(GL_DRAW_FRAMEBUFFER, 1, depthAttachment);
+
+    // We now let the resolve happen implicitly.
 }
 
-void ovrFramebuffer_Resolve( ovrFramebuffer * frameBuffer )
-{
-	// Discard the depth buffer, so the tiler won't need to write it back out to memory.
-//	const GLenum depthAttachment[1] = { GL_DEPTH_ATTACHMENT };
-//	glInvalidateFramebuffer( GL_DRAW_FRAMEBUFFER, 1, depthAttachment );
+void ovrFramebuffer_Acquire(ovrFramebuffer* frameBuffer) {
+    // Acquire the swapchain image
+    XrSwapchainImageAcquireInfo acquireInfo = {XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO, NULL};
+    OXR(xrAcquireSwapchainImage(
+            frameBuffer->ColorSwapChain.Handle, &acquireInfo, &frameBuffer->TextureSwapChainIndex));
 
-    // Flush this frame worth of commands.
-    glFlush();
+    XrSwapchainImageWaitInfo waitInfo;
+    waitInfo.type = XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO;
+    waitInfo.next = NULL;
+    waitInfo.timeout = 1000000000; /* timeout in nanoseconds */
+    XrResult res = xrWaitSwapchainImage(frameBuffer->ColorSwapChain.Handle, &waitInfo);
+    int i = 0;
+    while (res == XR_TIMEOUT_EXPIRED) {
+        res = xrWaitSwapchainImage(frameBuffer->ColorSwapChain.Handle, &waitInfo);
+        i++;
+        ALOGV(
+                " Retry xrWaitSwapchainImage %d times due to XR_TIMEOUT_EXPIRED (duration %f seconds)",
+                i,
+                waitInfo.timeout * (1E-9));
+    }
 }
 
-void ovrFramebuffer_Advance( ovrFramebuffer * frameBuffer )
-{
-	// Advance to the next texture from the set.
-	frameBuffer->TextureSwapChainIndex = ( frameBuffer->TextureSwapChainIndex + 1 ) % frameBuffer->TextureSwapChainLength;
-}
-
-
-void ovrFramebuffer_ClearEdgeTexels( ovrFramebuffer * frameBuffer )
-{
-	//LOAD_GLES2(glEnable);
-	//LOAD_GLES2(glDisable);
-	//LOAD_GLES2(glViewport);
-	//LOAD_GLES2(glScissor);
-	//LOAD_GLES2(glClearColor);
-	//LOAD_GLES2(glClear);
-
-	GL( glEnable( GL_SCISSOR_TEST ) );
-	GL( glViewport( 0, 0, frameBuffer->Width, frameBuffer->Height ) );
-
-	// Explicitly clear the border texels to black because OpenGL-ES does not support GL_CLAMP_TO_BORDER.
-	// Clear to fully opaque black.
-	GL( glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ) );
-
-	// bottom
-	GL( glScissor( 0, 0, frameBuffer->Width, 1 ) );
-	GL( glClear( GL_COLOR_BUFFER_BIT ) );
-	// top
-	GL( glScissor( 0, frameBuffer->Height - 1, frameBuffer->Width, 1 ) );
-	GL( glClear( GL_COLOR_BUFFER_BIT ) );
-	// left
-	GL( glScissor( 0, 0, 1, frameBuffer->Height ) );
-	GL( glClear( GL_COLOR_BUFFER_BIT ) );
-	// right
-	GL( glScissor( frameBuffer->Width - 1, 0, 1, frameBuffer->Height ) );
-	GL( glClear( GL_COLOR_BUFFER_BIT ) );
-
-
-	GL( glScissor( 0, 0, 0, 0 ) );
-	GL( glDisable( GL_SCISSOR_TEST ) );
+void ovrFramebuffer_Release(ovrFramebuffer* frameBuffer) {
+    XrSwapchainImageReleaseInfo releaseInfo = {XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO, NULL};
+    OXR(xrReleaseSwapchainImage(frameBuffer->ColorSwapChain.Handle, &releaseInfo));
 }
 
 
@@ -676,48 +727,40 @@ ovrRenderer
 ================================================================================
 */
 
-
-void ovrRenderer_Clear( ovrRenderer * renderer )
-{
-	for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
-	{
-		ovrFramebuffer_Clear( &renderer->FrameBuffer[eye] );
-	}
-	renderer->ProjectionMatrix = ovrMatrix4f_CreateIdentity();
-	renderer->NumBuffers = VRAPI_FRAME_LAYER_EYE_MAX;
-}
-
-
-void ovrRenderer_Create( int width, int height, ovrRenderer * renderer )
-{
-	renderer->NumBuffers = VRAPI_FRAME_LAYER_EYE_MAX;
-
-	// Create the render Textures.
-	for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
-	{
-		ovrFramebuffer_Create( &renderer->FrameBuffer[eye],
-							   GL_RGBA8,
-							   width,
-							   height,
-							   NUM_MULTI_SAMPLES );
+void ovrRenderer_Clear(ovrRenderer* renderer) {
+	for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
+		ovrFramebuffer_Clear(&renderer->FrameBuffer[eye]);
 	}
 }
 
-void ovrRenderer_Destroy( ovrRenderer * renderer )
-{
-	for ( int eye = 0; eye < renderer->NumBuffers; eye++ )
-	{
-		ovrFramebuffer_Destroy( &renderer->FrameBuffer[eye] );
+void ovrRenderer_Create(
+		XrSession session,
+		ovrRenderer* renderer,
+		int suggestedEyeTextureWidth,
+		int suggestedEyeTextureHeight) {
+	// Create the frame buffers.
+	for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
+		ovrFramebuffer_Create(
+				session,
+				&renderer->FrameBuffer[eye],
+				GL_SRGB8_ALPHA8,
+				suggestedEyeTextureWidth,
+				suggestedEyeTextureHeight,
+				NUM_MULTI_SAMPLES);
 	}
-	renderer->ProjectionMatrix = ovrMatrix4f_CreateIdentity();
 }
 
+void ovrRenderer_Destroy(ovrRenderer* renderer) {
+	for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
+		ovrFramebuffer_Destroy(&renderer->FrameBuffer[eye]);
+	}
+}
 
 #ifndef EPSILON
 #define EPSILON 0.001f
 #endif
 
-static ovrVector3f normalizeVec(ovrVector3f vec) {
+static XrVector3f normalizeVec(XrVector3f vec) {
     //NOTE: leave w-component untouched
     //@@const float EPSILON = 0.000001f;
     float xxyyzz = vec.x*vec.x + vec.y*vec.y + vec.z*vec.z;
@@ -725,7 +768,7 @@ static ovrVector3f normalizeVec(ovrVector3f vec) {
     //@@    return *this; // do nothing if it is zero vector
 
     //float invLength = invSqrt(xxyyzz);
-    ovrVector3f result;
+	XrVector3f result;
     float invLength = 1.0f / sqrtf(xxyyzz);
     result.x = vec.x * invLength;
     result.y = vec.y * invLength;
@@ -743,7 +786,7 @@ void NormalizeAngles(vec3_t angles)
 	while (angles[2] < -180) angles[2] += 360;
 }
 
-void GetAnglesFromVectors(const ovrVector3f forward, const ovrVector3f right, const ovrVector3f up, vec3_t angles)
+void GetAnglesFromVectors(const XrVector3f forward, const XrVector3f right, const XrVector3f up, vec3_t angles)
 {
 	float sr, sp, sy, cr, cp, cy;
 
@@ -857,7 +900,7 @@ void setHMDPosition( float x, float y, float z )
 
 	VectorSet(vr.hmdposition, x, y, z);
 
-    if (s_useScreen != JKVR_useScreenLayer())
+ //   if (s_useScreen != JKVR_useScreenLayer())
     {
 		s_useScreen = JKVR_useScreenLayer();
 
@@ -875,28 +918,7 @@ JKVR_Vibrate
 ========================
 */
 
-//0 = left, 1 = right
-float vibration_channel_duration[2] = {0.0f, 0.0f};
-float vibration_channel_intensity[2] = {0.0f, 0.0f};
-
-void JKVR_Vibrate( int duration, int chan, float intensity )
-{
-	for (int i = 0; i < 2; ++i)
-	{
-		int channel = (i + 1) & chan;
-		if (channel)
-		{
-			if (vibration_channel_duration[channel-1] > 0.0f)
-				return;
-
-			if (vibration_channel_duration[channel-1] == -1.0f && duration != 0.0f)
-				return;
-
-			vibration_channel_duration[channel-1] = duration;
-			vibration_channel_intensity[channel-1] = intensity * vr_haptic_intensity->value;
-		}
-	}
-}
+void JKVR_Vibrate( int duration, int chan, float intensity );
 
 void JKVR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side, float *up,
                     float *yaw, float *pitch, float *roll)
@@ -988,32 +1010,7 @@ void ovrApp_Clear(ovrApp* app) {
 	app->MainThreadTid = 0;
 	app->RenderThreadTid = 0;
 	ovrEgl_Clear( &app->Egl );
-	ovrScene_Clear( &app->Scene );
 	ovrRenderer_Clear(&app->Renderer);
-}
-
-static void ovrApp_PushBlackFinal( ovrApp * app )
-{
-	int frameFlags = 0;
-	frameFlags |= VRAPI_FRAME_FLAG_FLUSH | VRAPI_FRAME_FLAG_FINAL;
-
-	ovrLayerProjection2 layer = vrapi_DefaultLayerBlackProjection2();
-	layer.Header.Flags |= VRAPI_FRAME_LAYER_FLAG_INHIBIT_SRGB_FRAMEBUFFER;
-
-	const ovrLayerHeader2 * layers[] =
-	{
-		&layer.Header
-	};
-
-	ovrSubmitFrameDescription2 frameDesc = {};
-	frameDesc.Flags = frameFlags;
-	frameDesc.SwapInterval = 1;
-	frameDesc.FrameIndex = app->FrameIndex;
-	frameDesc.DisplayTime = app->DisplayTime;
-	frameDesc.LayerCount = 1;
-	frameDesc.Layers = layers;
-
-	vrapi_SubmitFrame2( app->Ovr, &frameDesc );
 }
 
 
@@ -1398,7 +1395,6 @@ void JKVR_Init()
 	positional_movementForward = 0.0f;
 	vr.snapTurn = 0.0f;
 	vr.immersive_cinematics = true;
-	ducked = DUCK_NOTDUCKED;
 
 	//init randomiser
 	srand(time(NULL));
@@ -1441,49 +1437,20 @@ void JKVR_Init()
 }
 
 
-static ovrAppThread * gAppThread = NULL;
-static ovrApp gAppState;
-static ovrJava java;
-static bool destroyed = qfalse;
+ovrAppThread * gAppThread = NULL;
+ovrApp gAppState;
+ovrJava java;
+bool destroyed = qfalse;
 
-void JKVR_prepareEyeBuffer(int eye )
-{
-	ovrRenderer *renderer = JKVR_useScreenLayer() ? &gAppState.Scene.CylinderRenderer : &gAppState.Renderer;
-
-	ovrFramebuffer *frameBuffer = &(renderer->FrameBuffer[eye]);
-	ovrFramebuffer_SetCurrent(frameBuffer);
-
-	GL(glEnable(GL_SCISSOR_TEST));
-	GL(glDepthMask(GL_TRUE));
-	GL(glEnable(GL_DEPTH_TEST));
-	GL(glDepthFunc(GL_LEQUAL));
-
-	//Weusing the size of the render target
-	GL(glViewport(0, 0, frameBuffer->Width, frameBuffer->Height));
-	GL(glScissor(0, 0, frameBuffer->Width, frameBuffer->Height));
-
-	GL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-	GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-	GL(glDisable(GL_SCISSOR_TEST));
-}
-
-void JKVR_finishEyeBuffer(int eye )
-{
-	ovrRenderer *renderer = JKVR_useScreenLayer() ? &gAppState.Scene.CylinderRenderer : &gAppState.Renderer;
-
-	ovrFramebuffer *frameBuffer = &(renderer->FrameBuffer[eye]);
-
-	//Clear edge to prevent smearing
-	ovrFramebuffer_ClearEdgeTexels(frameBuffer);
-	ovrFramebuffer_Resolve(frameBuffer);
+XrInstance ovrApp_GetInstance() {
+	return gAppState.Instance;
 }
 
 void JKVR_processMessageQueue() {
 	for ( ; ; )
 	{
 		ovrMessage message;
-		const bool waitForMessages = ( gAppState.Ovr == NULL && destroyed == false );
-		if ( !ovrMessageQueue_GetNextMessage( &gAppThread->MessageQueue, &message, waitForMessages ) )
+		if ( !ovrMessageQueue_GetNextMessage( &gAppThread->MessageQueue, &message, false ) )
 		{
 			break;
 		}
@@ -1524,21 +1491,14 @@ void JKVR_processMessageQueue() {
 			case MESSAGE_ON_SURFACE_CREATED:	{ gAppState.NativeWindow = (ANativeWindow *)ovrMessage_GetPointerParm( &message, 0 ); break; }
 			case MESSAGE_ON_SURFACE_DESTROYED:	{ gAppState.NativeWindow = NULL; break; }
 		}
-
-		ovrApp_HandleXrEvents(&gAppState);
 	}
 }
 
 void showLoadingIcon();
 extern "C" void jni_shutdown();
-void JKVR_incrementFrameIndex();
 void shutdownVR();
 int VR_main( int argc, char* argv[] );
 
-int GetRefresh()
-{
-    return vrapi_GetSystemPropertyInt(&java, VRAPI_SYS_PROP_DISPLAY_REFRESH_RATE);
-}
 
 void GL_APIENTRYP VR_GLDebugLog(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,GLvoid *userParam)
 {
@@ -1738,9 +1698,8 @@ void VR_InitRenderer(  ) {
 				"xrGetDisplayRefreshRateFB",
 				(PFN_xrVoidFunction*)(&gAppState.pfnGetDisplayRefreshRate)));
 
-		float currentDisplayRefreshRate = 0.0f;
-		OXR(gAppState.pfnGetDisplayRefreshRate(gAppState.Session, &currentDisplayRefreshRate));
-		ALOGV("Current System Display Refresh Rate: %f", currentDisplayRefreshRate);
+		OXR(gAppState.pfnGetDisplayRefreshRate(gAppState.Session, &gAppState.currentDisplayRefreshRate));
+		ALOGV("Current System Display Refresh Rate: %f", gAppState.currentDisplayRefreshRate);
 
 		OXR(xrGetInstanceProcAddr(
 				gAppState.Instance,
@@ -1771,7 +1730,7 @@ void VR_InitRenderer(  ) {
 	free(referenceSpaces);
 
 	if (gAppState.CurrentSpace == XR_NULL_HANDLE) {
-		VR_Recenter(engine);
+		VR_Recenter();
 	}
 
 	projections = (XrView*)(malloc(ovrMaxNumEyes * sizeof(XrView)));
@@ -1874,7 +1833,7 @@ void * AppThreadFunction(void * parm ) {
 	// Get the graphics requirements.
 	PFN_xrGetOpenGLESGraphicsRequirementsKHR pfnGetOpenGLESGraphicsRequirementsKHR = NULL;
 	OXR(xrGetInstanceProcAddr(
-			vr_engine.appState.Instance,
+			gAppState.Instance,
 			"xrGetOpenGLESGraphicsRequirementsKHR",
 			(PFN_xrVoidFunction*)(&pfnGetOpenGLESGraphicsRequirementsKHR)));
 
@@ -1896,7 +1855,7 @@ void * AppThreadFunction(void * parm ) {
 	}
 
 	//Using a symmetrical render target
-	VR_GetResolution(m_height, m_width);
+	VR_GetResolution(&m_height, &m_width);
 
 	gAppState.CpuLevel = CPU_LEVEL;
 	gAppState.GpuLevel = GPU_LEVEL;
@@ -1907,58 +1866,17 @@ void * AppThreadFunction(void * parm ) {
 	EglInitExtensions();
 
 	//First handle any messages in the queue
-	while ( gAppState.Ovr == NULL ) {
-		JKVR_processMessageQueue();
-	}
+	JKVR_processMessageQueue();
 
 	VR_EnterVR();
-	ovrRenderer_Create(m_width, m_height, &gAppState.Renderer, &java);
-
-
-	// Create the scene if not yet created.
-	ovrScene_Create( m_width, m_height, &gAppState.Scene, &java );
+	VR_InitRenderer();
+	JKVR_InitActions();
 
 #ifdef JK2_MODE
 		chdir("/sdcard/JKQuest/JK2");
 #else
 		chdir("/sdcard/JKQuest/JK3");
 #endif
-
-
-	//Run loading loop until we are ready to start JKVR
-	while (!destroyed && !openjk_initialised) {
-		JKVR_processMessageQueue();
-		JKVR_incrementFrameIndex();
-		showLoadingIcon();
-	}
-
-    int maximumSupportRefresh = 0;
-    //AmmarkoV : Query Refresh rates and select maximum..!
-    //-----------------------------------------------------------------------------------------------------------
-    int numberOfRefreshRates = vrapi_GetSystemPropertyInt(&java,
-                                                          VRAPI_SYS_PROP_NUM_SUPPORTED_DISPLAY_REFRESH_RATES);
-    float refreshRatesArray[16]; //Refresh rates are currently (12/2020) the following 4 : 60.0 / 72.0 / 80.0 / 90.0
-    if (numberOfRefreshRates > 16) { numberOfRefreshRates = 16; }
-    vrapi_GetSystemPropertyFloatArray(&java, VRAPI_SYS_PROP_SUPPORTED_DISPLAY_REFRESH_RATES,
-                                      &refreshRatesArray[0], numberOfRefreshRates);
-    for (int i = 0; i < numberOfRefreshRates; i++) {
-        ALOGV("Supported refresh rate : %d Hz", refreshRatesArray[i]);
-        if (maximumSupportRefresh < refreshRatesArray[i]) {
-            maximumSupportRefresh = refreshRatesArray[i];
-        }
-    }
-
-    if (maximumSupportRefresh > 90.0) {
-        ALOGV("Soft limiting to 90.0 Hz as per John carmack's request ( https://www.onlinepeeps.org/oculus-quest-2-according-to-carmack-in-the-future-also-at-120-hz/ );P");
-        maximumSupportRefresh = 90.0;
-    }
-
-    if (REFRESH == 0 || REFRESH > maximumSupportRefresh)
-    {
-        REFRESH = 72.0;
-    }
-    //-----------------------------------------------------------------------------------------------------------
-
 
     //start
 	VR_main(argc, argv);
@@ -1972,46 +1890,163 @@ void * AppThreadFunction(void * parm ) {
 	return NULL;
 }
 
+void VR_Recenter() {
+
+	// Calculate recenter reference
+	XrReferenceSpaceCreateInfo spaceCreateInfo = {};
+	spaceCreateInfo.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
+	spaceCreateInfo.poseInReferenceSpace.orientation.w = 1.0f;
+	if (gAppState.CurrentSpace != XR_NULL_HANDLE) {
+		vec3_t rotation = {0, 0, 0};
+		XrSpaceLocation loc = {};
+		loc.type = XR_TYPE_SPACE_LOCATION;
+		OXR(xrLocateSpace(gAppState.HeadSpace, gAppState.CurrentSpace, gAppState.PredictedDisplayTime, &loc));
+		QuatToYawPitchRoll(loc.pose.orientation, rotation, vr.hmdorientation);
+
+		spaceCreateInfo.poseInReferenceSpace.orientation.x = 0;
+		spaceCreateInfo.poseInReferenceSpace.orientation.y = 0;
+		spaceCreateInfo.poseInReferenceSpace.orientation.z = 0;
+		spaceCreateInfo.poseInReferenceSpace.orientation.w = 1;
+	}
+
+	// Delete previous space instances
+	if (gAppState.StageSpace != XR_NULL_HANDLE) {
+		OXR(xrDestroySpace(gAppState.StageSpace));
+	}
+	if (gAppState.FakeStageSpace != XR_NULL_HANDLE) {
+		OXR(xrDestroySpace(gAppState.FakeStageSpace));
+	}
+
+	// Create a default stage space to use if SPACE_TYPE_STAGE is not
+	// supported, or calls to xrGetReferenceSpaceBoundsRect fail.
+	spaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_LOCAL;
+	spaceCreateInfo.poseInReferenceSpace.position.y = -1.6750f;
+	OXR(xrCreateReferenceSpace(gAppState.Session, &spaceCreateInfo, &gAppState.FakeStageSpace));
+	ALOGV("Created fake stage space from local space with offset");
+	gAppState.CurrentSpace = gAppState.FakeStageSpace;
+
+	if (stageSupported) {
+		spaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
+		spaceCreateInfo.poseInReferenceSpace.position.y = 0.0f;
+		OXR(xrCreateReferenceSpace(gAppState.Session, &spaceCreateInfo, &gAppState.StageSpace));
+		ALOGV("Created stage space");
+		gAppState.CurrentSpace = gAppState.StageSpace;
+	}
+}
+
+void VR_UpdateStageBounds() {
+	XrExtent2Df stageBounds = {};
+
+	XrResult result;
+	OXR(result = xrGetReferenceSpaceBoundsRect(
+			gAppState.Session, XR_REFERENCE_SPACE_TYPE_STAGE, &stageBounds));
+	if (result != XR_SUCCESS) {
+		ALOGV("Stage bounds query failed: using small defaults");
+		stageBounds.width = 1.0f;
+		stageBounds.height = 1.0f;
+
+		gAppState.CurrentSpace = gAppState.FakeStageSpace;
+	}
+
+	ALOGV("Stage bounds: width = %f, depth %f", stageBounds.width, stageBounds.height);
+}
+
 //All the stuff we want to do each frame
 void JKVR_FrameSetup()
 {
-	//Use floor based tracking space
-	vrapi_SetTrackingSpace(gAppState.Ovr, VRAPI_TRACKING_SPACE_LOCAL_FLOOR);
+	GLboolean stageBoundsDirty = GL_TRUE;
+	if (ovrApp_HandleXrEvents(&gAppState)) {
+		VR_Recenter();
+	}
+	if (gAppState.SessionActive == GL_FALSE) {
+		return;
+	}
 
-	//Set framerate so VrApi doesn't change it on us..
-    vrapi_SetDisplayRefreshRate(gAppState.Ovr, REFRESH);
+	if (stageBoundsDirty) {
+		VR_UpdateStageBounds();
+		stageBoundsDirty = GL_FALSE;
+	}
 
-	vrapi_SetExtraLatencyMode(gAppState.Ovr, VRAPI_EXTRA_LATENCY_MODE_ON);
+
+	// NOTE: OpenXR does not use the concept of frame indices. Instead,
+	// XrWaitFrame returns the predicted display time.
+	XrFrameWaitInfo waitFrameInfo = {};
+	waitFrameInfo.type = XR_TYPE_FRAME_WAIT_INFO;
+	waitFrameInfo.next = NULL;
+
+	XrFrameState frameState = {};
+	frameState.type = XR_TYPE_FRAME_STATE;
+	frameState.next = NULL;
+
+	OXR(xrWaitFrame(gAppState.Session, &waitFrameInfo, &frameState));
+	gAppState.PredictedDisplayTime = frameState.predictedDisplayTime;
+	if (!frameState.shouldRender) {
+		return;
+	}
+
+	// Get the HMD pose, predicted for the middle of the time period during which
+	// the new eye images will be displayed. The number of frames predicted ahead
+	// depends on the pipeline depth of the engine and the synthesis rate.
+	// The better the prediction, the less black will be pulled in at the edges.
+	XrFrameBeginInfo beginFrameDesc = {};
+	beginFrameDesc.type = XR_TYPE_FRAME_BEGIN_INFO;
+	beginFrameDesc.next = NULL;
+	OXR(xrBeginFrame(gAppState.Session, &beginFrameDesc));
 
 	//get any cvar values required here
 	vr.immersive_cinematics = (vr_immersive_cinematics->value != 0.0f);
+
+
 }
 
-void JKVR_processHaptics() {
-	static float lastFrameTime = 0.0f;
-	float timestamp = (float)(GetTimeInMilliSeconds());
-	float frametime = timestamp - lastFrameTime;
-	lastFrameTime = timestamp;
-
-	for (int i = 0; i < 2; ++i) {
-		if (vibration_channel_duration[i] > 0.0f ||
-			vibration_channel_duration[i] == -1.0f) {
-			vrapi_SetHapticVibrationSimple(gAppState.Ovr, controllerIDs[1 - i],
-										   vibration_channel_intensity[i]);
-
-			if (vibration_channel_duration[i] != -1.0f) {
-				vibration_channel_duration[i] -= frametime;
-
-				if (vibration_channel_duration[i] < 0.0f) {
-					vibration_channel_duration[i] = 0.0f;
-					vibration_channel_intensity[i] = 0.0f;
-				}
-			}
-		} else {
-			vrapi_SetHapticVibrationSimple(gAppState.Ovr, controllerIDs[1 - i], 0.0f);
-		}
-	}
+int GetRefresh()
+{
+	return gAppState.currentDisplayRefreshRate;
 }
+
+void VR_ClearFrameBuffer( int width, int height)
+{
+	glEnable( GL_SCISSOR_TEST );
+	glViewport( 0, 0, width, height );
+
+	//Black
+	glClearColor( 1.0f, 0.0f, 0.0f, 1.0f );
+
+	glScissor( 0, 0, width, height );
+	glClear( GL_COLOR_BUFFER_BIT );
+
+	glScissor( 0, 0, 0, 0 );
+	glDisable( GL_SCISSOR_TEST );
+}
+
+void JKVR_prepareEyeBuffer(int eye )
+{
+	ovrFramebuffer* frameBuffer = &(gAppState.Renderer.FrameBuffer[eye]);
+	ovrFramebuffer_Acquire(frameBuffer);
+	ovrFramebuffer_SetCurrent(frameBuffer);
+	VR_ClearFrameBuffer(frameBuffer->ColorSwapChain.Width, frameBuffer->ColorSwapChain.Height);
+}
+
+void JKVR_finishEyeBuffer(int eye )
+{
+	ovrRenderer *renderer = &gAppState.Renderer;
+
+	ovrFramebuffer *frameBuffer = &(renderer->FrameBuffer[eye]);
+
+	// Clear the alpha channel, other way OpenXR would not transfer the framebuffer fully
+	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
+	glClearColor(1.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+	//Clear edge to prevent smearing
+	ovrFramebuffer_Resolve(frameBuffer);
+	ovrFramebuffer_Release(frameBuffer);
+	ovrFramebuffer_SetNone();
+}
+
+void JKVR_processHaptics();
+
 
 extern "C" {
 void jni_haptic_event(const char *event, int position, int flags, int intensity, float angle,
@@ -2127,32 +2162,70 @@ void JKVR_HapticEvent(const char* event, int position, int flags, int intensity,
 	}
 }
 
-void showLoadingIcon()
+void JKVR_SyncActions( void )
 {
-	int frameFlags = 0;
-	frameFlags |= VRAPI_FRAME_FLAG_FLUSH;
+	// Attach to session
+	XrSessionActionSetsAttachInfo attachInfo = {};
+	attachInfo.type = XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO;
+	attachInfo.next = NULL;
+	attachInfo.countActionSets = 1;
+	attachInfo.actionSets = &runningActionSet;
+	OXR(xrAttachSessionActionSets(gAppState.Session, &attachInfo));
 
-	ovrLayerProjection2 blackLayer = vrapi_DefaultLayerBlackProjection2();
-	blackLayer.Header.Flags |= VRAPI_FRAME_LAYER_FLAG_INHIBIT_SRGB_FRAMEBUFFER;
+	// sync action data
+	XrActiveActionSet activeActionSet = {};
+	activeActionSet.actionSet = runningActionSet;
+	activeActionSet.subactionPath = XR_NULL_PATH;
 
-	ovrLayerLoadingIcon2 iconLayer = vrapi_DefaultLayerLoadingIcon2();
-	iconLayer.Header.Flags |= VRAPI_FRAME_LAYER_FLAG_INHIBIT_SRGB_FRAMEBUFFER;
+	XrActionsSyncInfo syncInfo = {};
+	syncInfo.type = XR_TYPE_ACTIONS_SYNC_INFO;
+	syncInfo.next = NULL;
+	syncInfo.countActiveActionSets = 1;
+	syncInfo.activeActionSets = &activeActionSet;
+	OXR(xrSyncActions(gAppState.Session, &syncInfo));
 
-	const ovrLayerHeader2 * layers[] =
-			{
-					&blackLayer.Header,
-					&iconLayer.Header,
-			};
+	// query input action states
+	XrActionStateGetInfo getInfo = {};
+	getInfo.type = XR_TYPE_ACTION_STATE_GET_INFO;
+	getInfo.next = NULL;
+	getInfo.subactionPath = XR_NULL_PATH;
+}
 
-	ovrSubmitFrameDescription2 frameDesc = {};
-	frameDesc.Flags = frameFlags;
-	frameDesc.SwapInterval = 1;
-	frameDesc.FrameIndex = gAppState.FrameIndex;
-	frameDesc.DisplayTime = gAppState.DisplayTime;
-	frameDesc.LayerCount = 2;
-	frameDesc.Layers = layers;
+void JKVR_UpdateControllers( )
+{
+	JKVR_SyncActions();
 
-	vrapi_SubmitFrame2( gAppState.Ovr, &frameDesc );
+	//get controller poses
+	XrAction controller[] = {handPoseLeftAction, handPoseRightAction};
+	XrPath subactionPath[] = {leftHandPath, rightHandPath};
+	XrSpace controllerSpace[] = {leftControllerAimSpace, rightControllerAimSpace};
+	for (int i = 0; i < 2; i++) {
+		if (ActionPoseIsActive(controller[i], subactionPath[i])) {
+			XrSpaceVelocity vel = {};
+			vel.type = XR_TYPE_SPACE_VELOCITY;
+			XrSpaceLocation loc = {};
+			loc.type = XR_TYPE_SPACE_LOCATION;
+			loc.next = &vel;
+			OXR(xrLocateSpace(controllerSpace[i], gAppState.CurrentSpace, gAppState.PredictedDisplayTime, &loc));
+
+			gAppState.TrackedController[i].Active = (loc.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0;
+			gAppState.TrackedController[i].Pose = loc.pose;
+
+			// apply velocity
+//			float dt = (in_vrEventTime - lastframetime) * 0.001f;
+//			for (int j = 0; j < 3; j++) {
+//				(&gAppState.TrackedController[i].Pose.position.x)[j] += (&vel.linearVelocity.x)[j] * dt;
+//			}
+		} else {
+			ovrTrackedController_Clear(&gAppState.TrackedController[i]);
+		}
+	}
+
+	//apply controller poses
+//	if (gAppState.TrackedController[0].Active)
+//		IN_VRController(qfalse, gAppState.TrackedController[0].Pose);
+//	if (gAppState.TrackedController[1].Active)
+//		IN_VRController(qtrue, gAppState.TrackedController[1].Pose);
 }
 
 void JKVR_getHMDOrientation() {//Get orientation
@@ -2161,13 +2234,13 @@ void JKVR_getHMDOrientation() {//Get orientation
 	// the new eye images will be displayed. The number of frames predicted ahead
 	// depends on the pipeline depth of the engine and the synthesis rate.
 	// The better the prediction, the less black will be pulled in at the edges.
-	tracking = vrapi_GetPredictedTracking2(gAppState.Ovr, gAppState.DisplayTime);
+	XrSpaceLocation loc = {};
+	loc.type = XR_TYPE_SPACE_LOCATION;
+	OXR(xrLocateSpace(gAppState.HeadSpace, gAppState.CurrentSpace, gAppState.PredictedDisplayTime, &loc));
+	gAppState.xfStageFromHead = loc.pose;
+	const XrQuaternionf quatHmd = gAppState.xfStageFromHead.orientation;
+	const XrVector3f positionHmd = gAppState.xfStageFromHead.position;
 
-
-	// We extract Yaw, Pitch, Roll instead of directly using the orientation
-	// to allow "additional" yaw manipulation with mouse/controller.
-	const ovrQuatf quatHmd = tracking.Pose.orientation;
-	const ovrVector3f positionHmd = tracking.Pose.position;
 	vec3_t rotation = {0, 0, 0};
 	QuatToYawPitchRoll(quatHmd, rotation, vr.hmdorientation);
 	setHMDPosition(positionHmd.x, positionHmd.y, positionHmd.z);
@@ -2180,33 +2253,16 @@ void JKVR_getHMDOrientation() {//Get orientation
 		vr.maxHeight = positionHmd.y;
 	}
 	vr.curHeight = positionHmd.y;
-
-	///ALOGV("        HMD-Position: %f, %f, %f", positionHmd.x, positionHmd.y, positionHmd.z);
 }
 
 void shutdownVR() {
 	ovrRenderer_Destroy( &gAppState.Renderer );
 	ovrEgl_DestroyContext( &gAppState.Egl );
 	java.Vm->DetachCurrentThread( );
-	vrapi_Shutdown();
-}
-
-long long JKVR_getFrameIndex()
-{
-	return gAppState.FrameIndex;
-}
-
-void JKVR_incrementFrameIndex()
-{
-	// This is the only place the frame index is incremented, right before
-	// calling vrapi_GetPredictedDisplayTime().
-	gAppState.FrameIndex++;
-	gAppState.DisplayTime = vrapi_GetPredictedDisplayTime(gAppState.Ovr,
-														  gAppState.FrameIndex);
 }
 
 void JKVR_getTrackedRemotesOrientation() {//Get info for tracked remotes
-	acquireTrackedRemotesData(gAppState.Ovr, gAppState.DisplayTime);
+	JKVR_UpdateControllers();
 
 	//Call additional control schemes here
 	switch (vr_control_scheme->integer)
@@ -2232,102 +2288,157 @@ void JKVR_getTrackedRemotesOrientation() {//Get info for tracked remotes
 
 void JKVR_submitFrame()
 {
-	ovrSubmitFrameDescription2 frameDesc = {0};
+	XrViewLocateInfo projectionInfo = {};
+	projectionInfo.type = XR_TYPE_VIEW_LOCATE_INFO;
+	projectionInfo.viewConfigurationType = gAppState.ViewportConfig.viewConfigurationType;
+	projectionInfo.displayTime = gAppState.PredictedDisplayTime;
+	projectionInfo.space = gAppState.HeadSpace;
 
+	XrViewState viewState = {XR_TYPE_VIEW_STATE, NULL};
+
+	uint32_t projectionCapacityInput = ovrMaxNumEyes;
+	uint32_t projectionCountOutput = projectionCapacityInput;
+
+	OXR(xrLocateViews(
+			gAppState.Session,
+			&projectionInfo,
+			&viewState,
+			projectionCapacityInput,
+			&projectionCountOutput,
+			projections));
+	//
+
+	XrFovf fov;
+	XrPosef viewTransform[2];
+	for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
+		XrPosef xfHeadFromEye = projections[eye].pose;
+		XrPosef xfStageFromEye = XrPosef_Multiply(gAppState.xfStageFromHead, xfHeadFromEye);
+		viewTransform[eye] = XrPosef_Inverse(xfStageFromEye);
+
+		fov = projections[eye].fov;
+	}
+	vr.fov_x = (fabs(fov.angleLeft) + fabs(fov.angleRight)) * 180.0f / M_PI;
+	vr.fov_y = (fabs(fov.angleUp) + fabs(fov.angleDown)) * 180.0f / M_PI;
+
+	//Projection used for drawing HUD models etc
+	float hudScale = M_PI * 15.0f / 180.0f;
+	const ovrMatrix4f monoVRMatrix = ovrMatrix4f_CreateProjectionFov(
+			-hudScale, hudScale, hudScale, -hudScale, 1.0f, 0.0f );
+	const ovrMatrix4f projectionMatrix = ovrMatrix4f_CreateProjectionFov(
+			fov.angleLeft / vr.cgzoommode ? 1.3f : 1.0f,
+			fov.angleRight / vr.cgzoommode ? 1.3f : 1.0f,
+			fov.angleUp / vr.cgzoommode ? 1.3f : 1.0f,
+			fov.angleDown / vr.cgzoommode ? 1.3f : 1.0f,
+			1.0f, 0.0f );
+
+	gAppState.LayerCount = 0;
+	memset(gAppState.Layers, 0, sizeof(ovrCompositorLayer_Union) * ovrMaxLayerCount);
+
+	XrCompositionLayerProjectionView projection_layer_elements[2] = {};
 	if (!JKVR_useScreenLayer()) {
+/*		for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
+			ovrFramebuffer* frameBuffer = &(gAppState.Renderer.FrameBuffer[eye]);
 
-		ovrLayerProjection2 layer = vrapi_DefaultLayerProjection2();
-		layer.HeadPose = tracking.HeadPose;
-		for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
-		{
-			ovrFramebuffer * frameBuffer = &gAppState.Renderer.FrameBuffer[gAppState.Renderer.NumBuffers == 1 ? 0 : eye];
-			layer.Textures[eye].ColorSwapChain = frameBuffer->ColorTextureSwapChain;
-			layer.Textures[eye].SwapChainIndex = frameBuffer->TextureSwapChainIndex;
+			memset(&projection_layer_elements[eye], 0, sizeof(XrCompositionLayerProjectionView));
+			projection_layer_elements[eye].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
+			projection_layer_elements[eye].pose = XrPosef_Inverse(viewTransform[eye]);
+			projection_layer_elements[eye].fov = fov;
 
-			ovrMatrix4f projectionMatrix;
-
-			if (vr.cgzoommode)
-			{
-				projectionMatrix = ovrMatrix4f_CreateProjectionFov(vr.fov / 1.3, vr.fov / 1.3,
-																   0.0f, 0.0f, 0.1f, 0.0f);
-			}
-			else
-			{
-				projectionMatrix = ovrMatrix4f_CreateProjectionFov(vr.fov, vr.fov,
-																   0.0f, 0.0f, 0.1f, 0.0f);
-			}
-
-			layer.Textures[eye].TexCoordsFromTanAngles = ovrMatrix4f_TanAngleMatrixFromProjection(&projectionMatrix);
-
-			layer.Textures[eye].TextureRect.x = 0;
-			layer.Textures[eye].TextureRect.y = 0;
-			layer.Textures[eye].TextureRect.width = 1.0f;
-			layer.Textures[eye].TextureRect.height = 1.0f;
-
-			ovrFramebuffer_Advance(frameBuffer);
+			memset(&projection_layer_elements[eye].subImage, 0, sizeof(XrSwapchainSubImage));
+			projection_layer_elements[eye].subImage.swapchain = frameBuffer->ColorSwapChain.Handle;
+			projection_layer_elements[eye].subImage.imageRect.offset.x = 0;
+			projection_layer_elements[eye].subImage.imageRect.offset.y = 0;
+			projection_layer_elements[eye].subImage.imageRect.extent.width = frameBuffer->ColorSwapChain.Width;
+			projection_layer_elements[eye].subImage.imageRect.extent.height = frameBuffer->ColorSwapChain.Height;
+			projection_layer_elements[eye].subImage.imageArrayIndex = eye;
 		}
 
-		ovrFramebuffer_SetNone();
+		XrCompositionLayerProjection projection_layer = {};
+		projection_layer.type = XR_TYPE_COMPOSITION_LAYER_PROJECTION;
+		projection_layer.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
+		projection_layer.layerFlags |= XR_COMPOSITION_LAYER_CORRECT_CHROMATIC_ABERRATION_BIT;
+		projection_layer.space = gAppState.CurrentSpace;
+		projection_layer.viewCount = ovrMaxNumEyes;
+		projection_layer.views = projection_layer_elements; */
 
-		layer.Header.Flags |= VRAPI_FRAME_LAYER_FLAG_CHROMATIC_ABERRATION_CORRECTION;
+		XrCompositionLayerProjection projection_layer = {};
+		projection_layer.type = XR_TYPE_COMPOSITION_LAYER_PROJECTION;
+		projection_layer.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
+		projection_layer.layerFlags |= XR_COMPOSITION_LAYER_CORRECT_CHROMATIC_ABERRATION_BIT;
+		projection_layer.space = gAppState.CurrentSpace;
+		projection_layer.viewCount = ovrMaxNumEyes;
+		projection_layer.views = projection_layer_elements;
 
-		// Set up the description for this frame.
-		const ovrLayerHeader2 *layers[] =
-				{
-						&layer.Header
-				};
+		for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
+			ovrFramebuffer* frameBuffer = &gAppState.Renderer.FrameBuffer[eye];
 
-		frameDesc.Flags = 0;
-		frameDesc.SwapInterval = gAppState.SwapInterval;
-		frameDesc.FrameIndex = gAppState.FrameIndex;
-		frameDesc.DisplayTime = gAppState.DisplayTime;
-		frameDesc.LayerCount = 1;
-		frameDesc.Layers = layers;
+			memset(
+					&projection_layer_elements[eye], 0, sizeof(XrCompositionLayerProjectionView));
+			projection_layer_elements[eye].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
 
-		// Hand over the eye images to the time warp.
-		vrapi_SubmitFrame2(gAppState.Ovr, &frameDesc);
+			projection_layer_elements[eye].pose = XrPosef_Inverse(viewTransform[eye]);
+			projection_layer_elements[eye].fov = projections[eye].fov;
 
+			memset(&projection_layer_elements[eye].subImage, 0, sizeof(XrSwapchainSubImage));
+			projection_layer_elements[eye].subImage.swapchain =
+					frameBuffer->ColorSwapChain.Handle;
+			projection_layer_elements[eye].subImage.imageRect.offset.x = 0;
+			projection_layer_elements[eye].subImage.imageRect.offset.y = 0;
+			projection_layer_elements[eye].subImage.imageRect.extent.width =
+					frameBuffer->ColorSwapChain.Width;
+			projection_layer_elements[eye].subImage.imageRect.extent.height =
+					frameBuffer->ColorSwapChain.Height;
+			projection_layer_elements[eye].subImage.imageArrayIndex = 0;
+		}
+
+
+		gAppState.Layers[gAppState.LayerCount++].Projection = projection_layer;
 	} else {
-		// Set-up the compositor layers for this frame.
-		// NOTE: Multiple independent layers are allowed, but they need to be added
-		// in a depth consistent order.
-		memset( gAppState.Layers, 0, sizeof( ovrLayer_Union2 ) * ovrMaxLayerCount );
-		gAppState.LayerCount = 0;
 
-		// Add a simple cylindrical layer
-		gAppState.Layers[gAppState.LayerCount++].Cylinder =
-				BuildCylinderLayer(&gAppState.Scene.CylinderRenderer,
-								   gAppState.Scene.CylinderWidth, gAppState.Scene.CylinderHeight, &tracking, radians(vr.hmdorientation_snap[YAW]) );
+		// Build the cylinder layer
+		XrCompositionLayerCylinderKHR cylinder_layer = {};
+		int width = gAppState.Renderer.FrameBuffer[0].ColorSwapChain.Width;
+		int height = gAppState.Renderer.FrameBuffer[0].ColorSwapChain.Height;
+		cylinder_layer.type = XR_TYPE_COMPOSITION_LAYER_CYLINDER_KHR;
+		cylinder_layer.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
+		cylinder_layer.space = gAppState.CurrentSpace;
+		cylinder_layer.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
+		memset(&cylinder_layer.subImage, 0, sizeof(XrSwapchainSubImage));
+		cylinder_layer.subImage.swapchain = gAppState.Renderer.FrameBuffer[0].ColorSwapChain.Handle;
+		cylinder_layer.subImage.imageRect.offset.x = 0;
+		cylinder_layer.subImage.imageRect.offset.y = 0;
+		cylinder_layer.subImage.imageRect.extent.width = width;
+		cylinder_layer.subImage.imageRect.extent.height = height;
+		cylinder_layer.subImage.imageArrayIndex = 0;
+		const XrVector3f axis = {0.0f, 1.0f, 0.0f};
+		XrVector3f pos = {
+				gAppState.xfStageFromHead.position.x - sin(radians(vr.hmdorientation_snap[YAW])) * 4.0f,
+				-0.25f,
+				gAppState.xfStageFromHead.position.z - cos(radians(vr.hmdorientation_snap[YAW])) * 4.0f
+		};
+		cylinder_layer.pose.orientation = XrQuaternionf_CreateFromVectorAngle(axis, radians(vr.hmdorientation_snap[YAW]));
+		cylinder_layer.pose.position = pos;
+		cylinder_layer.radius = 12.0f;
+		cylinder_layer.centralAngle = M_PI * 0.5f;
+		cylinder_layer.aspectRatio = m_width / (float)m_height / 0.75f;
 
-		for ( int eye = 0; eye < VRAPI_FRAME_LAYER_EYE_MAX; eye++ )
-		{
-			ovrFramebuffer * frameBuffer = &gAppState.Scene.CylinderRenderer.FrameBuffer[gAppState.Renderer.NumBuffers == 1 ? 0 : eye];
-			ovrFramebuffer_Advance(frameBuffer);
-		}
-
-		ovrFramebuffer_SetNone();
-
-		// Compose the layers for this frame.
-		const ovrLayerHeader2 * layerHeaders[ovrMaxLayerCount] = { 0 };
-		for ( int i = 0; i < gAppState.LayerCount; i++ )
-		{
-			layerHeaders[i] = &gAppState.Layers[i].Header;
-		}
-
-		// Set up the description for this frame.
-		frameDesc.Flags = 0;
-		frameDesc.SwapInterval = gAppState.SwapInterval;
-		frameDesc.FrameIndex = gAppState.FrameIndex;
-		frameDesc.DisplayTime = gAppState.DisplayTime;
-		frameDesc.LayerCount = gAppState.LayerCount;
-		frameDesc.Layers = layerHeaders;
-
-		// Hand over the eye images to the time warp.
-		vrapi_SubmitFrame2(gAppState.Ovr, &frameDesc);
+		gAppState.Layers[gAppState.LayerCount++].Cylinder = cylinder_layer;
 	}
 
+	// Compose the layers for this frame.
+	const XrCompositionLayerBaseHeader* layers[ovrMaxLayerCount] = {};
+	for (int i = 0; i < gAppState.LayerCount; i++) {
+		layers[i] = (const XrCompositionLayerBaseHeader*)&gAppState.Layers[i];
+	}
 
-	JKVR_incrementFrameIndex();
+	XrFrameEndInfo endFrameInfo = {};
+	endFrameInfo.type = XR_TYPE_FRAME_END_INFO;
+	endFrameInfo.displayTime = gAppState.PredictedDisplayTime;
+	endFrameInfo.environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
+	endFrameInfo.layerCount = gAppState.LayerCount;
+	endFrameInfo.layers = layers;
+
+	OXR(xrEndFrame(gAppState.Session, &endFrameInfo));
 }
 
 static void ovrAppThread_Create( ovrAppThread * appThread, JNIEnv * env, jobject activityObject, jclass activityClass )

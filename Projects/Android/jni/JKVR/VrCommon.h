@@ -14,6 +14,7 @@
 #include <openxr/openxr_oculus.h>
 #include <openxr/openxr_oculus_helpers.h>
 
+#include <android/native_window_jni.h>
 #include <android/log.h>
 
 #include "../qcommon/q_shared.h"
@@ -35,6 +36,30 @@
 #define ALOGV(...)
 #endif
 
+extern XrPath leftHandPath;
+extern XrPath rightHandPath;
+extern XrAction handPoseLeftAction;
+extern XrAction handPoseRightAction;
+extern XrAction indexLeftAction;
+extern XrAction indexRightAction;
+extern XrAction menuAction;
+extern XrAction buttonAAction;
+extern XrAction buttonBAction;
+extern XrAction buttonXAction;
+extern XrAction buttonYAction;
+extern XrAction gripLeftAction;
+extern XrAction gripRightAction;
+extern XrAction moveOnLeftJoystickAction;
+extern XrAction moveOnRightJoystickAction;
+extern XrAction thumbstickLeftClickAction;
+extern XrAction thumbstickRightClickAction;
+extern XrAction vibrateLeftFeedback;
+extern XrAction vibrateRightFeedback;
+extern XrActionSet runningActionSet;
+extern XrSpace leftControllerAimSpace;
+extern XrSpace rightControllerAimSpace;
+extern qboolean inputInitialized;
+extern qboolean useSimpleProfile;
 
 enum { ovrMaxLayerCount = 1 };
 enum { ovrMaxNumEyes = 2 };
@@ -93,6 +118,7 @@ typedef struct {
 typedef struct {
     int Width;
     int Height;
+    int Multisamples;
     uint32_t TextureSwapChainLength;
     uint32_t TextureSwapChainIndex;
     ovrSwapChain ColorSwapChain;
@@ -131,10 +157,53 @@ typedef union {
 } ovrCompositorLayer_Union;
 
 #define GL(func) func;
-#define OXR(func) func;
+
+// Forward declarations
+XrInstance ovrApp_GetInstance();
+
+#if defined(DEBUG)
+static void
+OXR_CheckErrors(XrInstance instance, XrResult result, const char* function, bool failOnError) {
+    if (XR_FAILED(result)) {
+        char errorBuffer[XR_MAX_RESULT_STRING_SIZE];
+        xrResultToString(instance, result, errorBuffer);
+        if (failOnError) {
+            ALOGE("OpenXR error: %s: %s\n", function, errorBuffer);
+        } else {
+            ALOGV("OpenXR error: %s: %s\n", function, errorBuffer);
+        }
+    }
+}
+#endif
+
+#if defined(DEBUG)
+#define OXR(func) OXR_CheckErrors(ovrApp_GetInstance(), func, #func, true);
+#else
+#define OXR(func) OXR_CheckErrors(ovrApp_GetInstance(), func, #func, false);
+#endif
+
+typedef struct {
+    EGLint MajorVersion;
+    EGLint MinorVersion;
+    EGLDisplay Display;
+    EGLConfig Config;
+    EGLSurface TinySurface;
+    EGLSurface MainSurface;
+    EGLContext Context;
+} ovrEgl;
+
+/// Java details about an activity
+typedef struct ovrJava_ {
+    JavaVM* Vm; //< Java Virtual Machine
+    JNIEnv* Env; //< Thread specific environment
+    jobject ActivityObject; //< Java activity object
+} ovrJava;
 
 typedef struct
 {
+    ovrJava				Java;
+    ovrEgl Egl;
+    ANativeWindow* NativeWindow;
     bool				Resumed;
     bool				Focused;
 
@@ -148,15 +217,17 @@ typedef struct
     XrSpace FakeStageSpace;
     XrSpace CurrentSpace;
     GLboolean SessionActive;
+    XrPosef xfStageFromHead;
 
+    float currentDisplayRefreshRate;
     float* SupportedDisplayRefreshRates;
     uint32_t RequestedDisplayRefreshRateIndex;
     uint32_t NumSupportedDisplayRefreshRates;
     PFN_xrGetDisplayRefreshRateFB pfnGetDisplayRefreshRate;
     PFN_xrRequestDisplayRefreshRateFB pfnRequestDisplayRefreshRate;
 
+    XrTime               PredictedDisplayTime;
     long long			FrameIndex;
-    double 				DisplayTime;
     int					SwapInterval;
     int					CpuLevel;
     int					GpuLevel;
@@ -202,9 +273,14 @@ void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteSta
 void interactWithTouchScreen(bool reset, ovrInputStateTrackedRemote *newState, ovrInputStateTrackedRemote *oldState);
 int GetRefresh();
 
+//XrAction stuff
+bool ActionPoseIsActive(XrAction action, XrPath subactionPath);
+void VR_Recenter();
+
 //Called from engine code
 bool JKVR_useScreenLayer();
 void JKVR_GetScreenRes(int *width, int *height);
+void JKVR_InitActions( void );
 void JKVR_Vibrate(int duration, int channel, float intensity );
 void JKVR_Haptic(int duration, int channel, float intensity, char *description, float yaw, float height);
 void JKVR_HapticEvent(const char* event, int position, int flags, int intensity, float angle, float yHeight );
@@ -217,9 +293,8 @@ void JKVR_processMessageQueue();
 void JKVR_FrameSetup();
 void JKVR_setUseScreenLayer(bool use);
 void JKVR_processHaptics();
-void JKVR_getHMDOrientation();
+void JKVR_getHMDOrientation(  );
 void JKVR_getTrackedRemotesOrientation();
-void JKVR_incrementFrameIndex();
 
 bool JKVR_useScreenLayer();
 void JKVR_prepareEyeBuffer(int eye );

@@ -1181,7 +1181,7 @@ void CGCam_Update( void )
 	}
 	else
 	{
-		float fov = vr && vr->immersive_cinematics ? vr->fov : client_camera.FOV;
+		float fov = vr && vr->immersive_cinematics ? vr->fov_x : client_camera.FOV;
 		CG_CalcFOVFromX( fov );
 	}
 

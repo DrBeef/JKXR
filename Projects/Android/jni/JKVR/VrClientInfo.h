@@ -13,7 +13,8 @@ typedef struct {
 
     bool using_screen_layer;
     bool third_person;
-    float  fov;
+    float fov_x;
+    float fov_y;
     bool immersive_cinematics;
     bool weapon_stabilised;
     bool right_handed;
