@@ -1364,7 +1364,7 @@ static qboolean	CG_CalcFov( void ) {
 			g_entities[cg.snap->ps.viewEntity].NPC )
 		{//FIXME: looks bad when take over a jedi... but never really do that, do we?
 			//fov_x = g_entities[cg.snap->ps.viewEntity].NPC->stats.hfov;
-			fov_x = vr ? vr->fov : cg_fov.value;
+			fov_x = vr ? vr->fov_x : cg_fov.value;
 			//sanity-cap?
 			if ( fov_x > 120 )
 			{
@@ -1384,13 +1384,13 @@ static qboolean	CG_CalcFov( void ) {
 			else
 			{
 				//fov_x = 120;//FIXME: read from the NPC's fov stats?
-				fov_x = vr ? vr->fov : cg_fov.value;
+				fov_x = vr ? vr->fov_x : cg_fov.value;
 			}
 		}
 	} 
 	else if ( (!cg.zoomMode || cg.zoomMode > 2) && (cg.snap->ps.forcePowersActive&(1<<FP_SPEED)) && player->client->ps.forcePowerDuration[FP_SPEED] )//cg.renderingThirdPerson && 
 	{
-		fov_x = CG_ForceSpeedFOV(vr ? vr->fov : cg_fov.value);
+		fov_x = CG_ForceSpeedFOV(vr ? vr->fov_x : cg_fov.value);
 	} else {
 		/*
 		// user selectable
@@ -1408,7 +1408,7 @@ static qboolean	CG_CalcFov( void ) {
 			fov_x = 160;
 		}*/
 
-		fov_x = vr ? vr->fov : cg_fov.value;
+		fov_x = vr ? vr->fov_x : cg_fov.value;
 
 		// Disable zooming when in third person
 		if (( cg.zoomMode && cg.zoomMode < 3 ) || cg.zoomMode == 4)//&& !cg.renderingThirdPerson ) // light amp goggles do none of the zoom silliness
