@@ -153,7 +153,7 @@ ovrApp
 
 typedef union {
     XrCompositionLayerProjection Projection;
-    XrCompositionLayerCylinderKHR Cylinder;
+    XrCompositionLayerQuad Quad;
 } ovrCompositorLayer_Union;
 
 #define GL(func) func;

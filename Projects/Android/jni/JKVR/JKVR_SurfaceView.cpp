@@ -900,7 +900,7 @@ void setHMDPosition( float x, float y, float z )
 
 	VectorSet(vr.hmdposition, x, y, z);
 
- //   if (s_useScreen != JKVR_useScreenLayer())
+    if (s_useScreen != JKVR_useScreenLayer())
     {
 		s_useScreen = JKVR_useScreenLayer();
 
@@ -1661,9 +1661,6 @@ void VR_LeaveVR( ) {
 }
 
 void VR_InitRenderer(  ) {
-	int eyeW, eyeH;
-	VR_GetResolution(&eyeW, &eyeH);
-
 	// Get the viewport configuration info for the chosen viewport configuration type.
 	gAppState.ViewportConfig.type = XR_TYPE_VIEW_CONFIGURATION_PROPERTIES;
 
@@ -1854,8 +1851,7 @@ void * AppThreadFunction(void * parm ) {
 		SS_MULTIPLIER = 1.5f;
 	}
 
-	//Using a symmetrical render target
-	VR_GetResolution(&m_height, &m_width);
+	VR_GetResolution(&m_width, &m_height);
 
 	gAppState.CpuLevel = CPU_LEVEL;
 	gAppState.GpuLevel = GPU_LEVEL;
@@ -2230,6 +2226,11 @@ void JKVR_UpdateControllers( )
 
 void JKVR_getHMDOrientation() {//Get orientation
 
+	if (gAppState.PredictedDisplayTime == 0)
+	{
+		return;
+	}
+
 	// Get the HMD pose, predicted for the middle of the time period during which
 	// the new eye images will be displayed. The number of frames predicted ahead
 	// depends on the pipeline depth of the engine and the synthesis rate.
@@ -2320,47 +2321,19 @@ void JKVR_submitFrame()
 	vr.fov_x = (fabs(fov.angleLeft) + fabs(fov.angleRight)) * 180.0f / M_PI;
 	vr.fov_y = (fabs(fov.angleUp) + fabs(fov.angleDown)) * 180.0f / M_PI;
 
-	//Projection used for drawing HUD models etc
-	float hudScale = M_PI * 15.0f / 180.0f;
-	const ovrMatrix4f monoVRMatrix = ovrMatrix4f_CreateProjectionFov(
-			-hudScale, hudScale, hudScale, -hudScale, 1.0f, 0.0f );
-	const ovrMatrix4f projectionMatrix = ovrMatrix4f_CreateProjectionFov(
-			fov.angleLeft / vr.cgzoommode ? 1.3f : 1.0f,
-			fov.angleRight / vr.cgzoommode ? 1.3f : 1.0f,
-			fov.angleUp / vr.cgzoommode ? 1.3f : 1.0f,
-			fov.angleDown / vr.cgzoommode ? 1.3f : 1.0f,
-			1.0f, 0.0f );
+	if (vr.cgzoommode)
+	{
+		fov.angleLeft /= 1.3f;
+		fov.angleRight /= 1.3f;
+		fov.angleUp /= 1.3f;
+		fov.angleDown /= 1.3f;
+	}
 
 	gAppState.LayerCount = 0;
 	memset(gAppState.Layers, 0, sizeof(ovrCompositorLayer_Union) * ovrMaxLayerCount);
 
 	XrCompositionLayerProjectionView projection_layer_elements[2] = {};
 	if (!JKVR_useScreenLayer()) {
-/*		for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
-			ovrFramebuffer* frameBuffer = &(gAppState.Renderer.FrameBuffer[eye]);
-
-			memset(&projection_layer_elements[eye], 0, sizeof(XrCompositionLayerProjectionView));
-			projection_layer_elements[eye].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
-			projection_layer_elements[eye].pose = XrPosef_Inverse(viewTransform[eye]);
-			projection_layer_elements[eye].fov = fov;
-
-			memset(&projection_layer_elements[eye].subImage, 0, sizeof(XrSwapchainSubImage));
-			projection_layer_elements[eye].subImage.swapchain = frameBuffer->ColorSwapChain.Handle;
-			projection_layer_elements[eye].subImage.imageRect.offset.x = 0;
-			projection_layer_elements[eye].subImage.imageRect.offset.y = 0;
-			projection_layer_elements[eye].subImage.imageRect.extent.width = frameBuffer->ColorSwapChain.Width;
-			projection_layer_elements[eye].subImage.imageRect.extent.height = frameBuffer->ColorSwapChain.Height;
-			projection_layer_elements[eye].subImage.imageArrayIndex = eye;
-		}
-
-		XrCompositionLayerProjection projection_layer = {};
-		projection_layer.type = XR_TYPE_COMPOSITION_LAYER_PROJECTION;
-		projection_layer.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
-		projection_layer.layerFlags |= XR_COMPOSITION_LAYER_CORRECT_CHROMATIC_ABERRATION_BIT;
-		projection_layer.space = gAppState.CurrentSpace;
-		projection_layer.viewCount = ovrMaxNumEyes;
-		projection_layer.views = projection_layer_elements; */
-
 		XrCompositionLayerProjection projection_layer = {};
 		projection_layer.type = XR_TYPE_COMPOSITION_LAYER_PROJECTION;
 		projection_layer.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
@@ -2395,34 +2368,34 @@ void JKVR_submitFrame()
 		gAppState.Layers[gAppState.LayerCount++].Projection = projection_layer;
 	} else {
 
-		// Build the cylinder layer
-		XrCompositionLayerCylinderKHR cylinder_layer = {};
+		// Build the quad layer
+		XrCompositionLayerQuad quad_layer = {};
 		int width = gAppState.Renderer.FrameBuffer[0].ColorSwapChain.Width;
 		int height = gAppState.Renderer.FrameBuffer[0].ColorSwapChain.Height;
-		cylinder_layer.type = XR_TYPE_COMPOSITION_LAYER_CYLINDER_KHR;
-		cylinder_layer.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
-		cylinder_layer.space = gAppState.CurrentSpace;
-		cylinder_layer.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
-		memset(&cylinder_layer.subImage, 0, sizeof(XrSwapchainSubImage));
-		cylinder_layer.subImage.swapchain = gAppState.Renderer.FrameBuffer[0].ColorSwapChain.Handle;
-		cylinder_layer.subImage.imageRect.offset.x = 0;
-		cylinder_layer.subImage.imageRect.offset.y = 0;
-		cylinder_layer.subImage.imageRect.extent.width = width;
-		cylinder_layer.subImage.imageRect.extent.height = height;
-		cylinder_layer.subImage.imageArrayIndex = 0;
+		quad_layer.type = XR_TYPE_COMPOSITION_LAYER_QUAD;
+		quad_layer.next = NULL;
+		quad_layer.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
+		quad_layer.space = gAppState.CurrentSpace;
+		quad_layer.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
+		memset(&quad_layer.subImage, 0, sizeof(XrSwapchainSubImage));
+		quad_layer.subImage.swapchain = gAppState.Renderer.FrameBuffer[0].ColorSwapChain.Handle;
+		quad_layer.subImage.imageRect.offset.x = 0;
+		quad_layer.subImage.imageRect.offset.y = 0;
+		quad_layer.subImage.imageRect.extent.width = width;
+		quad_layer.subImage.imageRect.extent.height = height;
+		quad_layer.subImage.imageArrayIndex = 0;
 		const XrVector3f axis = {0.0f, 1.0f, 0.0f};
 		XrVector3f pos = {
 				gAppState.xfStageFromHead.position.x - sin(radians(vr.hmdorientation_snap[YAW])) * 4.0f,
-				-0.25f,
+				1.0f,
 				gAppState.xfStageFromHead.position.z - cos(radians(vr.hmdorientation_snap[YAW])) * 4.0f
 		};
-		cylinder_layer.pose.orientation = XrQuaternionf_CreateFromVectorAngle(axis, radians(vr.hmdorientation_snap[YAW]));
-		cylinder_layer.pose.position = pos;
-		cylinder_layer.radius = 12.0f;
-		cylinder_layer.centralAngle = M_PI * 0.5f;
-		cylinder_layer.aspectRatio = m_width / (float)m_height / 0.75f;
+		quad_layer.pose.orientation = XrQuaternionf_CreateFromVectorAngle(axis, radians(vr.hmdorientation_snap[YAW]));
+		quad_layer.pose.position = pos;
+		XrExtent2Df size = {5.0f, 4.5f};
+		quad_layer.size = size;
 
-		gAppState.Layers[gAppState.LayerCount++].Cylinder = cylinder_layer;
+		gAppState.Layers[gAppState.LayerCount++].Quad = quad_layer;
 	}
 
 	// Compose the layers for this frame.
