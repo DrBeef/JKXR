@@ -275,6 +275,11 @@ int GetRefresh();
 
 //XrAction stuff
 bool ActionPoseIsActive(XrAction action, XrPath subactionPath);
+XrActionStateBoolean GetActionStateBoolean(XrAction action);
+XrActionStateFloat GetActionStateFloat(XrAction action);
+XrActionStateVector2f GetActionStateVector2(XrAction action);
+
+
 void VR_Recenter();
 
 //Called from engine code

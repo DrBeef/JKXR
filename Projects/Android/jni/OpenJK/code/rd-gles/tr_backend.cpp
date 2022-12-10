@@ -1435,8 +1435,6 @@ const void	*RB_DrawBuffer( const void *data ) {
 	qglDrawBuffer( cmd->buffer );
 #endif
 */
-	ri.JKVR_prepareEyeBuffer(cmd->buffer);
-
 	// clear screen for debugging
 	if ( r_clear->integer ) {
 		qglClearColor( 0, 0, 0, 1 );

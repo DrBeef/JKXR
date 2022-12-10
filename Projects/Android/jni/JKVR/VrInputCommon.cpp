@@ -213,6 +213,13 @@ void JKVR_InitActions( void )
     handPoseLeftAction = CreateAction(runningActionSet, XR_ACTION_TYPE_POSE_INPUT, "hand_pose_left", NULL, 1, &leftHandPath);
     handPoseRightAction = CreateAction(runningActionSet, XR_ACTION_TYPE_POSE_INPUT, "hand_pose_right", NULL, 1, &rightHandPath);
 
+    if (leftControllerAimSpace == XR_NULL_HANDLE) {
+        leftControllerAimSpace = CreateActionSpace(handPoseLeftAction, leftHandPath);
+    }
+    if (rightControllerAimSpace == XR_NULL_HANDLE) {
+        rightControllerAimSpace = CreateActionSpace(handPoseRightAction, rightHandPath);
+    }
+
     XrPath interactionProfilePath = XR_NULL_PATH;
     XrPath interactionProfilePathTouch = XR_NULL_PATH;
     XrPath interactionProfilePathKHRSimple = XR_NULL_PATH;
@@ -401,14 +408,14 @@ void JKVR_Vibrate( int duration, int chan, float intensity )
         int channel = (i + 1) & chan;
         if (channel)
         {
-            if (vibration_channel_duration[channel-1] > 0.0f)
+            if (vibration_channel_duration[channel] > 0.0f)
                 return;
 
-            if (vibration_channel_duration[channel-1] == -1.0f && duration != 0.0f)
+            if (vibration_channel_duration[channel] == -1.0f && duration != 0.0f)
                 return;
 
-            vibration_channel_duration[channel-1] = duration;
-            vibration_channel_intensity[channel-1] = intensity * vr_haptic_intensity->value;
+            vibration_channel_duration[channel] = duration;
+            vibration_channel_intensity[channel] = intensity * vr_haptic_intensity->value;
         }
     }
 }

@@ -507,30 +507,29 @@ void SCR_UpdateScreen( void ) {
 	// that case.
 	if ( cls.uiStarted )
 	{
-		//Draw twice for Quest
-		SCR_DrawScreenField( STEREO_LEFT );
+		JKVR_FrameSetup();
 
-		//This won't perform the submit eye buffers
+		for (int eye = 0; eye < 2; ++eye)
 		{
-			if (com_speeds->integer) {
-				re.EndFrame(&time_frontend, &time_backend);
-			} else {
-				re.EndFrame(NULL, NULL);
+			JKVR_prepareEyeBuffer(eye);
+
+			//Draw twice for Quest
+			SCR_DrawScreenField(eye == 0 ? STEREO_LEFT : STEREO_RIGHT);
+
+			//This won't perform the submit eye buffers
+			{
+				if (com_speeds->integer)
+				{
+					re.EndFrame(&time_frontend, &time_backend);
+				}
+				else
+				{
+					re.EndFrame(NULL, NULL);
+				}
 			}
+
+			JKVR_finishEyeBuffer(eye);
 		}
-
-		JKVR_finishEyeBuffer(0);
-
-		SCR_DrawScreenField( STEREO_RIGHT );
-
-		//This will perform the submit eye buffers
-		if ( com_speeds->integer ) {
-			re.EndFrame( &time_frontend, &time_backend );
-		} else {
-			re.EndFrame( NULL, NULL );
-		}
-
-		JKVR_finishEyeBuffer(1);
 
 		//And we're done
 		re.SubmitStereoFrame();

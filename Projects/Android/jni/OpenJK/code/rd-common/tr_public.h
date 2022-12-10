@@ -128,7 +128,6 @@ typedef struct {
 	int					(*com_frameTime)					( void );
 
 	//JKVR Functions
-	void 				(*JKVR_prepareEyeBuffer)			(int eye );
 	bool 				(*JKVR_useScreenLayer)				( void );
 
 } refimport_t;
