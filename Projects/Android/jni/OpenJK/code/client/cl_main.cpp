@@ -832,15 +832,6 @@ void CL_Frame ( int msec,float fractionMsec ) {
 		SCR_DebugGraph ( cls.realFrametime * 0.25, 0 );
 	}
 
-	JKVR_FrameSetup();
-	JKVR_processMessageQueue();
-
-	//Get controller state here
-	JKVR_getHMDOrientation();
-	JKVR_getTrackedRemotesOrientation();
-
-	JKVR_processHaptics();
-
 	// see if we need to update any userinfo
 	CL_CheckUserinfo();
 
@@ -1200,7 +1191,6 @@ void CL_InitRef( void ) {
 
 	rit.saved_game = &ojk::SavedGame::get_instance();
 
-	rit.JKVR_prepareEyeBuffer = JKVR_prepareEyeBuffer;
 	rit.JKVR_useScreenLayer = JKVR_useScreenLayer;
 
 	ret = GetRefAPI( REF_API_VERSION, &rit );

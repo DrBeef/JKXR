@@ -1992,7 +1992,13 @@ void JKVR_FrameSetup()
 	//get any cvar values required here
 	vr.immersive_cinematics = (vr_immersive_cinematics->value != 0.0f);
 
+	JKVR_processMessageQueue();
 
+	//Get controller state here
+	JKVR_getHMDOrientation();
+	JKVR_getTrackedRemotesOrientation();
+
+	JKVR_processHaptics();
 }
 
 int GetRefresh()
@@ -2031,7 +2037,7 @@ void JKVR_finishEyeBuffer(int eye )
 
 	// Clear the alpha channel, other way OpenXR would not transfer the framebuffer fully
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
-	glClearColor(1.0, 0.0, 0.0, 1.0);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
@@ -2206,6 +2212,7 @@ void JKVR_UpdateControllers( )
 
 			gAppState.TrackedController[i].Active = (loc.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0;
 			gAppState.TrackedController[i].Pose = loc.pose;
+			gAppState.TrackedController[i].Velocity = vel;
 
 			// apply velocity
 //			float dt = (in_vrEventTime - lastframetime) * 0.001f;
@@ -2217,11 +2224,40 @@ void JKVR_UpdateControllers( )
 		}
 	}
 
-	//apply controller poses
-//	if (gAppState.TrackedController[0].Active)
-//		IN_VRController(qfalse, gAppState.TrackedController[0].Pose);
-//	if (gAppState.TrackedController[1].Active)
-//		IN_VRController(qtrue, gAppState.TrackedController[1].Pose);
+	leftRemoteTracking_new = gAppState.TrackedController[0];
+	rightRemoteTracking_new = gAppState.TrackedController[1];
+
+
+	memset(&leftTrackedRemoteState_new, 0, sizeof leftTrackedRemoteState_new);
+	memset(&rightTrackedRemoteState_new, 0, sizeof rightTrackedRemoteState_new);
+
+	//button mapping
+	if (GetActionStateBoolean(menuAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Enter;
+	if (GetActionStateBoolean(buttonXAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_X;
+	if (GetActionStateBoolean(buttonYAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Y;
+	leftTrackedRemoteState_new.GripTrigger = GetActionStateFloat(gripLeftAction).currentState;
+	leftTrackedRemoteState_new.IndexTrigger = GetActionStateFloat(indexLeftAction).currentState;
+	if (GetActionStateBoolean(thumbstickLeftClickAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_LThumb;
+
+	if (GetActionStateBoolean(buttonAAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_A;
+	if (GetActionStateBoolean(buttonBAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_B;
+	rightTrackedRemoteState_new.GripTrigger = GetActionStateFloat(gripRightAction).currentState;
+	rightTrackedRemoteState_new.IndexTrigger = GetActionStateFloat(indexRightAction).currentState;
+	if (GetActionStateBoolean(thumbstickRightClickAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_RThumb;
+
+	//index finger click
+	if (GetActionStateBoolean(indexLeftAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Trigger;
+	if (GetActionStateBoolean(indexRightAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_Trigger;
+
+	//thumbstick
+	XrActionStateVector2f moveJoystickState;
+	moveJoystickState = GetActionStateVector2(moveOnLeftJoystickAction);
+	leftTrackedRemoteState_new.Joystick.x = moveJoystickState.currentState.x;
+	leftTrackedRemoteState_new.Joystick.y = moveJoystickState.currentState.y;
+
+	moveJoystickState = GetActionStateVector2(moveOnRightJoystickAction);
+	rightTrackedRemoteState_new.Joystick.x = moveJoystickState.currentState.x;
+	rightTrackedRemoteState_new.Joystick.y = moveJoystickState.currentState.y;
 }
 
 void JKVR_getHMDOrientation() {//Get orientation
