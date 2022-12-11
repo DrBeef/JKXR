@@ -218,6 +218,7 @@ typedef struct
     XrSpace CurrentSpace;
     GLboolean SessionActive;
     XrPosef xfStageFromHead;
+    XrView* Projections;
 
     float currentDisplayRefreshRate;
     float* SupportedDisplayRefreshRates;
