@@ -214,17 +214,18 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         if (vr.item_selector) {
             static bool itemSwitched = false;
             if (between(-0.2f, pPrimaryJoystick->y, 0.2f) &&
-                (between(0.8f, primaryJoystickX, 1.0f) ||
-                 between(-1.0f, primaryJoystickX, -0.8f))) {
+                (primaryJoystickX > 0.8f || primaryJoystickX < -0.8f)) {
+
                 if (!itemSwitched) {
-                    if (between(0.8f, primaryJoystickX, 1.0f)) {
+                    if (primaryJoystickX > 0.8f) {
                         sendButtonActionSimple("itemselectornext");
-                    } else {
+                        itemSwitched = true;
+                    } else if (primaryJoystickX < -0.8f) {
                         sendButtonActionSimple("itemselectorprev");
+                        itemSwitched = true;
                     }
-                    itemSwitched = true;
                 }
-            } else {
+            } else if (between(-0.4f, primaryJoystickX, 0.4f)) {
                 itemSwitched = false;
             }
         }
@@ -249,12 +250,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             if (between(-0.2f, primaryJoystickX, 0.2f)) {
                 if (cl.frame.ps.weapon == WP_DISRUPTOR)
                 {
-                    sendButtonAction("+altattack", between(0.8f, pPrimaryJoystick->y, 1.0f));
+                    sendButtonAction("+altattack", pPrimaryJoystick->y > 0.8f);
                 }
                 else
                 {
-                    sendButtonAction("+attack", between(0.8f, pPrimaryJoystick->y, 1.0f));
-                    sendButtonAction("+altattack", between(-1.0f, pPrimaryJoystick->y, -0.8f));
+                    sendButtonAction("+attack", pPrimaryJoystick->y > 0.8f);
+                    sendButtonAction("+altattack", pPrimaryJoystick->y < -0.8f);
                 }
             }
         }

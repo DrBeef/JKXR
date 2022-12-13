@@ -105,6 +105,7 @@ int argc=0;
 
 GLboolean stageSupported = GL_FALSE;
 
+#ifdef META_QUEST
 
 const char* const requiredExtensionNames[] = {
 		XR_KHR_OPENGL_ES_ENABLE_EXTENSION_NAME,
@@ -112,6 +113,69 @@ const char* const requiredExtensionNames[] = {
 		XR_KHR_ANDROID_THREAD_SETTINGS_EXTENSION_NAME,
 		XR_FB_DISPLAY_REFRESH_RATE_EXTENSION_NAME,
 		XR_FB_COLOR_SPACE_EXTENSION_NAME};
+#endif //META_QUEST
+
+#ifdef PICO_XR
+#define XR_PICO_CONFIGS_EXT_EXTENSION_NAME "XR_PICO_configs_ext"
+
+enum ConfigsEXT
+{
+    RENDER_TEXTURE_WIDTH = 0,
+    RENDER_TEXTURE_HEIGHT,
+    SHOW_FPS,
+    RUNTIME_LOG_LEVEL,
+    PXRPLUGIN_LOG_LEVEL,
+    UNITY_LOG_LEVEL,
+    UNREAL_LOG_LEVEL,
+    NATIVE_LOG_LEVEL,
+    TARGET_FRAME_RATE,
+    NECK_MODEL_X,
+    NECK_MODEL_Y,
+    NECK_MODEL_Z,
+    DISPLAY_REFRESH_RATE,
+    ENABLE_6DOF,
+    CONTROLLER_TYPE,
+    PHYSICAL_IPD,
+    TO_DELTA_SENSOR_Y,
+    GET_DISPLAY_RATE,
+    FOVEATION_SUBSAMPLED_ENABLED = 18,
+    TRACKING_ORIGIN_HEIGHT
+};
+typedef XrResult (XRAPI_PTR *PFN_xrGetConfigPICO)(
+        XrSession                              session,
+        enum ConfigsEXT                        configIndex,
+        float *                                configData);
+PFN_xrGetConfigPICO    pfnXrGetConfigPICO;
+
+
+enum ConfigsSetEXT
+{
+	UNREAL_VERSION = 0,
+	TRACKING_ORIGIN,
+	OPENGL_NOERROR,
+	ENABLE_SIX_DOF,
+	PRESENTATION_FLAG,
+	ENABLE_CPT,
+	PLATFORM,
+	FOVEATION_LEVEL,
+	SET_DISPLAY_RATE = 8,
+	MRC_TEXTURE_ID = 9,
+};
+
+typedef XrResult (XRAPI_PTR *PFN_xrSetConfigPICO) (
+		XrSession                             session,
+		enum ConfigsSetEXT                    configIndex,
+		char *                                configData);
+PFN_xrSetConfigPICO    pfnXrSetConfigPICO;
+
+const char* const requiredExtensionNames[] = {
+		XR_KHR_ANDROID_CREATE_INSTANCE_EXTENSION_NAME,
+		XR_EXT_PERFORMANCE_SETTINGS_EXTENSION_NAME,
+		XR_KHR_OPENGL_ES_ENABLE_EXTENSION_NAME,
+		XR_PICO_CONFIGS_EXT_EXTENSION_NAME};
+
+#endif //PICO_XR
+
 const uint32_t numRequiredExtensions =
 		sizeof(requiredExtensionNames) / sizeof(requiredExtensionNames[0]);
 
@@ -972,7 +1036,8 @@ void ovrApp_HandleSessionStateChanges(ovrApp* app, XrSessionState state) {
 		app->SessionActive = (result == XR_SUCCESS);
 
 		// Set session state once we have entered VR mode and have a valid session object.
-		if (app->SessionActive) {
+		if (app->SessionActive)
+		{
 			XrPerfSettingsLevelEXT cpuPerfLevel = XR_PERF_SETTINGS_LEVEL_BOOST_EXT;
 			XrPerfSettingsLevelEXT gpuPerfLevel = XR_PERF_SETTINGS_LEVEL_BOOST_EXT;
 
@@ -980,23 +1045,25 @@ void ovrApp_HandleSessionStateChanges(ovrApp* app, XrSessionState state) {
 			OXR(xrGetInstanceProcAddr(
 					app->Instance,
 					"xrPerfSettingsSetPerformanceLevelEXT",
-					(PFN_xrVoidFunction*)(&pfnPerfSettingsSetPerformanceLevelEXT)));
+					(PFN_xrVoidFunction * )(&pfnPerfSettingsSetPerformanceLevelEXT)));
 
 			OXR(pfnPerfSettingsSetPerformanceLevelEXT(
 					app->Session, XR_PERF_SETTINGS_DOMAIN_CPU_EXT, cpuPerfLevel));
 			OXR(pfnPerfSettingsSetPerformanceLevelEXT(
 					app->Session, XR_PERF_SETTINGS_DOMAIN_GPU_EXT, gpuPerfLevel));
 
+#ifdef META_QUEST
 			PFN_xrSetAndroidApplicationThreadKHR pfnSetAndroidApplicationThreadKHR = NULL;
 			OXR(xrGetInstanceProcAddr(
 					app->Instance,
 					"xrSetAndroidApplicationThreadKHR",
-					(PFN_xrVoidFunction*)(&pfnSetAndroidApplicationThreadKHR)));
+					(PFN_xrVoidFunction * )(&pfnSetAndroidApplicationThreadKHR)));
 
 			OXR(pfnSetAndroidApplicationThreadKHR(
 					app->Session, XR_ANDROID_THREAD_TYPE_APPLICATION_MAIN_KHR, app->MainThreadTid));
 			OXR(pfnSetAndroidApplicationThreadKHR(
 					app->Session, XR_ANDROID_THREAD_TYPE_RENDERER_MAIN_KHR, app->RenderThreadTid));
+#endif
 		}
 	} else if (state == XR_SESSION_STATE_STOPPING) {
 		assert(app->SessionActive);
@@ -1045,6 +1112,7 @@ GLboolean ovrApp_HandleXrEvents(ovrApp* app) {
 						perf_settings_event->fromLevel,
 						perf_settings_event->toLevel);
 			} break;
+#ifdef META_QUEST
 			case XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB: {
 				const XrEventDataDisplayRefreshRateChangedFB* refresh_rate_changed_event =
 						(XrEventDataDisplayRefreshRateChangedFB*)(baseEventHeader);
@@ -1053,6 +1121,7 @@ GLboolean ovrApp_HandleXrEvents(ovrApp* app) {
 						refresh_rate_changed_event->fromDisplayRefreshRate,
 						refresh_rate_changed_event->toDisplayRefreshRate);
 			} break;
+#endif
 			case XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING: {
 				XrEventDataReferenceSpaceChangePending* ref_space_change_event =
 						(XrEventDataReferenceSpaceChangePending*)(baseEventHeader);
@@ -1606,7 +1675,7 @@ void VR_InitRenderer(  ) {
 			gAppState.Instance, gAppState.SystemId, XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO, &gAppState.ViewportConfig));
 
 
-
+#ifdef META_QUEST
 	XrSystemColorSpacePropertiesFB colorSpacePropertiesFB = {};
 	colorSpacePropertiesFB.type = XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB;
 
@@ -1688,6 +1757,7 @@ void VR_InitRenderer(  ) {
 		OXR(gAppState.pfnRequestDisplayRefreshRate(gAppState.Session, 0.0f));
 		ALOGV("Requesting system default display refresh rate");
 	}
+#endif
 
 	uint32_t numOutputSpaces = 0;
 	OXR(xrEnumerateReferenceSpaces(gAppState.Session, 0, &numOutputSpaces, NULL));
@@ -1717,6 +1787,16 @@ void VR_InitRenderer(  ) {
         gAppState.Projections[eye].type = XR_TYPE_VIEW;
 	}
 
+#ifdef PICO_XR
+	xrGetInstanceProcAddr(gAppState.Instance,"xrSetConfigPICO", (PFN_xrVoidFunction*)(&pfnXrSetConfigPICO));
+	xrGetInstanceProcAddr(gAppState.Instance,"xrGetConfigPICO", (PFN_xrVoidFunction*)(&pfnXrGetConfigPICO));
+
+	pfnXrSetConfigPICO(gAppState.Session,TRACKING_ORIGIN,"0");
+	pfnXrSetConfigPICO(gAppState.Session,TRACKING_ORIGIN,"1");
+
+	pfnXrGetConfigPICO(gAppState.Session, GET_DISPLAY_RATE, &gAppState.currentDisplayRefreshRate);
+#endif
+
 	ovrRenderer_Create(
 			gAppState.Session,
 			&gAppState.Renderer,
@@ -1740,7 +1820,7 @@ void * AppThreadFunction(void * parm ) {
 	jclass cls = java.Env->GetObjectClass(java.ActivityObject);
 
 	// Note that AttachCurrentThread will reset the thread name.
-	prctl(PR_SET_NAME, (long) "OVR::Main", 0, 0, 0);
+	prctl(PR_SET_NAME, (long) "AppThreadFunction", 0, 0, 0);
 
 	openjk_initialised = false;
 	vr_screen_dist = NULL;
@@ -1748,6 +1828,8 @@ void * AppThreadFunction(void * parm ) {
 	ovrApp_Clear(&gAppState);
 	gAppState.Java = java;
 
+	ovrEgl_CreateContext(&gAppState.Egl, NULL);
+	EglInitExtensions();
 
 	PFN_xrInitializeLoaderKHR xrInitializeLoaderKHR;
 	xrGetInstanceProcAddr(
@@ -1765,16 +1847,25 @@ void * AppThreadFunction(void * parm ) {
 	// Create the OpenXR instance.
 	XrApplicationInfo appInfo;
 	memset(&appInfo, 0, sizeof(appInfo));
-	strcpy(appInfo.applicationName, "JKQUest");
+	strcpy(appInfo.applicationName, "JKXR");
 	appInfo.applicationVersion = 0;
-	strcpy(appInfo.engineName, "JKQuest");
+	strcpy(appInfo.engineName, "JKXR");
 	appInfo.engineVersion = 0;
 	appInfo.apiVersion = XR_CURRENT_API_VERSION;
 
 	XrInstanceCreateInfo instanceCreateInfo;
 	memset(&instanceCreateInfo, 0, sizeof(instanceCreateInfo));
 	instanceCreateInfo.type = XR_TYPE_INSTANCE_CREATE_INFO;
+#ifdef META_QUEST
 	instanceCreateInfo.next = NULL;
+#endif
+#ifdef PICO_XR
+	XrInstanceCreateInfoAndroidKHR instanceCreateInfoAndroid = {XR_TYPE_INSTANCE_CREATE_INFO_ANDROID_KHR};
+	instanceCreateInfoAndroid.applicationVM = java.Vm;
+	instanceCreateInfoAndroid.applicationActivity = java.ActivityObject;
+
+	instanceCreateInfo.next = (XrBaseInStructure*)&instanceCreateInfoAndroid;
+#endif
 	instanceCreateInfo.createFlags = 0;
 	instanceCreateInfo.applicationInfo = appInfo;
 	instanceCreateInfo.enabledApiLayerCount = 0;
@@ -1823,6 +1914,7 @@ void * AppThreadFunction(void * parm ) {
 	graphicsRequirements.type = XR_TYPE_GRAPHICS_REQUIREMENTS_OPENGL_ES_KHR;
 	OXR(pfnGetOpenGLESGraphicsRequirementsKHR(gAppState.Instance, gAppState.SystemId, &graphicsRequirements));
 
+#ifdef META_QUEST
 	XrSystemColorSpacePropertiesFB colorSpacePropertiesFB = {};
 	colorSpacePropertiesFB.type = XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB;
 
@@ -1832,7 +1924,7 @@ void * AppThreadFunction(void * parm ) {
 	OXR(xrGetSystemProperties(gAppState.Instance, gAppState.SystemId, &systemProperties));
 
 	ALOGV("System Color Space Properties: colorspace=%d", colorSpacePropertiesFB.colorSpace);
-
+#endif
 
 	//Set device defaults
 	if (SS_MULTIPLIER == 0.0f)
@@ -1851,9 +1943,6 @@ void * AppThreadFunction(void * parm ) {
 	gAppState.GpuLevel = GPU_LEVEL;
 	gAppState.MainThreadTid = gettid();
 
-	ovrEgl_CreateContext(&gAppState.Egl, NULL);
-
-	EglInitExtensions();
 
 	VR_EnterVR();
 	VR_InitRenderer();
@@ -1949,6 +2038,11 @@ void VR_UpdateStageBounds() {
 //All the stuff we want to do each frame
 void JKVR_FrameSetup()
 {
+	if (gAppState.FrameSetup)
+	{
+		return;
+	}
+
 	GLboolean stageBoundsDirty = GL_TRUE;
 	if (ovrApp_HandleXrEvents(&gAppState)) {
 		VR_Recenter();
@@ -1998,6 +2092,8 @@ void JKVR_FrameSetup()
 	JKVR_getTrackedRemotesOrientation();
 
 	JKVR_processHaptics();
+
+	gAppState.FrameSetup = true;
 }
 
 int GetRefresh()
@@ -2021,6 +2117,8 @@ void VR_ClearFrameBuffer( int width, int height)
 	glScissor( 0, 0, 0, 0 );
 	glDisable( GL_SCISSOR_TEST );
 
+	//This is a bit of a hack, but we need to do this to correct for the fact that the engine uses linear RGB colorspace
+	//but openxr uses SRGB (or something, must admit I don't really understand, but adding this works to make it look good again)
 	glDisable( GL_FRAMEBUFFER_SRGB );
 }
 
@@ -2167,101 +2265,6 @@ void JKVR_HapticEvent(const char* event, int position, int flags, int intensity,
 	}
 }
 
-void JKVR_SyncActions( void )
-{
-	// Attach to session
-	XrSessionActionSetsAttachInfo attachInfo = {};
-	attachInfo.type = XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO;
-	attachInfo.next = NULL;
-	attachInfo.countActionSets = 1;
-	attachInfo.actionSets = &runningActionSet;
-	OXR(xrAttachSessionActionSets(gAppState.Session, &attachInfo));
-
-	// sync action data
-	XrActiveActionSet activeActionSet = {};
-	activeActionSet.actionSet = runningActionSet;
-	activeActionSet.subactionPath = XR_NULL_PATH;
-
-	XrActionsSyncInfo syncInfo = {};
-	syncInfo.type = XR_TYPE_ACTIONS_SYNC_INFO;
-	syncInfo.next = NULL;
-	syncInfo.countActiveActionSets = 1;
-	syncInfo.activeActionSets = &activeActionSet;
-	OXR(xrSyncActions(gAppState.Session, &syncInfo));
-
-	// query input action states
-	XrActionStateGetInfo getInfo = {};
-	getInfo.type = XR_TYPE_ACTION_STATE_GET_INFO;
-	getInfo.next = NULL;
-	getInfo.subactionPath = XR_NULL_PATH;
-}
-
-void JKVR_UpdateControllers( )
-{
-	JKVR_SyncActions();
-
-	//get controller poses
-	XrAction controller[] = {handPoseLeftAction, handPoseRightAction};
-	XrPath subactionPath[] = {leftHandPath, rightHandPath};
-	XrSpace controllerSpace[] = {leftControllerAimSpace, rightControllerAimSpace};
-	for (int i = 0; i < 2; i++) {
-		if (ActionPoseIsActive(controller[i], subactionPath[i])) {
-			XrSpaceVelocity vel = {};
-			vel.type = XR_TYPE_SPACE_VELOCITY;
-			XrSpaceLocation loc = {};
-			loc.type = XR_TYPE_SPACE_LOCATION;
-			loc.next = &vel;
-			OXR(xrLocateSpace(controllerSpace[i], gAppState.CurrentSpace, gAppState.PredictedDisplayTime, &loc));
-
-			gAppState.TrackedController[i].Active = (loc.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0;
-			gAppState.TrackedController[i].Pose = loc.pose;
-			gAppState.TrackedController[i].Velocity = vel;
-
-			// apply velocity
-//			float dt = (in_vrEventTime - lastframetime) * 0.001f;
-//			for (int j = 0; j < 3; j++) {
-//				(&gAppState.TrackedController[i].Pose.position.x)[j] += (&vel.linearVelocity.x)[j] * dt;
-//			}
-		} else {
-			ovrTrackedController_Clear(&gAppState.TrackedController[i]);
-		}
-	}
-
-	leftRemoteTracking_new = gAppState.TrackedController[0];
-	rightRemoteTracking_new = gAppState.TrackedController[1];
-
-
-	memset(&leftTrackedRemoteState_new, 0, sizeof leftTrackedRemoteState_new);
-	memset(&rightTrackedRemoteState_new, 0, sizeof rightTrackedRemoteState_new);
-
-	//button mapping
-	if (GetActionStateBoolean(menuAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Enter;
-	if (GetActionStateBoolean(buttonXAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_X;
-	if (GetActionStateBoolean(buttonYAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Y;
-	leftTrackedRemoteState_new.GripTrigger = GetActionStateFloat(gripLeftAction).currentState;
-	if (leftTrackedRemoteState_new.GripTrigger > 0.5f) leftTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
-	if (GetActionStateBoolean(thumbstickLeftClickAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_LThumb;
-
-	if (GetActionStateBoolean(buttonAAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_A;
-	if (GetActionStateBoolean(buttonBAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_B;
-	rightTrackedRemoteState_new.GripTrigger = GetActionStateFloat(gripRightAction).currentState;
-	if (rightTrackedRemoteState_new.GripTrigger > 0.5f) rightTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
-	if (GetActionStateBoolean(thumbstickRightClickAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_RThumb;
-
-	//index finger click
-	if (GetActionStateBoolean(indexLeftAction).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Trigger;
-	if (GetActionStateBoolean(indexRightAction).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_Trigger;
-
-	//thumbstick
-	XrActionStateVector2f moveJoystickState;
-	moveJoystickState = GetActionStateVector2(moveOnLeftJoystickAction);
-	leftTrackedRemoteState_new.Joystick.x = moveJoystickState.currentState.x;
-	leftTrackedRemoteState_new.Joystick.y = moveJoystickState.currentState.y;
-
-	moveJoystickState = GetActionStateVector2(moveOnRightJoystickAction);
-	rightTrackedRemoteState_new.Joystick.x = moveJoystickState.currentState.x;
-	rightTrackedRemoteState_new.Joystick.y = moveJoystickState.currentState.y;
-}
 
 void JKVR_getHMDOrientation() {//Get orientation
 
@@ -2318,16 +2321,15 @@ void JKVR_getTrackedRemotesOrientation() {//Get info for tracked remotes
 								&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
 								xrButton_X, xrButton_Y, xrButton_A, xrButton_B);
 			break;
-/*		case WEAPON_ALIGN:
+		case WEAPON_ALIGN:
 			HandleInput_WeaponAlign(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, &rightRemoteTracking_new,
 								&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, &leftRemoteTracking_new,
 								xrButton_A, xrButton_B, xrButton_X, xrButton_Y);
 			break;
-			*/
 	}
 }
 
-void JKVR_submitFrame()
+void JKVR_updateProjections()
 {
 	XrViewLocateInfo projectionInfo = {};
 	projectionInfo.type = XR_TYPE_VIEW_LOCATE_INFO;
@@ -2347,6 +2349,15 @@ void JKVR_submitFrame()
 			projectionCapacityInput,
 			&projectionCountOutput,
 			gAppState.Projections));
+}
+
+void JKVR_submitFrame()
+{
+	if (gAppState.SessionActive == GL_FALSE) {
+		return;
+	}
+
+	JKVR_updateProjections();
 
 	XrFovf fov = {};
 	XrPosef viewTransform[2];
@@ -2390,7 +2401,7 @@ void JKVR_submitFrame()
 
 			memset(&projection_layer_elements[eye], 0, sizeof(XrCompositionLayerProjectionView));
 			projection_layer_elements[eye].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
-			projection_layer_elements[eye].pose = XrPosef_Inverse(viewTransform[eye]);
+			projection_layer_elements[eye].pose = gAppState.xfStageFromHead;
 			projection_layer_elements[eye].fov = fov;
 			memset(&projection_layer_elements[eye].subImage, 0, sizeof(XrSwapchainSubImage));
 			projection_layer_elements[eye].subImage.swapchain =
@@ -2451,6 +2462,8 @@ void JKVR_submitFrame()
 	endFrameInfo.layers = layers;
 
 	OXR(xrEndFrame(gAppState.Session, &endFrameInfo));
+
+	gAppState.FrameSetup = false;
 }
 
 static void ovrAppThread_Create( ovrAppThread * appThread, JNIEnv * env, jobject activityObject, jclass activityClass )

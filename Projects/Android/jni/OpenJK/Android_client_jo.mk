@@ -126,9 +126,10 @@ JK3_SRC = \
 JKVR_SRC_FILES :=  ${TOP_DIR}/JKVR/JKVR_SurfaceView.cpp \
        ${TOP_DIR}/JKVR/VrInputCommon.cpp \
        ${TOP_DIR}/JKVR/VrInputDefault.cpp \
-       ${TOP_DIR}/JKVR/argtable3.c
-#       ${TOP_DIR}/JKVR/VrCompositor.cpp \
-#       ${TOP_DIR}/JKVR/VrInputWeaponAlign.cpp \
+       ${TOP_DIR}/JKVR/VrInputWeaponAlign.cpp \
+       ${TOP_DIR}/JKVR/argtable3.c \
+       ${TOP_DIR}/JKVR/OpenXRInput_MetaQuest.cpp \
+       ${TOP_DIR}/JKVR/OpenXRInput_PicoXR.cpp
 
 LOCAL_SRC_FILES += $(JK3_SRC) $(JKVR_SRC_FILES)
 
