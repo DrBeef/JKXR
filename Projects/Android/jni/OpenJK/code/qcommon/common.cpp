@@ -24,6 +24,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 // common.c -- misc functions used in client and server
 
+#include <VrCommon.h>
 #include "q_shared.h"
 #include "qcommon.h"
 #include "qcommon/q_version.h"
@@ -1362,6 +1363,8 @@ void Com_Frame( void ) {
 		int		msec, minMsec;
 		int		timeVal;
 		static int	lastTime = 0, bias = 0;
+
+		JKVR_FrameSetup();
 
 		// write config file if anything changed
 		Com_WriteConfiguration();

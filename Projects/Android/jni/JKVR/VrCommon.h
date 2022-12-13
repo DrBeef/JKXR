@@ -11,7 +11,6 @@
 #include <jni.h>
 #include <openxr/openxr.h>
 #include <openxr/openxr_platform.h>
-#include <openxr/openxr_oculus.h>
 #include <openxr/openxr_oculus_helpers.h>
 
 #include <android/native_window_jni.h>
@@ -35,31 +34,6 @@
 #else
 #define ALOGV(...)
 #endif
-
-extern XrPath leftHandPath;
-extern XrPath rightHandPath;
-extern XrAction handPoseLeftAction;
-extern XrAction handPoseRightAction;
-extern XrAction indexLeftAction;
-extern XrAction indexRightAction;
-extern XrAction menuAction;
-extern XrAction buttonAAction;
-extern XrAction buttonBAction;
-extern XrAction buttonXAction;
-extern XrAction buttonYAction;
-extern XrAction gripLeftAction;
-extern XrAction gripRightAction;
-extern XrAction moveOnLeftJoystickAction;
-extern XrAction moveOnRightJoystickAction;
-extern XrAction thumbstickLeftClickAction;
-extern XrAction thumbstickRightClickAction;
-extern XrAction vibrateLeftFeedback;
-extern XrAction vibrateRightFeedback;
-extern XrActionSet runningActionSet;
-extern XrSpace leftControllerAimSpace;
-extern XrSpace rightControllerAimSpace;
-extern qboolean inputInitialized;
-extern qboolean useSimpleProfile;
 
 enum { ovrMaxLayerCount = 1 };
 enum { ovrMaxNumEyes = 2 };
@@ -206,6 +180,7 @@ typedef struct
     ANativeWindow* NativeWindow;
     bool				Resumed;
     bool				Focused;
+    bool                FrameSetup;
 
     XrInstance Instance;
     XrSession Session;
@@ -274,13 +249,6 @@ void handleTrackedControllerButton(ovrInputStateTrackedRemote * trackedRemoteSta
 void interactWithTouchScreen(bool reset, ovrInputStateTrackedRemote *newState, ovrInputStateTrackedRemote *oldState);
 int GetRefresh();
 
-//XrAction stuff
-bool ActionPoseIsActive(XrAction action, XrPath subactionPath);
-XrActionStateBoolean GetActionStateBoolean(XrAction action);
-XrActionStateFloat GetActionStateFloat(XrAction action);
-XrActionStateVector2f GetActionStateVector2(XrAction action);
-
-
 void VR_Recenter();
 
 //Called from engine code
@@ -297,17 +265,15 @@ void JKVR_HapticEnable();
 void JKVR_HapticDisable();
 void JKVR_processMessageQueue();
 void JKVR_FrameSetup();
-void JKVR_setUseScreenLayer(bool use);
 void JKVR_processHaptics();
 void JKVR_getHMDOrientation(  );
 void JKVR_getTrackedRemotesOrientation();
+void JKVR_updateProjections();
+void JKVR_UpdateControllers( );
 
 bool JKVR_useScreenLayer();
 void JKVR_prepareEyeBuffer(int eye );
 void JKVR_finishEyeBuffer(int eye );
 void JKVR_submitFrame();
-
-void GPUDropSync();
-void GPUWaitSync();
 
 #endif //vrcommon_h

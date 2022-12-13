@@ -65,6 +65,7 @@ import java.util.Vector;
 			e.printStackTrace();
 		}
 
+		System.loadLibrary("openxr_loader");
 		System.loadLibrary( "openjk_" + game );
 	}
 

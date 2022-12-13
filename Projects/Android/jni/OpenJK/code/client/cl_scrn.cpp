@@ -507,6 +507,7 @@ void SCR_UpdateScreen( void ) {
 	// that case.
 	if ( cls.uiStarted )
 	{
+		//Try again here in case we've not done it yet
 		JKVR_FrameSetup();
 
 		for (int eye = 0; eye < 2; ++eye)

@@ -24,8 +24,13 @@
 		>
 		
 		<meta-data android:name="com.samsung.android.vr.application.mode" android:value="vr_only"/>
+
+		<!-- META QUEST -->
 		<meta-data android:name="com.oculus.supportedDevices" android:value="quest|quest2"/>
 		<meta-data android:name="com.oculus.ossplash" android:value="true"/>
+
+		<!-- PICO XR -->
+		<meta-data android:name="pvr.app.type" android:value="vr" />
 
 		<activity
 				android:name="com.drbeef.jkquest.GLES3JNIActivity"
