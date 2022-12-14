@@ -1612,6 +1612,7 @@ static void CIN_AddTextCrawl()
 	refdef.rdflags = RDF_NOWORLDMODEL;
 	AxisClear( refdef.viewaxis );
 
+	refdef.override_fov = true;
 	refdef.fov_x = 130;
 	refdef.fov_y = 130;
 
@@ -2035,6 +2036,7 @@ void SCR_AddCreditTextCrawl()
 	refdef.rdflags = RDF_NOWORLDMODEL;
 	AxisClear( refdef.viewaxis );
 
+	refdef.override_fov = true;
 	refdef.fov_x = 150;
 	refdef.fov_y = 150;
 

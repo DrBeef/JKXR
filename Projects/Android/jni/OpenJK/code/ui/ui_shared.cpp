@@ -7164,6 +7164,7 @@ void Item_Model_Paint(itemDef_t *item)
 	//refdef.fov_x = (modelPtr->fov_x) ? modelPtr->fov_x : w;
 	//refdef.fov_y = (modelPtr->fov_y) ? modelPtr->fov_y : h;
 
+	refdef.override_fov = true;
 	refdef.fov_x = 45;
 	refdef.fov_y = 45;
 

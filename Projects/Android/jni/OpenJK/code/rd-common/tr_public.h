@@ -129,6 +129,7 @@ typedef struct {
 
 	//JKVR Functions
 	bool 				(*JKVR_useScreenLayer)				( void );
+	bool 				(*JKVR_GetVRProjection)				(int eye, float zNear, float zFar, float* projection);
 
 } refimport_t;
 

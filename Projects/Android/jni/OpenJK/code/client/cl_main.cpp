@@ -1192,6 +1192,7 @@ void CL_InitRef( void ) {
 	rit.saved_game = &ojk::SavedGame::get_instance();
 
 	rit.JKVR_useScreenLayer = JKVR_useScreenLayer;
+	rit.JKVR_GetVRProjection = JKVR_GetVRProjection;
 
 	ret = GetRefAPI( REF_API_VERSION, &rit );
 

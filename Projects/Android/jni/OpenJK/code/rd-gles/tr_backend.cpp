@@ -1430,11 +1430,9 @@ const void	*RB_DrawBuffer( const void *data ) {
 	const drawBufferCommand_t	*cmd;
 
 	cmd = (const drawBufferCommand_t *)data;
-	/*
-#ifndef HAVE_GLES
-	qglDrawBuffer( cmd->buffer );
-#endif
-*/
+
+	tr.stereoFrame = (stereoFrame_t )cmd->buffer;
+
 	// clear screen for debugging
 	if ( r_clear->integer ) {
 		qglClearColor( 0, 0, 0, 1 );

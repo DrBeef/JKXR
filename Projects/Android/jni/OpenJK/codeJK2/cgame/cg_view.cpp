@@ -1335,6 +1335,7 @@ float CG_ForceSpeedFOV( float infov )
 		fov = infov;//+amt;
 	}
 
+	cg.refdef.override_fov = true;
 	return fov;
 }
 /*

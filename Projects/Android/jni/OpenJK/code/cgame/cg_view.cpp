@@ -1317,6 +1317,7 @@ qboolean CG_CalcFOVFromX( float fov_x )
 	}
 
 	// set it
+	cg.refdef.override_fov = true;
 	cg.refdef.fov_x = fov_x;
 	cg.refdef.fov_y = fov_y;
 

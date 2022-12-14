@@ -2130,6 +2130,20 @@ void JKVR_prepareEyeBuffer(int eye )
 	VR_ClearFrameBuffer(frameBuffer->ColorSwapChain.Width, frameBuffer->ColorSwapChain.Height);
 }
 
+bool JKVR_GetVRProjection(int eye, float zNear, float zFar, float* projection)
+{
+	if (!vr.cgzoommode)
+	{
+		XrMatrix4x4f_CreateProjectionFov(
+				&(gAppState.ProjectionMatrices[eye]), GRAPHICS_OPENGL_ES,
+				gAppState.Projections[eye].fov, zNear, zFar);
+		memcpy(projection, gAppState.ProjectionMatrices[eye].m, 16 * sizeof(float));
+		return true;
+	}
+
+	return false;
+}
+
 void JKVR_finishEyeBuffer(int eye )
 {
 	ovrRenderer *renderer = &gAppState.Renderer;
@@ -2366,7 +2380,6 @@ void JKVR_submitFrame()
 		XrPosef xfHeadFromEye = gAppState.Projections[eye].pose;
 		XrPosef xfStageFromEye = XrPosef_Multiply(gAppState.xfStageFromHead, xfHeadFromEye);
 		viewTransform[eye] = XrPosef_Inverse(xfStageFromEye);
-
         fov.angleLeft += gAppState.Projections[eye].fov.angleLeft / 2.0f;
         fov.angleRight += gAppState.Projections[eye].fov.angleRight / 2.0f;
         fov.angleUp += gAppState.Projections[eye].fov.angleUp / 2.0f;

@@ -5,7 +5,7 @@ LOCAL_PATH := $(call my-dir)
 #OPENXR_HMD = -DMETA_QUEST
 OPENXR_HMD = -DPICO_XR
 
-JK3_BASE_CFLAGS = $(OPENXR_HMD) -DHAVE_GLES -DFINAL_BUILD -fexceptions  -Wall -Wno-write-strings -Wno-comment   -fno-caller-saves -fno-tree-vectorize -Wno-unused-but-set-variable -fvisibility=hidden
+JK3_BASE_CFLAGS = $(OPENXR_HMD) -O1 -DHAVE_GLES -DFINAL_BUILD -fexceptions  -Wall -Wno-write-strings -Wno-comment   -fno-caller-saves -fno-tree-vectorize -Wno-unused-but-set-variable -fvisibility=hidden
 JK3_BASE_CPPFLAGS =  -fvisibility-inlines-hidden -Wno-invalid-offsetof -fvisibility=hidden
 
 JK3_BASE_LDLIBS = 
