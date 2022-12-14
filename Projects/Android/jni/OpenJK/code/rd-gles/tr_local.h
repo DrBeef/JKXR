@@ -79,6 +79,7 @@ typedef struct {
 // as well as the locally generated scene information
 typedef struct {
 	int			x, y, width, height;
+	bool 		override_fov;
 	float		fov_x, fov_y;
 	vec3_t		vieworg;
 	vec3_t		viewaxis[3];		// transformation matrix
@@ -1017,6 +1018,7 @@ typedef struct {
 	model_t					*currentModel;
 
 	viewParms_t				viewParms;
+	stereoFrame_t 			stereoFrame;
 
 	float					identityLight;		// 1.0 / ( 1 << overbrightBits )
 	int						identityLightByte;	// identityLight * 255

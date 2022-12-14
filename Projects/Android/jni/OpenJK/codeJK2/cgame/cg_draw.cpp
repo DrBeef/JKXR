@@ -85,6 +85,7 @@ static void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model,
 
 	AxisClear( refdef.viewaxis );
 
+	refdef.override_fov = true;
 	refdef.fov_x = 30;
 	refdef.fov_y = 30;
 

@@ -539,6 +539,13 @@ void R_SetupProjection( void ) {
 	zNear	= r_znear->value;
 	zFar	= tr.viewParms.zFar;
 
+	if (!tr.refdef.override_fov &&
+        ri.JKVR_GetVRProjection((int)tr.stereoFrame, zNear, zFar, tr.viewParms.projectionMatrix))
+	{
+		return;
+	}
+
+
 	ymax = zNear * tan( tr.refdef.fov_y * M_PI / 360.0f );
 	ymin = -ymax;
 

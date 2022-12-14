@@ -194,6 +194,8 @@ typedef struct
     GLboolean SessionActive;
     XrPosef xfStageFromHead;
     XrView* Projections;
+    XrMatrix4x4f ProjectionMatrices[2];
+
 
     float currentDisplayRefreshRate;
     float* SupportedDisplayRefreshRates;
@@ -246,6 +248,7 @@ void VR_Recenter();
 
 //Called from engine code
 bool JKVR_useScreenLayer();
+bool JKVR_GetVRProjection(int eye, float zNear, float zFar, float* projection);
 void JKVR_GetScreenRes(int *width, int *height);
 void JKVR_InitActions( void );
 void JKVR_Vibrate(int duration, int channel, float intensity );
