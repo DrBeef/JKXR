@@ -160,7 +160,7 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                                     powf(vr.hmdposition[1] - pOff->HeadPose.Pose.Position.y, 2) +
                                     powf(vr.hmdposition[2] - pOff->HeadPose.Pose.Position.z, 2));
 
-         
+
         float controllerYawHeading = 0.0f;
         //Turn on weapon stabilisation?
         bool offhandGripPushed = (pOffTrackedRemoteNew->Buttons & ovrButton_GripTrigger);
@@ -843,23 +843,20 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
 
         // Process "use" gesture
         if (vr_gesture_triggered_use->integer) {
-            float absoluteDistanceToHMD;
-            float verticalDistanceToHMD;
+            float distanceToBody;
+            bool controllerTracked;
             if (vr_gesture_triggered_use->integer == 1) {
                 // Gesture with off-hand
-                absoluteDistanceToHMD = distanceToHMDOff;
-                verticalDistanceToHMD = vr.offhandoffset[1];
+                distanceToBody = sqrt(vr.offhandoffset[0]*vr.offhandoffset[0] + vr.offhandoffset[2]*vr.offhandoffset[2]);
+                controllerTracked = pOffTracking->Status & VRAPI_TRACKING_STATUS_POSITION_TRACKED;
             } else {
                 // Gesture with dominant-hand
-                absoluteDistanceToHMD = distanceToHMD;
-                verticalDistanceToHMD = vr.weaponoffset[1];
+                distanceToBody = sqrt(vr.weaponoffset[0]*vr.weaponoffset[0] + vr.weaponoffset[2]*vr.weaponoffset[2]);
+                controllerTracked = pDominantTracking->Status & VRAPI_TRACKING_STATUS_POSITION_TRACKED;
             }
-            float threshhold = vr_gesture_triggered_use_threshold->value;
-            // Hand must be extended and at least on waist level
-            // Com_Printf("DISTANCE: %.2f ; HEIGHT: %.2f\n", absoluteDistanceToHMD, verticalDistanceToHMD);
-            bool gestureUseAllowed = !vr.weapon_stabilised && !vr.cin_camera && !vr.misc_camera &&
-                                  !vr.remote_turret;
-            if (gestureUseAllowed && absoluteDistanceToHMD > threshhold && verticalDistanceToHMD > -threshhold) {
+            float boundary = vr_use_gesture_boundary->value;
+            bool gestureUseAllowed = !vr.weapon_stabilised && !vr.cin_camera && !vr.misc_camera && !vr.remote_turret;
+            if (gestureUseAllowed && controllerTracked && distanceToBody > boundary) {
                 if (!vr.useGestureActive) {
                     vr.useGestureActive = true;
                     sendButtonAction("+use", true);
@@ -868,6 +865,9 @@ void HandleInput_Default( ovrInputStateGamepad *pFootTrackingNew, ovrInputStateG
                 vr.useGestureActive = false;
                 sendButtonAction("+use", false);
             }
+        } else if (vr.useGestureActive) {
+            vr.useGestureActive = false;
+            sendButtonAction("+use", false);
         }
     }
 
