@@ -836,19 +836,16 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         // Process "use" gesture
         if (vr_gesture_triggered_use->integer) {
             float distanceToBody;
-            bool controllerTracked;
             if (vr_gesture_triggered_use->integer == 1) {
                 // Gesture with off-hand
                 distanceToBody = sqrt(vr.offhandoffset[0]*vr.offhandoffset[0] + vr.offhandoffset[2]*vr.offhandoffset[2]);
-                controllerTracked = pOffTracking->Status & VRAPI_TRACKING_STATUS_POSITION_TRACKED;
             } else {
                 // Gesture with dominant-hand
                 distanceToBody = sqrt(vr.weaponoffset[0]*vr.weaponoffset[0] + vr.weaponoffset[2]*vr.weaponoffset[2]);
-                controllerTracked = pDominantTracking->Status & VRAPI_TRACKING_STATUS_POSITION_TRACKED;
             }
-            float boundary = vr_use_gesture_boundary->value;
-            bool gestureUseAllowed = !vr.weapon_stabilised && !vr.cin_camera && !vr.misc_camera && !vr.remote_turret;
-            if (gestureUseAllowed && controllerTracked && distanceToBody > boundary) {
+
+            bool gestureUseAllowed = !vr.weapon_stabilised && !vr.cin_camera && !vr.misc_camera && !vr.remote_turret && !vr.emplaced_gun;
+            if (gestureUseAllowed && distanceToBody > vr_use_gesture_boundary->value) {
                 if (!vr.useGestureActive) {
                     vr.useGestureActive = true;
                     sendButtonAction("+use", true);

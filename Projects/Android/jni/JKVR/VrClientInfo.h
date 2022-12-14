@@ -8,6 +8,7 @@ typedef struct {
 
     bool misc_camera; // looking through a misc camera view entity
     bool remote_turret; // controlling a remote turret
+    bool emplaced_gun; // controlling an emplaced gun
     bool remote_droid; // controlling a remote droid
     bool remote_npc; // controlling a remote NPC (will also be true when controlling a droid)
 

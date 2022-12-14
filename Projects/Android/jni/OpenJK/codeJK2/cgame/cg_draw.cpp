@@ -2936,6 +2936,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
     vr->remote_npc = !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname );
     vr->remote_droid = false;
     vr->remote_turret = false;
+	vr->emplaced_gun = ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON );
     in_misccamera = false;
 
     if (cg.snap->ps.viewEntity) {
@@ -2957,7 +2958,6 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
                         || vr->remote_droid
                         || vr->remote_turret;
     }
-	bool emplaced_gun = ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON );
 
 	cg.refdef.worldscale = cg_worldScale.value;
 
@@ -3008,7 +3008,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	}
 
 	//Immersive cinematic sequence 6DoF
-	if ((in_camera && vr->immersive_cinematics) || emplaced_gun || cg.renderingThirdPerson)
+	if ((in_camera && vr->immersive_cinematics) || vr->emplaced_gun || cg.renderingThirdPerson)
 	{
 		BG_ConvertFromVR(vr->hmdposition_offset, cg.refdef.vieworg, cg.refdef.vieworg);
 	}
@@ -3027,7 +3027,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		cgi_R_LAGoggles();
 	}
 
-	if (!emplaced_gun && !in_misccamera && !in_camera) {
+	if (!vr->emplaced_gun && !in_misccamera && !in_camera) {
 		//Vertical Positional Movement
 		cg.refdef.vieworg[2] -= DEFAULT_PLAYER_HEIGHT;
 		cg.refdef.vieworg[2] += (vr->hmdposition[1] + cg_heightAdjust.value) * cg_worldScale.value;
