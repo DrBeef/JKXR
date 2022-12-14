@@ -153,7 +153,7 @@ OXR_CheckErrors(XrInstance instance, XrResult result, const char* function, bool
 #if defined(DEBUG)
 #define OXR(func) OXR_CheckErrors(ovrApp_GetInstance(), func, #func, true);
 #else
-#define OXR(func) OXR_CheckErrors(ovrApp_GetInstance(), func, #func, false);
+#define OXR(func) func;
 #endif
 
 typedef struct {
@@ -226,13 +226,6 @@ void ovrTrackedController_Clear(ovrTrackedController* controller);
 ovrMatrix4f ovrMatrix4f_Multiply(const ovrMatrix4f* a, const ovrMatrix4f* b);
 ovrMatrix4f ovrMatrix4f_CreateRotation(const float radiansX, const float radiansY, const float radiansZ);
 ovrMatrix4f ovrMatrix4f_CreateFromQuaternion(const XrQuaternionf* q);
-ovrMatrix4f ovrMatrix4f_CreateProjectionFov(
-        const float fovDegreesX,
-        const float fovDegreesY,
-        const float offsetX,
-        const float offsetY,
-        const float nearZ,
-        const float farZ);
 
 XrVector4f XrVector4f_MultiplyMatrix4f(const ovrMatrix4f* a, const XrVector4f* v);
 

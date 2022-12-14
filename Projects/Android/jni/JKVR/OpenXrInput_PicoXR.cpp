@@ -1,9 +1,9 @@
 #include "VrInput.h"
 #include "VrCvars.h"
 
-extern ovrApp gAppState;
+#ifdef PICO_XR
 
-//#ifdef PICO_XR
+extern ovrApp gAppState;
 
 XrResult CheckXrResult(XrResult res, const char* originator) {
     if (XR_FAILED(res)) {
@@ -580,17 +580,17 @@ void JKVR_Vibrate( int duration, int chan, float intensity )
 {
     for (int i = 0; i < 2; ++i)
     {
-        int channel = (i + 1) & chan;
-        if (channel)
+        int channel = 1-i;
+        if ((i + 1) & chan)
         {
-            if (vibration_channel_duration[i] > 0.0f)
+            if (vibration_channel_duration[channel] > 0.0f)
                 return;
 
-            if (vibration_channel_duration[i] == -1.0f && duration != 0.0f)
+            if (vibration_channel_duration[channel] == -1.0f && duration != 0.0f)
                 return;
 
-            vibration_channel_duration[i] = duration;
-            vibration_channel_intensity[i] = intensity * vr_haptic_intensity->value;
+            vibration_channel_duration[channel] = duration;
+            vibration_channel_intensity[channel] = intensity * vr_haptic_intensity->value;
         }
     }
 }
@@ -638,4 +638,4 @@ void JKVR_processHaptics() {
         }
     }
 }
-//#endif
+#endif //PICO_XR
