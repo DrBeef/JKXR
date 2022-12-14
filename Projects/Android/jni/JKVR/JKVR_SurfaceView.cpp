@@ -1436,7 +1436,7 @@ void JKVR_Init()
 	vr_comfort_vignette = Cvar_Get ("vr_comfort_vignette", "0.0", CVAR_ARCHIVE);
 	vr_saber_3rdperson_mode = Cvar_Get ("vr_saber_3rdperson_mode", "1", CVAR_ARCHIVE);
 	vr_gesture_triggered_use = Cvar_Get ("vr_gesture_triggered_use", "0", CVAR_ARCHIVE);
-	vr_gesture_triggered_use_threshold = Cvar_Get ("vr_gesture_triggered_use_threshold", "0.5", CVAR_ARCHIVE);
+	vr_use_gesture_boundary = Cvar_Get ("vr_use_gesture_boundary", "0.35", CVAR_ARCHIVE);
 
 	cvar_t *expanded_menu_enabled = Cvar_Get ("expanded_menu_enabled", "0", CVAR_ARCHIVE);
 	if (FS_FileExists("expanded_menu.pk3")) {

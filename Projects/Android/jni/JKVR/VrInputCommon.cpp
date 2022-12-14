@@ -34,7 +34,7 @@ cvar_t	*vr_haptic_intensity;
 cvar_t  *vr_comfort_vignette;
 cvar_t  *vr_saber_3rdperson_mode;
 cvar_t  *vr_gesture_triggered_use;
-cvar_t  *vr_gesture_triggered_use_threshold;
+cvar_t  *vr_use_gesture_boundary;
 
 ovrInputStateTrackedRemote leftTrackedRemoteState_old;
 ovrInputStateTrackedRemote leftTrackedRemoteState_new;
