@@ -211,7 +211,14 @@ import java.util.Vector;
 		copy_asset("/sdcard/JKQuest/JK2/base", "z_vr_assets.pk3", true);
 		
 		//Bummser's default configuration
-		copy_asset("/sdcard/JKQuest/JK2/base", "openjo_sp.cfg", false);
+		String model = android.os.Build.MODEL;
+		if (model.contains("Quest")) {
+			//Meta Quest
+			copy_asset_device_specific("/sdcard/JKQuest/JK2/base", "openjo_sp_quest.cfg", "openjo_sp.cfg", false);
+		} else {
+			//Pico XR
+			copy_asset_device_specific("/sdcard/JKQuest/JK2/base", "openjo_sp_pico.cfg", "openjo_sp.cfg", false);
+		}
 
 		//Read these from a file and pass through
 		commandLineParams = new String("jo");
@@ -259,10 +266,22 @@ import java.util.Vector;
 		mNativeHandle = GLES3JNILib.onCreate( this, commandLineParams );
 	}
 
-	public void copy_asset(String path, String name, boolean force) {
+	public void copy_asset_device_specific(String path, String name, String name_out, boolean force) {
 		File f = new File(path + "/" + name);
 		if (!f.exists() || force) {
 			
+			//Ensure we have an appropriate folder
+			String fullname = path + "/" + name;
+			String directory = fullname.substring(0, fullname.lastIndexOf("/"));
+			new File(directory).mkdirs();
+			_copy_asset(name, path + "/" + name_out);
+		}
+	}
+
+	public void copy_asset(String path, String name, boolean force) {
+		File f = new File(path + "/" + name);
+		if (!f.exists() || force) {
+
 			//Ensure we have an appropriate folder
 			String fullname = path + "/" + name;
 			String directory = fullname.substring(0, fullname.lastIndexOf("/"));
