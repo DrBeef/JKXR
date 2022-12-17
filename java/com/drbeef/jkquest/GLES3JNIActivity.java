@@ -214,10 +214,10 @@ import java.util.Vector;
 		String model = android.os.Build.MODEL;
 		if (model.contains("Quest")) {
 			//Meta Quest
-			copy_asset_device_specific("/sdcard/JKQuest/JK2/base", "openjo_sp_quest.cfg", "openjo_sp.cfg", false);
+			copy_asset_with_rename("/sdcard/JKQuest/JK2/base", "openjo_sp_quest.cfg", "openjo_sp.cfg", false);
 		} else {
 			//Pico XR
-			copy_asset_device_specific("/sdcard/JKQuest/JK2/base", "openjo_sp_pico.cfg", "openjo_sp.cfg", false);
+			copy_asset_with_rename("/sdcard/JKQuest/JK2/base", "openjo_sp_pico.cfg", "openjo_sp.cfg", false);
 		}
 
 		//Read these from a file and pass through
@@ -266,8 +266,8 @@ import java.util.Vector;
 		mNativeHandle = GLES3JNILib.onCreate( this, commandLineParams );
 	}
 
-	public void copy_asset_device_specific(String path, String name, String name_out, boolean force) {
-		File f = new File(path + "/" + name);
+	public void copy_asset_with_rename(String path, String name, String name_out, boolean force) {
+		File f = new File(path + "/" + name_out);
 		if (!f.exists() || force) {
 			
 			//Ensure we have an appropriate folder
