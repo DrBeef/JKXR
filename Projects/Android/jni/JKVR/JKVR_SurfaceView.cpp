@@ -2466,9 +2466,9 @@ void JKVR_submitFrame()
 		quad_layer.subImage.imageArrayIndex = 0;
 		const XrVector3f axis = {0.0f, 1.0f, 0.0f};
 		XrVector3f pos = {
-				gAppState.xfStageFromHead.position.x - sin(radians(vr.hmdorientation_snap[YAW])) * 4.0f,
+				gAppState.xfStageFromHead.position.x - sin(radians(vr.hmdorientation_snap[YAW])) * (2.0f + vr_screen_dist->value),
 				1.0f,
-				gAppState.xfStageFromHead.position.z - cos(radians(vr.hmdorientation_snap[YAW])) * 4.0f
+				gAppState.xfStageFromHead.position.z - cos(radians(vr.hmdorientation_snap[YAW])) * (2.0f + vr_screen_dist->value)
 		};
 		quad_layer.pose.orientation = XrQuaternionf_CreateFromVectorAngle(axis, radians(vr.hmdorientation_snap[YAW]));
 		quad_layer.pose.position = pos;
