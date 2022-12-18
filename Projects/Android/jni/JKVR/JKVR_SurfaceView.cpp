@@ -2025,14 +2025,12 @@ void VR_UpdateStageBounds() {
 	OXR(result = xrGetReferenceSpaceBoundsRect(
 			gAppState.Session, XR_REFERENCE_SPACE_TYPE_STAGE, &stageBounds));
 	if (result != XR_SUCCESS) {
-		ALOGV("Stage bounds query failed: using small defaults");
+		ALOGE("Stage bounds query failed: using small defaults");
 		stageBounds.width = 1.0f;
 		stageBounds.height = 1.0f;
 
 		gAppState.CurrentSpace = gAppState.FakeStageSpace;
 	}
-
-	ALOGV("Stage bounds: width = %f, depth %f", stageBounds.width, stageBounds.height);
 }
 
 //All the stuff we want to do each frame
@@ -2043,18 +2041,34 @@ void JKVR_FrameSetup()
 		return;
 	}
 
-	GLboolean stageBoundsDirty = GL_TRUE;
-	if (ovrApp_HandleXrEvents(&gAppState)) {
-		VR_Recenter();
-	}
-	if (gAppState.SessionActive == GL_FALSE) {
-		return;
-	}
+    while (!destroyed)
+    {
+        JKVR_processMessageQueue();
 
-	if (stageBoundsDirty) {
-		VR_UpdateStageBounds();
-		stageBoundsDirty = GL_FALSE;
-	}
+        GLboolean stageBoundsDirty = GL_TRUE;
+        if (ovrApp_HandleXrEvents(&gAppState))
+        {
+            VR_Recenter();
+        }
+
+        if (gAppState.SessionActive == GL_FALSE)
+        {
+            continue;
+        }
+
+        if (stageBoundsDirty)
+        {
+            VR_UpdateStageBounds();
+            stageBoundsDirty = GL_FALSE;
+        }
+
+        break;
+    }
+
+    if (destroyed)
+    {
+        return;
+    }
 
 
 	// NOTE: OpenXR does not use the concept of frame indices. Instead,
@@ -2084,8 +2098,6 @@ void JKVR_FrameSetup()
 
 	//get any cvar values required here
 	vr.immersive_cinematics = (vr_immersive_cinematics->value != 0.0f);
-
-	JKVR_processMessageQueue();
 
 	//Get controller state here
 	JKVR_getHMDOrientation();

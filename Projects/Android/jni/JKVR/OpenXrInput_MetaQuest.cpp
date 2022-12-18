@@ -346,19 +346,20 @@ void JKVR_InitActions( void )
             }
         }
     }
+
+    // Attach to session
+    XrSessionActionSetsAttachInfo attachInfo = {};
+    attachInfo.type = XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO;
+    attachInfo.next = NULL;
+    attachInfo.countActionSets = 1;
+    attachInfo.actionSets = &runningActionSet;
+    OXR(xrAttachSessionActionSets(gAppState.Session, &attachInfo));
+
     inputInitialized = qtrue;
 }
 
 void JKVR_SyncActions( void )
 {
-	// Attach to session
-	XrSessionActionSetsAttachInfo attachInfo = {};
-	attachInfo.type = XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO;
-	attachInfo.next = NULL;
-	attachInfo.countActionSets = 1;
-	attachInfo.actionSets = &runningActionSet;
-	OXR(xrAttachSessionActionSets(gAppState.Session, &attachInfo));
-
 	// sync action data
 	XrActiveActionSet activeActionSet = {};
 	activeActionSet.actionSet = runningActionSet;
