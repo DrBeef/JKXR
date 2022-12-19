@@ -9164,7 +9164,7 @@ void Item_MouseEnter(itemDef_t *item, float x, float y)
 	}
 }
 
-void JKVR_HapticEvent(const char* event, int position, int flags, int intensity, float angle, float yHeight );
+void VR_HapticEvent(const char* event, int position, int flags, int intensity, float angle, float yHeight );
 
 /*
 =================
@@ -9249,7 +9249,7 @@ qboolean Item_SetFocus(itemDef_t *item, float x, float y)
 	if (playSound && sfx)
 	{
 		DC->startLocalSound( *sfx, CHAN_LOCAL_SOUND );
-		JKVR_HapticEvent("selector_icon", 0, vr.right_handed ? 1 : 2, 60, 0, 0);
+        VR_HapticEvent("selector_icon", 0, vr.right_handed ? 1 : 2, 60, 0, 0);
 	}
 
 	for (i = 0; i < parent->itemCount; i++)

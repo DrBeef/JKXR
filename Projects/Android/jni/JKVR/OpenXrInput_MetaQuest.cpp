@@ -141,7 +141,7 @@ qboolean useSimpleProfile = qfalse;
 float vibration_channel_duration[2] = {0.0f, 0.0f};
 float vibration_channel_intensity[2] = {0.0f, 0.0f};
 
-void JKVR_InitActions( void )
+void TBXR_InitActions( void )
 {
     // Actions
     runningActionSet = CreateActionSet(1, "running_action_set", "Action Set used on main loop");
@@ -358,7 +358,7 @@ void JKVR_InitActions( void )
     inputInitialized = qtrue;
 }
 
-void JKVR_SyncActions( void )
+void TBXR_SyncActions( void )
 {
 	// sync action data
 	XrActiveActionSet activeActionSet = {};
@@ -379,9 +379,9 @@ void JKVR_SyncActions( void )
 	getInfo.subactionPath = XR_NULL_PATH;
 }
 
-void JKVR_UpdateControllers( )
+void TBXR_UpdateControllers( )
 {
-	JKVR_SyncActions();
+	TBXR_SyncActions();
 
 	//get controller poses
 	XrAction controller[] = {handPoseLeftAction, handPoseRightAction};
@@ -440,7 +440,7 @@ void JKVR_UpdateControllers( )
 	rightTrackedRemoteState_new.Joystick.y = moveJoystickState.currentState.y;
 }
 
-void JKVR_Vibrate( int duration, int chan, float intensity )
+void TBXR_Vibrate( int duration, int chan, float intensity )
 {
     for (int i = 0; i < 2; ++i)
     {
@@ -459,7 +459,7 @@ void JKVR_Vibrate( int duration, int chan, float intensity )
     }
 }
 
-void JKVR_processHaptics() {
+void TBXR_ProcessHaptics() {
     static float lastFrameTime = 0.0f;
     float timestamp = (float)(Sys_Milliseconds( ));
     float frametime = timestamp - lastFrameTime;

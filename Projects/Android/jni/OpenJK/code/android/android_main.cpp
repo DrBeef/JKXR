@@ -813,7 +813,7 @@ char *Sys_StripAppBundle( char *dir )
 
 #include "../client/client.h"
 
-void JKVR_Init();
+void VR_Init();
 qboolean shutdown;
 int VR_main( int argc, char* argv[] ) {
 	// int  oldtime, newtime; // bk001204 - unused
@@ -839,7 +839,7 @@ int VR_main( int argc, char* argv[] ) {
 
 	Com_Init( cmdline );
 	NET_Init();
-	JKVR_Init();
+    VR_Init();
 
 	//Sys_ConsoleInputInit();
 

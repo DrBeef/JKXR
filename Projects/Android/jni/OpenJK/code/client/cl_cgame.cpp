@@ -1382,7 +1382,7 @@ Ghoul2 Insert End
 #endif
 
 	case CG_HAPTICEVENT:
-		JKVR_HapticEvent( (const char*)VMA(1), args[2], args[3], args[4], VMF(5), VMF(6) );
+        VR_HapticEvent((const char *) VMA(1), args[2], args[3], args[4], VMF(5), VMF(6));
 		return 0;
 	default:
 		Com_Error( ERR_DROP, "Bad cgame system trap: %ld", (long int) args[0] );

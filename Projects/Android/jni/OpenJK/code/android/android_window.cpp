@@ -54,7 +54,7 @@ cvar_t	*r_colorbits;
 cvar_t	*r_ignorehwgamma;
 cvar_t  *r_ext_multisample;
 
-void JKVR_GetScreenRes(int *width, int *height);
+void TBXR_GetScreenRes(int *width, int *height);
 
 
 /*
@@ -138,11 +138,11 @@ void GLimp_Minimize(void)
 	
 }
 
-void JKVR_submitFrame();
+void TBXR_submitFrame();
 
 void WIN_Present( window_t *window )
 {
-	JKVR_submitFrame();
+	TBXR_submitFrame();
 }
 
 
@@ -188,7 +188,7 @@ window_t WIN_Init( const windowDesc_t *windowDesc, glconfig_t *glConfig )
 
 	int android_screen_width;
 	int android_screen_height;
-	JKVR_GetScreenRes(&android_screen_width, &android_screen_height);
+	TBXR_GetScreenRes(&android_screen_width, &android_screen_height);
 	glConfig->vidWidth = android_screen_width;
 	glConfig->vidHeight = android_screen_height;
 	glConfig->colorBits = 32;

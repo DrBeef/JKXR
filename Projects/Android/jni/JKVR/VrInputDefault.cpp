@@ -22,11 +22,9 @@ Authors		:	Simon Brown
 
 void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, int capsule );
 
-void JKVR_HapticEvent(const char* event, int position, int flags, int intensity, float angle, float yHeight );
-
 static inline float AngleBetweenVectors(const vec3_t a, const vec3_t b)
 {
-    return degrees(acosf(DotProduct(a, b)/(VectorLength(a) * VectorLength(b))));
+    return RAD2DEG(acosf(DotProduct(a, b)/(VectorLength(a) * VectorLength(b))));
 }
 
 void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTrackedController* pDominantTracking,
@@ -122,7 +120,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, xrButton_Enter, A_ESCAPE);
 
     static bool resetCursor = qtrue;
-    if ( JKVR_useScreenLayer() && !vr.misc_camera /*bit of a fiddle, but if we are in a misc camera, we are in the game and shouldn't be in here*/)
+    if (VR_UseScreenLayer() && !vr.misc_camera /*bit of a fiddle, but if we are in a misc camera, we are in the game and shouldn't be in here*/)
     {
         interactWithTouchScreen(resetCursor, pDominantTrackedRemoteNew, pDominantTrackedRemoteOld);
         resetCursor = qfalse;
@@ -411,8 +409,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     float zxDist = length(x, z);
 
                     if (zxDist != 0.0f && z != 0.0f) {
-                        VectorSet(vr.weaponangles, -degrees(atanf(y / zxDist)),
-                                  -degrees(atan2f(x, -z)), 0);
+                        VectorSet(vr.weaponangles, -RAD2DEG(atanf(y / zxDist)),
+                                  -RAD2DEG(atan2f(x, -z)), 0);
                     }
                 }
                 else if (vr.cgzoommode == 2 || vr.cgzoommode == 4)
@@ -426,8 +424,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     float zxDist = length(x, z);
 
                     if (zxDist != 0.0f && z != 0.0f) {
-                        VectorSet(vr.weaponangles, -degrees(atanf(y / zxDist)),
-                                  -degrees(atan2f(x, -z)), vr.weaponangles[ROLL] /
+                        VectorSet(vr.weaponangles, -RAD2DEG(atanf(y / zxDist)),
+                                  -RAD2DEG(atan2f(x, -z)), vr.weaponangles[ROLL] /
                                                            2.0f); //Dampen roll on stabilised weapon
 
                         VectorCopy(vr.hmdposition, vr.weaponposition);
@@ -446,8 +444,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     float zxDist = length(x, z);
 
                     if (zxDist != 0.0f && z != 0.0f) {
-                        VectorSet(vr.weaponangles, -degrees(atanf(y / zxDist)),
-                                  -degrees(atan2f(x, -z)), vr.weaponangles[ROLL] /
+                        VectorSet(vr.weaponangles, -RAD2DEG(atanf(y / zxDist)),
+                                  -RAD2DEG(atan2f(x, -z)), vr.weaponangles[ROLL] /
                                                            2.0f); //Dampen roll on stabilised weapon
                     }
                 }
@@ -554,7 +552,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             // Check quicksave
             if (canUseQuickSave) {
                 int channel = (vr_control_scheme->integer >= 10) ? 1 : 0;
-                JKVR_Vibrate(40, channel, 0.5); // vibrate to let user know they can switch
+                TBXR_Vibrate(40, channel, 0.5); // vibrate to let user know they can switch
 
                 if (((pOffTrackedRemoteNew->Buttons & offButton1) !=
                      (pOffTrackedRemoteOld->Buttons & offButton1)) &&
@@ -577,8 +575,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             //Positional movement speed correction for when we are not hitting target framerate
             static double lastframetime = 0;
-            int refresh = GetRefresh();
-            double newframetime = GetTimeInMilliSeconds();
+            int refresh = TBXR_GetRefresh();
+            double newframetime = TBXR_GetTimeInMilliSeconds();
             float multiplier = (float) ((1000.0 / refresh) / (newframetime - lastframetime));
             lastframetime = newframetime;
 

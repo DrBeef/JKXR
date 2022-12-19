@@ -1364,7 +1364,7 @@ void Com_Frame( void ) {
 		int		timeVal;
 		static int	lastTime = 0, bias = 0;
 
-		JKVR_FrameSetup();
+		TBXR_FrameSetup();
 
 		// write config file if anything changed
 		Com_WriteConfiguration();

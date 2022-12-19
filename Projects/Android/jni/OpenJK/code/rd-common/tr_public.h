@@ -128,8 +128,8 @@ typedef struct {
 	int					(*com_frameTime)					( void );
 
 	//JKVR Functions
-	bool 				(*JKVR_useScreenLayer)				( void );
-	bool 				(*JKVR_GetVRProjection)				(int eye, float zNear, float zFar, float* projection);
+	bool 				(*TBXR_useScreenLayer)				( void );
+	bool 				(*TBXR_GetVRProjection)				(int eye, float zNear, float zFar, float* projection);
 
 } refimport_t;
 

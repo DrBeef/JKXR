@@ -225,12 +225,9 @@ void PortableMouse(float dx,float dy)
 }
 
 int absx=0,absy=0;
-void JKVR_GetScreenRes(int *width, int *height);
+void TBXR_GetScreenRes(int *width, int *height);
 void PortableMouseAbs(float x,float y)
 {
-    //int width;
-    //int height;
-	//JKVR_GetScreenRes(&width, &height);
 	absx = x * 640;
 	absy = y * 480;
 

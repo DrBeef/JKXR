@@ -508,11 +508,11 @@ void SCR_UpdateScreen( void ) {
 	if ( cls.uiStarted )
 	{
 		//Try again here in case we've not done it yet
-		JKVR_FrameSetup();
+		TBXR_FrameSetup();
 
 		for (int eye = 0; eye < 2; ++eye)
 		{
-			JKVR_prepareEyeBuffer(eye);
+			TBXR_prepareEyeBuffer(eye);
 
 			//Draw twice for Quest
 			SCR_DrawScreenField(eye == 0 ? STEREO_LEFT : STEREO_RIGHT);
@@ -529,7 +529,7 @@ void SCR_UpdateScreen( void ) {
 				}
 			}
 
-			JKVR_finishEyeBuffer(eye);
+			TBXR_finishEyeBuffer(eye);
 		}
 
 		//And we're done

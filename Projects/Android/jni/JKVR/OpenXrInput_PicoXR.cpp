@@ -104,7 +104,7 @@ XrActionStateVector2f GetActionStateVector2(XrAction action, int hand) {
     return state;
 }
 
-void JKVR_InitActions( void )
+void TBXR_InitActions( void )
 {
     // Create an action set.
     {
@@ -505,7 +505,7 @@ void JKVR_InitActions( void )
     CHECK_XRCMD(xrAttachSessionActionSets(gAppState.Session, &attachInfo));
 }
 
-void JKVR_SyncActions( void )
+void TBXR_SyncActions( void )
 {
     XrActiveActionSet activeActionSet = {};
     activeActionSet.actionSet = actionSet;
@@ -517,9 +517,9 @@ void JKVR_SyncActions( void )
     CHECK_XRCMD(xrSyncActions(gAppState.Session, &syncInfo));
 }
 
-void JKVR_UpdateControllers( )
+void TBXR_UpdateControllers( )
 {
-    JKVR_SyncActions();
+    TBXR_SyncActions();
 
     //get controller poses
     for (int i = 0; i < 2; i++) {
@@ -576,7 +576,7 @@ void JKVR_UpdateControllers( )
 float vibration_channel_duration[2] = {0.0f, 0.0f};
 float vibration_channel_intensity[2] = {0.0f, 0.0f};
 
-void JKVR_Vibrate( int duration, int chan, float intensity )
+void TBXR_Vibrate( int duration, int chan, float intensity )
 {
     for (int i = 0; i < 2; ++i)
     {
@@ -595,7 +595,7 @@ void JKVR_Vibrate( int duration, int chan, float intensity )
     }
 }
 
-void JKVR_processHaptics() {
+void TBXR_processHaptics() {
     static float lastFrameTime = 0.0f;
     float timestamp = (float)(Sys_Milliseconds( ));
     float frametime = timestamp - lastFrameTime;

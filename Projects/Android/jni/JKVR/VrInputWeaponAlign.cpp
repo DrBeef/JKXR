@@ -60,7 +60,7 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
 	handleTrackedControllerButton(&leftTrackedRemoteState_new, &leftTrackedRemoteState_old, xrButton_Enter, A_ESCAPE);
 
     static bool resetCursor = qtrue;
-    if ( JKVR_useScreenLayer() )
+    if (VR_UseScreenLayer() )
     {
         interactWithTouchScreen(resetCursor, pDominantTrackedRemoteNew, pDominantTrackedRemoteOld);
         resetCursor = qfalse;

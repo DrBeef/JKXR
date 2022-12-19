@@ -882,7 +882,7 @@ void CL_Frame ( int msec,float fractionMsec ) {
 
 	Con_RunConsole();
 
-	JKVR_HapticEndFrame();
+    VR_HapticEndFrame();
 
 	cls.framecount++;
 }
@@ -1191,8 +1191,8 @@ void CL_InitRef( void ) {
 
 	rit.saved_game = &ojk::SavedGame::get_instance();
 
-	rit.JKVR_useScreenLayer = JKVR_useScreenLayer;
-	rit.JKVR_GetVRProjection = JKVR_GetVRProjection;
+	rit.TBXR_useScreenLayer = VR_UseScreenLayer;
+	rit.TBXR_GetVRProjection = VR_GetVRProjection;
 
 	ret = GetRefAPI( REF_API_VERSION, &rit );
 

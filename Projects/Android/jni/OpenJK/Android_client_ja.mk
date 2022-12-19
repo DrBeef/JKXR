@@ -124,6 +124,7 @@ JK3_SRC = \
 
 
 JKVR_SRC_FILES :=  ${TOP_DIR}/JKVR/JKVR_SurfaceView.cpp \
+                  ${TOP_DIR}/JKVR/TBXR_Common.cpp \
                   ${TOP_DIR}/JKVR/VrInputCommon.cpp \
                   ${TOP_DIR}/JKVR/VrInputDefault.cpp \
                   ${TOP_DIR}/JKVR/VrInputWeaponAlign.cpp \

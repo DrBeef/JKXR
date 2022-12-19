@@ -540,7 +540,7 @@ void R_SetupProjection( void ) {
 	zFar	= tr.viewParms.zFar;
 
 	if (!tr.refdef.override_fov &&
-        ri.JKVR_GetVRProjection((int)tr.stereoFrame, zNear, zFar, tr.viewParms.projectionMatrix))
+        ri.TBXR_GetVRProjection((int)tr.stereoFrame, zNear, zFar, tr.viewParms.projectionMatrix))
 	{
 		return;
 	}
