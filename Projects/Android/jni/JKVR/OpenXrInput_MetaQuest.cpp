@@ -394,7 +394,7 @@ void TBXR_UpdateControllers( )
 			XrSpaceLocation loc = {};
 			loc.type = XR_TYPE_SPACE_LOCATION;
 			loc.next = &vel;
-			OXR(xrLocateSpace(controllerSpace[i], gAppState.CurrentSpace, gAppState.PredictedDisplayTime, &loc));
+			OXR(xrLocateSpace(controllerSpace[i], gAppState.CurrentSpace, gAppState.FrameState.predictedDisplayTime, &loc));
 
 			gAppState.TrackedController[i].Active = (loc.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0;
 			gAppState.TrackedController[i].Pose = loc.pose;

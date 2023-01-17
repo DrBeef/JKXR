@@ -13,37 +13,13 @@
 #include "VrInput.h"
 #include "VrCvars.h"
 
-#include <EGL/egl.h>
-#include <EGL/eglext.h>
-#include <GLES3/gl3.h>
-#include <GLES3/gl3ext.h>
-#define GL_GLEXT_PROTOTYPES
-#include <GLES/gl2ext.h>
-
 extern "C" {
 #include "src/gl/loader.h"
 }
 
 #include <client/client.h>
 
-#include "VrInput.h"
 
-#if !defined( EGL_OPENGL_ES3_BIT_KHR )
-#define EGL_OPENGL_ES3_BIT_KHR		0x0040
-#endif
-
-// EXT_texture_border_clamp
-#ifndef GL_CLAMP_TO_BORDER
-#define GL_CLAMP_TO_BORDER			0x812D
-#endif
-
-#ifndef GL_TEXTURE_BORDER_COLOR
-#define GL_TEXTURE_BORDER_COLOR		0x1004
-#endif
-
-#ifndef GLAPI
-#define GLAPI extern
-#endif
 //#define ENABLE_GL_DEBUG
 #define ENABLE_GL_DEBUG_VERBOSE 1
 
@@ -255,6 +231,7 @@ void VR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side
 		*pos_forward = positional_movementForward;
 		*up = remote_movementUp;
 		*side = remote_movementSideways;
+
 		*pos_side = positional_movementSideways;
 		*yaw = vr.hmdorientation[YAW] + vr.snapTurn;
 		*pitch = vr.hmdorientation[PITCH];
