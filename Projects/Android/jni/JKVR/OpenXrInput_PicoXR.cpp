@@ -595,7 +595,7 @@ void TBXR_Vibrate( int duration, int chan, float intensity )
     }
 }
 
-void TBXR_processHaptics() {
+void TBXR_ProcessHaptics() {
     static float lastFrameTime = 0.0f;
     float timestamp = (float)(Sys_Milliseconds( ));
     float frametime = timestamp - lastFrameTime;

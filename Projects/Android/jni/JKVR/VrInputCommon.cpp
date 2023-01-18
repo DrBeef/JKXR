@@ -84,14 +84,14 @@ float nonLinearFilter(float in)
     float val = 0.0f;
     if (in > NLF_DEADZONE)
     {
-        val = in;
+        val = in > 1.0f ? 1.0f : in;
         val -= NLF_DEADZONE;
         val /= (1.0f - NLF_DEADZONE);
         val = powf(val, NLF_POWER);
     }
     else if (in < -NLF_DEADZONE)
     {
-        val = in;
+        val = in < -1.0f ? -1.0f : in;
         val += NLF_DEADZONE;
         val /= (1.0f - NLF_DEADZONE);
         val = -powf(fabsf(val), NLF_POWER);

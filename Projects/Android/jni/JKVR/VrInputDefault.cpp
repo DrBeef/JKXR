@@ -696,8 +696,9 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             //Apply a filter and quadratic scaler so small movements are easier to make
             float dist = length(pSecondaryJoystick->x, pSecondaryJoystick->y);
             float nlf = nonLinearFilter(dist);
-            float x = (nlf * pSecondaryJoystick->x);
-            float y = (nlf * pSecondaryJoystick->y);
+            dist = (dist > 1.0f) ? dist : 1.0f;
+            float x = nlf * (pSecondaryJoystick->x / dist);
+            float y = nlf * (pSecondaryJoystick->y / dist);
 
             vr.player_moving = (fabs(x) + fabs(y)) > 0.05f;
 
