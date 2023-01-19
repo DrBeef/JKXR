@@ -237,17 +237,21 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 VectorLength(vr.weaponoffset) < 0.24f &&
                 vr.cgzoommode == 0) {
                 sendButtonAction("enterscope", true);
-            } else if ((VectorLength(vr.weaponoffset) >= 0.24f || !vr.weapon_stabilised) &&
+            } else if ((VectorLength(vr.weaponoffset) > 0.26f || !vr.weapon_stabilised) &&
                     (vr.cgzoommode == 2 || vr.cgzoommode == 4)) {
                 sendButtonActionSimple("exitscope");
             }
+        } else if (vr.cgzoommode == 2 || vr.cgzoommode == 4) {
+            // In case we were using weapon scope and weapon
+            // was changed due to out of ammo, exit scope
+            sendButtonActionSimple("exitscope");
         }
 
-        if (vr.cgzoommode > 0 && vr.cgzoommode < 4)
+        if (vr.cgzoommode)
         {
             if (between(-0.2f, primaryJoystickX, 0.2f)) {
-                if (cl.frame.ps.weapon == WP_DISRUPTOR)
-                {
+                if (vr.cgzoommode == 2)
+                { // We are in disruptor scope
                     if (pPrimaryJoystick->y > 0.8f) {
                         vr.cgzoomdir = -1; // zooming in
                         sendButtonAction("+altattack", true);
@@ -258,11 +262,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                         sendButtonAction("+altattack", false);
                     }
                 }
-                else
-                {
-                    sendButtonAction("+attack", pPrimaryJoystick->y > 0.8f);
-                    sendButtonAction("+altattack", pPrimaryJoystick->y < -0.8f);
+                else if (vr.cgzoommode == 1)
+                { // We are in binoculars scope - zoom in or out
+                  sendButtonAction("+attack", pPrimaryJoystick->y > 0.8f);
+                  sendButtonAction("+altattack", pPrimaryJoystick->y < -0.8f);
                 }
+                // No function of thumbstick for nightvision (3) or blaster scope (4)
             }
         }
         else if (cl.frame.ps.weapon == WP_SABER)
@@ -405,40 +410,23 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
             VectorScale(offhandPositionAverage, 0.2f, offhandPositionAverage);
             if (vr.weapon_stabilised) {
-                if (vr_virtual_stock->integer == 1) {
+                if (vr_virtual_stock->integer == 1 || vr.cgzoommode == 2 || vr.cgzoommode == 4) {
                     //offset to the appropriate eye a little bit
-                    vec2_t xy;
-                    rotateAboutOrigin(Cvar_VariableValue("cg_stereoSeparation") / 2.0f, 0.0f,
-                                      -vr.hmdorientation[YAW], xy);
-                    float x = offhandPositionAverage[0] - (vr.hmdposition[0] + xy[0]);
-                    float y = offhandPositionAverage[1] -
-                              (vr.hmdposition[1] - 0.1f); // Use a point lower
-                    float z = offhandPositionAverage[2] - (vr.hmdposition[2] + xy[1]);
-                    float zxDist = length(x, z);
-
-                    if (zxDist != 0.0f && z != 0.0f) {
-                        VectorSet(vr.weaponangles, -RAD2DEG(atanf(y / zxDist)),
-                                  -RAD2DEG(atan2f(x, -z)), 0);
+                    vec2_t xy = {0, 0};
+                    if (vr_virtual_stock->integer == 1 && !vr.cgzoommode) {
+                        rotateAboutOrigin(Cvar_VariableValue("cg_stereoSeparation") / 2.0f, 0.0f,
+                                          -vr.hmdorientation[YAW], xy);
                     }
-                }
-                else if (vr.cgzoommode == 2 || vr.cgzoommode == 4)
-                {
-                    float x =
-                            offhandPositionAverage[0] - vr.hmdposition[0];
-                    float y =
-                            offhandPositionAverage[1] - (vr.hmdposition[1] - 0.1f);
-                    float z =
-                            offhandPositionAverage[2] - vr.hmdposition[2];
+
+                    float x = offhandPositionAverage[0] - (vr.hmdposition[0] + xy[0]);
+                    float y = offhandPositionAverage[1] - (vr.hmdposition[1] - 0.1f);
+                    float z = offhandPositionAverage[2] - (vr.hmdposition[2] + xy[1]);
                     float zxDist = length(x, z);
 
                     if (zxDist != 0.0f && z != 0.0f) {
                         VectorSet(vr.weaponangles, -RAD2DEG(atanf(y / zxDist)),
                                   -RAD2DEG(atan2f(x, -z)), vr.weaponangles[ROLL] /
                                                            2.0f); //Dampen roll on stabilised weapon
-
-                        VectorCopy(vr.hmdposition, vr.weaponposition);
-                        VectorClear(vr.weaponoffset);
-                        vr.weaponposition[1] += 0.1;
                     }
                 }
                 else
@@ -609,8 +597,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             //B Button
             if ((primaryButtonsNew & primaryButton2) != (primaryButtonsOld & primaryButton2)) {
-                if (vr.cgzoommode)
-                {
+                if (vr.cgzoommode == 1 || vr.cgzoommode == 3)
+                {   // Exit scope only when using binoculars or nightvision
                     sendButtonActionSimple("exitscope");
                 }
                 else if (cl.frame.ps.weapon == WP_SABER && vr.velocitytriggered)
