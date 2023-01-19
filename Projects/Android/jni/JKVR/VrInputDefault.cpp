@@ -248,7 +248,15 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             if (between(-0.2f, primaryJoystickX, 0.2f)) {
                 if (cl.frame.ps.weapon == WP_DISRUPTOR)
                 {
-                    sendButtonAction("+altattack", pPrimaryJoystick->y > 0.8f);
+                    if (pPrimaryJoystick->y > 0.8f) {
+                        vr.cgzoomdir = -1; // zooming in
+                        sendButtonAction("+altattack", true);
+                    } else if (pPrimaryJoystick->y < -0.8f) {
+                        vr.cgzoomdir = 1; // zooming out
+                        sendButtonAction("+altattack", true);
+                    } else {
+                        sendButtonAction("+altattack", false);
+                    }
                 }
                 else
                 {

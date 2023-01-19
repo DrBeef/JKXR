@@ -1423,8 +1423,8 @@ static qboolean	CG_CalcFov( void ) {
 				}
 				else
 				{
-					// disruptor zooming in faster
-					cg_zoomFov -= cg.frametime * 0.075f;
+					// disruptor zooming in faster (and also either in or out)
+					cg_zoomFov += vr->cgzoomdir * cg.frametime * 0.075f;
 				}
 
 				// Clamp zoomFov

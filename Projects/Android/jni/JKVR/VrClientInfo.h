@@ -23,6 +23,7 @@ typedef struct {
     int move_speed; // 0 (default) = Comfortable (75%) , 1 = Full (100%), 2 = Walk (50%)
     bool crouched;
     int cgzoommode;
+    int cgzoomdir;
     int saberBlockDebounce; // Amount of time after player is blocked that the saber position is fixed
 
     int forceid;
