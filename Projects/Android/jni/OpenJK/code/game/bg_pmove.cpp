@@ -148,6 +148,8 @@ extern cvar_t	*g_stepSlideFix;
 extern cvar_t	*g_saberAutoBlocking;
 extern cvar_t	*g_saberAutoDeflect1stPerson;
 
+extern cvar_t	*g_TeamBeefDirectorsCut;
+
 static void PM_SetWaterLevelAtPoint( vec3_t org, int *waterlevel, int *watertype );
 
 #define		FLY_NONE	0

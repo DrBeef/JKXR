@@ -3,7 +3,7 @@ CONFIG W:\bin\striped.cfg
 ID 100
 REFERENCE MENUS_VR
 DESCRIPTION "VR Menu Localizations"
-COUNT 134
+COUNT 136
 INDEX 0
 {
    REFERENCE COMMON_CONTROLS_ITEM
@@ -673,4 +673,14 @@ INDEX 133
 {
    REFERENCE USE_GESTURE_BOUNDARY_DESC
    TEXT_LANGUAGE1 "Configures how far you need to reach to activate use gesture."
+}
+INDEX 134
+{
+   REFERENCE DIRECTORS_CUT_ITEM
+   TEXT_LANGUAGE1 "Team Beef Director's Cut:"
+}
+INDEX 135
+{
+   REFERENCE DIRECTORS_CUT_DESC
+   TEXT_LANGUAGE1 "Various tweaks for better balance of VR gameplay."
 }

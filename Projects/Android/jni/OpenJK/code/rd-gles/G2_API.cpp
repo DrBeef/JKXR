@@ -948,8 +948,8 @@ qboolean G2API_RemoveGhoul2Model(CGhoul2Info_v &ghlInfo, const int modelIndex)
 	{
 		// if we hit this assert then we are trying to delete a ghoul2 model on a ghoul2 instance that
 		// one way or another is already gone.
-		G2ERROR(0,"Remove Nonexistant Model");
-		assert(0 && "remove non existing model");
+		//G2ERROR(0,"Remove Nonexistant Model");
+		//assert(0 && "remove non existing model");
 		return qfalse;
 	}
 

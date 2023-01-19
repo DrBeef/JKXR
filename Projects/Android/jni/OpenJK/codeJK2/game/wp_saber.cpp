@@ -118,6 +118,8 @@ void ForceThrow( gentity_t *self, qboolean pull );
 qboolean WP_ForcePowerAvailable( gentity_t *self, forcePowers_t forcePower, int overrideAmt );
 void WP_ForcePowerDrain( gentity_t *self, forcePowers_t forcePower, int overrideAmt );
 
+extern cvar_t	*g_TeamBeefDirectorsCut;
+
 extern cvar_t	*g_saberAutoDeflect1stPerson;
 extern cvar_t	*g_saberAutoBlocking;
 extern cvar_t	*g_saberRealisticCombat;

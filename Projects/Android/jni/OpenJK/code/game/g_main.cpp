@@ -186,6 +186,8 @@ cvar_t	*g_AIsurrender;
 cvar_t	*g_numEntities;
 //cvar_t	*g_iscensored;
 
+cvar_t	*g_TeamBeefDirectorsCut;
+
 cvar_t	*g_saberAutoDeflect1stPerson;
 cvar_t	*g_saberAutoBlocking;
 cvar_t	*g_saberRealisticCombat;
@@ -659,6 +661,8 @@ void G_InitCvars( void ) {
 	// NOTE : I also create this is UI_Init()
 	g_subtitles = gi.cvar( "g_subtitles", "0", CVAR_ARCHIVE );
 	com_buildScript = gi.cvar ("com_buildscript", "0", 0);
+
+	g_TeamBeefDirectorsCut = gi.cvar( "g_TeamBeefDirectorsCut", "1", CVAR_ARCHIVE ); // Team Beef Director's Cut tweaks
 
 	g_saberAutoDeflect1stPerson = gi.cvar( "g_saberAutoDeflect1stPerson", "0", CVAR_CHEAT );//Whether the saber will auto deflect missiles in first person
 	g_saberAutoBlocking = gi.cvar( "g_saberAutoBlocking", "0", CVAR_CHEAT );//must press +block button to do any blocking
