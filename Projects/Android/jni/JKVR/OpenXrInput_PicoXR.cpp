@@ -1,8 +1,6 @@
 #include "VrInput.h"
 #include "VrCvars.h"
 
-#ifdef PICO_XR
-
 extern ovrApp gAppState;
 
 XrResult CheckXrResult(XrResult res, const char* originator) {
@@ -24,7 +22,6 @@ XrAction grabAction;
 XrAction poseAction;
 XrAction vibrateAction;
 XrAction quitAction;
-/*************************pico******************/
 XrAction touchpadAction;
 XrAction AXAction;
 XrAction homeAction;
@@ -34,14 +31,12 @@ XrAction sideAction;
 XrAction triggerAction;
 XrAction joystickAction;
 XrAction batteryAction;
-//---add new----------
 XrAction AXTouchAction;
 XrAction BYTouchAction;
-XrAction RockerTouchAction;
+XrAction thumbstickTouchAction;
 XrAction TriggerTouchAction;
 XrAction ThumbrestTouchAction;
 XrAction GripAction;
-//---add new----------zgt
 XrAction AAction;
 XrAction BAction;
 XrAction XAction;
@@ -51,7 +46,7 @@ XrAction BTouchAction;
 XrAction XTouchAction;
 XrAction YTouchAction;
 XrAction aimAction;
-/*************************pico******************/
+
 XrSpace aimSpace[SIDE_COUNT];
 XrPath handSubactionPath[SIDE_COUNT];
 XrSpace handSpace[SIDE_COUNT];
@@ -164,7 +159,7 @@ void TBXR_InitActions( void )
         actionInfo.countSubactionPaths = SIDE_COUNT;
         actionInfo.subactionPaths = handSubactionPath;
         CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &quitAction));
-        /**********************************pico***************************************/
+
         // Create input actions for toucpad key using the left and right controller.
         actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
         strcpy(actionInfo.actionName, "touchpad");
@@ -229,7 +224,7 @@ void TBXR_InitActions( void )
         actionInfo.countSubactionPaths = SIDE_COUNT;
         actionInfo.subactionPaths = handSubactionPath;
         CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &batteryAction));
-        //------------------------add new---------------------------------
+
         actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
         strcpy(actionInfo.actionName, "axtouch");
         strcpy(actionInfo.localizedActionName, "AXtouch");
@@ -249,7 +244,7 @@ void TBXR_InitActions( void )
         strcpy(actionInfo.localizedActionName, "Rockertouch");
         actionInfo.countSubactionPaths = SIDE_COUNT;
         actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &RockerTouchAction));
+        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &thumbstickTouchAction));
 
         actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
         strcpy(actionInfo.actionName, "triggertouch");
@@ -272,7 +267,6 @@ void TBXR_InitActions( void )
         actionInfo.subactionPaths = handSubactionPath;
         CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &GripAction));
 
-        //--------------add new----------zgt
         actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
         strcpy(actionInfo.actionName, "akey");
         strcpy(actionInfo.localizedActionName, "Akey");
@@ -328,9 +322,6 @@ void TBXR_InitActions( void )
         actionInfo.countSubactionPaths = SIDE_COUNT;
         actionInfo.subactionPaths = handSubactionPath;
         CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &YTouchAction));
-        /**********************************pico***************************************/
-
-
     }
 
     XrPath selectPath[SIDE_COUNT];
@@ -348,7 +339,6 @@ void TBXR_InitActions( void )
     XrPath thumbstickPosPath[SIDE_COUNT];
     XrPath aimPath[SIDE_COUNT];
 
-    /**************************pico************************************/
     XrPath touchpadPath[SIDE_COUNT];
     XrPath AXValuePath[SIDE_COUNT];
     XrPath homeClickPath[SIDE_COUNT];
@@ -358,14 +348,14 @@ void TBXR_InitActions( void )
     XrPath triggerPath[SIDE_COUNT];
     XrPath joystickPath[SIDE_COUNT];
     XrPath batteryPath[SIDE_COUNT];
-    //--------------add new----------
+
     XrPath GripPath[SIDE_COUNT];
     XrPath AXTouchPath[SIDE_COUNT];
     XrPath BYTouchPath[SIDE_COUNT];
     XrPath RockerTouchPath[SIDE_COUNT];
     XrPath TriggerTouchPath[SIDE_COUNT];
     XrPath ThumbresetTouchPath[SIDE_COUNT];
-    //--------------add new----------zgt
+
     XrPath AValuePath[SIDE_COUNT];
     XrPath BValuePath[SIDE_COUNT];
     XrPath XValuePath[SIDE_COUNT];
@@ -374,7 +364,7 @@ void TBXR_InitActions( void )
     XrPath BTouchPath[SIDE_COUNT];
     XrPath XTouchPath[SIDE_COUNT];
     XrPath YTouchPath[SIDE_COUNT];
-    /**************************pico************************************/
+
     CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/user/hand/left/input/select/click", &selectPath[SIDE_LEFT]));
     CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/user/hand/right/input/select/click", &selectPath[SIDE_RIGHT]));
     CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/user/hand/left/input/menu/click", &menuClickPath[SIDE_LEFT]));
@@ -409,7 +399,6 @@ void TBXR_InitActions( void )
     CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/user/hand/left/input/thumbrest/touch", &thumbrestPath[SIDE_LEFT]));
     CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/user/hand/right/input/thumbrest/touch", &thumbrestPath[SIDE_RIGHT]));
 
-    /**************************pico************************************/
     CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/user/hand/left/input/back/click", &backPath[SIDE_LEFT]));
     CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/user/hand/right/input/back/click", &backPath[SIDE_RIGHT]));
     CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/user/hand/left/input/battery/value", &batteryPath[SIDE_LEFT]));
@@ -423,22 +412,24 @@ void TBXR_InitActions( void )
     CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/user/hand/left/input/y/touch", &YTouchPath[SIDE_LEFT]));
     CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/user/hand/right/input/a/touch", &ATouchPath[SIDE_RIGHT]));
     CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/user/hand/right/input/b/touch", &BTouchPath[SIDE_RIGHT]));
-    /**************************pico************************************/
-    XrActionSuggestedBinding bindings[128];
-    int currBinding = 0;
 
-    // Suggest bindings for the Pico Neo 3 controller
+
+    XrResult result;
+
+    //First try Pico Devices
     {
         XrPath picoMixedRealityInteractionProfilePath;
         CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/interaction_profiles/pico/neo3_controller",
                                    &picoMixedRealityInteractionProfilePath));
 
+        XrActionSuggestedBinding bindings[128];
+        int currBinding = 0;
         bindings[currBinding++] = ActionSuggestedBinding(touchpadAction, thumbstickClickPath[SIDE_LEFT]);
         bindings[currBinding++] = ActionSuggestedBinding(touchpadAction, thumbstickClickPath[SIDE_RIGHT]);
         bindings[currBinding++] = ActionSuggestedBinding(joystickAction, thumbstickPosPath[SIDE_LEFT]);
         bindings[currBinding++] = ActionSuggestedBinding(joystickAction, thumbstickPosPath[SIDE_RIGHT]);
-        bindings[currBinding++] = ActionSuggestedBinding(RockerTouchAction, thumbstickTouchPath[SIDE_LEFT]);
-        bindings[currBinding++] = ActionSuggestedBinding(RockerTouchAction, thumbstickTouchPath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(thumbstickTouchAction, thumbstickTouchPath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(thumbstickTouchAction, thumbstickTouchPath[SIDE_RIGHT]);
 
         bindings[currBinding++] = ActionSuggestedBinding(triggerAction, triggerValuePath[SIDE_LEFT]);
         bindings[currBinding++] = ActionSuggestedBinding(triggerAction, triggerValuePath[SIDE_RIGHT]);
@@ -480,7 +471,58 @@ void TBXR_InitActions( void )
         suggestedBindings.interactionProfile = picoMixedRealityInteractionProfilePath;
         suggestedBindings.suggestedBindings = bindings;
         suggestedBindings.countSuggestedBindings = currBinding;
-        CHECK_XRCMD(xrSuggestInteractionProfileBindings(gAppState.Instance, &suggestedBindings));
+        result = xrSuggestInteractionProfileBindings(gAppState.Instance, &suggestedBindings);
+    }
+
+    if (result != XR_SUCCESS)
+    {
+        XrPath touchControllerInteractionProfilePath;
+        CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/interaction_profiles/oculus/touch_controller",
+                                   &touchControllerInteractionProfilePath));
+
+        XrActionSuggestedBinding bindings[128];
+        int currBinding = 0;
+        bindings[currBinding++] = ActionSuggestedBinding(touchpadAction, thumbstickClickPath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(touchpadAction, thumbstickClickPath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(joystickAction, thumbstickPosPath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(joystickAction, thumbstickPosPath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(thumbstickTouchAction, thumbstickTouchPath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(thumbstickTouchAction, thumbstickTouchPath[SIDE_RIGHT]);
+
+        bindings[currBinding++] = ActionSuggestedBinding(triggerAction, triggerValuePath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(triggerAction, triggerValuePath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(TriggerTouchAction, triggerTouchPath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(TriggerTouchAction, triggerTouchPath[SIDE_RIGHT]);
+
+        bindings[currBinding++] = ActionSuggestedBinding(GripAction, squeezeValuePath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(GripAction, squeezeValuePath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(poseAction, posePath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(poseAction, posePath[SIDE_RIGHT]);
+
+        bindings[currBinding++] = ActionSuggestedBinding(backAction, menuClickPath[SIDE_LEFT]);
+
+        bindings[currBinding++] = ActionSuggestedBinding(ThumbrestTouchAction, thumbrestPath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(ThumbrestTouchAction, thumbrestPath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(vibrateAction, hapticPath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(vibrateAction, hapticPath[SIDE_RIGHT]);
+
+        bindings[currBinding++] = ActionSuggestedBinding(XTouchAction, XTouchPath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(YTouchAction, YTouchPath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(ATouchAction, ATouchPath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(BTouchAction, BTouchPath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(XAction, XValuePath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(YAction, YValuePath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(AAction, AValuePath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(BAction, BValuePath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(aimAction, aimPath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(aimAction, aimPath[SIDE_RIGHT]);
+
+        XrInteractionProfileSuggestedBinding suggestedBindings = {};
+        suggestedBindings.type = XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING;
+        suggestedBindings.interactionProfile = touchControllerInteractionProfilePath;
+        suggestedBindings.suggestedBindings = bindings;
+        suggestedBindings.countSuggestedBindings = currBinding;
+        result = xrSuggestInteractionProfileBindings(gAppState.Instance, &suggestedBindings);
     }
 
     XrActionSpaceCreateInfo actionSpaceInfo = {};
@@ -542,23 +584,36 @@ void TBXR_UpdateControllers( )
     rightRemoteTracking_new = gAppState.TrackedController[1];
 
 
-
     //button mapping
     leftTrackedRemoteState_new.Buttons = 0;
     if (GetActionStateBoolean(backAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Enter;
     if (GetActionStateBoolean(XAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_X;
+    if (GetActionStateBoolean(XTouchAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Touches |= xrButton_X;
     if (GetActionStateBoolean(YAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Y;
-    if (GetActionStateBoolean(sideAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
+    if (GetActionStateBoolean(YTouchAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Touches |= xrButton_Y;
+    leftTrackedRemoteState_new.GripTrigger = GetActionStateFloat(GripAction, SIDE_LEFT).currentState;
+    if (leftTrackedRemoteState_new.GripTrigger > 0.5f) leftTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
     if (GetActionStateBoolean(touchpadAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_LThumb;
-    if (GetActionStateFloat(triggerAction, SIDE_LEFT).currentState > 0.5f) leftTrackedRemoteState_new.Buttons |= xrButton_Trigger;
+    if (GetActionStateBoolean(thumbstickTouchAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Touches |= xrButton_LThumb;
+    leftTrackedRemoteState_new.IndexTrigger = GetActionStateFloat(triggerAction, SIDE_LEFT).currentState;
+    if (leftTrackedRemoteState_new.IndexTrigger > 0.5f) leftTrackedRemoteState_new.Buttons |= xrButton_Trigger;
+    if (GetActionStateBoolean(TriggerTouchAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Touches |= xrButton_Trigger;
+    if (GetActionStateBoolean(ThumbrestTouchAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Touches |= xrButton_ThumbRest;
 
     rightTrackedRemoteState_new.Buttons = 0;
     if (GetActionStateBoolean(backAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_Enter;
     if (GetActionStateBoolean(AAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_A;
+    if (GetActionStateBoolean(ATouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_A;
     if (GetActionStateBoolean(BAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_B;
-    if (GetActionStateBoolean(sideAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
+    if (GetActionStateBoolean(BTouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_B;
+    rightTrackedRemoteState_new.GripTrigger = GetActionStateFloat(GripAction, SIDE_RIGHT).currentState;
+    if (rightTrackedRemoteState_new.GripTrigger > 0.5f) rightTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
     if (GetActionStateBoolean(touchpadAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_RThumb;
-    if (GetActionStateFloat(triggerAction, SIDE_RIGHT).currentState > 0.5f) rightTrackedRemoteState_new.Buttons |= xrButton_Trigger;
+    if (GetActionStateBoolean(thumbstickTouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_LThumb;
+    rightTrackedRemoteState_new.IndexTrigger = GetActionStateFloat(triggerAction, SIDE_RIGHT).currentState;
+    if (rightTrackedRemoteState_new.IndexTrigger > 0.5f) rightTrackedRemoteState_new.Buttons |= xrButton_Trigger;
+    if (GetActionStateBoolean(TriggerTouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_Trigger;
+    if (GetActionStateBoolean(ThumbrestTouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_ThumbRest;
 
     //thumbstick
     XrActionStateVector2f moveJoystickState;
@@ -638,4 +693,3 @@ void TBXR_ProcessHaptics() {
         }
     }
 }
-#endif //PICO_XR

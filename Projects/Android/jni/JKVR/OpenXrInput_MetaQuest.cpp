@@ -1,7 +1,7 @@
 #include "VrInput.h"
 #include "VrCvars.h"
 
-#ifdef META_QUEST
+#if 0
 
 extern ovrApp gAppState;
 
