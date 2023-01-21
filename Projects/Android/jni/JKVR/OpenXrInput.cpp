@@ -99,6 +99,30 @@ XrActionStateVector2f GetActionStateVector2(XrAction action, int hand) {
     return state;
 }
 
+void CreateAction(
+        XrActionSet actionSet,
+        XrActionType type,
+        const char* actionName,
+        const char* localizedName,
+        int countSubactionPaths,
+        XrPath* subactionPaths,
+        XrAction* action) {
+    ALOGV("CreateAction %s, %", actionName, countSubactionPaths);
+
+    XrActionCreateInfo aci = {};
+    aci.type = XR_TYPE_ACTION_CREATE_INFO;
+    aci.next = NULL;
+    aci.actionType = type;
+    if (countSubactionPaths > 0) {
+        aci.countSubactionPaths = countSubactionPaths;
+        aci.subactionPaths = subactionPaths;
+    }
+    strcpy(aci.actionName, actionName);
+    strcpy(aci.localizedActionName, localizedName ? localizedName : actionName);
+    *action = XR_NULL_HANDLE;
+    OXR(xrCreateAction(actionSet, &aci, action));
+}
+
 void TBXR_InitActions( void )
 {
     // Create an action set.
@@ -118,210 +142,40 @@ void TBXR_InitActions( void )
     // Create actions.
     {
         // Create an input action for grabbing objects with the left and right hands.
-        XrActionCreateInfo actionInfo = {};
-        actionInfo.type = XR_TYPE_ACTION_CREATE_INFO;
-        actionInfo.actionType = XR_ACTION_TYPE_FLOAT_INPUT;
-        strcpy(actionInfo.actionName, "grab_object");
-        strcpy(actionInfo.localizedActionName, "Grab Object");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &grabAction));
+        CreateAction(actionSet, XR_ACTION_TYPE_POSE_INPUT, "grab_object", "Grab Object", SIDE_COUNT, handSubactionPath, &grabAction);
 
         // Create an input action getting the left and right hand poses.
-        actionInfo.actionType = XR_ACTION_TYPE_POSE_INPUT;
-        strcpy(actionInfo.actionName, "hand_pose");
-        strcpy(actionInfo.localizedActionName, "Hand Pose");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &poseAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_POSE_INPUT;
-        strcpy(actionInfo.actionName, "aim_pose");
-        strcpy(actionInfo.localizedActionName, "Aim Pose");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &aimAction));
+        CreateAction(actionSet, XR_ACTION_TYPE_POSE_INPUT, "hand_pose", "Hand Pose", SIDE_COUNT, handSubactionPath, &poseAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_POSE_INPUT, "aim_pose", "Aim Pose", SIDE_COUNT, handSubactionPath, &aimAction);
 
         // Create output actions for vibrating the left and right controller.
-        actionInfo.actionType = XR_ACTION_TYPE_VIBRATION_OUTPUT;
-        strcpy(actionInfo.actionName, "vibrate_hand");
-        strcpy(actionInfo.localizedActionName, "Vibrate Hand");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &vibrateAction));
+        CreateAction(actionSet, XR_ACTION_TYPE_VIBRATION_OUTPUT, "vibrate_hand", "Vibrate Hand", SIDE_COUNT, handSubactionPath, &vibrateAction);
 
-        // Create input actions for quitting the session using the left and right controller.
-        // Since it doesn't matter which hand did this, we do not specify subaction paths for it.
-        // We will just suggest bindings for both hands, where possible.
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "quit_session");
-        strcpy(actionInfo.localizedActionName, "Quit Session");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &quitAction));
-
-        // Create input actions for toucpad key using the left and right controller.
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "touchpad");
-        strcpy(actionInfo.localizedActionName, "Touchpad");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &touchpadAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "axkey");
-        strcpy(actionInfo.localizedActionName, "AXkey");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &AXAction));
-
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "homekey");
-        strcpy(actionInfo.localizedActionName, "Homekey");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &homeAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "bykey");
-        strcpy(actionInfo.localizedActionName, "BYkey");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &BYAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "backkey");
-        strcpy(actionInfo.localizedActionName, "Backkey");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &backAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "sidekey");
-        strcpy(actionInfo.localizedActionName, "Sidekey");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &sideAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_FLOAT_INPUT;
-        strcpy(actionInfo.actionName, "trigger");
-        strcpy(actionInfo.localizedActionName, "Trigger");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &triggerAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_VECTOR2F_INPUT;
-        strcpy(actionInfo.actionName, "joystick");
-        strcpy(actionInfo.localizedActionName, "Joystick");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &joystickAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_FLOAT_INPUT;
-        strcpy(actionInfo.actionName, "battery");
-        strcpy(actionInfo.localizedActionName, "battery");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &batteryAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "axtouch");
-        strcpy(actionInfo.localizedActionName, "AXtouch");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &AXTouchAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "bytouch");
-        strcpy(actionInfo.localizedActionName, "BYtouch");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &BYTouchAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "rockertouch");
-        strcpy(actionInfo.localizedActionName, "Rockertouch");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &thumbstickTouchAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "triggertouch");
-        strcpy(actionInfo.localizedActionName, "Triggertouch");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &TriggerTouchAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "thumbresttouch");
-        strcpy(actionInfo.localizedActionName, "Thumbresttouch");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &ThumbrestTouchAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_FLOAT_INPUT;
-        strcpy(actionInfo.actionName, "gripvalue");
-        strcpy(actionInfo.localizedActionName, "GripValue");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &GripAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "akey");
-        strcpy(actionInfo.localizedActionName, "Akey");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &AAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "bkey");
-        strcpy(actionInfo.localizedActionName, "Bkey");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &BAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "xkey");
-        strcpy(actionInfo.localizedActionName, "Xkey");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &XAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "ykey");
-        strcpy(actionInfo.localizedActionName, "Ykey");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &YAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "atouch");
-        strcpy(actionInfo.localizedActionName, "Atouch");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &ATouchAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "btouch");
-        strcpy(actionInfo.localizedActionName, "Btouch");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &BTouchAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "xtouch");
-        strcpy(actionInfo.localizedActionName, "Xtouch");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &XTouchAction));
-
-        actionInfo.actionType = XR_ACTION_TYPE_BOOLEAN_INPUT;
-        strcpy(actionInfo.actionName, "ytouch");
-        strcpy(actionInfo.localizedActionName, "Ytouch");
-        actionInfo.countSubactionPaths = SIDE_COUNT;
-        actionInfo.subactionPaths = handSubactionPath;
-        CHECK_XRCMD(xrCreateAction(actionSet, &actionInfo, &YTouchAction));
+        //All remaining actions (not necessarily supported by all controllers)
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "quit_session", "Quit Session", SIDE_COUNT, handSubactionPath, &quitAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "touchpad", "Touchpad", SIDE_COUNT, handSubactionPath, &touchpadAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "axkey", "AXkey", SIDE_COUNT, handSubactionPath, &AXAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "homekey", "Homekey", SIDE_COUNT, handSubactionPath, &homeAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "bykey", "BYkey", SIDE_COUNT, handSubactionPath, &BYAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "backkey", "Backkey", SIDE_COUNT, handSubactionPath, &backAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "sidekey", "Sidekey", SIDE_COUNT, handSubactionPath, &sideAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_FLOAT_INPUT, "trigger", "Trigger", SIDE_COUNT, handSubactionPath, &triggerAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_VECTOR2F_INPUT, "joystick", "Joystick", SIDE_COUNT, handSubactionPath, &joystickAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_FLOAT_INPUT, "battery", "battery", SIDE_COUNT, handSubactionPath, &batteryAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "axtouch", "AXtouch", SIDE_COUNT, handSubactionPath, &AXTouchAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "bytouch", "BYtouch", SIDE_COUNT, handSubactionPath, &BYTouchAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "rockertouch", "Rockertouch", SIDE_COUNT, handSubactionPath, &thumbstickTouchAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "triggertouch", "Triggertouch", SIDE_COUNT, handSubactionPath, &TriggerTouchAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "thumbresttouch", "Thumbresttouch", SIDE_COUNT, handSubactionPath, &ThumbrestTouchAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_FLOAT_INPUT, "gripvalue", "GripValue", SIDE_COUNT, handSubactionPath, &GripAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "akey", "Akey", SIDE_COUNT, handSubactionPath, &AAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "bkey", "Bkey", SIDE_COUNT, handSubactionPath, &BAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "xkey", "Xkey", SIDE_COUNT, handSubactionPath, &XAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "ykey", "Ykey", SIDE_COUNT, handSubactionPath, &YAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "atouch", "Atouch", SIDE_COUNT, handSubactionPath, &ATouchAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "btouch", "Btouch", SIDE_COUNT, handSubactionPath, &BTouchAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "xtouch", "Xtouch", SIDE_COUNT, handSubactionPath, &XTouchAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "ytouch", "Ytouch", SIDE_COUNT, handSubactionPath, &YTouchAction);
     }
 
     XrPath selectPath[SIDE_COUNT];
