@@ -562,6 +562,7 @@ void CGCam_Track( const char *trackName, float speed, float initLerp )
 	else
 	{
 		client_camera.trackInitLerp = qfalse;
+		vr->take_snap = true;
 	}
 	/*
 	if ( client_camera.info_state & CAMERA_FOLLOWING )
@@ -801,6 +802,12 @@ void CGCam_FollowUpdate ( void )
 		//So tracker doesn't move right away thinking the first angle change
 		//is the subject moving... FIXME: shouldn't set this until lerp done OR snapped?
 		client_camera.subjectSpeed = 0;
+
+		//Store initial point, let player do the follow from here themselves
+		if (vr->immersive_cinematics)
+		{
+			vr->take_snap = true;
+		}
 	}
 
 	//Point camera to lerp angles
@@ -1078,7 +1085,8 @@ void CGCam_Update( void )
 		{
 			actualFOV_X = client_camera.FOV + (( ( client_camera.FOV2 - client_camera.FOV ) ) / client_camera.FOV_duration ) * ( cg.time - client_camera.FOV_time );
 		}
-		CG_CalcFOVFromX( actualFOV_X );
+		float fov = vr && vr->immersive_cinematics ? vr->fov_x : actualFOV_X;
+		CG_CalcFOVFromX( fov );
 	}
 	else
 	{
@@ -1089,31 +1097,45 @@ void CGCam_Update( void )
 	//Check for roffing angles
 	if ( (client_camera.info_state & CAMERA_ROFFING) && !(client_camera.info_state & CAMERA_FOLLOWING) )
 	{
-		for ( i = 0; i < 3; i++ )
+		if (!vr->immersive_cinematics)
 		{
-			cg.refdefViewAngles[i] =  client_camera.angles[i] + ( client_camera.angles2[i] / client_camera.pan_duration ) * ( cg.time - client_camera.pan_time );
+			for ( i = 0; i < 3; i++ )
+			{
+				cg.refdefViewAngles[i] =  client_camera.angles[i] + ( client_camera.angles2[i] / client_camera.pan_duration ) * ( cg.time - client_camera.pan_time );
+			}
+		}
+		else
+		{
+			VectorCopy(client_camera.angles, cg.refdefViewAngles);
 		}
 	}
 	else if ( client_camera.info_state & CAMERA_PANNING )
 	{
-		//Note: does not actually change the camera's angles until the pan time is done!
-		if ( client_camera.pan_time + client_camera.pan_duration < cg.time )
-		{//finished panning
-			for ( i = 0; i < 3; i++ )
-			{
-				client_camera.angles[i] = AngleNormalize360( ( client_camera.angles[i] + client_camera.angles2[i] ) );
-			}
+		if (!vr->immersive_cinematics)
+		{
+			//Note: does not actually change the camera's angles until the pan time is done!
+			if ( client_camera.pan_time + client_camera.pan_duration < cg.time )
+			{//finished panning
+				for ( i = 0; i < 3; i++ )
+				{
+					client_camera.angles[i] = AngleNormalize360( ( client_camera.angles[i] + client_camera.angles2[i] ) );
+				}
 
-			client_camera.info_state &= ~CAMERA_PANNING;
-			VectorCopy(client_camera.angles, cg.refdefViewAngles );
+				client_camera.info_state &= ~CAMERA_PANNING;
+				VectorCopy(client_camera.angles, cg.refdefViewAngles );
+			}
+			else
+			{//still panning
+				for ( i = 0; i < 3; i++ )
+				{
+					//NOTE: does not store the resultant angle in client_camera.angles until pan is done
+					cg.refdefViewAngles[i] = client_camera.angles[i] + ( client_camera.angles2[i] / client_camera.pan_duration ) * ( cg.time - client_camera.pan_time );
+				}
+			}
 		}
 		else
-		{//still panning
-			for ( i = 0; i < 3; i++ )
-			{
-				//NOTE: does not store the resultant angle in client_camera.angles until pan is done
-				cg.refdefViewAngles[i] = client_camera.angles[i] + ( client_camera.angles2[i] / client_camera.pan_duration ) * ( cg.time - client_camera.pan_time );
-			}
+		{
+			VectorCopy(client_camera.angles, cg.refdefViewAngles);
 		}
 	}
 	else 
@@ -1148,7 +1170,8 @@ void CGCam_Update( void )
 
 	if ( checkFollow )
 	{
-		if ( client_camera.info_state & CAMERA_FOLLOWING )
+		//Don't follow if immersive
+		if (( client_camera.info_state & CAMERA_FOLLOWING ) && !vr->immersive_cinematics )
 		{//This needs to be done after camera movement
 			CGCam_FollowUpdate();
 		}
@@ -1176,7 +1199,7 @@ void CGCam_Update( void )
 
 	if (vr->immersive_cinematics)
 	{
-		float yaw = cg.refdefViewAngles[YAW] + vr->hmdorientation[YAW];
+		float yaw = cg.refdefViewAngles[YAW] + (vr->hmdorientation[YAW] - vr->hmdorientation_snap[YAW]) + vr->snapTurn;
 		VectorCopy(vr->hmdorientation, cg.refdefViewAngles);
 		cg.refdefViewAngles[YAW] = yaw;
 	}

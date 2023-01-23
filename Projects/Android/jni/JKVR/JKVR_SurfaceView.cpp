@@ -173,13 +173,16 @@ void VR_SetHMDPosition(float x, float y, float z )
 
 	VectorSet(vr.hmdposition, x, y, z);
 
-    if (s_useScreen != VR_UseScreenLayer())
+	//Can be set elsewhere
+	vr.take_snap |= s_useScreen != VR_UseScreenLayer();
+	if (vr.take_snap)
     {
 		s_useScreen = VR_UseScreenLayer();
 
 		//Record player position on transition
 		VectorSet(vr.hmdposition_snap, x, y, z);
 		VectorCopy(vr.hmdorientation, vr.hmdorientation_snap);
+		vr.take_snap = false;
     }
 
 	VectorSubtract(vr.hmdposition, vr.hmdposition_snap, vr.hmdposition_offset);
@@ -360,6 +363,12 @@ void VR_FrameSetup()
 
 bool VR_GetVRProjection(int eye, float zNear, float zFar, float* projection)
 {
+	//Don't use our projection if playing a cinematic and we are not immersive
+	if (vr.cin_camera && !vr.immersive_cinematics)
+	{
+		return false;
+	}
+
 	if (!vr.cgzoommode)
 	{
 #ifdef PICO_XR
@@ -384,7 +393,6 @@ bool VR_GetVRProjection(int eye, float zNear, float zFar, float* projection)
 		memcpy(projection, gAppState.ProjectionMatrices[eye].m, 16 * sizeof(float));
 		return true;
 	}
-
 
 	return false;
 }

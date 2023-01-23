@@ -34,6 +34,8 @@ typedef struct {
     vec3_t hmdposition_snap; // The position the HMD was in last time the menu was up (snapshot position)
     vec3_t hmdposition_offset; // offset from the position the HMD was in last time the menu was up
 
+    bool   take_snap;
+
     vec3_t hmdorientation;
     vec3_t hmdorientation_last; // Don't use this, it is just for calculating delta!
     vec3_t hmdorientation_delta;
