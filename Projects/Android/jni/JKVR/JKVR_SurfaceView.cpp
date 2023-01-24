@@ -182,6 +182,12 @@ void VR_SetHMDPosition(float x, float y, float z )
 		//Record player position on transition
 		VectorSet(vr.hmdposition_snap, x, y, z);
 		VectorCopy(vr.hmdorientation, vr.hmdorientation_snap);
+		if (vr.cin_camera)
+		{
+			//Reset snap turn too if in a cinematic
+			vr.snapTurn = 0;
+		}
+
 		vr.take_snap = false;
     }
 

@@ -54,6 +54,10 @@ typedef struct camera_s
 	vec3_t	origin2;
 	vec3_t	angles2;
 
+	//Stored angles/origin used in immersive cinematic mode
+	bool has_stored_angles;
+	vec3_t	stored_angles;
+
 	//Movement information
 	float	move_duration;
 	float	move_time;
