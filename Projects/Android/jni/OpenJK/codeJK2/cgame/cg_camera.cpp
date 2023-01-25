@@ -1095,41 +1095,31 @@ void CGCam_Update( void )
 	//Check for roffing angles
 	if ( (client_camera.info_state & CAMERA_ROFFING) && !(client_camera.info_state & CAMERA_FOLLOWING) )
 	{
-		if (!vr->immersive_cinematics)
+		for ( i = 0; i < 3; i++ )
 		{
-			for ( i = 0; i < 3; i++ )
-			{
-				cg.refdefViewAngles[i] =  client_camera.angles[i] + ( client_camera.angles2[i] / client_camera.pan_duration ) * ( cg.time - client_camera.pan_time );
-			}
+			cg.refdefViewAngles[i] =  client_camera.angles[i] + ( client_camera.angles2[i] / client_camera.pan_duration ) * ( cg.time - client_camera.pan_time );
 		}
 	}
 	else if ( client_camera.info_state & CAMERA_PANNING )
 	{
-		if (!vr->immersive_cinematics)
-		{
-			//Note: does not actually change the camera's angles until the pan time is done!
-			if ( client_camera.pan_time + client_camera.pan_duration < cg.time )
-			{//finished panning
-				for ( i = 0; i < 3; i++ )
-				{
-					client_camera.angles[i] = AngleNormalize360( ( client_camera.angles[i] + client_camera.angles2[i] ) );
-				}
+		//Note: does not actually change the camera's angles until the pan time is done!
+		if ( client_camera.pan_time + client_camera.pan_duration < cg.time )
+		{//finished panning
+			for ( i = 0; i < 3; i++ )
+			{
+				client_camera.angles[i] = AngleNormalize360( ( client_camera.angles[i] + client_camera.angles2[i] ) );
+			}
 
-				client_camera.info_state &= ~CAMERA_PANNING;
-				VectorCopy(client_camera.angles, cg.refdefViewAngles );
-			}
-			else
-			{//still panning
-				for ( i = 0; i < 3; i++ )
-				{
-					//NOTE: does not store the resultant angle in client_camera.angles until pan is done
-					cg.refdefViewAngles[i] = client_camera.angles[i] + ( client_camera.angles2[i] / client_camera.pan_duration ) * ( cg.time - client_camera.pan_time );
-				}
-			}
+			client_camera.info_state &= ~CAMERA_PANNING;
+			VectorCopy(client_camera.angles, cg.refdefViewAngles );
 		}
 		else
-		{
-			VectorCopy(client_camera.angles, cg.refdefViewAngles);
+		{//still panning
+			for ( i = 0; i < 3; i++ )
+			{
+				//NOTE: does not store the resultant angle in client_camera.angles until pan is done
+				cg.refdefViewAngles[i] = client_camera.angles[i] + ( client_camera.angles2[i] / client_camera.pan_duration ) * ( cg.time - client_camera.pan_time );
+			}
 		}
 	}
 	else 
@@ -1221,8 +1211,10 @@ void CGCam_Update( void )
 			VectorCopy(client_camera.angles, client_camera.stored_angles);
 		}
 
-		//Copy stored angles to refdef whether they have changed or not
-		VectorCopy(client_camera.stored_angles, cg.refdefViewAngles);
+		//Copy stored YAW angle to refdef whether it has changed or not, use pitch/roll direct from the hmd
+		float yaw = client_camera.stored_angles[YAW] + (vr->hmdorientation[YAW] - vr->hmdorientation_snap[YAW]) + vr->snapTurn;
+		VectorCopy(vr->hmdorientation, cg.refdefViewAngles);
+		cg.refdefViewAngles[YAW] = yaw;
 
 		//store previous state
 		previous_client_camera = client_camera;
@@ -1236,13 +1228,6 @@ void CGCam_Update( void )
 
 	//Normal fading - separate call because can finish after camera is disabled
 	CGCam_UpdateFade();
-
-	if (vr->immersive_cinematics)
-	{
-		float yaw = cg.refdefViewAngles[YAW] + (vr->hmdorientation[YAW] - vr->hmdorientation_snap[YAW]) + vr->snapTurn;
-		VectorCopy(vr->hmdorientation, cg.refdefViewAngles);
-		cg.refdefViewAngles[YAW] = yaw;
-	}
 
 	//Update shaking if there's any
 	//CGCam_UpdateSmooth( cg.refdef.vieworg, cg.refdefViewAngles );
