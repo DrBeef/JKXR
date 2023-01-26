@@ -167,6 +167,9 @@ void CGCam_Disable( void )
 		gi.cvar_set("timescale", "1");
 		gi.cvar_set("skippingCinematic", "0");
 	}
+
+	//Now's a good time for a reset
+	vr->take_snap = true;
 }
 
 /*
