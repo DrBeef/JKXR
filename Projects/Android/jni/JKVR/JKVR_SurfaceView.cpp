@@ -187,7 +187,6 @@ void VR_SetHMDPosition(float x, float y, float z )
 			//Reset snap turn too if in a cinematic
 			vr.snapTurn = 0;
 		}
-
 		vr.take_snap = false;
     }
 
@@ -231,7 +230,7 @@ void VR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side
 		*up = 0.0f;
 		*side = remote_movementSideways;
 		*pos_side = 0.0f;
-		*yaw = vr.snapTurn + vr.hmdorientation[YAW] - vr.hmdorientation_first[YAW];
+		*yaw = vr.hmdorientation[YAW] + vr.snapTurn;
 		*pitch = vr.hmdorientation[PITCH];
 		*roll = 0.0f;
 	}

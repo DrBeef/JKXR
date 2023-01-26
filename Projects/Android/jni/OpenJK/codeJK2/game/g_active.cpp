@@ -217,7 +217,10 @@ void G_SetViewEntity( gentity_t *self, gentity_t *viewEntity )
 	{
 		//vec3_t	clear = {0,0,0};
 		CG_SetClientViewAngles( viewEntity->client->ps.viewangles, qtrue );
-		vr->snapTurn = 0;
+		VectorCopy(viewEntity->client->ps.viewangles, vr->remote_angles);
+		vr->remote_snapTurn = vr->snapTurn;
+		vr->take_snap = true;
+		vr->remote_cooldown = cg.time + 250;
 
 		//SetClientViewAngle( self, viewEntity->client->ps.viewangles );
 		//SetClientViewAngle( viewEntity, clear );

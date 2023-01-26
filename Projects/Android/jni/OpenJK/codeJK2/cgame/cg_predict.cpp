@@ -205,9 +205,9 @@ void CG_SetClientViewAngles( vec3_t angles, qboolean overrideViewEnt )
 	{//don't clamp angles when looking through a viewEntity
 		for( int i = 0; i < 3; i++ ) 
 		{
-			cg.predicted_player_state.viewangles[PITCH] = angles[i];
+			cg.predicted_player_state.viewangles[i] = angles[i];
 			cg.predicted_player_state.delta_angles[i] = 0;
-			cg.snap->ps.viewangles[PITCH] = angles[i];
+			cg.snap->ps.viewangles[i] = angles[i];
 			cg.snap->ps.delta_angles[i] = 0;
 			g_entities[0].client->pers.cmd_angles[i] = ANGLE2SHORT(angles[i]);
 		}

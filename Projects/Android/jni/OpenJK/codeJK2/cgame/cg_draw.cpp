@@ -2980,8 +2980,13 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	if (vr->remote_npc &&
 		!vr->remote_droid)
 	{
+		if (vr->remote_cooldown > cg.time)
+		{
+			VectorCopy(cg.refdefViewAngles, vr->remote_angles);
+			vr->take_snap = true;
+		}
 		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
-		cg.refdef.viewangles[YAW] = cg.refdefViewAngles[YAW];
+		cg.refdef.viewangles[YAW] = vr->remote_angles[YAW] + (vr->hmdorientation[YAW] - vr->hmdorientation_snap[YAW]) + (vr->snapTurn - vr->remote_snapTurn);
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}
 
