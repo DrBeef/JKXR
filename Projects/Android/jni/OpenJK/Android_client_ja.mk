@@ -137,10 +137,4 @@ LOCAL_SRC_FILES += $(JK3_SRC) $(JKVR_SRC_FILES)
 include $(BUILD_SHARED_LIBRARY)
 
 
-
-$(call import-module,OpenXR/Projects/AndroidPrebuilt/jni)
-
-
-
-
-
+$(call import-module,AndroidPrebuilt/jni)
