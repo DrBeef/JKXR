@@ -27,8 +27,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 #include "g_functions.h"
-#include "bg_local.h"
-#include <JKVR/VrClientInfo.h>
 
 // ATST Main
 //---------------------------------------------------------
@@ -42,27 +40,13 @@ void WP_ATSTMainFire( gentity_t *ent )
 //		vel = 4500.0f;
 //	}
 
-
-	vec3_t	dir, angs, start;
-
-	if ( BG_UseVRPosition(ent) )
-	{
-		BG_CalculateVRWeaponPosition(start, angs);
-		AngleVectors( angs, dir, NULL, NULL );
-	}
-	else {
-		VectorCopy(wpMuzzle, start);
-		VectorCopy(wpFwd, dir);
-		vectoangles(wpFwd, angs);
-	}
-
 	if ( !ent->s.number )
 	{
 		// player shoots faster
 		vel *= 1.6f;
 	}
 
-	gentity_t	*missile = CreateMissile( start, dir, vel, 10000, ent );
+	gentity_t	*missile = CreateMissile( wpMuzzle, wpFwd, vel, 10000, ent );
 
 	missile->classname = "atst_main_proj";
 	missile->s.weapon = WP_ATST_MAIN;
@@ -92,20 +76,7 @@ void WP_ATSTSideAltFire( gentity_t *ent )
 		vel = ATST_SIDE_ALT_VELOCITY;
 	}
 
-	vec3_t	dir, angs, start;
-
-	if ( BG_UseVRPosition(ent) )
-	{
-		BG_CalculateVRWeaponPosition(start, angs);
-		AngleVectors( angs, dir, NULL, NULL );
-	}
-	else {
-		VectorCopy(wpMuzzle, start);
-		VectorCopy(wpFwd, dir);
-		vectoangles(wpFwd, angs);
-	}
-
-	gentity_t *missile = CreateMissile( start, dir, vel, 10000, ent, qtrue );
+	gentity_t *missile = CreateMissile( wpMuzzle, wpFwd, vel, 10000, ent, qtrue );
 
 	missile->classname = "atst_rocket";
 	missile->s.weapon = WP_ATST_SIDE;
@@ -156,20 +127,7 @@ void WP_ATSTSideFire( gentity_t *ent )
 {
 	int	damage	= weaponData[WP_ATST_SIDE].damage;
 
-	vec3_t	dir, angs, start;
-
-	if ( BG_UseVRPosition(ent) )
-	{
-		BG_CalculateVRWeaponPosition(start, angs);
-		AngleVectors( angs, dir, NULL, NULL );
-	}
-	else {
-		VectorCopy(wpMuzzle, start);
-		VectorCopy(wpFwd, dir);
-		vectoangles(wpFwd, angs);
-	}
-
-	gentity_t *missile = CreateMissile( start, dir, ATST_SIDE_MAIN_VELOCITY, 10000, ent, qfalse );
+	gentity_t *missile = CreateMissile( wpMuzzle, wpFwd, ATST_SIDE_MAIN_VELOCITY, 10000, ent, qfalse );
 
 	missile->classname = "atst_side_proj";
 	missile->s.weapon = WP_ATST_SIDE;
