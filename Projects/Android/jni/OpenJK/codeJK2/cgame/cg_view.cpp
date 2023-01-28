@@ -1926,9 +1926,11 @@ wasForceSpeed=isForceSpeed;
 	// decide on third person view
 	cg.renderingThirdPerson = (qboolean)(
 		cg_thirdPerson.integer ||
-		(cg.snap->ps.stats[STAT_HEALTH] <= 0) ||
-		(g_entities[0].client &&
-			g_entities[0].client->NPC_class == CLASS_ATST));
+		(cg.snap->ps.stats[STAT_HEALTH] <= 0));
+		//Using the AT-ST in 3rd person is a mess, just use 1st person
+		// ||
+		//(g_entities[0].client &&
+		//	g_entities[0].client->NPC_class == CLASS_ATST));
 
 	vr->third_person = cg.renderingThirdPerson;
 

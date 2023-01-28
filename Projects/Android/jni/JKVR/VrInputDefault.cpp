@@ -793,7 +793,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         }
 
         //process force motion controls here
-        if (vr_force_motion_controlled->integer)
+        if (vr_force_motion_controlled->integer &&
+                !vr.weapon_stabilised)
         {
             if (vr.secondaryswingvelocity > vr_force_velocity_trigger->value)
             {
@@ -839,7 +840,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 distanceToBody = sqrt(vr.weaponoffset[0]*vr.weaponoffset[0] + vr.weaponoffset[2]*vr.weaponoffset[2]);
             }
 
-            bool gestureUseAllowed = !vr.weapon_stabilised && !vr.cin_camera && !vr.misc_camera && !vr.remote_turret && !vr.emplaced_gun;
+            bool gestureUseAllowed = !vr.weapon_stabilised && !vr.cin_camera && !vr.misc_camera && !vr.remote_turret && !vr.emplaced_gun && !vr.in_vehicle;
             if (gestureUseAllowed && distanceToBody > vr_use_gesture_boundary->value) {
                 if (!vr.useGestureActive) {
                     vr.useGestureActive = true;

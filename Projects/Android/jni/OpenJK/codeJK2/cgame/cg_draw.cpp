@@ -1877,7 +1877,7 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 		return;
 	}
 
-	if ( cg.renderingThirdPerson || in_camera) {
+	if ( in_camera ) {
 		return;
 	}
 
@@ -2932,7 +2932,9 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		CG_Error( "CG_DrawActive: Undefined stereoView" );
 	}
 
-
+	//Only vehicle in JK2 is the AT-ST
+	vr->in_vehicle = (g_entities[0].client &&
+						 g_entities[0].client->NPC_class == CLASS_ATST);
     vr->remote_npc = !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname );
     vr->remote_droid = false;
     vr->remote_turret = false;

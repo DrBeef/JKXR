@@ -1,7 +1,3 @@
-# MAKEFILE_LIST specifies the current used Makefiles, of which this is the last
-# one. I use that to obtain the Application.mk dir then import the root
-# Application.mk.
-
 APP_PLATFORM := android-24
 
 APP_CFLAGS += -Wl,--no-undefined

@@ -2814,6 +2814,12 @@ qboolean ForcePower_Valid(int index);
 
 void CG_DrawItemSelector( void )
 {
+	if (cg.predicted_player_state.stats[STAT_HEALTH] <= 0 ||
+		(g_entities[0].client && g_entities[0].client->NPC_class != CLASS_KYLE))
+	{
+		return;
+	}
+
 	if (cg.itemSelectorTime == 0)
 	{
 		cg.itemSelectorTime = cg.time;
