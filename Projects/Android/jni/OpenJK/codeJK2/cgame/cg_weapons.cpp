@@ -1156,10 +1156,16 @@ void CG_AddViewWeapon( playerState_t *ps )
 
 		// set up gun position
 	float scale = CG_CalculateWeaponPositionAndScale( ps, hand.origin, angles );
+
+	if (vr->in_vehicle)
+	{
+		//Shunt the origin up if we are in a vehicle to avoid blinding the player with a muzzle flash
+		VectorMA( hand.origin, 2.0f * cg_worldScale.value, cg.refdef.viewaxis[2], hand.origin );
+	}
 	
-	VectorMA( hand.origin, cg_gun_x.value, cg.refdef.viewaxis[0], hand.origin );
-	VectorMA( hand.origin, (cg_gun_y.value+leanOffset), cg.refdef.viewaxis[1], hand.origin );
-	VectorMA( hand.origin, (cg_gun_z.value+fovOffset), cg.refdef.viewaxis[2], hand.origin );
+//	VectorMA( hand.origin, cg_gun_x.value, cg.refdef.viewaxis[0], hand.origin );
+//	VectorMA( hand.origin, (cg_gun_y.value+leanOffset), cg.refdef.viewaxis[1], hand.origin );
+//	VectorMA( hand.origin, (cg_gun_z.value+fovOffset), cg.refdef.viewaxis[2], hand.origin );
 
 	AnglesToAxis( angles, hand.axis );
 
@@ -2814,8 +2820,7 @@ qboolean ForcePower_Valid(int index);
 
 void CG_DrawItemSelector( void )
 {
-	if (cg.predicted_player_state.stats[STAT_HEALTH] <= 0 ||
-		(g_entities[0].client && g_entities[0].client->NPC_class != CLASS_KYLE))
+	if (cg.predicted_player_state.stats[STAT_HEALTH] <= 0)
 	{
 		return;
 	}
@@ -2898,7 +2903,10 @@ void CG_DrawItemSelector( void )
 	switch (cg.itemSelectorType)
 	{
 		case 0: //weapons
-			count = WP_MELEE;
+			if (vr->in_vehicle)
+				count = 2;
+			else
+				count = WP_MELEE;
 			beam.shaderRGBA[0] = 0xff;
 			beam.shaderRGBA[1] = 0xae;
 			beam.shaderRGBA[2] = 0x40;
@@ -3010,26 +3018,33 @@ void CG_DrawItemSelector( void )
 	{
 		int itemId = index;
 		if (cg.itemSelectorType == 0) {
-			itemId = index+1; // We need to ignore WP_NONE for weapons
-			if (itemId == count)
+			if (vr->in_vehicle)
 			{
-				break;
+				itemId = WP_ATST_MAIN + index;
 			}
+			else
+			{
+				itemId = index + 1; // We need to ignore WP_NONE for weapons
+				if (itemId == count)
+				{
+					break;
+				}
 
 #ifdef _DEMO
-			if (itemId == WP_SABER ||
-				itemId == WP_BRYAR_PISTOL ||
-				itemId == WP_BLASTER ||
-				itemId == WP_FLECHETTE ||
-				itemId == WP_REPEATER ||
-				itemId == WP_THERMAL) {
-				CG_RegisterWeapon(itemId);
-			} else {
-				continue;
-			}
+                if (itemId == WP_SABER ||
+                    itemId == WP_BRYAR_PISTOL ||
+                    itemId == WP_BLASTER ||
+                    itemId == WP_FLECHETTE ||
+                    itemId == WP_REPEATER ||
+                    itemId == WP_THERMAL) {
+                    CG_RegisterWeapon(itemId);
+                } else {
+                    continue;
+                }
 #else
-            CG_RegisterWeapon(itemId);
+				CG_RegisterWeapon(itemId);
 #endif
+			}
 		}
 
 		{
@@ -3037,7 +3052,8 @@ void CG_DrawItemSelector( void )
 			switch (cg.itemSelectorType)
 			{
 				case 0: //weapons
-					selectable = CG_WeaponSelectable(itemId, cg.weaponSelect, qfalse) && cg.snap->ps.ammo[weaponData[itemId].ammoIndex];
+					selectable = vr->in_vehicle || // both ATST weapons are always selectable
+							(CG_WeaponSelectable(itemId, cg.weaponSelect, qfalse) && cg.snap->ps.ammo[weaponData[itemId].ammoIndex]);
 					break;
 				case 1: //gadgets
 					selectable = CG_InventorySelectable(itemId) && inv_icons[itemId];
@@ -3063,7 +3079,7 @@ void CG_DrawItemSelector( void )
 				angles[YAW] = wheelAngles[YAW];
 				angles[PITCH] = wheelAngles[PITCH];
 				angles[ROLL] =
-                        (float)(360 / (count - ((cg.itemSelectorType == 0) ? 1 : 0))) * index;
+                        (float)(360 / (count - ((cg.itemSelectorType == 0 && !vr->in_vehicle) ? 1 : 0))) * index;
 				vec3_t forward, up;
 				AngleVectors(angles, forward, NULL, up);
 

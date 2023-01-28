@@ -1166,7 +1166,7 @@ void CG_PlayerAnimSounds( int animFileIndex, qboolean torso, int oldFrame, int f
 		}
 	}
 
-	if ( entNum == 0 && !cg.renderingThirdPerson )//!cg_thirdPerson.integer )
+	if ( entNum == 0 && !cg.renderingThirdPerson && !vr->in_vehicle)//!cg_thirdPerson.integer )
 	{//player in first person view does not play any keyframed sounds
 		return;
 	}

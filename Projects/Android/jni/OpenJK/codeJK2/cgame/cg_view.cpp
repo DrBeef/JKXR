@@ -2032,11 +2032,13 @@ wasForceSpeed=isForceSpeed;
 					&g_entities[cg.snap->ps.viewEntity].client->ps);    // HAX - because I wanted to --eez
 		}
 
+		//Render hand models when appropriate
 		if (!in_camera
 			&& !cg.renderingThirdPerson
 			&& cg.predicted_player_state.stats[STAT_HEALTH] > 0
 			&& cg.snap->ps.weapon != WP_MELEE
 			&& !vr->weapon_stabilised
+			&& !vr->in_vehicle
 			&& !cg_pano.integer
 			&& (cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD))
 		{
@@ -2047,7 +2049,7 @@ wasForceSpeed=isForceSpeed;
 
 			//Move it back a bit?
 			AngleVectors(handEnt.angles, forward, NULL, NULL);
-			VectorMA( handEnt.origin, -1.0f, forward, handEnt.origin );
+			VectorMA( handEnt.origin, -3.0f, forward, handEnt.origin );
 
 
 			handEnt.renderfx = RF_DEPTHHACK | RF_VRVIEWMODEL;
@@ -2077,7 +2079,7 @@ wasForceSpeed=isForceSpeed;
 
 				//Move it back a bit?
 				AngleVectors(handEnt.angles, forward, NULL, NULL);
-				VectorMA( handEnt.origin, -1.0f, forward, handEnt.origin );
+				VectorMA( handEnt.origin, -3.0f, forward, handEnt.origin );
 				VectorCopy(handEnt.origin, handEnt.oldorigin);
 
 				vec3_t axis[3];
