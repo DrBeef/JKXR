@@ -3302,7 +3302,8 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire )
 			case WP_BRYAR_PISTOL:
 			case WP_BOWCASTER:
 			case WP_BLASTER:
-				cgi_HapticEvent("machinegun_fire", position, 0, 100, 0, 0);
+			case WP_ATST_MAIN:
+				cgi_HapticEvent("machinegun_fire", position, 0, (ent->weapon == WP_BRYAR_PISTOL) ? 60 : 100, 0, 0);
 				break;
 			case WP_BLASTER_PISTOL:
 				cgi_HapticEvent("shotgun_fire", position, 0, 100, 0, 0);
@@ -3313,6 +3314,7 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire )
 				cgi_HapticEvent("handgrenade_fire", position, 0, 80, 0, 0);
 				break;
 			case WP_ROCKET_LAUNCHER:
+			case WP_ATST_SIDE:
 				cgi_HapticEvent("rocket_fire", position, 0, 100, 0, 0);
 				break;
 			case WP_DISRUPTOR:
