@@ -29,10 +29,10 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	if (cg.drawingHUD && !vr->cin_camera && !vr->using_screen_layer)
 	{
-		float screenXScale = 1.0f / (cg.drawingHUD == CG_HUD_SCALED ? 2.5f : 1.0f);
-		float screenYScale = 1.0f / (cg.drawingHUD == CG_HUD_SCALED ? 2.5f : 1.25f);
+		float screenXScale = 1.0f / (cg.drawingHUD == CG_HUD_SCALED ? cg_hudScale.value : 1.0f);
+		float screenYScale = 1.0f / (cg.drawingHUD == CG_HUD_SCALED ? cg_hudScale.value : 1.25f);
 
-		float xoffset = cg.drawingHUD == CG_HUD_SCALED ? -20 : 0;
+		float xoffset = cg.drawingHUD == CG_HUD_SCALED ? -cg_hudStereo.value : 0;
 		if (cg.stereoView == STEREO_LEFT) {
 			xoffset *= -1;
 		}
@@ -47,7 +47,7 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 		}
 
 		*x += (640 - (640 * screenXScale)) / 2.0f + xoffset;
-		*y += (480 - (480 * screenYScale)) / 2.0f;
+		*y += (480 - (480 * screenYScale)) / 2.0f - cg_hudYOffset.value;
 	}
 }
 

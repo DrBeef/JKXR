@@ -640,6 +640,10 @@ extern	vmCvar_t		cg_developer;
 extern	vmCvar_t		cg_timescale;
 extern	vmCvar_t		cg_skippingcin;
 
+extern  vmCvar_t		cg_hudScale;
+extern  vmCvar_t		cg_hudStereo;
+extern  vmCvar_t		cg_hudYOffset;
+
 extern	vmCvar_t		cg_pano;
 extern	vmCvar_t		cg_panoNumShots;
 

@@ -315,6 +315,11 @@ vmCvar_t 	cg_developer;
 vmCvar_t 	cg_timescale;
 vmCvar_t	cg_skippingcin;
 
+vmCvar_t	cg_hudScale;
+vmCvar_t	cg_hudStereo;
+vmCvar_t	cg_hudYOffset;
+
+
 vmCvar_t	cg_pano;
 vmCvar_t	cg_panoNumShots;
 
@@ -380,6 +385,10 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_worldScale, "cg_worldScale", "33.5", CVAR_ARCHIVE  },
 	{ &cg_heightAdjust, "cg_heightAdjust", "0.0", CVAR_ARCHIVE  },
 	{ &cg_shadows, "cg_shadows", "3", CVAR_ARCHIVE  },
+
+	{ &cg_hudScale, "cg_hudScale", "2.5", CVAR_ARCHIVE  },
+	{ &cg_hudStereo, "cg_hudStereo", "20", CVAR_ARCHIVE  },
+	{ &cg_hudYOffset, "cg_hudYOffset", "0.0", CVAR_ARCHIVE  },
 
 	{ &cg_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE  },
 	{ &cg_drawStatus, "cg_drawStatus", "1", CVAR_ARCHIVE  },

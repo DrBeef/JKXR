@@ -320,6 +320,11 @@ vmCvar_t 	cg_developer;
 vmCvar_t 	cg_timescale;
 vmCvar_t	cg_skippingcin;
 
+vmCvar_t	cg_hudScale;
+vmCvar_t	cg_hudStereo;
+vmCvar_t	cg_hudYOffset;
+
+
 vmCvar_t	cg_pano;
 vmCvar_t	cg_panoNumShots;
 
@@ -391,6 +396,10 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_shadowCullDistance, "r_shadowRange", "1000", CVAR_ARCHIVE },
 	{ &cg_footsteps, "cg_footsteps", "3", CVAR_ARCHIVE  },//1 = sounds, 2 = sounds & effects, 3 = sounds, effects & marks, 4 = always
 	{ &cg_saberEntMarks, "cg_saberEntMarks", "1", CVAR_ARCHIVE  },
+
+	{ &cg_hudScale, "cg_hudScale", "2.5", CVAR_ARCHIVE  },
+	{ &cg_hudStereo, "cg_hudStereo", "20", CVAR_ARCHIVE  },
+	{ &cg_hudYOffset, "cg_hudYOffset", "0.0", CVAR_ARCHIVE  },
 
 	{ &cg_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE  },
 	{ &cg_drawStatus, "cg_drawStatus", "1", CVAR_ARCHIVE  },
