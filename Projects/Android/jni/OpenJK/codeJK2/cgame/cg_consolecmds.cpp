@@ -252,7 +252,7 @@ static consoleCommand_t	commands[] = {
 	{ "itemselectorprev", CG_ItemSelectorPrev_f },
 	{ "togglesaber", CG_ToggleSaber_f },
 	{ "exitscope", CG_ExitScope_f },
-	{ "enterscope", CG_EnterScope_f },
+	{ "enterscope", CG_EnterScope_f }
 };
 
 static const size_t numCommands = ARRAY_LEN( commands );

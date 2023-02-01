@@ -36,10 +36,11 @@ extern vmCvar_t	cg_debugHealthBars;
 
 extern Vehicle_t *G_IsRidingVehicle( gentity_t *ent );
 
-void CG_DrawIconBackground(void);
-void CG_DrawMissionInformation( void );
+void CG_DrawMoveSpeedIcon(void);
 void CG_DrawInventorySelect( void );
 void CG_DrawForceSelect( void );
+void CG_DrawIconBackground(void);
+void CG_DrawMissionInformation( void );
 qboolean CG_WorldCoordToScreenCoord(vec3_t worldCoord, int *x, int *y);
 qboolean CG_WorldCoordToScreenCoordFloat(vec3_t worldCoord, float *x, float *y);
 
@@ -1620,6 +1621,47 @@ static qboolean CG_DrawCustomHealthHud( centity_t *cent )
 	}
 
 	return qtrue;
+}
+
+
+/*
+==============
+CG_DrawWeapReticle
+==============
+*/
+static void CG_DrawWeapReticle( void )
+{
+    vec4_t light_color = {0.7, 0.7, 0.7, 1};
+    vec4_t black = {0.0, 0.0, 0.0, 1};
+
+    float indent = 0.16;
+    float X_WIDTH=640;
+    float Y_HEIGHT=480;
+
+    float x = (X_WIDTH * indent), y = (Y_HEIGHT * indent), w = (X_WIDTH * (1-(2*indent))) / 2.0f, h = (Y_HEIGHT * (1-(2*indent))) / 2;
+
+    // sides
+    CG_FillRect( 0, 0, (X_WIDTH * indent), Y_HEIGHT, black );
+    CG_FillRect( X_WIDTH * (1 - indent), 0, (X_WIDTH * indent), Y_HEIGHT, black );
+    // top/bottom
+    CG_FillRect( X_WIDTH * indent, 0, X_WIDTH * (1-indent), Y_HEIGHT * indent, black );
+    CG_FillRect( X_WIDTH * indent, Y_HEIGHT * (1-indent), X_WIDTH * (1-indent), Y_HEIGHT * indent, black );
+
+    {
+        // center
+        if ( cgs.media.reticleShader ) {
+            cgi_R_DrawStretchPic( x, y, w, h, 0, 0, 1, 1, cgs.media.reticleShader );    // tl
+            cgi_R_DrawStretchPic( x + w, y, w, h, 1, 0, 0, 1, cgs.media.reticleShader );  // tr
+            cgi_R_DrawStretchPic( x, y + h, w, h, 0, 1, 1, 0, cgs.media.reticleShader );    // bl
+            cgi_R_DrawStretchPic( x + w, y + h, w, h, 1, 1, 0, 0, cgs.media.reticleShader );  // br
+        }
+
+        // hairs
+        CG_FillRect( 84, 239, 177, 2, black );   // left
+        CG_FillRect( 320, 242, 1, 58, black );   // center top
+        CG_FillRect( 319, 300, 2, 178, black );  // center bot
+        CG_FillRect( 380, 239, 177, 2, black );  // right
+    }
 }
 
 //--------------------------------------
@@ -4001,6 +4043,25 @@ static void CG_Draw2DScreenTints( void )
 		CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, hcolor  );
 	}
 }
+
+/*
+-------------------------
+CG_DrawZoomBorders
+-------------------------
+*/
+
+static void CG_DrawZoomBorders( void )
+{
+	vec4_t	modulate;
+	modulate[0] = modulate[1] = modulate[2] = 0.0f;
+	modulate[3] = 1.0f;
+
+	int bar_height = 80;
+	CG_FillRect( 0, 0, 640, bar_height, modulate  );
+	CG_FillRect( 0, 480 - 80, 640, bar_height, modulate  );
+}
+
+
 /*
 =================
 CG_Draw2D
@@ -4047,7 +4108,15 @@ static void CG_Draw2D( void )
 		CGCam_DrawWideScreen();
 	}
 
-	//Everything below here needs to be fitted into the visible portion of the display
+    if (cg.zoomMode == 4)
+    {
+        CG_DrawWeapReticle();
+    }
+	else if (cg.zoomMode != 0)
+	{
+		CG_DrawZoomBorders();
+	}
+
 	cg.drawingHUD = CG_HUD_SCALED;
 
 	CG_DrawBatteryCharge();
@@ -4060,13 +4129,16 @@ static void CG_Draw2D( void )
 	// Draw this before the text so that any text won't get clipped off
 	if ( !in_camera )
 	{
-		cg.drawingHUD = CG_HUD_NORMAL;
+		cg.drawingHUD = CG_HUD_ZOOM;
 		CG_DrawZoomMask();
 		cg.drawingHUD = CG_HUD_SCALED;
 	}
 
 	CG_DrawScrollText();
-	CG_DrawCaptionText();
+
+	if (!vr->immersive_cinematics) {
+		CG_DrawCaptionText();
+	}
 
 	if ( in_camera )
 	{//still draw the saber clash flare, but nothing else
@@ -4105,6 +4177,8 @@ static void CG_Draw2D( void )
 		{
 			//CG_DrawIconBackground();
 		}
+
+		CG_DrawMoveSpeedIcon();
 
 		CG_DrawWeaponSelect();
 
@@ -4383,15 +4457,92 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		CG_Error( "CG_DrawActive: Undefined stereoView" );
 	}
 
-	in_misccamera = ( !Q_stricmp( "misc_camera", g_entities[cg.snap->ps.viewEntity].classname ));
+	//Only vehicle in JK2 is the AT-ST
+	vr->in_vehicle = (g_entities[0].client &&
+						 g_entities[0].client->NPC_class == CLASS_ATST);
+    vr->remote_npc = !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname );
+    vr->remote_droid = false;
+    vr->remote_turret = false;
+	vr->emplaced_gun = ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON );
+    in_misccamera = false;
+
+    if (cg.snap->ps.viewEntity) {
+
+        if (g_entities[cg.snap->ps.viewEntity].NPC_type) {
+            char modelName[256];
+            Q_strncpyz(modelName, g_entities[cg.snap->ps.viewEntity].NPC_type, sizeof modelName);
+
+            vr->remote_droid = vr->remote_npc &&
+                               (!Q_stricmp("gonk", modelName) || !Q_stricmp("seeker", modelName) ||
+                                !Q_stricmp("remote", modelName)
+                                || !Q_strncmp("r2d2", modelName, 4) ||
+                                !Q_strncmp("r5d2", modelName, 4) || !Q_stricmp("mouse", modelName));
+        }
+
+        vr->remote_turret = (!Q_stricmp("misc_panel_turret",
+                                        g_entities[cg.snap->ps.viewEntity].classname));
+        in_misccamera = (!Q_stricmp("misc_camera", g_entities[cg.snap->ps.viewEntity].classname))
+                        || vr->remote_droid
+                        || vr->remote_turret;
+    }
 
 	cg.refdef.worldscale = cg_worldScale.value;
+
+	bool usingScope = (cg.zoomMode == 2 || cg.zoomMode == 4);
+	//Normal 1st person view angles
 	if (!in_camera &&
-		!in_misccamera) {
+		!in_misccamera &&
+		!vr->remote_droid &&
+		!vr->remote_npc &&
+		!usingScope &&
+		!cg.renderingThirdPerson)
+	{
 		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
 		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
+									SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
+		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+	}
+
+	//Controlling an NPC that isn't a droid
+	if (vr->remote_npc &&
+		!vr->remote_droid)
+	{
+		if (vr->remote_cooldown > cg.time)
+		{
+			VectorCopy(cg.refdefViewAngles, vr->remote_angles);
+			vr->take_snap = true;
+		}
+		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
+		cg.refdef.viewangles[YAW] = vr->remote_angles[YAW] + (vr->hmdorientation[YAW] - vr->hmdorientation_snap[YAW]) + (vr->snapTurn - vr->remote_snapTurn);
+		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+	}
+
+	//Sniper/E11 scope
+	if (usingScope)
+	{
+		cg.refdef.viewangles[ROLL] = vr->clientviewangles[ROLL];
+		cg.refdef.viewangles[PITCH] = vr->weaponangles[PITCH];
+		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW]
+				+ vr->weaponangles[YAW] + SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
+		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+	}
+
+	//Normal 3rd person view angles
+	if (!in_camera &&
+		!in_misccamera &&
+		cg.renderingThirdPerson)
+	{
+		VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
+		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
+				(vr->hmdorientation[YAW] - vr->hmdorientation_first[YAW]) +
 				SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+	}
+
+	//Immersive cinematic sequence 6DoF
+	if ((in_camera && vr->immersive_cinematics) || vr->emplaced_gun || cg.renderingThirdPerson)
+	{
+		BG_ConvertFromVR(vr->hmdposition_offset, cg.refdef.vieworg, cg.refdef.vieworg);
 	}
 
 	// clear around the rendered view if sized down
@@ -4399,7 +4550,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	// offset vieworg appropriately if we're doing stereo separation
 	VectorCopy( cg.refdef.vieworg, baseOrg );
-	if ( separation != 0 && (!in_camera || vr->immersive_cinematics) && !in_misccamera) {
+	if ( separation != 0 && (!in_camera || vr->immersive_cinematics) && !in_misccamera && !usingScope ) {
 		VectorMA( cg.refdef.vieworg, -separation, cg.refdef.viewaxis[1], cg.refdef.vieworg );
 	}
 
@@ -4408,9 +4559,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		cgi_R_LAGoggles();
 	}
 
-	bool in_turret = ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON );
-
-	if (!in_turret && (!in_camera || vr->immersive_cinematics)) {
+	if (!vr->emplaced_gun && !in_misccamera && !in_camera) {
 		//Vertical Positional Movement
 		cg.refdef.vieworg[2] -= DEFAULT_PLAYER_HEIGHT;
 		cg.refdef.vieworg[2] += (vr->hmdposition[1] + cg_heightAdjust.value) * cg_worldScale.value;

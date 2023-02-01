@@ -307,6 +307,9 @@ vmCvar_t	cg_thirdPersonCameraDamp;
 vmCvar_t	cg_thirdPersonTargetDamp;
 vmCvar_t	cg_saberAutoThird;
 vmCvar_t	cg_gunAutoFirst;
+vmCvar_t	cg_debugSaberCombat;
+vmCvar_t	cg_saberBurnMarkCoolDownTime;
+vmCvar_t	cg_autoUseBacta;
 
 vmCvar_t	cg_thirdPersonAlpha;
 vmCvar_t	cg_thirdPersonAutoAlpha;
@@ -1425,6 +1428,11 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.personalShieldShader		= cgi_R_RegisterShader( "gfx/misc/personalshield" );
 	cgs.media.cloakedShader				= cgi_R_RegisterShader( "gfx/effects/cloakedShader" );
 											cgi_R_RegisterShader( "gfx/misc/ion_shield" );
+
+	//VR Hand models
+	cgs.media.handModel_relaxed		= cgi_R_RegisterModel( "models/players/kyle/lhand_r.md3" );
+	cgs.media.handModel_force		= cgi_R_RegisterModel( "models/players/kyle/lhand_f.md3" );
+
 
 	cgs.media.boltShader				= cgi_R_RegisterShader( "gfx/misc/blueLine" );
 
@@ -3093,7 +3101,7 @@ INVENTORY SELECTION
 CG_InventorySelectable
 ===============
 */
-static inline qboolean CG_InventorySelectable( int index)
+qboolean CG_InventorySelectable( int index)
 {
 	if (cg.snap->ps.inventory[index])	// Is there any in the inventory?
 	{

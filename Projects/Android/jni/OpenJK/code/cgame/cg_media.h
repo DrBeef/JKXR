@@ -125,6 +125,7 @@ typedef struct {
 	qhandle_t	charsetShader;
 	qhandle_t	whiteShader;
 
+	qhandle_t	selectShader;
 	qhandle_t	crosshairShader[NUM_CROSSHAIRS];
 	qhandle_t	backTileShader;
 //	qhandle_t	noammoShader;
@@ -144,6 +145,8 @@ typedef struct {
 	qhandle_t	inventoryIconBackground;
 	qhandle_t	turretComputerOverlayShader;
 	qhandle_t	turretCrossHairShader;
+
+	qhandle_t	iconMoveSpeed[3];
 
 //Chunks
 	qhandle_t	chunkModels[NUM_CHUNK_TYPES][4];
@@ -178,6 +181,10 @@ typedef struct {
 	qhandle_t	explosionModel;
 	qhandle_t	surfaceExplosionShader;
 
+	//Hand models
+	qhandle_t	handModel_relaxed;
+	qhandle_t	handModel_force;
+
 	qhandle_t	halfShieldModel;
 
 	qhandle_t	solidWhiteShader;
@@ -185,6 +192,10 @@ typedef struct {
 	qhandle_t	electricBody2Shader;
 	qhandle_t	refractShader;
 	qhandle_t	boltShader;
+
+	qhandle_t	reticleShader;
+
+	qhandle_t vignetteShader;
 
 	// Disruptor zoom graphics
 	qhandle_t	disruptorMask;

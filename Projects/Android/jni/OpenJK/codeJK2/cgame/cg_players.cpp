@@ -5731,9 +5731,13 @@ Ghoul2 Insert End
 	// add a water splash if partially in and out of water
 	CG_PlayerSplash( cent );
 
-	// get the player model information
+	bool playerInATST = (g_entities[0].client &&
+						 g_entities[0].client->NPC_class == CLASS_ATST);
+
+
+		// get the player model information
 	renderfx = 0;
-	if ( !cg.renderingThirdPerson || cg.zoomMode )
+	if ( !playerInATST && (!cg.renderingThirdPerson || cg.zoomMode ))
 	{
 		if ( cg.snap->ps.viewEntity <= 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD)
 		{//no viewentity

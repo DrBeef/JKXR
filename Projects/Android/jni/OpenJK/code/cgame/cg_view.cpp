@@ -31,6 +31,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "FxScheduler.h"
 #include "../game/wp_saber.h"
 #include "../game/g_vehicles.h"
+#include "bg_local.h"
 #include <JKVR/VrClientInfo.h>
 
 #define MASK_CAMERACLIP (MASK_SOLID)
@@ -1677,7 +1678,7 @@ static qboolean CG_CalcViewValues( void ) {
 		}
 	}
 
-	if ( (cg.renderingThirdPerson||cg.snap->ps.weapon == WP_SABER||cg.snap->ps.weapon == WP_MELEE)
+	if ( (cg.renderingThirdPerson)//||cg.snap->ps.weapon == WP_SABER||cg.snap->ps.weapon == WP_MELEE)
 		&& !cg.zoomMode
 		&& !viewEntIsCam )
 	{
@@ -2114,10 +2115,10 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		cg_thirdPerson.integer
 		|| (cg.snap->ps.stats[STAT_HEALTH] <= 0)
 		|| (cg.snap->ps.eFlags&EF_HELD_BY_SAND_CREATURE)
-		|| (
-				(g_entities[0].client&&g_entities[0].client->NPC_class==CLASS_ATST)
+//		|| (
+//				(g_entities[0].client&&g_entities[0].client->NPC_class==CLASS_ATST)
 //				|| (cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE)
-										 )
+///										 )
 	);
 
 	vr->third_person = cg.renderingThirdPerson;
@@ -2215,19 +2216,94 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		cgi_CM_SnapPVS( cg.refdef.vieworg, cg.snap->areamask );
 	}
 
-	// Don't draw the in-view weapon when in camera mode
-	if ( !in_camera
-		&& !cg_pano.integer
-		&& cg.snap->ps.weapon != WP_SABER
-		&& ( cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD ) )
+	if (cg.predicted_player_state.stats[STAT_HEALTH] > 0 &&
+		cg.predicted_player_state.stats[STAT_HEALTH] < 40)
 	{
-		CG_AddViewWeapon( &cg.predicted_player_state );
+		cgi_HapticEvent("heartbeat", 0, 0, cg.predicted_player_state.stats[STAT_HEALTH], 0, 0);
 	}
-	else if( cg.snap->ps.viewEntity != 0 && cg.snap->ps.viewEntity < ENTITYNUM_WORLD )
+
+	if (vr->item_selector)
 	{
-		if( g_entities[cg.snap->ps.viewEntity].client && g_entities[cg.snap->ps.viewEntity].NPC )
+		CG_DrawItemSelector();
+	}
+	else
+	{
+		// Don't draw the in-view weapon when in camera mode
+		if ( !in_camera
+			&& !cg_pano.integer
+			&& cg.snap->ps.weapon != WP_SABER
+			&& ( cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD ) )
 		{
-			CG_AddViewWeapon( &g_entities[cg.snap->ps.viewEntity ].client->ps );	// HAX - because I wanted to --eez
+			CG_AddViewWeapon( &cg.predicted_player_state );
+		}
+		else if( cg.snap->ps.viewEntity != 0 && cg.snap->ps.viewEntity < ENTITYNUM_WORLD )
+		{
+			if( g_entities[cg.snap->ps.viewEntity].client && g_entities[cg.snap->ps.viewEntity].NPC )
+			{
+				CG_AddViewWeapon( &g_entities[cg.snap->ps.viewEntity ].client->ps );	// HAX - because I wanted to --eez
+			}
+		}
+
+		//Render hand models when appropriate
+		if (!in_camera
+			&& !cg.renderingThirdPerson
+			&& cg.predicted_player_state.stats[STAT_HEALTH] > 0
+			&& cg.snap->ps.weapon != WP_MELEE
+			&& !vr->weapon_stabilised
+			&& !vr->in_vehicle
+			&& !cg_pano.integer
+			&& (cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD))
+		{
+			vec3_t end, forward;
+			refEntity_t handEnt;
+			memset( &handEnt, 0, sizeof(refEntity_t) );
+			BG_CalculateVROffHandPosition(handEnt.origin, handEnt.angles);
+
+			//Move it back a bit?
+			AngleVectors(handEnt.angles, forward, NULL, NULL);
+			VectorMA( handEnt.origin, -3.0f, forward, handEnt.origin );
+
+
+			handEnt.renderfx = RF_DEPTHHACK | RF_VRVIEWMODEL;
+
+			if (cg.snap->ps.powerups[PW_FORCE_PUSH] > cg.time ||
+				(cg.snap->ps.forcePowersActive & (1<<FP_GRIP)) ||
+				(cg.snap->ps.forcePowersActive & (1<<FP_LIGHTNING)) ||
+				(cg.snap->ps.forcePowersActive & (1<<FP_ABSORB)) ||
+				(cg.snap->ps.forcePowersActive & (1<<FP_DRAIN)))
+			{
+				handEnt.hModel = cgs.media.handModel_force;
+			}
+			else
+			{
+				handEnt.hModel = cgs.media.handModel_relaxed;
+			}
+			VectorCopy(handEnt.origin, handEnt.oldorigin);
+
+			AnglesToAxis(handEnt.angles, handEnt.axis);
+			for ( int i = 0; i < 3; i++ ) {
+				VectorScale( handEnt.axis[i], (vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
+			}
+
+			cgi_R_AddRefEntityToScene(&handEnt);
+
+			if (cg.snap->ps.weapon == WP_NONE)
+			{
+				BG_CalculateVRWeaponPosition(handEnt.origin, handEnt.angles);
+
+				//Move it back a bit?
+				AngleVectors(handEnt.angles, forward, NULL, NULL);
+				VectorMA( handEnt.origin, -3.0f, forward, handEnt.origin );
+				VectorCopy(handEnt.origin, handEnt.oldorigin);
+
+				vec3_t axis[3];
+				AnglesToAxis(handEnt.angles, handEnt.axis);
+				for ( int i = 0; i < 3; i++ ) {
+					VectorScale( handEnt.axis[i], (!vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
+				}
+
+				cgi_R_AddRefEntityToScene(&handEnt);
+			}
 		}
 	}
 

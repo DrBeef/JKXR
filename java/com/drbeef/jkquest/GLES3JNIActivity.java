@@ -209,7 +209,8 @@ import java.util.Vector;
 
 		//Our assets
 		copy_asset("/sdcard/JKQuest/JK2/base", "z_vr_assets.pk3", true);
-		
+		copy_asset("/sdcard/JKQuest/JK3/base", "z_vr_assets_jka.pk3", true);
+
 		//Bummser's default configuration
 		String model = android.os.Build.MODEL;
 		if (model.contains("Quest")) {

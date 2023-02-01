@@ -68,7 +68,9 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define	MAX_STEP_CHANGE		32
 
 #define	MAX_VERTS_ON_POLY	10
-#define	MAX_MARK_POLYS		256
+#define	MAX_MARK_POLYS		2048
+#define	MARK_TOTAL_TIME		10000
+#define	MARK_FADE_TIME		1000
 
 #define STAT_MINUS			10	// num frame for '-' stats digit
 
@@ -100,8 +102,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define	WAVE_AMPLITUDE	1
 #define	WAVE_FREQUENCY	0.4
 
-#define DEFAULT_PLAYER_HEIGHT 64
-
+#define DEFAULT_PLAYER_HEIGHT 58
 //=================================================
 
 // player entities need to track more information
@@ -202,6 +203,7 @@ typedef centity_s centity_t;
 typedef struct markPoly_s {
 	struct markPoly_s	*prevMark, *nextMark;
 	int			time;
+	int			fadeTime; // custom fade time (to slow down fade of saber burn marks)
 	qhandle_t	markShader;
 	qboolean	alphaFade;		// fade alpha instead of rgb
 	float		color[4];
@@ -453,6 +455,15 @@ typedef struct {
 	int			weaponAnimation;
 	int			weaponAnimationTime;
 
+	int 		itemSelectorType; // 0 - weapons, 1 - gadgets, 2 - fighting-style, 3 - force powers
+	int			itemSelectorSelection;
+	int 		itemSelectorTime;
+	vec3_t		itemSelectorOrigin;
+	vec3_t		itemSelectorOffset;
+
+	int			moveSpeedSelect;
+	int			moveSpeedSelectTime;
+
 	int			inventorySelect;		// Current inventory item chosen
 	int			inventorySelectTime;
 
@@ -585,6 +596,7 @@ extern	vmCvar_t		cg_drawFPS;
 extern	vmCvar_t		cg_drawSnapshot;
 extern	vmCvar_t		cg_drawAmmoWarning;
 extern	vmCvar_t		cg_drawCrosshair;
+extern	vmCvar_t		cg_drawCrosshairForce;
 extern	vmCvar_t		cg_dynamicCrosshair;
 extern	vmCvar_t		cg_crosshairForceHint;
 extern	vmCvar_t		cg_crosshairIdentifyTarget;
@@ -635,6 +647,9 @@ extern	vmCvar_t		cg_thirdPersonCameraDamp;
 extern	vmCvar_t		cg_thirdPersonTargetDamp;
 extern	vmCvar_t		cg_saberAutoThird;
 extern	vmCvar_t		cg_gunAutoFirst;
+extern	vmCvar_t		cg_debugSaberCombat;
+extern	vmCvar_t		cg_saberBurnMarkCoolDownTime;
+extern	vmCvar_t		cg_autoUseBacta;
 
 extern	vmCvar_t		cg_zProj;
 extern	vmCvar_t		cg_stereoSeparation;
@@ -873,6 +888,8 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire );
 void CG_AddViewWeapon (playerState_t *ps);
 void CG_DrawWeaponSelect( void );
 
+void CG_DrawItemSelector( void );
+
 void CG_OutOfAmmoChange( void );	// should this be in pmove?
 
 //
@@ -974,6 +991,9 @@ void	cgi_Cvar_Update( vmCvar_t *vmCvar );
 void	cgi_Cvar_Set( const char *var_name, const char *value );
 char*	cgi_Cvar_Get( const char *var_name );
 
+
+//Haptics
+int cgi_HapticEvent( char *description, int position, int channel, int intensity, float yaw, float height);
 
 // ServerCommand and ConsoleCommand parameter access
 int		cgi_Argc( void );

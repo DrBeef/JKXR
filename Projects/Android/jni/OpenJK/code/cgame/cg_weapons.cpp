@@ -1201,26 +1201,31 @@ void CG_AddViewWeapon( playerState_t *ps )
 
 		trace_t trace;
 		VectorMA(origin, 256, forward, endForward);
-		static vec3_t WHITE	={1.0f,1.0f,1.0f};
+		static vec3_t RED	= {1.0f,0.0f,0.0f};
 		FX_AddLine( -1, origin, endForward, 0.1f, 4.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
-					WHITE, WHITE, 0.0f,
-					120, cgi_R_RegisterShader( "gfx/effects/redLine" ),
+					RED, RED, 0.0f,
+					120, cgi_R_RegisterShader( "gfx/effects/whiteline2" ),
 					0, FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
 		VectorMA(origin, 20, right, endRight);
+		vec3_t	BLUE = {0.0f,0.0f,1.0f};
 		FX_AddLine( -1, origin, endRight, 0.1f, 4.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
-					WHITE, WHITE, 0.0f,
-					120, cgi_R_RegisterShader( "gfx/effects/blueLine" ),
+					BLUE, BLUE, 0.0f,
+					120, cgi_R_RegisterShader( "gfx/misc/whiteline2" ),
 					0, FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
 		VectorMA(origin, 20, up, endUp);
+		vec3_t	GREEN = {0.0f,1.0f,0.0f};
 		FX_AddLine( -1, origin, endUp, 0.1f, 4.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
-					WHITE, WHITE, 0.0f,
+					GREEN, GREEN, 0.0f,
 					120, cgi_R_RegisterShader( "gfx/misc/whiteline2" ),
 					0, FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
+
+		CG_CenterPrint(vr->test_name, 240);
+
 	}
 
 		// set up gun position
@@ -1236,9 +1241,15 @@ void CG_AddViewWeapon( playerState_t *ps )
 		extraOffset[2] = -6;
 	}
 
-	VectorMA( hand.origin, cg_gun_x.value+extraOffset[0], cg.refdef.viewaxis[0], hand.origin );
-	VectorMA( hand.origin, (cg_gun_y.value+leanOffset+extraOffset[1]), cg.refdef.viewaxis[1], hand.origin );
-	VectorMA( hand.origin, (cg_gun_z.value+fovOffset+extraOffset[2]), cg.refdef.viewaxis[2], hand.origin );
+	if (vr->in_vehicle)
+	{
+		//Shunt the origin up if we are in a vehicle to avoid blinding the player with a muzzle flash
+		VectorMA( hand.origin, 2.0f * cg_worldScale.value, cg.refdef.viewaxis[2], hand.origin );
+	}
+
+	//VectorMA( hand.origin, cg_gun_x.value+extraOffset[0], cg.refdef.viewaxis[0], hand.origin );
+	//VectorMA( hand.origin, (cg_gun_y.value+leanOffset+extraOffset[1]), cg.refdef.viewaxis[1], hand.origin );
+	//VectorMA( hand.origin, (cg_gun_z.value+fovOffset+extraOffset[2]), cg.refdef.viewaxis[2], hand.origin );
 
 	AnglesToAxis(angles, hand.axis);
 
@@ -1536,6 +1547,31 @@ int CG_WeaponCheck( int weaponIndex )
 	return value;
 }
 
+/*
+===================
+CG_DrawMoveSpeedIcon
+===================
+*/
+void CG_DrawMoveSpeedIcon(void) {
+	if ((cg.zoomMode != 0) || !(cg_drawHUD.integer)) {
+		return;
+	}
+
+	if ((cg.snap->ps.viewEntity > 0 && cg.snap->ps.viewEntity < ENTITYNUM_WORLD)) {
+		return;
+	}
+
+	if (cg.moveSpeedSelect != vr->move_speed)
+	{
+		cg.moveSpeedSelect = vr->move_speed;
+		cg.moveSpeedSelectTime = cg.time;
+	}
+
+	if (((cg.moveSpeedSelectTime+WEAPON_SELECT_TIME)>cg.time)) {
+		cgi_R_SetColor(colorTable[CT_WHITE]);
+		CG_DrawPic(96, 64, 48, 64, cgs.media.iconMoveSpeed[cg.moveSpeedSelect]);
+	}
+}
 int cgi_UI_GetItemText(char *menuFile,char *itemName, char *text);
 
 const char *weaponDesc[13] =
@@ -2781,6 +2817,502 @@ void CG_Weapon_f( void )
 	SetWeaponSelectTime();
 //	cg.weaponSelectTime = cg.time;
 	cg.weaponSelect = num;
+}
+
+
+void Cmd_UseInventory_f(gentity_t *ent);
+
+extern float cg_zoomFov;	//from cg_view.cpp
+
+void CG_ExitScope_f( )
+{
+	if ( cg.zoomMode )
+	{
+		G_SoundOnEnt( pm->gent, CHAN_AUTO, "sound/weapons/disruptor/zoomend.wav" );
+		// already zooming, so must be wanting to turn it off
+		cg.zoomMode = 0;
+		cg.zoomTime = cg.time;
+		cg.zoomLocked = qfalse;
+	}
+}
+
+void CG_EnterScope_f( )
+{
+	if ( cg.zoomMode == 0 || cg.zoomMode == 3 )
+	{
+		G_SoundOnEnt( pm->gent, CHAN_AUTO, "sound/weapons/disruptor/zoomstart.wav" );
+		// not already zooming, so do it now
+		if (cg.weaponSelect == WP_DISRUPTOR) {
+			cg.zoomMode = 2;
+			cg_zoomFov = 80.0f;
+			cg.zoomLocked = qfalse;
+		} else {
+			//Our specially created E11 Blaster scope
+			cg.zoomMode = 4;
+			cg_zoomFov = 30.0f;
+			cg.zoomLocked = qtrue;
+		}
+	}
+}
+
+void CG_ToggleSaber_f( )
+{
+	if (player->client->ps.saber->Active())
+	{
+		//G_SoundOnEnt( player, CHAN_WEAPON, "sound/weapons/saber/saberon.wav" );
+		player->client->ps.saber->Deactivate();
+	}
+	else
+	{
+		player->client->ps.saber->Activate();
+		//G_SoundOnEnt( player, CHAN_WEAPON, "sound/weapons/saber/saberoff.wav" );
+	}
+}
+
+//Selects the currently selected thing (if one _is_ selected)
+void CG_ItemSelectorSelect_f( void )
+{
+	cg.itemSelectorTime = 0;
+	cgi_Cvar_Set("timescale", "1.0");
+
+	if (cg.itemSelectorSelection == -1)
+	{
+		return;
+	}
+
+	if (cg.itemSelectorType == 0) // weapons
+	{
+		if (cg.weaponSelect == cg.itemSelectorSelection)
+		{
+			return;
+		}
+
+		cg.weaponSelectTime = cg.time;
+		cg.weaponSelect = cg.itemSelectorSelection;
+	}
+	else if (cg.itemSelectorType == 1) // gadgets
+	{
+		cg.inventorySelectTime = cg.time;
+		cg.inventorySelect = cg.itemSelectorSelection;
+
+		//Immediately use the selected inventory item
+		if (player)
+		{
+			Cmd_UseInventory_f(player);
+		}
+	}
+	else  if (cg.itemSelectorType == 2) //fighting style
+	{
+		cgi_SendConsoleCommand(va( "setSaberLevel %i\n", cg.itemSelectorSelection + 1));
+	}
+	else // 3 - force powers
+	{
+		if (cg.forcepowerSelect == cg.itemSelectorSelection)
+		{
+			return;
+		}
+
+		cg.forcepowerSelectTime = cg.time;
+		cg.forcepowerSelect = cg.itemSelectorSelection;
+	}
+
+	//reset ready for next time
+	cg.itemSelectorSelection = -1;
+}
+
+void CG_ItemSelectorNext_f( void )
+{
+	if (cg.itemSelectorType  == 3)
+	{
+		return;
+	}
+
+	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
+
+    //Only show the stance selection if using saber and in third person
+	int selectors = ((cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) &&
+					 cent->currentState.weapon == WP_SABER && cg_thirdPerson.integer) ? 3 : 2;
+	cg.itemSelectorType = (cg.itemSelectorType+1) % selectors;
+	cg.itemSelectorTime = cg.time;
+}
+
+void CG_ItemSelectorPrev_f( void )
+{
+	if (cg.itemSelectorType  == 3)
+	{
+		return;
+	}
+
+	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
+
+    //Only show the stance selection if using saber and in third person
+	int selectors = ((cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) &&
+							 cent->currentState.weapon == WP_SABER && cg_thirdPerson.integer) ? 3 : 2;
+	if (--cg.itemSelectorType < 0)
+		cg.itemSelectorType = selectors-1;
+	cg.itemSelectorTime = cg.time;
+}
+
+extern int	force_icons[NUM_FORCE_POWERS];
+extern int inv_icons[INV_MAX];
+qboolean CG_InventorySelectable( int index);
+qboolean ForcePower_Valid(int index);
+
+void CG_DrawItemSelector( void )
+{
+	if (cg.predicted_player_state.stats[STAT_HEALTH] <= 0)
+	{
+		return;
+	}
+
+	if (cg.itemSelectorTime == 0)
+	{
+		cg.itemSelectorTime = cg.time;
+
+		if (vr->item_selector == 2)
+		{
+			cg.itemSelectorType = 3;
+			VectorCopy(vr->offhandposition[0], cg.itemSelectorOrigin);
+			VectorCopy(vr->offhandoffset, cg.itemSelectorOffset);
+		}
+		else {
+			cg.itemSelectorType = 0;
+			VectorCopy(vr->weaponposition, cg.itemSelectorOrigin);
+			VectorCopy(vr->weaponoffset, cg.itemSelectorOffset);
+		}
+	}
+
+	float dist = 10.0f;
+	float radius = 4.4f;
+	float scale = 0.05f;
+
+	float frac = (cg.time - cg.itemSelectorTime) / 20.0f;
+	if (frac > 1.0f)
+	{
+		frac = 1.0f;
+	}
+	cgi_Cvar_Set("timescale", "0.22");
+
+	vec3_t controllerOrigin, controllerAngles, controllerOffset, selectorOrigin;
+	if (cg.itemSelectorType == 3)
+	{
+		BG_CalculateVROffHandPosition(controllerOrigin, controllerAngles);
+		VectorSubtract(vr->offhandposition[0], cg.itemSelectorOrigin, controllerOffset);
+	}
+	else
+	{
+		BG_CalculateVRWeaponPosition(controllerOrigin, controllerAngles);
+		VectorSubtract(vr->weaponposition, cg.itemSelectorOrigin, controllerOffset);
+	}
+
+	vec3_t wheelAngles, wheelOrigin, beamOrigin, wheelForward, wheelRight, wheelUp;
+	vec3_t angles;
+	VectorClear(angles);
+	angles[YAW] = vr->hmdorientation[YAW];
+	BG_CalculateVRPositionInWorld(cg.itemSelectorOrigin, cg.itemSelectorOffset, angles, wheelOrigin, wheelAngles);
+
+	AngleVectors(wheelAngles, wheelForward, wheelRight, wheelUp);
+	VectorCopy(controllerOrigin, wheelOrigin);
+
+	VectorCopy(wheelOrigin, beamOrigin);
+	VectorMA(wheelOrigin, (dist * frac), wheelForward, wheelOrigin);
+	VectorCopy(wheelOrigin, selectorOrigin);
+
+	vec3_t pos;
+	memset(&pos, 0, sizeof pos);
+	{
+		pos[0] = (sinf(DEG2RAD(wheelAngles[YAW] - controllerAngles[YAW])) / sinf(DEG2RAD(22.5f)));
+		pos[1] = ((wheelAngles[PITCH] - controllerAngles[PITCH]) / 22.5f);
+
+		float len = VectorLength(pos);
+		if (len > 1.0f)
+		{
+			pos[0] *= (1.0f / len);
+			pos[1] *= (1.0f / len);
+		}
+	}
+
+	VectorMA(selectorOrigin, radius * pos[0], wheelRight, selectorOrigin);
+	VectorMA(selectorOrigin, radius * pos[1], wheelUp, selectorOrigin);
+
+	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
+
+	refEntity_t beam;
+	beam.shaderRGBA[3] = 0xff;
+	int count;
+	switch (cg.itemSelectorType)
+	{
+		case 0: //weapons
+			if (vr->in_vehicle)
+				count = 2;
+			else
+				count = WP_MELEE;
+			beam.shaderRGBA[0] = 0xff;
+			beam.shaderRGBA[1] = 0xae;
+			beam.shaderRGBA[2] = 0x40;
+			break;
+		case 1: //gadgets
+			count = INV_GOODIE_KEY;
+			beam.shaderRGBA[0] = 0x00;
+			beam.shaderRGBA[1] = 0xff;
+			beam.shaderRGBA[2] = 0x00;
+			break;
+		case 2: //fighting style
+			count = 3;
+			beam.shaderRGBA[0] = 0xff;
+			beam.shaderRGBA[1] = 0xff;
+			beam.shaderRGBA[2] = 0xff;
+			break;
+		case 3: // force powers
+			count = MAX_SHOWPOWERS;
+			beam.shaderRGBA[0] = 0x00;
+			beam.shaderRGBA[1] = 0x00;
+			beam.shaderRGBA[2] = 0xff;
+			break;
+	}
+
+	VectorCopy(beamOrigin, beam.oldorigin);
+	VectorCopy(selectorOrigin, beam.origin );
+	beam.customShader = cgi_R_RegisterShader( "gfx/misc/whiteline2" );
+	beam.reType = RT_LINE;
+	beam.radius = 0.3f;
+
+	cgi_R_AddRefEntityToScene( &beam );
+
+
+	if (cg.itemSelectorType == 0) // weapons
+	{
+		if (cg.weaponSelect != WP_NONE &&
+				cg.weaponSelect != WP_MELEE) {
+			refEntity_t sprite;
+			memset(&sprite, 0, sizeof(sprite));
+			VectorCopy(wheelOrigin, sprite.origin);
+			sprite.reType = RT_SPRITE;
+			sprite.customShader = cg_weapons[cg.weaponSelect].weaponIcon;
+			sprite.radius = 1.8f;
+			memset(sprite.shaderRGBA, 0xff, 4);
+			cgi_R_AddRefEntityToScene(&sprite);
+		}
+	}
+/*	else if (cg.itemSelectorType == 2) // fighting style
+	{
+		//For the fighting style show the active one in the middle
+		int level = cent->gent->client->ps.saberAnimLevel;
+		if (cent->gent->client->ps.forcePowersKnown & (1 << FP_SABER_OFFENSE) &&
+			level > FORCE_LEVEL_0) {
+			refEntity_t sprite;
+			memset(&sprite, 0, sizeof(sprite));
+			VectorCopy(wheelOrigin, sprite.origin);
+			sprite.reType = RT_SPRITE;
+			switch (level) {
+				case FORCE_LEVEL_1:
+					sprite.customShader = cgs.media.HUDSaberStyleFast;
+					break;
+				case FORCE_LEVEL_2:
+					sprite.customShader = cgs.media.HUDSaberStyleMed;
+					break;
+				case FORCE_LEVEL_3:
+					sprite.customShader = cgs.media.HUDSaberStyleStrong;
+					break;
+			}
+
+			sprite.radius = 1.8f;
+			memset(sprite.shaderRGBA, 0xff, 4);
+			cgi_R_AddRefEntityToScene(&sprite);
+		}
+	}*/
+	else if (cg.itemSelectorType == 3) // force powers
+	{
+		if (cent->gent->client->ps.forcePowersKnown != 0) {
+			refEntity_t sprite;
+			memset(&sprite, 0, sizeof(sprite));
+			VectorCopy(wheelOrigin, sprite.origin);
+			sprite.reType = RT_SPRITE;
+			sprite.customShader = force_icons[showPowers[cg.forcepowerSelect]];
+			sprite.radius = 1.8f;
+			memset(sprite.shaderRGBA, 0xff, 4);
+			cgi_R_AddRefEntityToScene(&sprite);
+		}
+	}
+
+	if (cg.itemSelectorType != 3) {
+		for (int s = -1; s < 2; s += 2) {
+			refEntity_t sprite;
+			memset(&sprite, 0, sizeof(sprite));
+			vec3_t right;
+			AngleVectors(wheelAngles, NULL, right, NULL);
+			float offset = ((float) s * 6.0f) + (((float) s * 0.3f) *
+					sinf(DEG2RAD(AngleNormalize360(cg.time - cg.itemSelectorTime))));
+			VectorMA(wheelOrigin, offset, right, sprite.origin);
+			sprite.reType = RT_SPRITE;
+			sprite.customShader = cgs.media.binocularArrow;
+			sprite.radius = 0.6f;
+			sprite.rotation = 180.0f * ((s - 1.0f) / 2.0f);
+			memset(sprite.shaderRGBA, 0xff, 4);
+			cgi_R_AddRefEntityToScene(&sprite);
+		}
+	}
+
+	qboolean selected = qfalse;
+	for (int index = 0; index < count; ++index)
+	{
+		int itemId = index;
+		if (cg.itemSelectorType == 0) {
+			if (vr->in_vehicle)
+			{
+				itemId = WP_ATST_MAIN + index;
+			}
+			else
+			{
+				itemId = index + 1; // We need to ignore WP_NONE for weapons
+				if (itemId == count)
+				{
+					break;
+				}
+
+#ifdef _DEMO
+                if (itemId == WP_SABER ||
+                    itemId == WP_BRYAR_PISTOL ||
+                    itemId == WP_BLASTER ||
+                    itemId == WP_FLECHETTE ||
+                    itemId == WP_REPEATER ||
+                    itemId == WP_THERMAL) {
+                    CG_RegisterWeapon(itemId);
+                } else {
+                    continue;
+                }
+#else
+				CG_RegisterWeapon(itemId);
+#endif
+			}
+		}
+
+		{
+			bool selectable;
+			switch (cg.itemSelectorType)
+			{
+				case 0: //weapons
+					selectable = vr->in_vehicle || // both ATST weapons are always selectable
+							(CG_WeaponSelectable(itemId, cg.weaponSelect, qfalse) && cg.snap->ps.ammo[weaponData[itemId].ammoIndex]);
+					break;
+				case 1: //gadgets
+					selectable = CG_InventorySelectable(itemId) && inv_icons[itemId];
+					break;
+				case 2: //fighting style
+					{
+						if (cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) {
+							selectable = itemId < cent->gent->client->ps.forcePowerLevel[FP_SABER_OFFENSE];
+						} else {
+							selectable = false;
+						}
+					}
+					break;
+				case 3: // force powers
+					selectable = ForcePower_Valid(itemId);
+					break;
+			}
+
+			if (selectable) {
+				//first calculate wheel slot position
+				vec3_t angles, iconOrigin, iconBackground, iconForeground;
+				VectorClear(angles);
+				angles[YAW] = wheelAngles[YAW];
+				angles[PITCH] = wheelAngles[PITCH];
+				angles[ROLL] =
+                        (float)(360 / (count - ((cg.itemSelectorType == 0 && !vr->in_vehicle) ? 1 : 0))) * index;
+				vec3_t forward, up;
+				AngleVectors(angles, forward, NULL, up);
+
+				VectorMA(wheelOrigin, (radius * frac), up, iconOrigin);
+				VectorMA(iconOrigin, 0.2f, forward, iconBackground);
+				VectorMA(iconOrigin, -0.2f, forward, iconForeground);
+
+				{
+					vec3_t diff;
+					VectorSubtract(selectorOrigin, iconOrigin, diff);
+					float length = VectorLength(diff);
+					if (length <= 1.0f &&
+						frac == 1.0f &&
+						selectable) {
+						if (cg.itemSelectorSelection != itemId) {
+							cg.itemSelectorSelection = itemId;
+
+							cgi_HapticEvent("selector_icon", 0, vr->right_handed ?
+								((cg.itemSelectorType == 3) ? 2 : 1) : ((cg.itemSelectorType == 3) ? 1 : 2), 100, 0, 0);
+						}
+
+						selected = qtrue;
+					}
+				}
+
+				if (cg.itemSelectorSelection == itemId) {
+					refEntity_t sprite;
+					memset(&sprite, 0, sizeof(sprite));
+					VectorCopy(iconOrigin, sprite.origin);
+					sprite.origin[2] += 2.5f + (0.5f * sinf(DEG2RAD(
+							AngleNormalize360(cg.time - cg.itemSelectorTime))));
+					sprite.reType = RT_SPRITE;
+					sprite.customShader = cgs.media.binocularArrow;
+					sprite.radius = 0.6f;
+					sprite.rotation = -90.0f;
+					sprite.shaderRGBA[0] = 255;
+					sprite.shaderRGBA[1] = 255;
+					sprite.shaderRGBA[2] = 255;
+					sprite.shaderRGBA[3] = 255;
+					cgi_R_AddRefEntityToScene(&sprite);
+				}
+
+				{
+					refEntity_t sprite;
+					memset(&sprite, 0, sizeof(sprite));
+
+					float sRadius = 1.3f;
+
+					VectorCopy(iconOrigin, sprite.origin);
+					sprite.reType = RT_SPRITE;
+					switch (cg.itemSelectorType)
+					{
+						case 0: //weapons
+							sprite.customShader = cg_weapons[itemId].weaponIcon;
+							break;
+						case 1: //gadgets
+							sprite.customShader = inv_icons[itemId];
+							break;
+/*						case 2: //fighting style
+							switch ( itemId )
+							{
+								case 0://FORCE_LEVEL_1:
+									sprite.customShader = cgs.media.HUDSaberStyleFast;
+									break;
+								case 1://FORCE_LEVEL_2:
+									sprite.customShader = cgs.media.HUDSaberStyleMed;
+									break;
+								case 2://FORCE_LEVEL_3:
+									sprite.customShader = cgs.media.HUDSaberStyleStrong;
+									break;
+							}
+							break;
+*/						case 3: // force powers
+							sprite.customShader = force_icons[showPowers[itemId]];
+							break;
+					}
+
+					sprite.radius =
+							sRadius * (cg.itemSelectorSelection == itemId ? 1.3f : 0.6f);
+					sprite.shaderRGBA[0] = 255;
+					sprite.shaderRGBA[1] = 255;
+					sprite.shaderRGBA[2] = 255;
+					sprite.shaderRGBA[3] = 255;
+					cgi_R_AddRefEntityToScene(&sprite);
+				}
+			}
+		}
+	}
+
+	if (!selected)
+	{
+		cg.itemSelectorSelection = -1;
+	}
 }
 
 /*

@@ -364,6 +364,12 @@ static void CG_RegisterCustomSounds(clientInfo_t *ci, int iSoundEntryBase,
 }
 
 
+//SB: Never render any player model if 1st person and using the saber
+bool CG_getPlayer1stPersonSaber(const centity_t *cent) {
+	return (!cent->gent->NPC && !cg.renderingThirdPerson &&
+			cent->gent->client->ps.weapon == WP_SABER);
+}
+
 
 /*
 ================
@@ -4624,11 +4630,17 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		}
 	}
 
+	bool player1stPersonSaber = CG_getPlayer1stPersonSaber(cent);
+
 //	if ( gent->client->ps.powerups[PW_WEAPON_OVERCHARGE] > 0 )
 //	{
 //		centity_t *cent = &cg_entities[gent->s.number];
 //		cgi_S_AddLoopingSound( 0, cent->lerpOrigin, vec3_origin, cgs.media.overchargeLoopSound );
 //	}
+
+	if (player1stPersonSaber) {
+		ent->renderfx = RF_THIRD_PERSON;
+	}
 
 	//get the dude's color choice in
 	ent->shaderRGBA[0] = gent->client->renderInfo.customRGBA[0];
@@ -5907,9 +5919,26 @@ static void CG_CreateSaberMarks( vec3_t start, vec3_t end, vec3_t normal )
 			v->st[1] = 0.5 + DotProduct( delta, axis[2] ) * (0.15f + Q_flrand(0.0f, 1.0f) * 0.05f);
 		}
 
-		// save it persistantly, do burn first
+		// Allow to prolong saber mark cool down time
+		int glowFadeTime = MARK_FADE_TIME + (cg_saberBurnMarkCoolDownTime.value * MARK_TOTAL_TIME);
+		// If glow fade time is longer than mark time, prolong mark time
+		int glowExtraTime;
+		if (glowFadeTime > MARK_TOTAL_TIME - 8500) {
+			glowExtraTime = glowFadeTime - (MARK_TOTAL_TIME - 8500);
+		} else {
+			glowExtraTime = 0;
+		}
+		// Maker sure burn mark is always visible for some time after glow cool down
+		int burnExtraTime;
+		if (glowFadeTime > MARK_TOTAL_TIME - MARK_FADE_TIME) {
+			burnExtraTime = glowFadeTime - (MARK_TOTAL_TIME - MARK_FADE_TIME);
+		} else {
+			burnExtraTime = 0;
+		}
+
+		// Save it persistantly, do burn first
 		mark = CG_AllocMark();
-		mark->time = cg.time;
+		mark->time = cg.time + burnExtraTime;
 		mark->alphaFade = qtrue;
 		mark->markShader = cgs.media.rivetMarkShader;
 		mark->poly.numVerts = mf->numPoints;
@@ -5917,9 +5946,9 @@ static void CG_CreateSaberMarks( vec3_t start, vec3_t end, vec3_t normal )
 		memcpy( mark->verts, verts, mf->numPoints * sizeof( verts[0] ) );
 
 		// And now do a glow pass
-		// by moving the start time back, we can hack it to fade out way before the burn does
 		mark = CG_AllocMark();
-		mark->time = cg.time - 8500;
+		mark->time = cg.time - 8500 + glowExtraTime;
+		mark->fadeTime = glowFadeTime;
 		mark->alphaFade = qfalse;
 		mark->markShader = cgi_R_RegisterShader("gfx/effects/saberDamageGlow" );
 		mark->poly.numVerts = mf->numPoints;
@@ -5989,6 +6018,12 @@ static void CG_AddSaberBladeGo( centity_t *cent, centity_t *scent, refEntity_t *
 	{
 		return;
 	}
+
+	if (vr->item_selector && cent->gent->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
+	{
+		return;
+	}
+
 /*
 Ghoul2 Insert Start
 */
@@ -6568,7 +6603,10 @@ Ghoul2 Insert End
 */
 	if ( !client->ps.saber[saberNum].blade[bladeNum].active && client->ps.saber[saberNum].blade[bladeNum].length <= 0 )
 	{
-		return;
+		if (vr->saberBlockDebounce > cg.time)
+		{
+			//saberColor = SABER_RED;
+		}
 	}
 
 	if ( (!WP_SaberBladeUseSecondBladeStyle( &client->ps.saber[saberNum], bladeNum ) && client->ps.saber[saberNum].trailStyle < 2 )
@@ -6736,6 +6774,41 @@ Ghoul2 Insert End
 		client->ps.saber[saberNum].blade[bladeNum].radius,
 		client->ps.saber[saberNum].blade[bladeNum].color,
 		renderfx, (qboolean)!noDlight );
+		
+    if (CG_getPlayer1stPersonSaber(cent) &&
+        cent->gent->client->ps.saberEventFlags & (SEF_BLOCKED|SEF_PARRIED) &&
+			vr->saberBlockDebounce < cg.time)
+    {
+		cvar_t *vr_saber_block_debounce_time = gi.cvar("vr_saber_block_debounce_time", "200", CVAR_ARCHIVE); // defined in VrCvars.h
+		vr->saberBlockDebounce = cg.time + vr_saber_block_debounce_time->integer;
+
+		cgi_HapticEvent("shotgun_fire", 0, 0, 100, 0, 0);
+	}
+	
+/*	if (CG_getPlayer1stPersonSaber(cent) &&
+		cent->gent->client->ps.saberLockEnemy != ENTITYNUM_NONE)
+	{
+		refEntity_t hiltEnt;
+		memset( &hiltEnt, 0, sizeof(refEntity_t) );
+
+		hiltEnt.hModel = cgs.media.saberHilt;
+
+		VectorCopy(org_, hiltEnt.origin);
+		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
+		vectoangles(axis_[0], hiltEnt.angles);
+
+		vec3_t axis[3];
+		AnglesToAxis(hiltEnt.angles, axis);
+		VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
+		VectorCopy(axis[1], hiltEnt.axis[1]);
+		VectorCopy(axis[0], hiltEnt.axis[2]);
+		VectorMA(hiltEnt.origin, 1.0f, hiltEnt.axis[2], hiltEnt.origin);
+		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
+
+		cgi_R_AddRefEntityToScene(&hiltEnt);
+	}
+*/
+
 }
 
 void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, int renderfx, int modelIndex, vec3_t origin, vec3_t angles )
@@ -6867,6 +6940,12 @@ void CG_Player( centity_t *cent ) {
 	{
 		return;
 	}
+	
+	if (cent->gent->client->ps.clientNum == 0) {
+		vr->velocitytriggered = (!cg.renderingThirdPerson &&
+								 (cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE));
+	}
+
 
 	G_RagDoll(cent->gent, cent->lerpAngles);
 
@@ -6899,9 +6978,12 @@ Ghoul2 Insert Start
 		// add a water splash if partially in and out of water
 		CG_PlayerSplash( cent );
 
+		bool playerInATST = (g_entities[0].client &&
+							 g_entities[0].client->NPC_class == CLASS_ATST);
+
 		// get the player model information
 		ent.renderfx = 0;
-		if ( !cg.renderingThirdPerson || cg.zoomMode )
+		if ( !playerInATST && (!cg.renderingThirdPerson || cg.zoomMode ))
 		{//in first person or zoomed in
 			if ( cg.snap->ps.viewEntity <= 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD)
 			{//no viewentity
@@ -7267,6 +7349,13 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 			{
 				VectorCopy( ent.origin, cent->gent->client->renderInfo.muzzlePoint );
 				VectorCopy( ent.axis[0], cent->gent->client->renderInfo.muzzleDir );
+
+				if ( !cg.renderingThirdPerson && cent->gent->client->ps.clientNum == 0 && (cg.snap->ps.weapon == WP_SABER||cg.snap->ps.weapon == WP_MELEE))
+				{
+					vec3_t angles;
+					BG_CalculateVRSaberPosition(cent->gent->client->renderInfo.muzzlePoint, angles);
+					AngleVectors( angles, cent->gent->client->renderInfo.muzzleDir, NULL, NULL );
+				}
 			}
 		}
 		//now try to get the right data
@@ -7281,6 +7370,11 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 							&boltMatrix, G2Angles, ent.origin, cg.time,
 							cgs.model_draw, cent->currentState.modelScale );
 			gi.G2API_GiveMeVectorFromMatrix( boltMatrix, ORIGIN, cent->gent->client->renderInfo.handRPoint );
+			if (!cg.renderingThirdPerson && !cent->gent->client->ps.saberInFlight && cent->gent->client->ps.clientNum == 0)
+			{
+				vec3_t angles;
+				BG_CalculateVRSaberPosition(cent->gent->client->renderInfo.handRPoint, angles);
+			}
 		}
 		if ( cent->gent->handLBolt != -1 )
 		{
@@ -7289,6 +7383,11 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 							&boltMatrix, G2Angles, ent.origin, cg.time,
 							cgs.model_draw, cent->currentState.modelScale );
 			gi.G2API_GiveMeVectorFromMatrix( boltMatrix, ORIGIN, cent->gent->client->renderInfo.handLPoint );
+			if (!cg.renderingThirdPerson && !cent->gent->client->ps.saberInFlight && cent->gent->client->ps.clientNum == 0)
+			{
+				vec3_t angles;
+				BG_CalculateVROffHandPosition(cent->gent->client->renderInfo.handLPoint, angles);
+			}
 		}
 		if ( cent->gent->footLBolt != -1 )
 		{
@@ -7995,9 +8094,13 @@ Ghoul2 Insert End
 	// add a water splash if partially in and out of water
 	CG_PlayerSplash( cent );
 
-	// get the player model information
+	bool playerInATST = (g_entities[0].client &&
+						 g_entities[0].client->NPC_class == CLASS_ATST);
+
+
+		// get the player model information
 	renderfx = 0;
-	if ( !cg.renderingThirdPerson || cg.zoomMode )
+	if ( !playerInATST && (!cg.renderingThirdPerson || cg.zoomMode ))
 	{
 		if ( cg.snap->ps.viewEntity <= 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD)
 		{//no viewentity
@@ -8180,14 +8283,18 @@ Ghoul2 Insert End
 			//FIXME: allow it to be put anywhere and move this out of if(torso.hModel)
 			//Will have to call CG_PositionRotatedEntityOnTag
 
-			//CG_PositionEntityOnTag( &gun, &torso, torso.hModel, "tag_weapon");
-
-			vec3_t angs;
-			BG_CalculateVRWeaponPosition(gun.origin, angs);
-			AnglesToAxis(angs, gun.axis);
-			//Gotta move this forward but test for now
-			VectorCopy( gun.origin, gun.lightingOrigin );
-
+			if (cent->gent->client->ps.clientNum == 0)
+			{
+				vec3_t angs;
+				BG_CalculateVRWeaponPosition(gun.origin, angs);
+				AnglesToAxis(angs, gun.axis);
+				//Gotta move this forward but test for now
+				VectorCopy( gun.origin, gun.lightingOrigin );
+			}
+			else
+			{
+				CG_PositionEntityOnTag( &gun, &torso, torso.hModel, "tag_weapon");
+			}
 
 //--------------------- start saber hacks
 /*
@@ -8357,6 +8464,39 @@ Ghoul2 Insert End
 		vectoangles( legs.axis[0], cent->gent->client->renderInfo.eyeAngles );
 	}
 
+	}
+
+	if (CG_getPlayer1stPersonSaber(cent) && !cent->currentState.saberInFlight && !vr->item_selector &&
+			cent->gent->client->ps.saberLockEnemy == ENTITYNUM_NONE)
+	{
+/*		refEntity_t hiltEnt;
+		memset( &hiltEnt, 0, sizeof(refEntity_t) );
+
+		hiltEnt.hModel = cgs.media.saberHilt;
+
+		BG_CalculateVRSaberPosition(hiltEnt.origin, hiltEnt.angles);
+
+		vec3_t axis[3];
+		AnglesToAxis(hiltEnt.angles, axis);
+		VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
+		VectorCopy(axis[1], hiltEnt.axis[1]);
+		VectorCopy(axis[0], hiltEnt.axis[2]);
+		VectorMA(hiltEnt.origin, 1.0f, hiltEnt.axis[2], hiltEnt.origin);
+		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
+
+		for (auto & axi : hiltEnt.axis)
+			VectorScale(axi, 0.85f, axi);
+
+		cgi_R_AddRefEntityToScene(&hiltEnt);
+*/
+
+		//Should be a much better place to do this...
+		static int playingSaberSwingSound = 0;
+		if (vr->primaryVelocityTriggeredAttack && ((cg.time - playingSaberSwingSound) > 800))
+		{
+			//cgi_S_StartSound ( hiltEnt.origin, cent->gent->s.number, CHAN_AUTO, cgi_S_RegisterSound( va( "sound/weapons/saber/saberhup%d.wav", Q_irand( 1, 9 ) ) ) );
+			playingSaberSwingSound = cg.time;
+		}
 	}
 
 	//FIXME: for debug, allow to draw a cone of the NPC's FOV...
