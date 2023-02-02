@@ -32,6 +32,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 bool		in_camera = false;
 bool		in_misccamera = false; // if we are viewing a misc_camera
 camera_t	client_camera={};
+camera_t	previous_client_camera={};
 extern qboolean	player_locked;
 
 extern gentity_t *G_Find (gentity_t *from, int fieldofs, const char *match);
@@ -93,9 +94,13 @@ void CGCam_Enable( void )
 	client_camera.FOV	= CAMERA_DEFAULT_FOV;
 	client_camera.FOV2	= CAMERA_DEFAULT_FOV;
 
+	client_camera.has_stored_angles = false;
+
 	in_camera = true;
 
 	client_camera.next_roff_time = 0;
+
+	previous_client_camera = client_camera;
 
 	if ( &g_entities[0] && g_entities[0].client )
 	{
@@ -163,7 +168,10 @@ void CGCam_Disable( void )
 		gi.cvar_set("skippingCinematic", "0");
 	}
 
+	//Now's a good time for a reset
+	vr->take_snap = true;
 	//we just came out of camera, so update cg.refdef.vieworg out of the camera's origin so the snapshot will know our new ori
+
 	VectorCopy( g_entities[0].currentOrigin, cg.refdef.vieworg);
 	VectorCopy( g_entities[0].client->ps.viewangles, cg.refdefViewAngles );
 }
@@ -1162,7 +1170,8 @@ void CGCam_Update( void )
 			}
 			client_camera.FOV = actualFOV_X;
 		}
-		CG_CalcFOVFromX( actualFOV_X );
+		float fov = vr && vr->immersive_cinematics ? vr->fov_x : actualFOV_X;
+		CG_CalcFOVFromX( fov );
 	}
 	else if ( client_camera.info_state & CAMERA_ZOOMING )
 	{
@@ -1177,7 +1186,8 @@ void CGCam_Update( void )
 		{
 			actualFOV_X = client_camera.FOV + (( ( client_camera.FOV2 - client_camera.FOV ) ) / client_camera.FOV_duration ) * ( cg.time - client_camera.FOV_time );
 		}
-		CG_CalcFOVFromX( actualFOV_X );
+		float fov = vr && vr->immersive_cinematics ? vr->fov_x : actualFOV_X;
+		CG_CalcFOVFromX( fov );
 	}
 	else
 	{
@@ -1278,11 +1288,16 @@ void CGCam_Update( void )
 
 	if ( checkFollow )
 	{
+		//Don't follow if immersive
 		if ( client_camera.info_state & CAMERA_FOLLOWING )
 		{//This needs to be done after camera movement
 			CGCam_FollowUpdate();
 		}
-		VectorCopy(client_camera.angles, cg.refdefViewAngles );
+
+		if (!vr->immersive_cinematics)
+		{
+			VectorCopy(client_camera.angles, cg.refdefViewAngles);
+		}
 	}
 
 	if ( checkTrack )
@@ -1295,6 +1310,50 @@ void CGCam_Update( void )
 		VectorCopy( client_camera.origin, cg.refdef.vieworg );
 	}
 
+	if (vr->immersive_cinematics)
+	{
+		//If no stored angles yet, store them
+		if (!client_camera.has_stored_angles)
+		{
+			client_camera.has_stored_angles = true;
+			vr->take_snap = true;
+		}
+
+		//if camera state has changed, store the angles and reset user's snap orientation
+		if (((client_camera.info_state & CAMERA_FOLLOWING) != (previous_client_camera.info_state & CAMERA_FOLLOWING)) ||
+				((client_camera.info_state & CAMERA_ROFFING) != (previous_client_camera.info_state & CAMERA_ROFFING)) ||
+				((client_camera.info_state & CAMERA_MOVING) != (previous_client_camera.info_state & CAMERA_MOVING)) ||
+				((client_camera.info_state & CAMERA_PANNING) != (previous_client_camera.info_state & CAMERA_PANNING)))
+		{
+			vr->take_snap = true;
+		}
+
+		//If the camera has changed position (by over half an in-game metre), but is not in moving mode (last frame)
+		//then it is a keyframe that requires a new snap
+		if (!(previous_client_camera.info_state & CAMERA_MOVING))
+		{
+			vec3_t delta;
+			VectorSubtract(client_camera.origin, previous_client_camera.origin, delta);
+			if (VectorLength(delta) > (0.5f * cg_worldScale.value))
+			{
+				vr->take_snap = true;
+			}
+		}
+
+		if (vr->take_snap)
+		{
+			VectorCopy(client_camera.angles, client_camera.stored_angles);
+		}
+
+		//Copy stored YAW angle to refdef whether it has changed or not, use pitch/roll direct from the hmd
+		float yaw = client_camera.stored_angles[YAW] + (vr->hmdorientation[YAW] - vr->hmdorientation_snap[YAW]) + vr->snapTurn;
+		VectorCopy(vr->hmdorientation, cg.refdefViewAngles);
+		cg.refdefViewAngles[YAW] = yaw;
+
+		//store previous state
+		previous_client_camera = client_camera;
+	}
+
 	//Bar fading
 	if ( client_camera.info_state & CAMERA_BAR_FADING )
 	{
@@ -1303,13 +1362,6 @@ void CGCam_Update( void )
 
 	//Normal fading - separate call because can finish after camera is disabled
 	CGCam_UpdateFade();
-
-	if (vr->immersive_cinematics)
-	{
-		float yaw = cg.refdefViewAngles[YAW] + vr->hmdorientation[YAW];
-		VectorCopy(vr->hmdorientation, cg.refdefViewAngles);
-		cg.refdefViewAngles[YAW] = yaw;
-	}
 
 	//Update shaking if there's any
 	//CGCam_UpdateSmooth( cg.refdef.vieworg, cg.refdefViewAngles );
