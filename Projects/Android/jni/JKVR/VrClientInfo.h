@@ -75,6 +75,7 @@ typedef struct {
     vec3_t offhandangles;
     vec3_t offhandangles_last; // Don't use this, it is just for calculating delta!
     vec3_t offhandangles_delta;
+    vec3_t offhandangles_saber;
 
     vec3_t offhandposition[5]; // store last 5
     vec3_t offhandoffset;

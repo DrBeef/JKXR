@@ -6118,6 +6118,21 @@ Ghoul2 Insert Start
 			gi.G2API_GiveMeVectorFromMatrix(boltMatrix, NEGATIVE_X, axis_[0]);//front (was NEGATIVE_Y, but the md3->glm exporter screws up this tag somethin' awful)
 			gi.G2API_GiveMeVectorFromMatrix(boltMatrix, NEGATIVE_Y, axis_[1]);//right
 			gi.G2API_GiveMeVectorFromMatrix(boltMatrix, POSITIVE_Z, axis_[2]);//up
+
+			if (!cent->gent->client->ps.saberInFlight &&
+				CG_getPlayer1stPersonSaber(cent) &&
+				cent->gent->client->ps.saberLockEnemy == ENTITYNUM_NONE)
+			{
+				vec3_t angles;
+				BG_CalculateVRSaberPosition(saberNum, org_, angles);
+				AnglesToAxis(angles, axis_);
+				if (bladeNum == 1)
+				{
+					VectorSubtract( vec3_origin, axis_[0], axis_[0] );
+				}
+				float dist = (cent->gent->client->ps.saber[saberNum].numBlades > 1) ? 12.0f : 5.5f;
+				VectorMA(org_, dist, axis_[0], org_);
+			}
 		}
 
 		//Now figure out where this info will be next frame
@@ -6603,10 +6618,7 @@ Ghoul2 Insert End
 */
 	if ( !client->ps.saber[saberNum].blade[bladeNum].active && client->ps.saber[saberNum].blade[bladeNum].length <= 0 )
 	{
-		if (vr->saberBlockDebounce > cg.time)
-		{
-			//saberColor = SABER_RED;
-		}
+		return;
 	}
 
 	if ( (!WP_SaberBladeUseSecondBladeStyle( &client->ps.saber[saberNum], bladeNum ) && client->ps.saber[saberNum].trailStyle < 2 )
@@ -7353,7 +7365,7 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 				if ( !cg.renderingThirdPerson && cent->gent->client->ps.clientNum == 0 && (cg.snap->ps.weapon == WP_SABER||cg.snap->ps.weapon == WP_MELEE))
 				{
 					vec3_t angles;
-					BG_CalculateVRSaberPosition(cent->gent->client->renderInfo.muzzlePoint, angles);
+					BG_CalculateVRSaberPosition(0, cent->gent->client->renderInfo.muzzlePoint, angles);
 					AngleVectors( angles, cent->gent->client->renderInfo.muzzleDir, NULL, NULL );
 				}
 			}
@@ -7373,7 +7385,7 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 			if (!cg.renderingThirdPerson && !cent->gent->client->ps.saberInFlight && cent->gent->client->ps.clientNum == 0)
 			{
 				vec3_t angles;
-				BG_CalculateVRSaberPosition(cent->gent->client->renderInfo.handRPoint, angles);
+				BG_CalculateVRSaberPosition(0, cent->gent->client->renderInfo.handRPoint, angles);
 			}
 		}
 		if ( cent->gent->handLBolt != -1 )
@@ -7386,7 +7398,7 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 			if (!cg.renderingThirdPerson && !cent->gent->client->ps.saberInFlight && cent->gent->client->ps.clientNum == 0)
 			{
 				vec3_t angles;
-				BG_CalculateVROffHandPosition(cent->gent->client->renderInfo.handLPoint, angles);
+				BG_CalculateVRSaberPosition(1, cent->gent->client->renderInfo.handLPoint, angles);
 			}
 		}
 		if ( cent->gent->footLBolt != -1 )
@@ -7507,7 +7519,8 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 								//this returns qfalse if it doesn't exist or isn't being rendered
 								if ( G_GetRootSurfNameWithVariant( cent->gent, "r_hand", handName, sizeof(handName) ) ) //!gi.G2API_GetSurfaceRenderStatus( &cent->gent->ghoul2[cent->gent->playerModel], "r_hand" ) )//surf is still on
 								{
-									CG_AddSaberBladeGo( cent, cent, NULL, ent.renderfx, cent->gent->weaponModel[saberNum], ent.origin, tempAngles, saberNum, bladeNum );
+									CG_AddSaberBladeGo( cent, cent, NULL, CG_getPlayer1stPersonSaber(cent) ? 0 : ent.renderfx,
+														cent->gent->weaponModel[saberNum], ent.origin, tempAngles, saberNum, bladeNum );
 									//CG_AddSaberBlades( cent, ent.renderfx, ent.origin, tempAngles, saberNum );
 								}//else, the limb will draw the blade itself
 							}
@@ -7516,7 +7529,8 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 								//this returns qfalse if it doesn't exist or isn't being rendered
 								if ( G_GetRootSurfNameWithVariant( cent->gent, "l_hand", handName, sizeof(handName) ) ) //!gi.G2API_GetSurfaceRenderStatus( &cent->gent->ghoul2[cent->gent->playerModel], "l_hand" ) )//surf is still on
 								{
-									CG_AddSaberBladeGo( cent, cent, NULL, ent.renderfx, cent->gent->weaponModel[saberNum], ent.origin, tempAngles, saberNum, bladeNum );
+									CG_AddSaberBladeGo( cent, cent, NULL, CG_getPlayer1stPersonSaber(cent) ? 0 : ent.renderfx,
+														cent->gent->weaponModel[saberNum], ent.origin, tempAngles, saberNum, bladeNum );
 									//CG_AddSaberBlades( cent, ent.renderfx, ent.origin, tempAngles, saberNum );
 								}//else, the limb will draw the blade itself
 							}
@@ -8356,7 +8370,7 @@ Ghoul2 Insert End
 					if ( cent->gent->client->ps.saber[saberNum].length > 0 )
 					{
 						if ( !cent->gent->client->ps.saberInFlight )
-						{//holding the saber in-hand
+						{//holding the saber in-hand.
 							CG_AddSaberBlade( cent, cent, &gun, renderfx, 0, NULL, NULL );
 							calcedMp = qtrue;
 						}
@@ -8469,33 +8483,78 @@ Ghoul2 Insert End
 	if (CG_getPlayer1stPersonSaber(cent) && !cent->currentState.saberInFlight && !vr->item_selector &&
 			cent->gent->client->ps.saberLockEnemy == ENTITYNUM_NONE)
 	{
-/*		refEntity_t hiltEnt;
-		memset( &hiltEnt, 0, sizeof(refEntity_t) );
-
-		hiltEnt.hModel = cgs.media.saberHilt;
-
-		BG_CalculateVRSaberPosition(hiltEnt.origin, hiltEnt.angles);
-
-		vec3_t axis[3];
-		AnglesToAxis(hiltEnt.angles, axis);
-		VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
-		VectorCopy(axis[1], hiltEnt.axis[1]);
-		VectorCopy(axis[0], hiltEnt.axis[2]);
-		VectorMA(hiltEnt.origin, 1.0f, hiltEnt.axis[2], hiltEnt.origin);
-		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
-
-		for (auto & axi : hiltEnt.axis)
-			VectorScale(axi, 0.85f, axi);
-
-		cgi_R_AddRefEntityToScene(&hiltEnt);
-*/
-
-		//Should be a much better place to do this...
-		static int playingSaberSwingSound = 0;
-		if (vr->primaryVelocityTriggeredAttack && ((cg.time - playingSaberSwingSound) > 800))
+		int	numSabers = 1;
+		if ( cent->gent->client->ps.dualSabers )
 		{
-			//cgi_S_StartSound ( hiltEnt.origin, cent->gent->s.number, CHAN_AUTO, cgi_S_RegisterSound( va( "sound/weapons/saber/saberhup%d.wav", Q_irand( 1, 9 ) ) ) );
-			playingSaberSwingSound = cg.time;
+			numSabers = 2;
+		}
+		for ( int saberNum = 0; saberNum < numSabers; saberNum++ )
+		{
+			gentity_t *main_saber = &g_entities[cent->gent->client->ps.saberEntityNum];
+
+			refEntity_t hiltEnt;
+			memset( &hiltEnt, 0, sizeof(refEntity_t) );
+
+			BG_CalculateVRSaberPosition(saberNum, hiltEnt.origin, hiltEnt.angles);
+
+			//Force it to use the ghoul2 model!?
+			if (saberNum == 0)
+			{
+				hiltEnt.ghoul2 = &main_saber->ghoul2;
+			}
+			else
+			{
+				static CGhoul2Info_v ghoul2;
+				if (ghoul2.size() == 0)
+				{
+					int saber2 =
+					G_ModelIndex( cent->gent->client->ps.saber[1].model );
+					gi.G2API_InitGhoul2Model( ghoul2, cent->gent->client->ps.saber[1].model, saber2 , NULL_HANDLE, NULL_HANDLE, 0, 0 );
+				}
+				hiltEnt.ghoul2 = &ghoul2;
+			}
+			hiltEnt.hModel = cgs.model_draw[0];
+			VectorCopy( main_saber->modelScale, hiltEnt.modelScale);
+			hiltEnt.radius = 60;
+
+			vec3_t axis[3];
+			AnglesToAxis(hiltEnt.angles, axis);
+			VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
+			VectorCopy(axis[1], hiltEnt.axis[1]);
+			VectorCopy(axis[0], hiltEnt.axis[2]);
+			//VectorMA(hiltEnt.origin, 1.0f, hiltEnt.axis[2], hiltEnt.origin);
+			VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
+
+			cgi_R_AddRefEntityToScene(&hiltEnt);
+/*
+//			if (cent->gent->weaponModel[saberNum] > 0)
+//			{
+//				gi.G2API_RemoveGhoul2Model(cent->gent->ghoul2, cent->gent->weaponModel[saberNum]);
+//				cent->gent->weaponModel[saberNum] = -1;
+//			}
+			//draw it
+			saber->s.eFlags &= ~EF_NODRAW;
+			saber->svFlags |= SVF_BROADCAST;
+			saber->svFlags &= ~SVF_NOCLIENT;
+			BG_CalculateVRSaberPosition(saberNum, saber->currentOrigin, saber->currentAngles);
+			VectorCopy(saber->currentOrigin, saber->s.pos.trBase);
+
+			vec3_t axis[3], _axis[3];
+			AnglesToAxis(saber->currentAngles, axis);
+			VectorSubtract(vec3_origin, axis[2], _axis[0]);
+			VectorCopy(axis[1], _axis[1]);
+			VectorCopy(axis[0], _axis[2]);
+			//vectoangles(_axis[2], saber->currentAngles);
+
+
+			VectorCopy(saber->currentAngles, saber->s.apos.trBase);
+			saber->s.pos.trTime = level.time;
+			saber->s.pos.trType = TR_STATIONARY;
+			saber->s.apos.trTime = level.time;
+			saber->s.apos.trType = TR_STATIONARY;
+			VectorClear(saber->s.pos.trDelta);
+			VectorClear(saber->s.apos.trDelta);
+			gi.linkentity(saber);*/
 		}
 	}
 

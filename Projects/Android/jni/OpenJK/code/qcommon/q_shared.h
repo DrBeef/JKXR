@@ -1827,6 +1827,8 @@ public:
 	int			saberLockTime;
 	int			saberLockEnemy;
 
+	int			saber2EntityNum;
+
 #ifndef JK2_MODE
 	int			saberStylesKnown;
 #endif // !JK2_MODE

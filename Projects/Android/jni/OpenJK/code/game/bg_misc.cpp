@@ -765,9 +765,16 @@ void BG_CalculateVRWeaponPosition( vec3_t origin, vec3_t angles )
 	BG_CalculateVRPositionInWorld(vr->weaponposition, vr->weaponoffset, vr->weaponangles, origin, angles);
 }
 
-void BG_CalculateVRSaberPosition( vec3_t origin, vec3_t angles )
+void BG_CalculateVRSaberPosition( int saberNum, vec3_t origin, vec3_t angles )
 {
-	BG_CalculateVRPositionInWorld(vr->weaponposition, vr->weaponoffset, vr->weaponangles_saber, origin, angles);
+	if (saberNum == 0)
+	{
+		BG_CalculateVRPositionInWorld(vr->weaponposition, vr->weaponoffset, vr->weaponangles_saber, origin, angles);
+	}
+	else
+	{
+		BG_CalculateVRPositionInWorld(vr->offhandposition[0], vr->offhandoffset, vr->offhandangles_saber, origin, angles);
+	}
 }
 
 bool BG_UseVRPosition( gentity_t *ent )

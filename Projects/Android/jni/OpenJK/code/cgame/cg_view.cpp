@@ -2248,6 +2248,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		if (!in_camera
 			&& !cg.renderingThirdPerson
 			&& cg.predicted_player_state.stats[STAT_HEALTH] > 0
+			&& (cg.snap->ps.viewEntity < ENTITYNUM_WORLD && g_entities[cg.snap->ps.viewEntity].client && !g_entities[cg.snap->ps.viewEntity].client->ps.dualSabers)
 			&& cg.snap->ps.weapon != WP_MELEE
 			&& !vr->weapon_stabilised
 			&& !vr->in_vehicle

@@ -97,6 +97,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         if (vr.saberBlockDebounce < cl.serverTime) {
             rotation[PITCH] = 45;
             QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles_saber);
+            QuatToYawPitchRoll(pOff->Pose.orientation, rotation, vr.offhandangles_saber);
         }
         rotation[PITCH] = vr_weapon_pitchadjust->value;
         QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles);

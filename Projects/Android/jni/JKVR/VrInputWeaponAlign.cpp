@@ -43,8 +43,9 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
     {
         //Set gun angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
         vec3_t rotation = {0};
-        rotation[PITCH] = 10;
+        rotation[PITCH] = 45;
         QuatToYawPitchRoll(pDominantTracking->Pose.orientation, rotation, vr.weaponangles_saber);
+        QuatToYawPitchRoll(pOffTracking->Pose.orientation, rotation, vr.offhandangles_saber);
         rotation[PITCH] = vr_weapon_pitchadjust->value;
         QuatToYawPitchRoll(pDominantTracking->Pose.orientation, rotation, vr.weaponangles);
 

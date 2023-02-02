@@ -2859,13 +2859,20 @@ void CG_ToggleSaber_f( )
 {
 	if (player->client->ps.saber->Active())
 	{
-		//G_SoundOnEnt( player, CHAN_WEAPON, "sound/weapons/saber/saberon.wav" );
-		player->client->ps.saber->Deactivate();
+		player->client->ps.saber[0].Deactivate();
+		if (player->client->ps.dualSabers)
+		{
+			player->client->ps.saber[1].Deactivate();
+		}
+		G_SoundOnEnt( player, CHAN_WEAPON, "sound/weapons/saber/saberoffquick.wav" );
 	}
 	else
 	{
-		player->client->ps.saber->Activate();
-		//G_SoundOnEnt( player, CHAN_WEAPON, "sound/weapons/saber/saberoff.wav" );
+		player->client->ps.saber[0].Activate();
+		if (player->client->ps.dualSabers)
+		{
+			player->client->ps.saber[1].Activate();
+		}
 	}
 }
 
