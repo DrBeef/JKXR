@@ -37,6 +37,11 @@ android {
       assets.srcDirs = ['../../assets']
     }
   }
+
+    packagingOptions {
+        exclude 'lib/arm64-v8a/libopenxr_loader.so'
+    }
+
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'

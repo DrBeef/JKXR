@@ -65,7 +65,16 @@ import java.util.Vector;
 			e.printStackTrace();
 		}
 
-		System.loadLibrary("openxr_loader");
+		String model = android.os.Build.MODEL;
+		if (model.contains("Quest"))
+		{
+			System.loadLibrary("openxr_loader_meta");
+		}
+		else
+		{
+			System.loadLibrary("openxr_loader_pico");
+		}
+
 		System.loadLibrary( "openjk_" + game );
 	}
 
@@ -248,6 +257,8 @@ import java.util.Vector;
 
 		try {
 			setenv("JK_LIBDIR", getApplicationInfo().nativeLibraryDir, true);
+
+			setenv("OPENXR_HMD", model, true);
 		}
 		catch (Exception e)
 		{

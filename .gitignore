@@ -15,9 +15,6 @@ $RECYCLE.BIN/
 *.o
 *.d
 
-#binaries
-*.so
-
 #libs
 *.a
 
@@ -43,3 +40,15 @@ assets/pak0.pk3
 assets/sp_pak_weapons.pk3
 assets/z_zvr_weapons.pk3
 assets/sp_vpak8.pk3
+Projects/Android/jni/SupportLibs/liboggvorbis/libs/armeabi-v7a/libogg.so
+Projects/Android/jni/SupportLibs/liboggvorbis/libs/armeabi-v7a/libvorbis-jni.so
+Projects/Android/jni/SupportLibs/liboggvorbis/libs/armeabi-v7a/libvorbis.so
+Projects/Android/jni/SupportLibs/liboggvorbis/libs/armeabi/libogg.so
+Projects/Android/jni/SupportLibs/liboggvorbis/libs/armeabi/libvorbis-jni.so
+Projects/Android/jni/SupportLibs/liboggvorbis/libs/armeabi/libvorbis.so
+Projects/Android/jni/SupportLibs/liboggvorbis/libs/mips/libogg.so
+Projects/Android/jni/SupportLibs/liboggvorbis/libs/mips/libvorbis-jni.so
+Projects/Android/jni/SupportLibs/liboggvorbis/libs/mips/libvorbis.so
+Projects/Android/jni/SupportLibs/liboggvorbis/libs/x86/libogg.so
+Projects/Android/jni/SupportLibs/liboggvorbis/libs/x86/libvorbis-jni.so
+Projects/Android/jni/SupportLibs/liboggvorbis/libs/x86/libvorbis.so
