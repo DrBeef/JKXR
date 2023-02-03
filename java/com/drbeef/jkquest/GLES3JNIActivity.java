@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.app.ActivityCompat;
@@ -31,6 +32,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
 import java.util.Vector;
 
 @SuppressLint("SdCardPath") public class GLES3JNIActivity extends Activity implements SurfaceHolder.Callback
@@ -65,14 +67,16 @@ import java.util.Vector;
 			e.printStackTrace();
 		}
 
-		String model = android.os.Build.MODEL;
-		if (model.contains("Quest"))
+		String manufacturer = Build.MANUFACTURER.toLowerCase(Locale.ROOT);
+		if (manufacturer.contains("oculus") ||
+				manufacturer.contains("meta"))
 		{
 			System.loadLibrary("openxr_loader_meta");
 		}
 		else
 		{
-			System.loadLibrary("openxr_loader_pico");
+			//Load manufacturer specific loader
+			System.loadLibrary("openxr_loader_" + manufacturer);
 		}
 
 		System.loadLibrary( "openjk_" + game );
