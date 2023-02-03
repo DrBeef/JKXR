@@ -52,3 +52,5 @@ Projects/Android/jni/SupportLibs/liboggvorbis/libs/mips/libvorbis.so
 Projects/Android/jni/SupportLibs/liboggvorbis/libs/x86/libogg.so
 Projects/Android/jni/SupportLibs/liboggvorbis/libs/x86/libvorbis-jni.so
 Projects/Android/jni/SupportLibs/liboggvorbis/libs/x86/libvorbis.so
+Projects/Android/libs/arm64-v8a/libopenxr_loader_meta.so
+Projects/Android/libs/arm64-v8a/libopenxr_loader_pico.so
