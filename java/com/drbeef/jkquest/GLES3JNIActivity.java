@@ -38,6 +38,7 @@ import java.util.Vector;
 @SuppressLint("SdCardPath") public class GLES3JNIActivity extends Activity implements SurfaceHolder.Callback
 {
 	private static String game = "";
+	private static String manufacturer = "";
 
 	private boolean hapticsEnabled = false;
 
@@ -67,17 +68,19 @@ import java.util.Vector;
 			e.printStackTrace();
 		}
 
-		String manufacturer = Build.MANUFACTURER.toLowerCase(Locale.ROOT);
-		if (manufacturer.contains("oculus") ||
-				manufacturer.contains("meta"))
+		manufacturer = Build.MANUFACTURER.toLowerCase(Locale.ROOT);
+		if (manufacturer.contains("oculus")) // rename oculus to meta as this will probably happen in the future anyway
 		{
-			System.loadLibrary("openxr_loader_meta");
+			manufacturer = "meta";
 		}
-		else
+
+		try
 		{
 			//Load manufacturer specific loader
 			System.loadLibrary("openxr_loader_" + manufacturer);
-		}
+			setenv("OPENXR_HMD", manufacturer, true);
+		} catch (Exception e)
+		{}
 
 		System.loadLibrary( "openjk_" + game );
 	}
@@ -225,8 +228,7 @@ import java.util.Vector;
 		copy_asset("/sdcard/JKQuest/JK3/base", "z_vr_assets_jka.pk3", true);
 
 		//Bummser's default configuration
-		String model = android.os.Build.MODEL;
-		if (model.contains("Quest")) {
+		if (manufacturer.contains("meta")) {
 			//Meta Quest
 			copy_asset_with_rename("/sdcard/JKQuest/JK2/base", "openjo_sp_quest.cfg", "openjo_sp.cfg", false);
 		} else {
@@ -261,8 +263,6 @@ import java.util.Vector;
 
 		try {
 			setenv("JK_LIBDIR", getApplicationInfo().nativeLibraryDir, true);
-
-			setenv("OPENXR_HMD", model, true);
 		}
 		catch (Exception e)
 		{

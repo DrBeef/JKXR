@@ -377,7 +377,7 @@ bool VR_GetVRProjection(int eye, float zNear, float zFar, float* projection)
 	if (!vr.cgzoommode)
 	{
 
-		if (strstr(gAppState.OpenXRHMDModel, "Quest") != NULL)
+		if (strstr(gAppState.OpenXRHMD, "meta") != NULL)
 		{
 			XrFovf fov = {};
 			for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
@@ -390,7 +390,8 @@ bool VR_GetVRProjection(int eye, float zNear, float zFar, float* projection)
 					&(gAppState.ProjectionMatrices[eye]), GRAPHICS_OPENGL_ES,
 					fov, zNear, zFar);
 		}
-		else
+
+		if (strstr(gAppState.OpenXRHMD, "pico") != NULL)
 		{
 			XrMatrix4x4f_CreateProjectionFov(
 					&(gAppState.ProjectionMatrices[eye]), GRAPHICS_OPENGL_ES,

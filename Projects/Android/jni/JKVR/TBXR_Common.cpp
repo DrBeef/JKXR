@@ -928,7 +928,7 @@ void ovrApp_HandleSessionStateChanges(ovrApp* app, XrSessionState state) {
 			OXR(pfnPerfSettingsSetPerformanceLevelEXT(
 					app->Session, XR_PERF_SETTINGS_DOMAIN_GPU_EXT, gpuPerfLevel));
 
-			if (strstr(gAppState.OpenXRHMDModel, "Quest") != NULL)
+			if (strstr(gAppState.OpenXRHMD, "meta") != NULL)
 			{
 				PFN_xrSetAndroidApplicationThreadKHR pfnSetAndroidApplicationThreadKHR = NULL;
 				OXR(xrGetInstanceProcAddr(
@@ -1448,7 +1448,7 @@ void TBXR_InitRenderer(  ) {
 			gAppState.Instance, gAppState.SystemId, XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO, &gAppState.ViewportConfig));
 
 
-	if (strstr(gAppState.OpenXRHMDModel, "Quest") != NULL)
+	if (strstr(gAppState.OpenXRHMD, "meta") != NULL)
 	{
 		XrSystemColorSpacePropertiesFB colorSpacePropertiesFB = {};
 		colorSpacePropertiesFB.type = XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB;
@@ -1565,7 +1565,7 @@ void TBXR_InitRenderer(  ) {
         gAppState.Projections[eye].type = XR_TYPE_VIEW;
 	}
 
-	if (strstr(gAppState.OpenXRHMDModel, "Quest") == NULL) // PICO
+	if (strstr(gAppState.OpenXRHMD, "meta") == NULL) // PICO
 	{
 		xrGetInstanceProcAddr(gAppState.Instance,"xrSetConfigPICO", (PFN_xrVoidFunction*)(&pfnXrSetConfigPICO));
 		xrGetInstanceProcAddr(gAppState.Instance,"xrGetConfigPICO", (PFN_xrVoidFunction*)(&pfnXrGetConfigPICO));
@@ -1598,7 +1598,7 @@ void TBXR_InitialiseOpenXR()
 	EglInitExtensions();
 
 	//First, find out which HMD we are using
-	gAppState.OpenXRHMDModel = (char*)getenv("OPENXR_HMD");
+	gAppState.OpenXRHMD = (char*)getenv("OPENXR_HMD");
 
 	PFN_xrInitializeLoaderKHR xrInitializeLoaderKHR;
 	xrGetInstanceProcAddr(
@@ -1636,7 +1636,7 @@ void TBXR_InitialiseOpenXR()
 	instanceCreateInfo.applicationInfo = appInfo;
 	instanceCreateInfo.enabledApiLayerCount = 0;
 	instanceCreateInfo.enabledApiLayerNames = NULL;
-	if (strstr(gAppState.OpenXRHMDModel, "Quest") != NULL)
+	if (strstr(gAppState.OpenXRHMD, "meta") != NULL)
 	{
 		instanceCreateInfo.enabledExtensionCount = numRequiredExtensions_meta;
 		instanceCreateInfo.enabledExtensionNames = requiredExtensionNames_meta;
@@ -1689,7 +1689,7 @@ void TBXR_InitialiseOpenXR()
 	OXR(pfnGetOpenGLESGraphicsRequirementsKHR(gAppState.Instance, gAppState.SystemId,
 											  &graphicsRequirements));
 
-	if (strstr(gAppState.OpenXRHMDModel, "Quest") != NULL)
+	if (strstr(gAppState.OpenXRHMD, "meta") != NULL)
 	{
 		XrSystemColorSpacePropertiesFB colorSpacePropertiesFB = {};
 		colorSpacePropertiesFB.type = XR_TYPE_SYSTEM_COLOR_SPACE_PROPERTIES_FB;

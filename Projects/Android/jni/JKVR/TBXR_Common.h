@@ -224,7 +224,7 @@ typedef struct
     bool				Resumed;
     bool				Focused;
     bool                FrameSetup;
-    char*               OpenXRHMDModel;
+    char*               OpenXRHMD;
 
     float               Width;
     float               Height;
