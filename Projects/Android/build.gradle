@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply from: "${rootProject.projectDir}/VrApp.gradle"
+apply from: "${rootProject.projectDir}/XrApp.gradle"
 
 android {
   // This is the name of the generated apk file, which will have

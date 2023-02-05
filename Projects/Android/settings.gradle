@@ -1,4 +1,4 @@
-rootProject.projectDir = new File(settingsDir, '../../../..')
+rootProject.projectDir = new File(settingsDir, '../..')
 rootProject.name = "JKQuest"
 
-include ':', ':XrSamples:JKQuest:Projects:Android'
+include ':', 'Projects:Android'

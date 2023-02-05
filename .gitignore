@@ -28,6 +28,7 @@ assets/oculussig*
 Projects/Android/.cxx/*
 *.json
 *.bin
+.gradle/*
 Projects/Android/.gradle/*
 *.ser
 Projects/Android/.idea/*
