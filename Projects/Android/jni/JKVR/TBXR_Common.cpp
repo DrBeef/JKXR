@@ -1565,7 +1565,7 @@ void TBXR_InitRenderer(  ) {
         gAppState.Projections[eye].type = XR_TYPE_VIEW;
 	}
 
-	if (strstr(gAppState.OpenXRHMD, "meta") == NULL) // PICO
+	if (strstr(gAppState.OpenXRHMD, "pico") != NULL)
 	{
 		xrGetInstanceProcAddr(gAppState.Instance,"xrSetConfigPICO", (PFN_xrVoidFunction*)(&pfnXrSetConfigPICO));
 		xrGetInstanceProcAddr(gAppState.Instance,"xrGetConfigPICO", (PFN_xrVoidFunction*)(&pfnXrGetConfigPICO));
