@@ -4521,9 +4521,9 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	if (usingScope)
 	{
 		cg.refdef.viewangles[ROLL] = vr->clientviewangles[ROLL];
-		cg.refdef.viewangles[PITCH] = vr->weaponangles[PITCH];
+		cg.refdef.viewangles[PITCH] = vr->weaponangles[ANGLES_ADJUSTED][PITCH];
 		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW]
-				+ vr->weaponangles[YAW] + SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
+				+ vr->weaponangles[ANGLES_ADJUSTED][YAW] + SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}
 

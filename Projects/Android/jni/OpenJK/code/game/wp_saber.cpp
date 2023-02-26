@@ -999,8 +999,7 @@ Ghoul2 Insert Start
 			//gi.G2API_SetLodBias( &saberent->ghoul2[0], 0 );
 			if ( ent->client->ps.dualSabers )
 			{
-				//int saber2 =
-				G_ModelIndex( ent->client->ps.saber[1].model );
+				int saber2 = G_ModelIndex( ent->client->ps.saber[1].model );
 				//gi.G2API_InitGhoul2Model( saberent->ghoul2, ent->client->ps.saber[1].model, saber2 );
 				// set up a bolt on the end so we can get where the sabre muzzle is - we can assume this is always bolt 0
 				//gi.G2API_AddBolt( &saberent->ghoul2[0], "*flash" );

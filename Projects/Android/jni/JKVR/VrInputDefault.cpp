@@ -87,34 +87,31 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         secondaryButton2 = offButton2;
     }
 
-
-
+    //Set controller angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
     {
-        //Set gun angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
         vec3_t rotation = {0};
+        QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles[ANGLES_DEFAULT]);
+        QuatToYawPitchRoll(pOff->Pose.orientation, rotation, vr.offhandangles[ANGLES_DEFAULT]);
 
-        //if we are in saber block debounce, don't update the angles
+        //if we are in saber block debounce, don't update the saber angles
         if (vr.saberBlockDebounce < cl.serverTime) {
             rotation[PITCH] = 45;
-            QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles_saber);
-            QuatToYawPitchRoll(pOff->Pose.orientation, rotation, vr.offhandangles_saber);
+            QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles[ANGLES_SABER]);
+            QuatToYawPitchRoll(pOff->Pose.orientation, rotation, vr.offhandangles[ANGLES_SABER]);
         }
+
         rotation[PITCH] = vr_weapon_pitchadjust->value;
-        QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles);
+        QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles[ANGLES_ADJUSTED]);
+        QuatToYawPitchRoll(pOff->Pose.orientation, rotation, vr.offhandangles[ANGLES_ADJUSTED]);
 
-        VectorSubtract(vr.weaponangles_last, vr.weaponangles, vr.weaponangles_delta);
-        VectorCopy(vr.weaponangles, vr.weaponangles_last);
+        for (int anglesIndex = 0; anglesIndex <= ANGLES_SABER; ++anglesIndex)
+        {
+            VectorSubtract(vr.weaponangles_last[anglesIndex], vr.weaponangles[anglesIndex], vr.weaponangles_delta[anglesIndex]);
+            VectorCopy(vr.weaponangles[anglesIndex], vr.weaponangles_last[anglesIndex]);
 
-//        ALOGV("        weaponangles_last: %f, %f, %f",
-//              vr.weaponangles_last[0], vr.weaponangles_last[1], vr.weaponangles_last[2]);
-
-        //GB Also set offhand angles just in case we want to use those.
-        vec3_t rotation_off = {0};
-        rotation_off[PITCH] = vr_weapon_pitchadjust->value;
-        QuatToYawPitchRoll(pOff->Pose.orientation, rotation_off, vr.offhandangles);
-
-        VectorSubtract(vr.offhandangles_last, vr.offhandangles, vr.offhandangles_delta);
-        VectorCopy(vr.offhandangles, vr.offhandangles_last);
+            VectorSubtract(vr.offhandangles_last[anglesIndex], vr.offhandangles[anglesIndex], vr.offhandangles_delta[anglesIndex]);
+            VectorCopy(vr.offhandangles[anglesIndex], vr.offhandangles_last[anglesIndex]);
+        }
     }
 
     //Menu button
@@ -425,8 +422,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     float zxDist = length(x, z);
 
                     if (zxDist != 0.0f && z != 0.0f) {
-                        VectorSet(vr.weaponangles, -RAD2DEG(atanf(y / zxDist)),
-                                  -RAD2DEG(atan2f(x, -z)), vr.weaponangles[ROLL] /
+                        VectorSet(vr.weaponangles[ANGLES_ADJUSTED], -RAD2DEG(atanf(y / zxDist)),
+                                  -RAD2DEG(atan2f(x, -z)), vr.weaponangles[ANGLES_ADJUSTED][ROLL] /
                                                            2.0f); //Dampen roll on stabilised weapon
                     }
                 }
@@ -441,8 +438,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     float zxDist = length(x, z);
 
                     if (zxDist != 0.0f && z != 0.0f) {
-                        VectorSet(vr.weaponangles, -RAD2DEG(atanf(y / zxDist)),
-                                  -RAD2DEG(atan2f(x, -z)), vr.weaponangles[ROLL] /
+                        VectorSet(vr.weaponangles[ANGLES_ADJUSTED], -RAD2DEG(atanf(y / zxDist)),
+                                  -RAD2DEG(atan2f(x, -z)), vr.weaponangles[ANGLES_ADJUSTED][ROLL] /
                                                            2.0f); //Dampen roll on stabilised weapon
                     }
                 }
@@ -461,7 +458,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                                                                       0.10)) // 3) Weapon height in relation to HMD must be within <-0.10, 0.10> range
             {
                 AngleVectors(vr.hmdorientation, hmdForwardXY, NULL, NULL);
-                AngleVectors(vr.weaponangles, weaponForwardXY, NULL, NULL);
+                AngleVectors(vr.weaponangles[ANGLES_ADJUSTED], weaponForwardXY, NULL, NULL);
 
                 float weaponToDownAngle = AngleBetweenVectors(downVector, weaponForwardXY);
                 // 4) Angle between weapon forward vector and a down vector must be within 80-140 degrees
@@ -492,11 +489,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 vr.offhandoffset[1] = pOff->Pose.position.y - vr.hmdposition[1];
                 vr.offhandoffset[2] = pOff->Pose.position.z - vr.hmdposition[2];
 
-                vec3_t rotation = {0};
-                QuatToYawPitchRoll(pOff->Pose.orientation, rotation, vr.offhandangles);
-
                 if (vr_walkdirection->value == 0) {
-                    controllerYawHeading = vr.offhandangles[YAW] - vr.hmdorientation[YAW];
+                    controllerYawHeading = vr.offhandangles[ANGLES_ADJUSTED][YAW] - vr.hmdorientation[YAW];
                 } else {
                     controllerYawHeading = 0.0f;
                 }
@@ -516,7 +510,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             {
                 //Need to do this again as might not have done it above and cant be bothered to refactor
                 AngleVectors(vr.hmdorientation, hmdForwardXY, NULL, NULL);
-                AngleVectors(vr.offhandangles, offhandForwardXY, NULL, NULL);
+                AngleVectors(vr.offhandangles[ANGLES_ADJUSTED], offhandForwardXY, NULL, NULL);
 
                 offhandToDownAngle = AngleBetweenVectors(downVector, offhandForwardXY);
 

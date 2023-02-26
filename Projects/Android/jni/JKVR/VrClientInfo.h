@@ -3,6 +3,11 @@
 
 #define NUM_WEAPON_SAMPLES      10
 
+#define ANGLES_DEFAULT          0
+#define ANGLES_ADJUSTED         1
+#define ANGLES_SABER            2
+#define ANGLES_COUNT            3
+
 typedef struct {
     bool cin_camera; // cinematic camera taken over
 
@@ -26,6 +31,7 @@ typedef struct {
     bool player_moving;
     int move_speed; // 0 (default) = Comfortable (75%) , 1 = Full (100%), 2 = Walk (50%)
     bool crouched;
+    bool dual_wield; // JKA only - is player dual sabers active
     int cgzoommode;
     int cgzoomdir;
     int saberBlockDebounce; // Amount of time after player is blocked that the saber position is fixed
@@ -46,16 +52,15 @@ typedef struct {
     vec3_t hmdorientation_snap;
     vec3_t hmdorientation_first; // only updated when in first person
 
-    vec3_t weaponangles_saber;
-    vec3_t weaponangles;
-    vec3_t weaponangles_last; // Don't use this, it is just for calculating delta!
-    vec3_t weaponangles_delta;
-    vec3_t weaponangles_first; // only updated when in first person
-
     vec3_t clientviewangles; //orientation in the client - we use this in the cgame
     float snapTurn; // how much turn has been applied to the yaw by joystick
     float clientview_yaw_last; // Don't use this, it is just for calculating delta!
     float clientview_yaw_delta;
+
+    vec3_t weaponangles[ANGLES_COUNT];
+    vec3_t weaponangles_last[ANGLES_COUNT]; // Don't use this, it is just for calculating delta!
+    vec3_t weaponangles_delta[ANGLES_COUNT];
+    vec3_t weaponangles_first[ANGLES_COUNT]; // only updated when in first person
 
     vec3_t weaponposition;
     vec3_t weaponoffset;
@@ -72,10 +77,10 @@ typedef struct {
     bool secondaryVelocityTriggeredAttack;
     vec3_t secondaryVelocityTriggerLocation;
 
-    vec3_t offhandangles;
-    vec3_t offhandangles_last; // Don't use this, it is just for calculating delta!
-    vec3_t offhandangles_delta;
-    vec3_t offhandangles_saber;
+    vec3_t offhandangles[ANGLES_COUNT];
+    vec3_t offhandangles_last[ANGLES_COUNT]; // Don't use this, it is just for calculating delta!
+    vec3_t offhandangles_delta[ANGLES_COUNT];
+    vec3_t offhandangles_saber[ANGLES_COUNT];
 
     vec3_t offhandposition[5]; // store last 5
     vec3_t offhandoffset;

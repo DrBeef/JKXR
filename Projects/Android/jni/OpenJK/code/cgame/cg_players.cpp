@@ -8480,9 +8480,11 @@ Ghoul2 Insert End
 
 	}
 
-	if (CG_getPlayer1stPersonSaber(cent) && !cent->currentState.saberInFlight && !vr->item_selector &&
+	if (CG_getPlayer1stPersonSaber(cent) && !vr->item_selector &&
 			cent->gent->client->ps.saberLockEnemy == ENTITYNUM_NONE)
 	{
+		gentity_t *main_saber = &g_entities[cent->gent->client->ps.saberEntityNum];
+
 		int	numSabers = 1;
 		if ( cent->gent->client->ps.dualSabers )
 		{
@@ -8490,31 +8492,30 @@ Ghoul2 Insert End
 		}
 		for ( int saberNum = 0; saberNum < numSabers; saberNum++ )
 		{
-			gentity_t *main_saber = &g_entities[cent->gent->client->ps.saberEntityNum];
+			if (saberNum == 0 && cent->currentState.saberInFlight)
+			{
+				continue;
+			}
 
 			refEntity_t hiltEnt;
 			memset( &hiltEnt, 0, sizeof(refEntity_t) );
 
 			BG_CalculateVRSaberPosition(saberNum, hiltEnt.origin, hiltEnt.angles);
 
-			//Force it to use the ghoul2 model!?
-			if (saberNum == 0)
+			int saberModelIndex = G_ModelIndex( cent->gent->client->ps.saber[saberNum].model );
+			if (saberModelIndex != cg.saberModelIndex[saberNum])
 			{
-				hiltEnt.ghoul2 = &main_saber->ghoul2;
-			}
-			else
-			{
-				static CGhoul2Info_v ghoul2;
-				if (ghoul2.size() == 0)
+				if (cg.saber_ghoul2[saberNum].size() != 0)
 				{
-					int saber2 =
-					G_ModelIndex( cent->gent->client->ps.saber[1].model );
-					gi.G2API_InitGhoul2Model( ghoul2, cent->gent->client->ps.saber[1].model, saber2 , NULL_HANDLE, NULL_HANDLE, 0, 0 );
+					gi.G2API_RemoveGhoul2Model(cg.saber_ghoul2[saberNum], cg.saberG2Num[saberNum]);
+					//cg.saber_ghoul2[saberNum].clear();
 				}
-				hiltEnt.ghoul2 = &ghoul2;
+				cg.saberG2Num[saberNum] = gi.G2API_InitGhoul2Model( cg.saber_ghoul2[saberNum], cent->gent->client->ps.saber[saberNum].model, saberModelIndex , NULL_HANDLE, NULL_HANDLE, 0, 0 );
+				cg.saberModelIndex[saberNum] = saberModelIndex;
 			}
+			hiltEnt.ghoul2 = &cg.saber_ghoul2[saberNum];
 			hiltEnt.hModel = cgs.model_draw[0];
-			VectorCopy( main_saber->modelScale, hiltEnt.modelScale);
+			VectorSet( hiltEnt.modelScale, 0.8f, 0.8f, 0.8f ); // Scale down slightly or they are all just too big
 			hiltEnt.radius = 60;
 
 			vec3_t axis[3];
@@ -8522,39 +8523,9 @@ Ghoul2 Insert End
 			VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
 			VectorCopy(axis[1], hiltEnt.axis[1]);
 			VectorCopy(axis[0], hiltEnt.axis[2]);
-			//VectorMA(hiltEnt.origin, 1.0f, hiltEnt.axis[2], hiltEnt.origin);
 			VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
 
 			cgi_R_AddRefEntityToScene(&hiltEnt);
-/*
-//			if (cent->gent->weaponModel[saberNum] > 0)
-//			{
-//				gi.G2API_RemoveGhoul2Model(cent->gent->ghoul2, cent->gent->weaponModel[saberNum]);
-//				cent->gent->weaponModel[saberNum] = -1;
-//			}
-			//draw it
-			saber->s.eFlags &= ~EF_NODRAW;
-			saber->svFlags |= SVF_BROADCAST;
-			saber->svFlags &= ~SVF_NOCLIENT;
-			BG_CalculateVRSaberPosition(saberNum, saber->currentOrigin, saber->currentAngles);
-			VectorCopy(saber->currentOrigin, saber->s.pos.trBase);
-
-			vec3_t axis[3], _axis[3];
-			AnglesToAxis(saber->currentAngles, axis);
-			VectorSubtract(vec3_origin, axis[2], _axis[0]);
-			VectorCopy(axis[1], _axis[1]);
-			VectorCopy(axis[0], _axis[2]);
-			//vectoangles(_axis[2], saber->currentAngles);
-
-
-			VectorCopy(saber->currentAngles, saber->s.apos.trBase);
-			saber->s.pos.trTime = level.time;
-			saber->s.pos.trType = TR_STATIONARY;
-			saber->s.apos.trTime = level.time;
-			saber->s.apos.trType = TR_STATIONARY;
-			VectorClear(saber->s.pos.trDelta);
-			VectorClear(saber->s.apos.trDelta);
-			gi.linkentity(saber);*/
 		}
 	}
 

@@ -26,6 +26,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "b_local.h"
 #include "anims.h"
 #include "../cgame/cg_local.h"
+#include "bg_local.h"
+#include <JKVR/VrClientInfo.h>
 
 #define ENTDIST_PLAYER	1
 #define ENTDIST_NPC		2
@@ -258,7 +260,20 @@ void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace )
 
 		if ( other->client )
 		{
-			AngleVectors( other->client->ps.viewangles, forward, NULL, NULL );
+			if (other->client->ps.clientNum == 0)
+			{
+				vec3_t origin, angles;
+				if (vr->useGestureActive && gi.cvar("vr_gesture_triggered_use", "2", CVAR_ARCHIVE)->integer == 1) { // defined in VrCvars.h
+					BG_CalculateVROffHandPosition(origin, angles);
+				} else {
+					BG_CalculateVRWeaponPosition(origin, angles);
+				}
+				AngleVectors( angles, forward, NULL, NULL );
+			}
+			else
+			{
+				AngleVectors( other->client->ps.viewangles, forward, NULL, NULL );
+			}
 		}
 		else
 		{

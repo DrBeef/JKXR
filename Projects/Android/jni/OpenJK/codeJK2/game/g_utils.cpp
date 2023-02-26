@@ -1284,7 +1284,7 @@ void TryUse( gentity_t *ent ) {
 	//cg.refdef.vieworg, basically
 	if (ent->client->ps.clientNum == 0) {
 		vec3_t angles;
-		if (vr->useGestureActive && gi.cvar("vr_gesture_triggered_use", "0", CVAR_ARCHIVE)->integer == 1) { // defined in VrCvars.h
+		if (vr->useGestureActive && gi.cvar("vr_gesture_triggered_use", "2", CVAR_ARCHIVE)->integer == 1) { // defined in VrCvars.h
 			BG_CalculateVROffHandPosition(src, angles);
 		} else {
 			BG_CalculateVRWeaponPosition(src, angles);

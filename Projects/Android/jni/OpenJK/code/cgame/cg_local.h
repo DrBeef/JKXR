@@ -347,6 +347,11 @@ typedef struct {
 
 	qboolean	renderingThirdPerson;		// during deaths, chasecams, etc
 
+	//Probably needs to move elsewhere but...
+	int saberG2Num[2];
+	int saberModelIndex[2];
+	CGhoul2Info_v saber_ghoul2[2];
+
 	// prediction state
 	qboolean	hyperspace;				// true if prediction has hit a trigger_teleport
 	playerState_t	predicted_player_state;

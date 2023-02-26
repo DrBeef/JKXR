@@ -114,7 +114,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 		AngleVectors( angs, dir, NULL, NULL );
 
 		vec3_t rotatedDir;
-		VectorRotateAroundAxis(dir, forward, vr->weaponangles[ROLL], rotatedDir);
+		VectorRotateAroundAxis(dir, forward, vr->weaponangles[ANGLES_ADJUSTED][ROLL], rotatedDir);
 
 		missile = CreateMissile( start, rotatedDir, vel, 10000, ent );
 

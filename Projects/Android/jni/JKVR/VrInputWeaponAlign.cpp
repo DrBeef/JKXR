@@ -39,22 +39,31 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
     VectorScale(vr.test_offset, vr.test_scale, vr.test_offset);
     */
 
-    //Need this for the touch screen
+    //Set controller angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
     {
-        //Set gun angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
         vec3_t rotation = {0};
-        rotation[PITCH] = 45;
-        QuatToYawPitchRoll(pDominantTracking->Pose.orientation, rotation, vr.weaponangles_saber);
-        QuatToYawPitchRoll(pOffTracking->Pose.orientation, rotation, vr.offhandangles_saber);
+        QuatToYawPitchRoll(pDominantTracking->Pose.orientation, rotation, vr.weaponangles[ANGLES_DEFAULT]);
+        QuatToYawPitchRoll(pOffTracking->Pose.orientation, rotation, vr.offhandangles[ANGLES_DEFAULT]);
+
+        //if we are in saber block debounce, don't update the saber angles
+        if (vr.saberBlockDebounce < cl.serverTime) {
+            rotation[PITCH] = 45;
+            QuatToYawPitchRoll(pDominantTracking->Pose.orientation, rotation, vr.weaponangles[ANGLES_SABER]);
+            QuatToYawPitchRoll(pOffTracking->Pose.orientation, rotation, vr.offhandangles[ANGLES_SABER]);
+        }
+
         rotation[PITCH] = vr_weapon_pitchadjust->value;
-        QuatToYawPitchRoll(pDominantTracking->Pose.orientation, rotation, vr.weaponangles);
+        QuatToYawPitchRoll(pDominantTracking->Pose.orientation, rotation, vr.weaponangles[ANGLES_ADJUSTED]);
+        QuatToYawPitchRoll(pOffTracking->Pose.orientation, rotation, vr.offhandangles[ANGLES_ADJUSTED]);
 
-        VectorSubtract(vr.weaponangles_last, vr.weaponangles, vr.weaponangles_delta);
-        VectorCopy(vr.weaponangles, vr.weaponangles_last);
+        for (int anglesIndex = 0; anglesIndex <= ANGLES_SABER; ++anglesIndex)
+        {
+            VectorSubtract(vr.weaponangles_last[anglesIndex], vr.weaponangles[anglesIndex], vr.weaponangles_delta[anglesIndex]);
+            VectorCopy(vr.weaponangles[anglesIndex], vr.weaponangles_last[anglesIndex]);
 
-        ALOGV("        weaponangles_last: %f, %f, %f",
-              vr.weaponangles_last[0], vr.weaponangles_last[1], vr.weaponangles_last[2]);
-
+            VectorSubtract(vr.offhandangles_last[anglesIndex], vr.offhandangles[anglesIndex], vr.offhandangles_delta[anglesIndex]);
+            VectorCopy(vr.offhandangles[anglesIndex], vr.offhandangles_last[anglesIndex]);
+        }
     }
 
     //Menu button
@@ -96,9 +105,6 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
             vr.offhandoffset[0] = pOffTracking->Pose.position.x - vr.hmdposition[0];
             vr.offhandoffset[1] = pOffTracking->Pose.position.y - vr.hmdposition[1];
             vr.offhandoffset[2] = pOffTracking->Pose.position.z - vr.hmdposition[2];
-
-            vec3_t rotation = {0};
-            QuatToYawPitchRoll(pOffTracking->Pose.orientation, rotation, vr.offhandangles);
         }
 
 

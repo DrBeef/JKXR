@@ -30,6 +30,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_navigator.h"
 #include "b_local.h"
 #include "g_nav.h"
+#include "bg_local.h"
+#include <JKVR/VrClientInfo.h>
 
 #define ACT_ACTIVE		qtrue
 #define ACT_INACTIVE	qfalse
@@ -1670,9 +1672,21 @@ qboolean CanUseInfrontOf(gentity_t *ent)
 
 	//FIXME: this does not match where the new accurate crosshair aims...
 	//cg.refdef.vieworg, basically
-	VectorCopy( ent->client->renderInfo.eyePoint, src );
+	if (ent->client->ps.clientNum == 0) {
+		vec3_t angles;
+		if (vr->useGestureActive && gi.cvar("vr_gesture_triggered_use", "2", CVAR_ARCHIVE)->integer == 1) { // defined in VrCvars.h
+			BG_CalculateVROffHandPosition(src, angles);
+		} else {
+			BG_CalculateVRWeaponPosition(src, angles);
+		}
+		AngleVectors(angles, vf, NULL, NULL);
+	} else {
+		VectorCopy(ent->client->renderInfo.eyePoint, src);
 
-	AngleVectors( ent->client->ps.viewangles, vf, NULL, NULL );
+		AngleVectors(ent->client->ps.viewangles, vf, NULL,
+					 NULL);//ent->client->renderInfo.eyeAngles was cg.refdef.viewangles, basically
+	}
+
 	//extend to find end of use trace
 	VectorMA( src, USE_DISTANCE, vf, dest );
 

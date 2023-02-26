@@ -233,7 +233,7 @@ void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace )
 			if (other->client->ps.clientNum == 0)
 			{
 				vec3_t origin, angles;
-				if (vr->useGestureActive && gi.cvar("vr_gesture_triggered_use", "0", CVAR_ARCHIVE)->integer == 1) { // defined in VrCvars.h
+				if (vr->useGestureActive && gi.cvar("vr_gesture_triggered_use", "2", CVAR_ARCHIVE)->integer == 1) { // defined in VrCvars.h
 					BG_CalculateVROffHandPosition(origin, angles);
 				} else {
 					BG_CalculateVRWeaponPosition(origin, angles);

@@ -151,7 +151,7 @@ void VR_SetHMDOrientation(float pitch, float yaw, float roll)
 
 	if (!vr.remote_turret)
 	{
-		VectorCopy(vr.weaponangles, vr.weaponangles_first);
+		VectorCopy(vr.weaponangles[ANGLES_ADJUSTED], vr.weaponangles_first[ANGLES_ADJUSTED]);
 	}
 
 	// View yaw delta
@@ -209,8 +209,8 @@ void VR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side
 		*side = 0.0f;
 		*pos_side = 0.0f;
 		*yaw = vr.snapTurn + vr.hmdorientation_first[YAW] +
-				vr.weaponangles[YAW] - vr.weaponangles_first[YAW];
-		*pitch = vr.weaponangles[PITCH];
+				vr.weaponangles[ANGLES_ADJUSTED][YAW] - vr.weaponangles_first[ANGLES_ADJUSTED][YAW];
+		*pitch = vr.weaponangles[ANGLES_ADJUSTED][PITCH];
 		*roll = 0.0f;
 	}
 	else if (vr.cgzoommode == 2 || vr.cgzoommode == 4)
@@ -221,7 +221,7 @@ void VR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side
 		*side = 0.0f;
 		*pos_side = 0.0f;
 		*yaw = vr.snapTurn;
-		*pitch = vr.weaponangles[PITCH];
+		*pitch = vr.weaponangles[ANGLES_ADJUSTED][PITCH];
 		*roll = vr.hmdorientation[ROLL];
 	}
 	else if (vr.remote_npc) {
@@ -301,7 +301,7 @@ void VR_Init()
 	vr_haptic_intensity = Cvar_Get ("vr_haptic_intensity", "1.0", CVAR_ARCHIVE);
 	vr_comfort_vignette = Cvar_Get ("vr_comfort_vignette", "0.0", CVAR_ARCHIVE);
 	vr_saber_3rdperson_mode = Cvar_Get ("vr_saber_3rdperson_mode", "1", CVAR_ARCHIVE);
-	vr_gesture_triggered_use = Cvar_Get ("vr_gesture_triggered_use", "0", CVAR_ARCHIVE);
+	vr_gesture_triggered_use = Cvar_Get ("vr_gesture_triggered_use", "2", CVAR_ARCHIVE);
 	vr_use_gesture_boundary = Cvar_Get ("vr_use_gesture_boundary", "0.35", CVAR_ARCHIVE);
 
 	cvar_t *expanded_menu_enabled = Cvar_Get ("expanded_menu_enabled", "0", CVAR_ARCHIVE);

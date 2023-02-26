@@ -55,3 +55,6 @@ Projects/Android/jni/SupportLibs/liboggvorbis/libs/x86/libvorbis-jni.so
 Projects/Android/jni/SupportLibs/liboggvorbis/libs/x86/libvorbis.so
 Projects/Android/libs/arm64-v8a/libopenxr_loader_meta.so
 Projects/Android/libs/arm64-v8a/libopenxr_loader_pico.so
+build/intermediates/lint-cache/sdk-registry.xml/sdk-registry.xml
+build/intermediates/lint-cache/maven.google/master-index.xml
+build/intermediates/lint-cache/maven.google/com/android/support/group-index.xml

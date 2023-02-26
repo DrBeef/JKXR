@@ -696,19 +696,31 @@ void BG_CalculateVRPositionInWorld( const vec3_t in_position,  vec3_t in_offset,
 	angles[YAW] += (cg.refdefViewAngles[YAW] - getHMDYawForCalc());
 }
 
+void BG_CalculateVRDefaultPosition( int hand, vec3_t origin, vec3_t angles )
+{
+	if (hand == 0)
+	{
+		BG_CalculateVRPositionInWorld(vr->weaponposition, vr->weaponoffset, vr->weaponangles[ANGLES_DEFAULT], origin, angles);
+	}
+	else
+	{
+		BG_CalculateVRPositionInWorld(vr->offhandposition[0], vr->offhandoffset, vr->offhandangles[ANGLES_DEFAULT], origin, angles);
+	}
+}
+
 void BG_CalculateVROffHandPosition( vec3_t origin, vec3_t angles )
 {
-	BG_CalculateVRPositionInWorld(vr->offhandposition[0], vr->offhandoffset, vr->offhandangles, origin, angles);
+	BG_CalculateVRPositionInWorld(vr->offhandposition[0], vr->offhandoffset, vr->offhandangles[ANGLES_ADJUSTED], origin, angles);
 }
 
 void BG_CalculateVRWeaponPosition( vec3_t origin, vec3_t angles )
 {
-	BG_CalculateVRPositionInWorld(vr->weaponposition, vr->weaponoffset, vr->weaponangles, origin, angles);
+	BG_CalculateVRPositionInWorld(vr->weaponposition, vr->weaponoffset, vr->weaponangles[ANGLES_ADJUSTED], origin, angles);
 }
 
 void BG_CalculateVRSaberPosition( vec3_t origin, vec3_t angles )
 {
-	BG_CalculateVRPositionInWorld(vr->weaponposition, vr->weaponoffset, vr->weaponangles_saber, origin, angles);
+	BG_CalculateVRPositionInWorld(vr->weaponposition, vr->weaponoffset, vr->weaponangles[ANGLES_SABER], origin, angles);
 }
 
 bool BG_UseVRPosition( gentity_t *ent )

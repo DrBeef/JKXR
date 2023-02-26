@@ -2013,6 +2013,9 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		cg.time = serverTime;
 	}
 
+	//Reset seed so random numbers are the same for each eye
+	Rand_Init(cg.time);
+
 	cg.stereoView = stereoView;
 
 	// update cvars
@@ -2258,7 +2261,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 			vec3_t end, forward;
 			refEntity_t handEnt;
 			memset( &handEnt, 0, sizeof(refEntity_t) );
-			BG_CalculateVROffHandPosition(handEnt.origin, handEnt.angles);
+			BG_CalculateVRDefaultPosition(1, handEnt.origin, handEnt.angles);
 
 			//Move it back a bit?
 			AngleVectors(handEnt.angles, forward, NULL, NULL);
@@ -2290,7 +2293,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 
 			if (cg.snap->ps.weapon == WP_NONE)
 			{
-				BG_CalculateVRWeaponPosition(handEnt.origin, handEnt.angles);
+				BG_CalculateVRDefaultPosition(0, handEnt.origin, handEnt.angles);
 
 				//Move it back a bit?
 				AngleVectors(handEnt.angles, forward, NULL, NULL);
