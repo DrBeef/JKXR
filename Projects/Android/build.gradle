@@ -64,3 +64,19 @@ buildscript {
         google()
     }
 }
+
+task packJOResources(type: Zip) {
+    from "../../z_vr_assets/"
+    destinationDir file("../../assets/")
+    archiveName "z_vr_assets.pk3"
+}
+
+task packJAResources(type: Zip) {
+    from "../../z_vr_assets_jka/"
+    destinationDir file("../../assets/")
+    archiveName "z_vr_assets_jka.pk3"
+}
+
+tasks.matching {it.name.startsWith("assemble")}.all { Task task ->
+    task.dependsOn([packJOResources, packJAResources])
+}
