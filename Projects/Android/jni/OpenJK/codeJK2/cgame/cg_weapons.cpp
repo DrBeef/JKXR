@@ -3013,6 +3013,9 @@ void CG_DrawItemSelector( void )
 		}
 	}
 
+	const char	*info	 = CG_ConfigString( CS_SERVERINFO );
+	const char	*mapname = Info_ValueForKey( info, "mapname" );
+
 	qboolean selected = qfalse;
 	for (int index = 0; index < count; ++index)
 	{
@@ -3029,21 +3032,6 @@ void CG_DrawItemSelector( void )
 				{
 					break;
 				}
-
-#ifdef _DEMO
-                if (itemId == WP_SABER ||
-                    itemId == WP_BRYAR_PISTOL ||
-                    itemId == WP_BLASTER ||
-                    itemId == WP_FLECHETTE ||
-                    itemId == WP_REPEATER ||
-                    itemId == WP_THERMAL) {
-                    CG_RegisterWeapon(itemId);
-                } else {
-                    continue;
-                }
-#else
-				CG_RegisterWeapon(itemId);
-#endif
 			}
 		}
 

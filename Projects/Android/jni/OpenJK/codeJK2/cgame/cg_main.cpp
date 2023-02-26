@@ -1520,10 +1520,34 @@ Ghoul2 Insert End
 		CG_NewClientinfo( i );
 	}
 
+	const char	*info	 = CG_ConfigString( CS_SERVERINFO );
+	const char	*mapname = Info_ValueForKey( info, "mapname" );
+	bool isDemoMap = !strcmp(mapname,"demo");
+
 	//Just register all weapons to avoid a pause when opening the selector
-	for (i=0; i < WP_MELEE; i++)
+	for (i=0; i <= WP_MELEE; i++)
 	{
-		CG_RegisterWeapon(i);
+		//Only certain weapon models available in the demo pk3
+		if (isDemoMap)
+		{
+			if (i == WP_SABER ||
+				i == WP_BRYAR_PISTOL ||
+				i == WP_BLASTER ||
+				i == WP_FLECHETTE ||
+				i == WP_REPEATER ||
+				i == WP_THERMAL)
+			{
+				CG_RegisterWeapon(i);
+			}
+			else
+			{
+				continue;
+			}
+		}
+		else
+		{
+			CG_RegisterWeapon(i);
+		}
 	}
 
 	for (i=0 ; i < ENTITYNUM_WORLD ; i++)

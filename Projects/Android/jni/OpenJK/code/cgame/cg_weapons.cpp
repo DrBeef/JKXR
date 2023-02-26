@@ -3177,20 +3177,7 @@ void CG_DrawItemSelector( void )
 					break;
 				}
 
-#ifdef _DEMO
-                if (itemId == WP_SABER ||
-                    itemId == WP_BRYAR_PISTOL ||
-                    itemId == WP_BLASTER ||
-                    itemId == WP_FLECHETTE ||
-                    itemId == WP_REPEATER ||
-                    itemId == WP_THERMAL) {
-                    CG_RegisterWeapon(itemId);
-                } else {
-                    continue;
-                }
-#else
 				CG_RegisterWeapon(itemId);
-#endif
 			}
 		}
 
