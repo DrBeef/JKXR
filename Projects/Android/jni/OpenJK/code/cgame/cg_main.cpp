@@ -1436,6 +1436,14 @@ static void CG_RegisterGraphics( void ) {
 
 	cgs.media.boltShader				= cgi_R_RegisterShader( "gfx/misc/blueLine" );
 
+	cgs.media.reticleShader = cgi_R_RegisterShader( "gfx/weapon/scope" );
+
+	cgs.media.vignetteShader = cgi_R_RegisterShaderNoMip( "gfx/vignette" );
+
+	cgs.media.iconMoveSpeed[0] = cgi_R_RegisterShaderNoMip( "gfx/icon_comfortable" );
+	cgs.media.iconMoveSpeed[1] = cgi_R_RegisterShaderNoMip( "gfx/icon_full" );
+	cgs.media.iconMoveSpeed[2] = cgi_R_RegisterShaderNoMip( "gfx/icon_walk" );
+
 	// FIXME: do these conditionally
 	cgi_R_RegisterShader( "gfx/2d/workingCamera" );
 	cgi_R_RegisterShader( "gfx/2d/brokenCamera" );
