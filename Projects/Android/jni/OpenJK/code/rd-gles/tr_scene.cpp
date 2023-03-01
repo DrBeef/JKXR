@@ -25,7 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../server/exe_headers.h"
 
 #include "tr_local.h"
-#include <JKVR/VrClientInfo.h>
+#include <JKXR/VrClientInfo.h>
 
 int			r_firstSceneDrawSurf;
 

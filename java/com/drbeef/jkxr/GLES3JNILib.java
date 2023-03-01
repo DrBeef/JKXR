@@ -1,5 +1,5 @@
 
-package com.drbeef.jkquest;
+package com.drbeef.jkxr;
 
 import android.app.Activity;
 import android.view.Surface;

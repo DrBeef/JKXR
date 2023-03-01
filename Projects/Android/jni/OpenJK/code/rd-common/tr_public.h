@@ -127,7 +127,7 @@ typedef struct {
 	qboolean			*(*gbAlreadyDoingLoad)				( void );
 	int					(*com_frameTime)					( void );
 
-	//JKVR Functions
+	//JKXR Functions
 	bool 				(*TBXR_useScreenLayer)				( void );
 	bool 				(*TBXR_GetVRProjection)				(int eye, float zNear, float zFar, float* projection);
 

@@ -1,5 +1,5 @@
 
-package com.drbeef.jkquest;
+package com.drbeef.jkxr;
 
 
 import static android.system.Os.setenv;
@@ -49,7 +49,7 @@ import java.util.Vector;
 
 		BufferedReader br;
 		try {
-			br = new BufferedReader(new FileReader("/sdcard/JKQuest/commandline.txt"));
+			br = new BufferedReader(new FileReader("/sdcard/JKXR/commandline.txt"));
 			String s;
 			StringBuilder sb = new StringBuilder(0);
 			while ((s = br.readLine()) != null)
@@ -85,8 +85,8 @@ import java.util.Vector;
 		System.loadLibrary( "openjk_" + game );
 	}
 
-	private static final String TAG = "JKQuest";
-	private static final String APPLICATION = "JKQuest";
+	private static final String TAG = "JKXR";
+	private static final String APPLICATION = "JKXR";
 
 
 	private int permissionCount = 0;
@@ -213,38 +213,38 @@ import java.util.Vector;
 
 	public void create() {
 		//Make the directories
-		new File("/sdcard/JKQuest/JK2/base").mkdirs();
-		new File("/sdcard/JKQuest/JK3/base").mkdirs();
+		new File("/sdcard/JKXR/JK2/base").mkdirs();
+		new File("/sdcard/JKXR/JK3/base").mkdirs();
 
 		//Copy the command line params file
-		copy_asset("/sdcard/JKQuest", "commandline.txt", false);
+		copy_asset("/sdcard/JKXR", "commandline.txt", false);
 
 		//Copy the weapon adjustment config - should we force overwrite?
-		copy_asset("/sdcard/JKQuest/JK2/base", "weapons_vr_jo.cfg", true);
-		copy_asset("/sdcard/JKQuest/JK3/base", "weapons_vr_ja.cfg", true);
+		copy_asset("/sdcard/JKXR/JK2/base", "weapons_vr_jo.cfg", true);
+		copy_asset("/sdcard/JKXR/JK3/base", "weapons_vr_ja.cfg", true);
 
 		//Our assets
-		copy_asset("/sdcard/JKQuest/JK2/base", "z_vr_assets.pk3", true);
-		copy_asset("/sdcard/JKQuest/JK3/base", "z_vr_assets_jka.pk3", true);
+		copy_asset("/sdcard/JKXR/JK2/base", "z_vr_assets.pk3", true);
+		copy_asset("/sdcard/JKXR/JK3/base", "z_vr_assets_jka.pk3", true);
 
 		//Bummser's default configuration
 		if (manufacturer.contains("meta")) {
 			//Meta Quest
-			copy_asset_with_rename("/sdcard/JKQuest/JK2/base", "openjo_sp_quest.cfg", "openjo_sp.cfg", false);
+			copy_asset_with_rename("/sdcard/JKXR/JK2/base", "openjo_sp_quest.cfg", "openjo_sp.cfg", false);
 		} else {
 			//Pico XR
-			copy_asset_with_rename("/sdcard/JKQuest/JK2/base", "openjo_sp_pico.cfg", "openjo_sp.cfg", false);
+			copy_asset_with_rename("/sdcard/JKXR/JK2/base", "openjo_sp_pico.cfg", "openjo_sp.cfg", false);
 		}
 
 		//Read these from a file and pass through
 		commandLineParams = new String("jo");
 
 		//See if user is trying to use command line params
-		if (new File("/sdcard/JKQuest/commandline.txt").exists()) // should exist!
+		if (new File("/sdcard/JKXR/commandline.txt").exists()) // should exist!
 		{
 			BufferedReader br;
 			try {
-				br = new BufferedReader(new FileReader("/sdcard/JKQuest/commandline.txt"));
+				br = new BufferedReader(new FileReader("/sdcard/JKXR/commandline.txt"));
 				String s;
 				StringBuilder sb = new StringBuilder(0);
 				while ((s = br.readLine()) != null)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-		package="com.drbeef.jkquest"
+		package="com.drbeef.jkxr"
 		android:versionCode="39"
 		android:versionName="0.6.2" android:installLocation="auto" >
 
@@ -18,8 +18,8 @@
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 	<application android:allowBackup="false" 
-		android:icon="@drawable/ic_jkquest"
-		android:label="@string/jkquest"
+		android:icon="@drawable/ic_jkxr"
+		android:label="@string/jkxr"
 		android:extractNativeLibs="true"
 		>
 		
@@ -33,7 +33,7 @@
 		<meta-data android:name="pvr.app.type" android:value="vr" />
 
 		<activity
-				android:name="com.drbeef.jkquest.GLES3JNIActivity"
+				android:name="com.drbeef.jkxr.GLES3JNIActivity"
 				android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
 				android:launchMode="singleTask"
 				android:screenOrientation="landscape"

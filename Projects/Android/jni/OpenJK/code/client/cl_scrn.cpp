@@ -28,7 +28,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "client.h"
 #include "client_ui.h"
-#include <JKVR/VrCommon.h>
+#include <JKXR/VrCommon.h>
 
 extern console_t con;
 

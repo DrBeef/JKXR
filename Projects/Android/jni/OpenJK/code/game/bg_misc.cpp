@@ -29,7 +29,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "bg_public.h"
 #include "g_items.h"
 #include "g_vehicles.h"
-#include <JKVR/VrClientInfo.h>
+#include <JKXR/VrClientInfo.h>
 
 
 extern weaponData_t weaponData[WP_NUM_WEAPONS];

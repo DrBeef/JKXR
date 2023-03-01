@@ -31,7 +31,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../game/anims.h"
 #include "../game/wp_saber.h"
 #include "bg_local.h"
-#include <JKVR/VrClientInfo.h>
+#include <JKXR/VrClientInfo.h>
 
 #define	LOOK_SWING_SCALE	0.5
 

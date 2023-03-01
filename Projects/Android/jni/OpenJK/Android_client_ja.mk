@@ -23,7 +23,7 @@ LOCAL_STATIC_LIBRARIES := sigc libzip libpng libminizip
 LOCAL_SHARED_LIBRARIES := openxr_loader gl4es
 
 
-LOCAL_C_INCLUDES := $(JK3_BASE_C_INCLUDES) $(TOP_DIR) $(TOP_DIR)/JKVR $(GL4ES_PATH) $(GL4ES_PATH)/include $(JK3_CODE_PATH)/game $(SUPPORT_LIBS)/minizip/include $(JK3_CODE_PATH)/rd-gles $(JK3_CODE_PATH)/rd-common
+LOCAL_C_INCLUDES := $(JK3_BASE_C_INCLUDES) $(TOP_DIR) $(TOP_DIR)/JKXR $(GL4ES_PATH) $(GL4ES_PATH)/include $(JK3_CODE_PATH)/game $(SUPPORT_LIBS)/minizip/include $(JK3_CODE_PATH)/rd-gles $(JK3_CODE_PATH)/rd-common
 
 
 #############################################################################
@@ -123,13 +123,13 @@ JK3_SRC = \
 		${SHARED_PATH}/qcommon/safe/string.cpp \
 
 
-JKVR_SRC_FILES :=  ${TOP_DIR}/JKVR/JKVR_SurfaceView.cpp \
-                  ${TOP_DIR}/JKVR/TBXR_Common.cpp \
-                  ${TOP_DIR}/JKVR/VrInputCommon.cpp \
-                  ${TOP_DIR}/JKVR/VrInputDefault.cpp \
-                  ${TOP_DIR}/JKVR/VrInputWeaponAlign.cpp \
-                  ${TOP_DIR}/JKVR/argtable3.c \
-                  ${TOP_DIR}/JKVR/OpenXrInput.cpp
+JKVR_SRC_FILES :=  ${TOP_DIR}/JKXR/JKXR_SurfaceView.cpp \
+                  ${TOP_DIR}/JKXR/TBXR_Common.cpp \
+                  ${TOP_DIR}/JKXR/VrInputCommon.cpp \
+                  ${TOP_DIR}/JKXR/VrInputDefault.cpp \
+                  ${TOP_DIR}/JKXR/VrInputWeaponAlign.cpp \
+                  ${TOP_DIR}/JKXR/argtable3.c \
+                  ${TOP_DIR}/JKXR/OpenXrInput.cpp
 
 LOCAL_SRC_FILES += $(JK3_SRC) $(JKVR_SRC_FILES)
 

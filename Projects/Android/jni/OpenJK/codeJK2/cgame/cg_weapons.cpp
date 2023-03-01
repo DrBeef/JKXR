@@ -28,7 +28,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../game/g_local.h"
 #include "../game/anims.h"
 #include <bg_local.h>
-#include <JKVR/VrClientInfo.h>
+#include <JKXR/VrClientInfo.h>
 
 extern void CG_LightningBolt( centity_t *cent, vec3_t origin );
 

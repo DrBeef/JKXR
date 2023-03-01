@@ -30,7 +30,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "tr_local.h"
 #include "qcommon/matcomp.h"
 #include "../qcommon/sstring.h"
-#include <JKVR/VrClientInfo.h>
+#include <JKXR/VrClientInfo.h>
 
 #define	LL(x) x=LittleLong(x)
 #define	LS(x) x=LittleShort(x)
