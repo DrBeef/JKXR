@@ -60,6 +60,21 @@
 			forecolor			1 1 1 1
 			visible			1
 			decoration
+			cvarTest			expanded_menu_enabled
+			hideCvar			{ 1 }
+		}
+		itemDef
+		{
+			name				frame_pic
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 640 480
+			background			"gfx/menus/expanded_menu_background"
+			forecolor			1 1 1 1
+			visible			1
+			decoration
+			cvarTest			expanded_menu_enabled
+			showCvar			{ 1 }
 		}
 
 		// The saber glow on the left

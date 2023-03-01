@@ -1,0 +1,1718 @@
+//----------------------------------------------------------------------------------------------
+//
+// INGAME CONTROLS MENU
+//
+//	Player can change key bindings from ingame
+//
+//----------------------------------------------------------------------------------------------
+{
+	menuDef 
+	{
+		name					"ingameControlsMenu"
+		fullScreen				1							// MENU_TRUE				
+		rect					0 0 640 480						// Size and position of the menu
+		visible					1							// Visible on open
+		focusColor				1 1 1 1						// Focus color for text and items
+		descX					320
+		descY					426
+		descScale				1
+		descColor				1 .682 0 .8
+		descAlignment				ITEM_ALIGN_CENTER		
+
+		onOpen 
+		{
+				uiScript 		loadControls
+				
+				// fade in movement controls
+				show			commoncontrols
+				setitemcolor		commoncontrols 	forecolor .615 .615 .956 0.0
+				fadein			commoncontrols
+				
+				// don't show any others
+				hide 			weaponcontrols
+				hide			forcecontrols
+				hide 			comfortcontrols
+
+				show			setup_background
+				
+				setitemcolor		side_buttons	forecolor 1 .682 0 1
+				setitemcolor		commoncontrolbutton forecolor 1 1 1 1
+		}
+
+		onClose 
+		{
+			uiScript 			saveControls
+		}
+			
+		onESC 
+		{ 
+			play			"sound/interface/esc.wav" 					
+			hide				highlights
+			close				all
+			open				ingameMainMenu
+			hide				ffwarning
+		}
+
+//----------------------------------------------------------------------------------------------
+//	MENU BACKGROUND
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				really_background
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				156 154 320 240
+			background			"gfx/menus/main_centerblue"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				background_text
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 160 480
+			background			"gfx/menus/menu_side_text"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				background_text_b
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				480 0 160 480
+			background			"gfx/menus/menu_side_text_right"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}	
+	
+		itemDef 
+		{
+			name				background
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 640 480
+			background			"gfx/menus/main_background"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				starwars
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				107 8 428 112
+			background			"gfx/menus/jediacademy"	
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				left_frame
+			group				lf_fr
+			style				WINDOW_STYLE_SHADER
+			rect				0 50 320 160
+			background			"gfx/menus/menu_boxes_left"	
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				right_frame
+			group				rt_fr
+			style				WINDOW_STYLE_SHADER
+			rect				320 50 320 160
+			background			"gfx/menus/menu_boxes_right"	
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+
+//----------------------------------------------------------------------------------------------
+//	TOP MENU BUTTONS
+//----------------------------------------------------------------------------------------------
+
+
+		// Big button "SAVE"
+		itemDef 
+		{
+			name				savegamebutton_glow
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				7 126 130 24
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+		}
+
+		itemDef 
+		{
+			name				savegamebutton
+			group				nbut
+			text				@MENUS_SAVE
+			descText			@MENUS_SAVE_CURRENT_GAME
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				7 126 130 24
+			textaligny			0
+			font				3
+			textscale			1.1
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			1
+			textalignx			65
+			forecolor			1 .682 0 1
+			visible			1
+
+			mouseEnter 
+			{ 
+				show			savegamebutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			savegamebutton_glow 
+			}	  	  
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			ingamesaveMenu 
+			}
+		}
+
+
+		// Big button "LOAD"
+		itemDef 
+		{
+			name				loadgamebutton_glow
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				170 126 130 24
+			background			"gfx/menus/menu_buttonback"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+		}
+
+		itemDef 
+		{
+			name				loadgamebutton
+			group				lbut
+			text				@MENUS_LOAD
+			descText			@MENUS_LOAD_A_SAVED_GAME
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				170 126 130 24
+			textaligny			0
+			font				3
+			textscale			1.1
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			1
+			textalignx			65
+			forecolor			1 .682 0 1
+			visible			1
+
+			mouseEnter 
+			{ 
+				show			loadgamebutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			loadgamebutton_glow 
+			}
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			ingameloadMenu 
+			}	  	  
+		}
+
+		// Big button "CONTROLS"
+		itemDef 
+		{
+			name				controlsbutton_glow
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				340 126 130 24
+			background			"gfx/menus/menu_buttonback"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+		}
+
+		itemDef {
+			name				controlsbutton
+			group				cbut
+			text				@MENUS_CONTROLS
+			descText			@MENUS_CONFIGURE_GAME_CONTROLS
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				340 126 130 24
+			font				3
+			textscale			1.1
+			textaligny			0
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			1
+			textalignx			65
+			backcolor			0 0 0 0
+			forecolor			1 .682 0 1
+			visible			1
+			 
+			mouseEnter 
+			{ 
+				show			controlsbutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			controlsbutton_glow 
+			}	  	  
+		}
+
+		// Big button "SETUP"
+		itemDef 
+		{
+			name				setupbutton_glow
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				502 126 130 24
+			background			"gfx/menus/menu_buttonback"	
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+		}
+
+		itemDef 
+		{
+			name				setupbutton
+			group				sbut
+			text				@MENUS_SETUP
+			descText			@MENUS_CONFIGURE_GAME_SETTINGS
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				502 126 130 24
+			font				3
+			textscale			1.1
+			textaligny			0
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			1
+			textalignx			65
+			backcolor			0 0 0 0
+			forecolor			1 .682 0 1
+			visible			1
+			 
+			mouseEnter 
+			{ 
+				show			setupbutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			setupbutton_glow 
+			}	  	  
+			action 
+			{
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			ingamesetupMenu ; 
+			}
+		}
+
+//----------------------------------------------------------------------------------------------
+//	OTHER MAIN MENU BUTTONS
+//----------------------------------------------------------------------------------------------
+		// BACK button in lower left corner
+		itemDef 
+		{
+			name				backbutton_glow
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				59 444 130 24 
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			name				backbutton
+			group				exit
+			text				@MENUS_BACK
+			descText			@MENUS_BACKTOMAIN
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				59 444 130 24  
+			font				3
+			textscale			1.1
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			3
+			textalignx			65
+			textaligny			-1
+			forecolor			1 .682 0 1
+			visible				1
+
+			mouseEnter 
+			{ 
+				show			backbutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			backbutton_glow 
+			}	  	  
+			action 
+			{ 
+				play			"sound/interface/esc.wav" 					
+				close			all ; 
+				open			ingamemainMenu 
+			}
+		}
+		
+		// EXIT button in lower left corner
+		itemDef 
+		{
+			name				exitgamebutton_glow
+			group				exit_glow
+			style				WINDOW_STYLE_SHADER
+			rect				255 444 130 24 
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			name				exitgamebutton
+			group				exit
+			text				@MENUS_EXIT
+			descText			@MENUS_JEDI_KNIGHT_II
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				255 444 130 24 
+			font				3
+			textscale			1.1
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			3
+			textalignx			65
+			textaligny			-1
+			forecolor			1 .682 0 1
+			visible				1
+
+			mouseEnter 
+			{ 
+				show			exitgamebutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			exitgamebutton_glow 
+			}	  	  
+			action 
+			{ 
+				play			"sound/weapons/saber/saberoff.mp3"; 
+				close			all ; 
+				open			ingamequitMenu 
+			}
+		}
+
+		// RESUME button in the lower right corner
+		itemDef 
+		{
+			name				resumebutton_glow
+			group				resume_glow
+			style				WINDOW_STYLE_SHADER
+			rect				455 444 130 24 
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			name				resume
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				455 444 130 24 
+			text				@MENUS_RESUME
+			descText			@MENUS_RESUME_CURRENT_GAME
+			font				3
+			textscale			1
+			textalign			ITEM_ALIGN_CENTER
+			textstyle			3
+			textalignx			65
+			textaligny			-1
+			forecolor			1 .682 0 1
+			visible				1
+			mouseEnter 
+			{ 
+				show			resumebutton_glow 
+			}
+			mouseExit 
+			{ 
+				hide			resumebutton_glow 
+			}	  	  
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				uiScript		closeingame			// Close menu				
+			}
+		}
+
+//----------------------------------------------------------------------------------------------
+//	SECOND ROW MENU BUTTONS
+//----------------------------------------------------------------------------------------------
+// Configure Controls title
+		itemDef 
+		{
+			name				control_title
+			group				title
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/menu_blendbox"
+			text				@MENUS_CONFIGURE_CONTROLS
+      			rect				100 164 440 16
+			font				3
+			textscale			0.7
+			textalign			ITEM_ALIGN_CENTER		
+			textalignx			225
+			textaligny			-1
+			forecolor			.549 .854 1 1
+      			visible				1 
+  	    		decoration 
+		}
+
+//----------------------------------------------------------------------------------------------
+// GLOW ON SIDE BUTTONS
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				sidebutton_glow
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				60 185 200 24
+			background			"gfx/menus/menu_blendbox2"			// Frame around button
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+		
+//----------------------------------------------------------------------------------------------
+// COMMON  button
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				commoncontrolbutton
+			group				side_buttons
+			text				@MENUS_VR_COMMON_CONTROLS_ITEM
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				80 185 170 24
+			font				3
+			textscale			0.9
+			textalignx			170
+			textaligny			2
+			textalign			ITEM_ALIGN_RIGHT
+			textstyle			1
+			forecolor			1 .682 0 1
+			visible				1
+			descText			@MENUS_VR_COMMON_CONTROLS_DESC
+
+			mouseEnter 
+			{ 
+				show			sidebutton_glow
+				setitemrect		sidebutton_glow	80 185 170 24
+			}
+			mouseExit 
+			{ 
+				hide			sidebutton_glow
+			}	  	  
+			  
+			action 
+			{ 
+				play			sound/interface/sub_select 
+				show			setup_background 
+				
+				show			commoncontrols 
+				fadein			commoncontrols
+				
+				hide 			weaponcontrols 
+				hide			forcecontrols 
+				hide 			comfortcontrols
+				setitemcolor		commoncontrolbutton 		forecolor 1 1 1 1 
+				setitemcolor		weaponscontrolbutton 		forecolor 1 .682 0 1
+				setitemcolor		forcecontrolbutton 		forecolor 1 .682 0 1
+				setitemcolor		comfortcontrolbutton 		forecolor 1 .682 0 1
+			}
+		}
+
+//----------------------------------------------------------------------------------------------
+// WEAPONS button
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				weaponscontrolbutton
+			group				side_buttons
+			text				@MENUS_WEAPONS
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				80 209 170 24
+			font				3
+			textscale			0.9
+			textalignx			170
+			textaligny			2
+			textalign			ITEM_ALIGN_RIGHT
+			textstyle			1
+			forecolor			1 .682 0 1
+			visible				1
+			descText			@MENUS_VR_WEAPON_CONTROLS_DESC
+
+			mouseEnter 
+			{ 
+				show			sidebutton_glow
+				setitemrect		sidebutton_glow	80 209 170 24
+			}
+			mouseExit 
+			{ 
+				hide			sidebutton_glow
+			}	  
+				  
+			action 
+			{ 
+				play			sound/interface/sub_select 
+				show			setup_background 
+				hide			commoncontrols 
+					
+				show 			weaponcontrols 		
+				
+				hide			forcecontrols 
+				hide 			comfortcontrols 
+				setitemcolor		commoncontrolbutton 		forecolor 1 .682 0 1
+				setitemcolor		weaponscontrolbutton 		forecolor 1 1 1 1 
+				setitemcolor		forcecontrolbutton 		forecolor 1 .682 0 1
+				setitemcolor		comfortcontrolbutton 		forecolor 1 .682 0 1
+			}
+		}
+
+//----------------------------------------------------------------------------------------------
+// FORCE POWERS button
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				forcecontrolbutton
+			group				side_buttons
+			text				@MENUS_FORCE_POWERS
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				80 233 170 24
+			font				3
+			textscale			0.9
+			textalignx			170
+			textaligny			2
+			textalign			ITEM_ALIGN_RIGHT
+			textstyle			1
+			forecolor			1 .682 0 1
+			visible			1
+			descText			@MENUS_VR_POWER_CONTROLS_DESC
+
+			mouseEnter 
+			{ 
+				show			sidebutton_glow
+				setitemrect		sidebutton_glow	80 233 170 24
+			}
+			mouseExit 
+			{ 
+				hide			sidebutton_glow
+			}	  	  
+			action 
+			{ 
+				play			sound/interface/sub_select 
+				show			setup_background 
+				hide			commoncontrols 
+				hide 			weaponcontrols 
+				show			forcecontrols 
+				hide 			comfortcontrols 
+				setitemcolor		commoncontrolbutton 		forecolor 1 .682 0 1
+				setitemcolor		weaponscontrolbutton 		forecolor 1 .682 0 1
+				setitemcolor		forcecontrolbutton 		forecolor 1 1 1 1 
+				setitemcolor		comfortcontrolbutton 		forecolor 1 .682 0 1
+			}
+		}
+
+//----------------------------------------------------------------------------------------------
+// COMFORT  button
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				comfortcontrolbutton
+			group				side_buttons
+			text				@MENUS_VR_COMFORT_CONTROLS_ITEM
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				80 257 170 24
+			font				3
+			textscale			0.9
+			textalignx			170
+			textaligny			2
+			textalign			ITEM_ALIGN_RIGHT
+			textstyle			1
+			forecolor			1 .682 0 1
+			visible				1
+			descText			@MENUS_VR_COMFORT_CONTROLS_DESC
+
+			mouseEnter 
+			{ 
+				show			sidebutton_glow
+				setitemrect		sidebutton_glow	80 257 170 24
+			}
+			mouseExit 
+			{ 
+				hide			sidebutton_glow
+			}	  	  
+			action 
+			{ 
+				play			sound/interface/sub_select 
+				show			setup_background
+				hide			commoncontrols
+				hide 			weaponcontrols
+				hide			forcecontrols
+				show 			comfortcontrols
+				setitemcolor		commoncontrolbutton 		forecolor 1 .682 0 1
+				setitemcolor		weaponscontrolbutton 		forecolor 1 .682 0 1
+				setitemcolor		forcecontrolbutton 		forecolor 1 .682 0 1
+				setitemcolor		comfortcontrolbutton 		forecolor 1 1 1 1
+			}
+		}
+
+		itemDef 
+		{
+			name				setup_background
+			group				side_buttons
+			style				WINDOW_STYLE_FILLED
+			rect				260 185 340 225	
+			backcolor			0 0 .6 .5
+			forecolor			1 1 1 1
+			border				1
+			bordercolor			0 0 .6 1
+			visible				0
+			decoration
+		}
+
+//----------------------------------------------------------------------------------------------
+//	HIGHLIGHT BARS
+//----------------------------------------------------------------------------------------------
+		itemDef
+		{
+			name				highlight1
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				260 200 340 14
+			background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+		
+		itemDef
+		{
+			name				highlight2
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				260 220 340 14
+			background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+		
+		itemDef
+		{
+			name				highlight3
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				260 240 340 14
+			background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+		
+		itemDef
+		{
+			name				highlight4
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				260 260 340 14
+			background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+		
+		itemDef
+		{
+			name				highlight5
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				260 280 340 14
+			background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+		
+		itemDef
+		{
+			name				highlight6
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				260 300 340 14
+			background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+		
+		itemDef
+		{
+			name				highlight7
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				260 320 340 14
+			background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+		
+		itemDef
+		{
+			name				highlight8
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				260 340 340 14
+			background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+		
+		itemDef
+		{
+			name				highlight9
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				260 360 340 14
+			background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+		
+		itemDef
+		{
+			name				highlight10
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				260 380 340 14
+			background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+		
+//----------------------------------------------------------------------------------------------
+//
+//	COMMON MENU
+//
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_DIRECTION_MODE_ITEM
+			cvar				"vr_walkdirection"
+			cvarFloatList
+			{
+				@MENUS_VR_DIRECTION_MODE_CONTROLLER 0
+				@MENUS_VR_DIRECTION_MODE_HMD 1
+			}
+			rect				260 200 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174 
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 0.0
+			visible				0
+			descText			@MENUS_VR_DIRECTION_MODE_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight1
+			}
+			mouseexit 
+			{ 
+				hide			highlight1
+			}
+		}
+
+
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_SMOOTH_TURN_ITEM
+			cvar				"vr_turn_mode"
+			cvarFloatList
+			{
+				@MENUS_NO 0
+				@MENUS_VR_SMOOTH_TURN_3RD_PERSON 1
+				@MENUS_YES 2
+			}
+			rect				260 220 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174 
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 0.0
+			visible				0
+			descText			@MENUS_VR_SMOOTH_TURN_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight2
+			}
+			mouseexit 
+			{ 
+				hide			highlight2
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_TURN_ANGLE_ITEM
+			cvar				"vr_turn_angle"
+			cvarFloatList
+			{ 
+				@MENUS_VR_TURN_ANGLE_30DEGREES 30
+				@MENUS_VR_TURN_ANGLE_45DEGREES 45
+				@MENUS_VR_TURN_ANGLE_90DEGREES 90
+			}
+			rect				260 240 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174 
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 0.0
+			visible				0
+			descText			@MENUS_VR_TURN_ANGLE_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight3
+			}
+			mouseexit 
+			{ 
+				hide			highlight3
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_SWITCH_STICKS_ITEM
+			cvar				"vr_switch_sticks"
+			rect				260 260 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174 
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 0.0
+			visible				0 
+			descText			@MENUS_VR_SWITCH_STICKS_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight4
+			}
+			mouseexit 
+			{ 
+				hide			highlight4
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_LEFT_HANDED_ITEM
+			cvar				"vr_control_scheme"
+			cvarFloatList
+			{ 
+				@MENUS_NO 0
+				@MENUS_YES 10
+			}
+			rect				260 280 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174 
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 0.0
+			visible				0 
+			descText			@MENUS_VR_LEFT_HANDED_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight5
+			}
+			mouseexit 
+			{ 
+				hide			highlight5
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_CROUCH_TOGGLE_ITEM
+			cvar				"vr_crouch_toggle"
+			rect				260 300 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174 
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 0.0
+			visible				0
+			descText			@MENUS_VR_CROUCH_TOGGLE_DESC
+
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+			mouseenter 
+			{
+				show			highlight6
+			}
+			mouseexit 
+			{ 
+				hide			highlight6
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_CROUCH_IRL_ITEM
+			cvar				"vr_irl_crouch_enabled"
+			cvarFloatList
+			{
+				@MENUS_NO 0
+				@MENUS_VR_CROUCH_IRL_1ST_PERSON 1
+				@MENUS_YES 2
+			}
+			rect				260 320 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174 
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 0.0
+			visible				0
+			descText			@MENUS_VR_CROUCH_IRL_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight7
+			}
+			mouseexit 
+			{ 
+				hide			highlight7
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_GESTURE_TRIGGERED_USE_ITEM
+			cvar				"vr_gesture_triggered_use"
+			cvarFloatList
+			{
+				@MENUS_NO 0
+				@MENUS_VR_GESTURE_TRIGGERED_USE_OFF_HAND 1
+				@MENUS_VR_GESTURE_TRIGGERED_USE_DOMINANT_HAND 2
+			}
+			rect				260 340 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174 
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 0.0
+			visible				0 
+			descText			@MENUS_VR_GESTURE_TRIGGERED_USE_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight8
+			}
+			mouseexit 
+			{ 
+				hide			highlight8
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_USE_GESTURE_BOUNDARY_ITEM
+			cvarfloat		"vr_use_gesture_boundary" 0 0.20 0.50
+			rect				260 360 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174 
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 0.0
+			visible				0
+			descText			@MENUS_VR_USE_GESTURE_BOUNDARY_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight9
+			}
+			mouseexit 
+			{ 
+				hide			highlight9
+			}
+		}
+
+//----------------------------------------------------------------------------------------------
+//
+//	WEAPON MENU
+//
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				none
+			group				weaponcontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_AUTO_SWITCH
+			cvar				"cg_autoswitch"
+			cvarFloatList
+			{ 
+				@MENUS_DON_T_SWITCH 0
+				@MENUS_BEST_SAFE_WEAPON 1
+				@MENUS_ALWAYS_BEST_WEAPON 2
+			}
+			rect				260 200 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 1.0
+			visible				0
+			descText			@MENUS_CHOOSE_WHETHER_TO_SWITCH
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight1
+			}
+			mouseexit 
+			{ 
+				hide			highlight1
+			} 
+		}
+
+		itemDef 
+		{
+			name				none
+			group				weaponcontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_WEAPON_PITCH_ITEM
+			cvarfloat		"vr_weapon_pitchadjust" 0 -25 5
+			rect				260 220 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 1.0
+			visible			0
+			descText			@MENUS_VR_WEAPON_PITCH_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight2
+			}
+			mouseexit 
+			{ 
+				hide			highlight2
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				weaponcontrols
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_TWO_HANDED_ITEM
+			cvar				"vr_two_handed_weapons"
+			rect				260 240 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 1.0
+			visible			0
+			descText			@MENUS_VR_TWO_HANDED_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+	
+			mouseenter 
+			{ 
+				show			highlight3
+			}
+			mouseexit 
+			{ 
+				hide			highlight3
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				weaponcontrols
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_GUN_STOCK_ITEM
+			cvar				"vr_virtual_stock"
+			rect				260 260 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 1.0
+			visible			0
+			descText			@MENUS_VR_GUN_STOCK_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight4
+			}
+			mouseexit 
+			{ 
+				hide			highlight4
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				weaponcontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_WEAPON_VELOCITY_TRIGGER_ITEM
+			cvarfloat		"vr_weapon_velocity_trigger" 0 1.5 2.5
+			rect				260 280 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 1.0
+			visible			0
+			descText			@MENUS_VR_WEAPON_VELOCITY_TRIGGER_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight5
+			}
+			mouseexit 
+			{ 
+				hide			highlight5
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				weaponcontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_SABER_3RD_PERSON_ITEM
+			cvar				"vr_saber_3rdperson_mode"
+			cvarFloatList
+			{
+				@MENUS_VR_SABER_3RD_PERSON_DISABLED 0
+				@MENUS_VR_SABER_3RD_PERSON_MANUAL 1
+				@MENUS_VR_SABER_3RD_PERSON_AUTO 2
+			}
+			rect				260 300 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 1.0
+			visible			0
+			descText			@MENUS_VR_SABER_3RD_PERSON_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight6
+			}
+			mouseexit 
+			{ 
+				hide			highlight6
+			}
+		}
+
+//----------------------------------------------------------------------------------------------
+//
+//	FORCE MENU
+//
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				none
+			group				forcecontrols
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_FORCE_SPEED_FOV_ITEM
+			cvar				"cg_forceSpeedFOVAdjust"
+			rect				260 200 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 1.0
+			visible				0
+			descText			@MENUS_VR_FORCE_SPEED_FOV_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight1
+			}
+			mouseexit 
+			{ 
+				hide			highlight1
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				forcecontrols
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_FORCE_MOTION_TRIGGER_TOGGLE_ITEM
+			cvar				"vr_force_motion_controlled"
+			rect				260 220 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 1.0
+			visible			0 
+			descText			@MENUS_VR_FORCE_MOTION_TRIGGER_TOGGLE_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight2
+			}
+			mouseexit 
+			{ 
+				hide			highlight2
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				forcecontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_FORCE_VELOCITY_TRIGGER_ITEM
+			cvarfloat		"vr_force_velocity_trigger" 0 1.5 2.5
+			rect				260 240 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 1.0
+			visible			0
+			descText			@MENUS_VR_FORCE_VELOCITY_TRIGGER_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight3
+			}
+			mouseexit 
+			{ 
+				hide			highlight3
+			}
+		}
+
+//----------------------------------------------------------------------------------------------
+//
+//	COMFORT MENU
+//
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_IMMERSIVE_CINEMATICS_ITEM
+			cvar				"vr_immersive_cinematics"
+			rect				260 200 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1       
+			forecolor			 .615 .615 .956 1.0
+			visible			0 
+			descText			@MENUS_VR_IMMERSIVE_CINEMATICS_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight1
+			}
+			mouseexit 
+			{ 
+				hide			highlight1
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_SCREEN_DISTANCE_ITEM
+			cvar				"vr_screen_dist"
+			cvarFloatList
+			{ 
+				@MENUS_VR_SCREEN_DISTANCE_NEAR 1.5
+				@MENUS_VR_SCREEN_DISTANCE_MEDIUM 2.5
+				@MENUS_VR_SCREEN_DISTANCE_FAR 3.5
+			}
+			rect				260 220 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1       
+			forecolor			 .615 .615 .956 1.0
+			visible			0 
+			descText			@MENUS_VR_SCREEN_DISTANCE_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{ 
+				show			highlight2
+			}
+			mouseexit 
+			{ 
+				hide			highlight2
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_HEIGHT_ADJUST_ITEM
+			cvarfloat 	"cg_heightAdjust" 0 0 1
+			rect				260 240 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1        
+			forecolor			 .615 .615 .956 1.0
+			visible			0 
+			descText			@MENUS_VR_HEIGHT_ADJUST_DESC
+
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+			mouseenter 
+			{ 
+				show			highlight3
+			}
+			mouseexit 
+			{ 
+				hide			highlight3
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_HAPTIC_INTENSITY_ITEM
+			cvarfloat 	"vr_haptic_intensity" 0 0 1
+			rect				260 260 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1       
+			forecolor			 .615 .615 .956 1.0
+			visible			0
+			descText			@MENUS_VR_HAPTIC_INTENSITY_DESC
+
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+			mouseenter 
+			{ 
+				show			highlight4
+			}
+			mouseexit 
+			{ 
+				hide			highlight4
+			}
+		}
+		
+		itemDef 
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_COMFORT_VIGNETTE_ITEM
+			cvarfloat 	"vr_comfort_vignette" 0 0 1
+			rect				260 280 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1       
+			forecolor			 .615 .615 .956 1.0
+			visible			0
+			descText			@MENUS_VR_COMFORT_VIGNETTE_DESC
+
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+			mouseenter 
+			{ 
+				show			highlight5
+			}
+			mouseexit 
+			{ 
+				hide			highlight5
+			}
+		}
+
+		itemDef
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_HUD_SCALE_ITEM
+			cvarfloat 			"cg_hudScale" 0.1 1.0 5.0
+			rect				260 300 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			.615 .615 .956 1.0
+			visible			0
+			descText			@MENUS_VR_HUD_SCALE_DESC
+			action
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter
+			{ 
+				show			highlight6
+			}
+
+			mouseexit
+			{ 
+				hide			highlight6
+			}
+		}
+
+		itemDef
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_HUD_STEREO_ITEM
+			cvarfloat 			"cg_hudStereo" 1 1 30
+			rect				260 320 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			.615 .615 .956 1.0
+			visible			0
+			descText			@MENUS_VR_HUD_STEREO_DESC
+			action
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter
+			{ 
+				show			highlight7
+			}
+
+			mouseexit
+			{ 
+				hide			highlight7
+			}
+		}
+
+		itemDef
+		{
+			name				none
+			group				comfortcontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_HUD_YOFFSET_ITEM
+			cvarfloat 			"cg_hudYOffset" 1 -50 120
+			rect				260 340 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			.615 .615 .956 1.0
+			visible			0
+			descText			@MENUS_VR_HUD_YOFFSET_DESC
+			action
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter
+			{ 
+				show			highlight8
+			}
+
+			mouseexit
+			{ 
+				hide			highlight8
+			}
+		}
+
+	}
+}

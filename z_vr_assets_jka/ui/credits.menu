@@ -1,0 +1,185 @@
+{
+	menuDef
+	{
+		name					"credits"
+		fullScreen				1
+		rect					0 0 640 480
+		visible					1
+		focusColor				1 1 1 1
+		descX					320
+		descY					426
+		descScale				1
+		descColor				1 .682 0 .8
+		descAlignment				ITEM_ALIGN_CENTER
+		onESC
+		{
+			uiScript	Quit ;
+		}
+		onAccept
+		{
+			uiScript	Quit ;
+		}
+
+		itemDef
+		{
+			name				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 640 480
+      background			"gfx/colors/black"
+			forecolor			1 1 1 1
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 10 640 40
+			text				"JKQuest by Team Beef"
+			font				2
+			forecolor			1 0 0 1
+			textscale			1.2
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 50 640 40
+			text				"--------------------"
+			font				2
+			forecolor			1 1 1 1
+			textscale			1.2
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 100 640 40
+			text				"Team Beef are DrBeef,  Baggyg,  Bummser"
+			font				2
+			forecolor			0 0 1 1
+			textscale			1.2
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 150 640 40
+			text				"Lead programmer"
+			font				2
+			forecolor			1 0 0 1
+			textscale			1.2
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 200 640 40
+			text				"DrBeef"
+			font				2
+			forecolor			1 1 1 1
+			textscale			1.2
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 250 640 40
+			text				"Companion App"
+			font				2
+			forecolor			1 0 0 1
+			textscale			1.2
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 300 640 40
+			text				"Baggyg"
+			font				2
+			forecolor			1 1 1 1
+			textscale			1.2
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 350 640 40
+			text				"Special Thanks to the Team Beef patrons and whole discord!"
+			font				2
+			forecolor			1 0 0 1
+			textscale			1.2
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 350 640 40
+			text				"Special Thanks to the Team Beef patrons and whole discord!"
+			font				2
+			forecolor			1 0 0 1
+			textscale			1.2
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 400 640 40
+			text				"JKQuest: https://www.jkquest.com/"
+			font				2
+			forecolor			1 0 0 1
+			textscale			1.2
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+	}
+}

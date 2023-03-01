@@ -892,6 +892,7 @@ static qboolean UI_DeferMenuScript ( const char **args )
 UI_RunMenuScript
 ===============
 */
+bool showCredits = true;
 static qboolean UI_RunMenuScript ( const char **args )
 {
 	const char *name, *name2,*mapName,*menuName,*warningMenuName;
@@ -988,7 +989,13 @@ static qboolean UI_RunMenuScript ( const char **args )
 		}
 		else if (Q_stricmp(name, "Quit") == 0)
 		{
-			Cbuf_ExecuteText( EXEC_NOW, "quit");
+			if (showCredits) {
+				showCredits = false;
+				Menus_CloseAll();
+				Menus_OpenByName( "credits" );
+			} else {
+				Cbuf_ExecuteText( EXEC_NOW, "quit");
+			}
 		}
 		else if (Q_stricmp(name, "Controls") == 0)
 		{
@@ -3794,6 +3801,73 @@ static void UI_DrawCrosshair(rectDef_t *rect, float scale, vec4_t color) {
  	trap_R_SetColor( NULL );
 }
 
+#define TC_PLANE_WIDTH	250
+#define TC_PLANE_NEAR	90
+#define TC_PLANE_FAR	715
+#define TC_PLANE_TOP	0
+#define TC_PLANE_BOTTOM	1100
+#define TC_PLANE_NO_BEVEL 150
+#define TC_STOPTIME 81000
+
+static void UI_PatreonCredits(float x, float y, float w, float h, bool useBevel) {
+	static int startTime = cls.realtime;
+	refdef_t	refdef;
+	polyVert_t	verts[4];
+
+	// Set up refdef
+	memset( &refdef, 0, sizeof( refdef ));
+
+	refdef.rdflags = RDF_NOWORLDMODEL;
+	AxisClear( refdef.viewaxis );
+
+	refdef.override_fov = true;
+	refdef.fov_x = 150;
+	refdef.fov_y = 150;
+
+	refdef.x = (x / 640) * cls.glconfig.vidWidth;
+	refdef.y = ((y - 15) / 480) * cls.glconfig.vidHeight;
+	refdef.width = (w / 640) * cls.glconfig.vidWidth;
+	refdef.height = (h / 480) * cls.glconfig.vidHeight * 2; // deliberately extend off the bottom of the render area
+
+	// use to set shaderTime for scrolling shaders
+	refdef.time = 0;
+
+	// Set up the poly verts
+	float fadeDown = 1.0;
+	for ( int i = 0; i < 4; i++ )
+	{
+		verts[i].modulate[0] = 255*fadeDown; // gold color?
+		verts[i].modulate[1] = 235*fadeDown;
+		verts[i].modulate[2] = 127*fadeDown;
+		verts[i].modulate[3] = 255*fadeDown;
+	}
+
+	VectorScaleM( verts[2].modulate, 0.1f, verts[2].modulate ); // darken at the top??
+	VectorScaleM( verts[3].modulate, 0.1f, verts[3].modulate );
+
+	float timeoffset = (cls.realtime-startTime)*0.000022f -1;
+	VectorSet( verts[0].xyz, useBevel ? TC_PLANE_NEAR : TC_PLANE_NO_BEVEL, -TC_PLANE_WIDTH, TC_PLANE_TOP );
+	verts[0].st[0] = 1;
+	verts[0].st[1] = 1 +timeoffset;
+
+	VectorSet( verts[1].xyz, useBevel ? TC_PLANE_NEAR : TC_PLANE_NO_BEVEL, TC_PLANE_WIDTH, TC_PLANE_TOP );
+	verts[1].st[0] = 0;
+	verts[1].st[1] = 1 +timeoffset;
+
+	VectorSet( verts[2].xyz, useBevel ? TC_PLANE_FAR : TC_PLANE_NO_BEVEL, TC_PLANE_WIDTH, TC_PLANE_BOTTOM );
+	verts[2].st[0] = 0;
+	verts[2].st[1] = 0 +timeoffset;
+
+	VectorSet( verts[3].xyz, useBevel ? TC_PLANE_FAR : TC_PLANE_NO_BEVEL, -TC_PLANE_WIDTH, TC_PLANE_BOTTOM );
+	verts[3].st[0] = 1;
+	verts[3].st[1] = 0 +timeoffset;
+
+	// render it out
+	re.ClearScene();
+	re.AddPolyToScene(  re.RegisterShaderNoMip( "menu/video/beef_crawl" ), 4, verts );
+	re.RenderScene( &refdef );
+}
+
 
 /*
 =================
@@ -3879,6 +3953,12 @@ static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float
 			break;
 		case UI_KEYBINDSTATUS:
 			UI_DrawKeyBindStatus(&rect,scale, color, textStyle, iFontIndex);
+			break;
+		case UI_PATREON_CREDITS:
+			UI_PatreonCredits(x, y, w, h, true);
+			break;
+		case UI_PATREON_CREDITS_NO_BEVEL:
+			UI_PatreonCredits(x, y, w, h, false);
 			break;
 		default:
 		  break;
