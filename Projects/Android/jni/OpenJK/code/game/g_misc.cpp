@@ -786,7 +786,7 @@ void camera_use( gentity_t *self, gentity_t *other, gentity_t *activator )
 		}
 		if ( next )
 		{//found another one
-			if ( !Q_stricmp( "misc_camera", next->classname ) )
+			if ( !Q_stricmp( "misc_camera", next->classname ) && next != self )
 			{//make sure it's another camera
 				camera_use( next, other, activator );
 			}
