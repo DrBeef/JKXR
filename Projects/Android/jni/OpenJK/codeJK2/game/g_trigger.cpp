@@ -225,7 +225,7 @@ void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace )
 	}
 
 	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
-	bool useGestureEnabled = gi.cvar("vr_gesture_triggered_use", "0", CVAR_ARCHIVE)->integer; // defined in VrCvars.h
+	bool useGestureEnabled = gi.cvar("vr_gesture_triggered_use", "1", CVAR_ARCHIVE)->integer; // defined in VrCvars.h
 	bool useGestureAllowed = useGestureEnabled && !thirdPersonActive;
 	if ( (self->spawnflags & 2) && ( !( self->spawnflags & 4 ) || (	( self->spawnflags & 4) && !useGestureAllowed ) ) )
 	{ //       FACING and...         ...is not USE_BUTTON or...       ...is USE_BUTTON but use gestures are not active

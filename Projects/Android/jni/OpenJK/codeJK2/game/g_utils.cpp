@@ -1532,7 +1532,7 @@ void TryUse_Internal( gentity_t *ent, vec3_t src, vec3_t vf ) {
 
 	//extend to find end of use trace
 	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
-	bool useGestureEnabled = gi.cvar("vr_gesture_triggered_use", "0", CVAR_ARCHIVE)->integer; // defined in VrCvars.h
+	bool useGestureEnabled = gi.cvar("vr_gesture_triggered_use", "1", CVAR_ARCHIVE)->integer; // defined in VrCvars.h
 	bool useGestureAllowed = useGestureEnabled && !thirdPersonActive;
 	float useDistance = useGestureAllowed ? USE_DISTANCE_GESTURE : USE_DISTANCE_BUTTON;
 	VectorMA( src, useDistance, vf, dest );
