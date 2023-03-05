@@ -1268,37 +1268,20 @@ Try and use an entity in the world, directly ahead of us
 ==============
 */
 
-#define USE_DISTANCE	64.0f
+#define USE_DISTANCE_BUTTON		64.0f
+#define USE_DISTANCE_GESTURE	16.0f
 
-void TryUse( gentity_t *ent ) {
+void TryUse_Internal( gentity_t *ent, vec3_t src, vec3_t vf ) {
 	gentity_t *target;
 	trace_t trace;
-	vec3_t src, dest, vf;
-
-	if (ent->s.number == 0 &&
-		ent->client->NPC_class == CLASS_ATST) {//a player trying to get out of his ATST
-		GEntity_UseFunc(ent->activator, ent, ent);
-		return;
-	}
-	//FIXME: this does not match where the new accurate crosshair aims...
-	//cg.refdef.vieworg, basically
-	if (ent->client->ps.clientNum == 0) {
-		vec3_t angles;
-		if (vr->useGestureActive && gi.cvar("vr_gesture_triggered_use", "2", CVAR_ARCHIVE)->integer == 1) { // defined in VrCvars.h
-			BG_CalculateVROffHandPosition(src, angles);
-		} else {
-			BG_CalculateVRWeaponPosition(src, angles);
-		}
-		AngleVectors(angles, vf, NULL, NULL);
-	} else {
-		VectorCopy(ent->client->renderInfo.eyePoint, src);
-
-		AngleVectors(ent->client->ps.viewangles, vf, NULL,
-					 NULL);//ent->client->renderInfo.eyeAngles was cg.refdef.viewangles, basically
-	}
+	vec3_t dest;
 
 	//extend to find end of use trace
-	VectorMA( src, USE_DISTANCE, vf, dest );
+	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
+	bool useGestureEnabled = gi.cvar("vr_gesture_triggered_use", "0", CVAR_ARCHIVE)->integer; // defined in VrCvars.h
+	bool useGestureAllowed = useGestureEnabled && !thirdPersonActive;
+	float useDistance = useGestureAllowed ? USE_DISTANCE_GESTURE : USE_DISTANCE_BUTTON;
+	VectorMA( src, useDistance, vf, dest );
 
 	//Trace ahead to find a valid target
 	gi.trace( &trace, src, vec3_origin, vec3_origin, dest, ent->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, G2_NOCOLLIDE, 0 );
@@ -1347,6 +1330,44 @@ void TryUse( gentity_t *ent ) {
 		ForceTelepathy( ent );
 	}
 	*/
+}
+
+void TryUse( gentity_t *ent ) {
+	if (ent->s.number == 0 &&
+		ent->client->NPC_class == CLASS_ATST) {//a player trying to get out of his ATST
+		GEntity_UseFunc(ent->activator, ent, ent);
+		return;
+	}
+
+	vec3_t src, angles, vf;
+	if (ent->client->ps.clientNum == 0) {
+		BG_CalculateVRWeaponPosition(src, angles);
+		AngleVectors( angles, vf, NULL, NULL );
+		TryUse_Internal(ent, src, vf);
+	} else {
+		VectorCopy(ent->client->renderInfo.eyePoint, src);
+		AngleVectors(ent->client->ps.viewangles, vf, NULL, NULL);
+		TryUse_Internal(ent, src, vf);
+	}
+}
+
+void TryAltUse( gentity_t *ent ) {
+	if (ent->s.number == 0 &&
+		ent->client->NPC_class == CLASS_ATST) {//a player trying to get out of his ATST
+		GEntity_UseFunc(ent->activator, ent, ent);
+		return;
+	}
+
+	vec3_t src, angles, vf;
+	if (ent->client->ps.clientNum == 0) {
+		BG_CalculateVROffHandPosition(src, angles);
+		AngleVectors( angles, vf, NULL, NULL );
+		TryUse_Internal(ent, src, vf);
+	} else {
+		VectorCopy(ent->client->renderInfo.eyePoint, src);
+		AngleVectors(ent->client->ps.viewangles, vf, NULL, NULL);
+		TryUse_Internal(ent, src, vf);
+	}
 }
 
 extern int killPlayerTimer;

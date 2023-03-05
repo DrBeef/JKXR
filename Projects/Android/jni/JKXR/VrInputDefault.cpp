@@ -826,28 +826,42 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
         // Process "use" gesture
         if (vr_gesture_triggered_use->integer) {
-            float distanceToBody;
-            if (vr_gesture_triggered_use->integer == 1) {
-                // Gesture with off-hand
-                distanceToBody = sqrt(vr.offhandoffset[0]*vr.offhandoffset[0] + vr.offhandoffset[2]*vr.offhandoffset[2]);
+            bool thirdPersonActive = !!((int) Cvar_VariableValue("cg_thirdPerson"));
+            bool gestureUseAllowed = !vr.weapon_stabilised && !vr.cin_camera && !vr.misc_camera && !vr.remote_turret && !vr.emplaced_gun && !vr.in_vehicle && !thirdPersonActive;
+            // Off-hand gesture
+            float distanceToBody = sqrt(vr.offhandoffset[0]*vr.offhandoffset[0] + vr.offhandoffset[2]*vr.offhandoffset[2]);
+            if (gestureUseAllowed && (distanceToBody > vr_use_gesture_boundary->value)) {
+                if (!(vr.useGestureState & USE_GESTURE_OFF_HAND)) {
+                    sendButtonAction("+altuse", true);
+                }
+                vr.useGestureState |= USE_GESTURE_OFF_HAND;
             } else {
-                // Gesture with dominant-hand
-                distanceToBody = sqrt(vr.weaponoffset[0]*vr.weaponoffset[0] + vr.weaponoffset[2]*vr.weaponoffset[2]);
+                if (vr.useGestureState & USE_GESTURE_OFF_HAND) {
+                    sendButtonAction("+altuse", false);
+                }
+                vr.useGestureState &= ~USE_GESTURE_OFF_HAND;
             }
-
-            bool gestureUseAllowed = !vr.weapon_stabilised && !vr.cin_camera && !vr.misc_camera && !vr.remote_turret && !vr.emplaced_gun && !vr.in_vehicle;
-            if (gestureUseAllowed && distanceToBody > vr_use_gesture_boundary->value) {
-                if (!vr.useGestureActive) {
-                    vr.useGestureActive = true;
+            // Weapon-hand gesture
+            distanceToBody = sqrt(vr.weaponoffset[0]*vr.weaponoffset[0] + vr.weaponoffset[2]*vr.weaponoffset[2]);
+            if (gestureUseAllowed && (distanceToBody > vr_use_gesture_boundary->value)) {
+                if (!(vr.useGestureState & USE_GESTURE_WEAPON_HAND)) {
                     sendButtonAction("+use", true);
                 }
-            } else if (vr.useGestureActive) {
-                vr.useGestureActive = false;
+                vr.useGestureState |= USE_GESTURE_WEAPON_HAND;
+            } else {
+                if (vr.useGestureState & USE_GESTURE_WEAPON_HAND) {
+                    sendButtonAction("+use", false);
+                }
+                vr.useGestureState &= ~USE_GESTURE_WEAPON_HAND;
+            }
+        } else {
+            if (vr.useGestureState & USE_GESTURE_OFF_HAND) {
+                sendButtonAction("+altuse", false);
+            }
+            if (vr.useGestureState & USE_GESTURE_WEAPON_HAND) {
                 sendButtonAction("+use", false);
             }
-        } else if (vr.useGestureActive) {
-            vr.useGestureActive = false;
-            sendButtonAction("+use", false);
+            vr.useGestureState = 0;
         }
     }
 

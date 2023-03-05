@@ -8,6 +8,9 @@
 #define ANGLES_SABER            2
 #define ANGLES_COUNT            3
 
+#define USE_GESTURE_OFF_HAND      1
+#define USE_GESTURE_WEAPON_HAND   2
+
 typedef struct {
     bool cin_camera; // cinematic camera taken over
 
@@ -87,7 +90,7 @@ typedef struct {
 
     float   maxHeight;
     float   curHeight;
-    bool    useGestureActive;
+    int     useGestureState;
 
     //////////////////////////////////////
     //    Test stuff for weapon alignment

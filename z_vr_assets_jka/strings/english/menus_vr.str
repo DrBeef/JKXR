@@ -404,7 +404,7 @@ REFERENCE           GESTURE_TRIGGERED_USE_ITEM
 LANG_ENGLISH        "Gesture Triggered Use:"
 
 REFERENCE           GESTURE_TRIGGERED_USE_DESC
-LANG_ENGLISH        "Toggles triggering of use/action by gesture."
+LANG_ENGLISH        "Toggles triggering of use/action by gesture (not active in 3rd person)."
 
 REFERENCE           GESTURE_TRIGGERED_USE_OFF_HAND
 LANG_ENGLISH        "Off-Hand"

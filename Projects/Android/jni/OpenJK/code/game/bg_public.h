@@ -142,6 +142,7 @@ typedef struct {
 	int			touchents[MAXTOUCH];
 
 	int			useEvent;
+	int			altUseEvent;
 
 	vec3_t		mins, maxs;			// bounding box size
 

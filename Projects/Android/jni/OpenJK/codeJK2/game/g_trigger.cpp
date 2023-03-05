@@ -224,20 +224,21 @@ void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace )
 		}
 	}
 
-	if ( self->spawnflags & 2 )
-	{//FACING
+	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
+	bool useGestureEnabled = gi.cvar("vr_gesture_triggered_use", "0", CVAR_ARCHIVE)->integer; // defined in VrCvars.h
+	bool useGestureAllowed = useGestureEnabled && !thirdPersonActive;
+	if ( (self->spawnflags & 2) && ( !( self->spawnflags & 4 ) || (	( self->spawnflags & 4) && !useGestureAllowed ) ) )
+	{ //       FACING and...         ...is not USE_BUTTON or...       ...is USE_BUTTON but use gestures are not active
+		// In case of buttons activated by use gesture, we do not need to check if we are facing them as we are touching them by hand.
 		vec3_t	forward;
 
 		if ( other->client )
 		{
-			if (other->client->ps.clientNum == 0)
+			if ( (other->client->ps.clientNum == 0) && (self->spawnflags & 4) )
 			{
+				// In case of USE_BUTTON, check facing by controller and not by head
 				vec3_t origin, angles;
-				if (vr->useGestureActive && gi.cvar("vr_gesture_triggered_use", "2", CVAR_ARCHIVE)->integer == 1) { // defined in VrCvars.h
-					BG_CalculateVROffHandPosition(origin, angles);
-				} else {
-					BG_CalculateVRWeaponPosition(origin, angles);
-				}
+				BG_CalculateVRWeaponPosition(origin, angles);
 				AngleVectors( angles, forward, NULL, NULL );
 			}
 			else
@@ -263,7 +264,7 @@ void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace )
 			return;
 		}
 
-		if( !( other->client->usercmd.buttons & BUTTON_USE ) )
+		if( !( other->client->usercmd.buttons & ( BUTTON_USE | BUTTON_ALT_USE ) ) )
 		{//not pressing use button
 			return;
 		}

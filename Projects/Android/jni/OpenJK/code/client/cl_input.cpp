@@ -1015,6 +1015,8 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("+block", IN_Button8Down);//manual blocking
 	Cmd_AddCommand ("-block", IN_Button8Up);
 #endif
+	Cmd_AddCommand ("+altuse", IN_Button9Down); //use object with other hand
+	Cmd_AddCommand ("-altuse", IN_Button9Up);
 
 	Cmd_AddCommand ("+button0", IN_Button0Down);
 	Cmd_AddCommand ("-button0", IN_Button0Up);

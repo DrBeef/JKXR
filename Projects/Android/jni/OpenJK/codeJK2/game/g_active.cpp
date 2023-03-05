@@ -41,7 +41,10 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 extern qboolean Q3_TaskIDPending( gentity_t *ent, taskID_t taskType );
 extern void G_MaintainFormations(gentity_t *self);
 extern void BG_CalculateOffsetAngles( gentity_t *ent, usercmd_t *ucmd );//in bg_pangles.cpp
+extern void BG_CalculateVRWeaponPosition( vec3_t origin, vec3_t angles );//in bg_pmisc.cpp
+extern void BG_CalculateVROffHandPosition( vec3_t origin, vec3_t angles );//in bg_pmisc.cpp
 extern void TryUse( gentity_t *ent );
+extern void TryAltUse( gentity_t *ent );
 extern void ChangeWeapon( gentity_t *ent, int newWeapon );
 extern void ScoreBoardReset(void);
 extern void WP_SaberReflectCheck( gentity_t *self, usercmd_t *ucmd  );
@@ -816,6 +819,51 @@ void ClientImpacts( gentity_t *ent, pmove_t *pm ) {
 
 }
 
+ // Use triggers seems to have bigger "front" boundaries
+ // (with longer range player often reaches behind them
+ // not activating them at all)
+const	float	TOUCH_DISTANCE =	1.0f;
+const	vec3_t	TOUCH_RANGE =		{ 4, 4, 4 };
+
+void	G_TouchTriggersWithHand( gentity_t *ent, vec3_t src, vec3_t vf ) {
+	vec3_t		dest, mins, maxs;
+	gentity_t	*touch[MAX_GENTITIES], *hit;
+	qboolean	touched[MAX_GENTITIES];
+	int			i, num;
+	trace_t	trace;
+
+	memset (touched, qfalse, sizeof(touched) );
+
+	VectorMA( src, TOUCH_DISTANCE, vf, dest );
+	VectorSubtract( dest, TOUCH_RANGE, mins );
+	VectorAdd( dest, TOUCH_RANGE, maxs );
+
+	num = gi.EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
+
+	for ( i=0 ; i<num ; i++ ) {
+		hit = touch[i];
+
+		if ( !( hit->contents & CONTENTS_TRIGGER ) ) {
+			// Entity is not trigger
+			continue;
+		}
+		if ( touched[i] == qtrue ) {
+			// Already touched this move
+			continue;
+		}
+		if ( !( hit->spawnflags & 4 ) ) {
+			// Non-BUTTON entities were already processed
+			continue;
+		}
+
+		touched[i] = qtrue;
+		memset( &trace, 0, sizeof(trace) );
+		if ( hit->e_TouchFunc != touchF_NULL ) {
+			GEntity_TouchFunc(hit, ent, &trace);
+		}
+	}
+}
+
 /*
 ============
 G_TouchTriggersLerped
@@ -859,6 +907,10 @@ void	G_TouchTriggersLerped( gentity_t *ent ) {
 	dist = VectorNormalize( diff );
 
 	memset (touched, qfalse, sizeof(touched) );
+
+	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
+	bool useGestureEnabled = gi.cvar("vr_gesture_triggered_use", "0", CVAR_ARCHIVE)->integer; // defined in VrCvars.h
+	bool useGestureAllowed = useGestureEnabled && !thirdPersonActive;
 
 	for ( curDist = 0; !done && ent->maxs[1]>0; curDist += (float)ent->maxs[1]/2.0f )
 	{
@@ -914,6 +966,12 @@ void	G_TouchTriggersLerped( gentity_t *ent ) {
 				}
 			}
 
+			if (ent->client && ent->client->ps.clientNum == 0 && hit->spawnflags & 4 && useGestureAllowed) {
+				// Entity is BUTTON touched by player with enabled use gestures. Skip it as we want to touch
+				// buttons by hands and not by body in this case
+				continue;
+			}
+
 			touched[i] = qtrue;
 
 			memset( &trace, 0, sizeof(trace) );
@@ -928,6 +986,22 @@ void	G_TouchTriggersLerped( gentity_t *ent ) {
 				GEntity_TouchFunc( ent, hit, &trace );
 			}
 			*/
+		}
+	}
+
+	// In case of player entity with use gesture enabled, trace additional entities for each players hand based on active use action.
+	if ( ent->client && ent->client->ps.clientNum == 0 && ent->client->ps.stats[STAT_HEALTH] > 0 && useGestureAllowed) {
+		if( ent->client->usercmd.buttons & BUTTON_USE ) {
+			vec3_t src, angles, vf;
+			BG_CalculateVRWeaponPosition(src, angles);
+			AngleVectors( angles, vf, NULL, NULL );
+			G_TouchTriggersWithHand( ent, src, vf );
+		}
+		if( ent->client->usercmd.buttons & BUTTON_ALT_USE ) {
+			vec3_t src, angles, vf;
+			BG_CalculateVROffHandPosition(src, angles);
+			AngleVectors( angles, vf, NULL, NULL );
+			G_TouchTriggersWithHand( ent, src, vf );
 		}
 	}
 }
@@ -2853,6 +2927,10 @@ extern cvar_t	*g_skippingcin;
 	{
 		//TODO: Use
 		TryUse( ent );
+	}
+	if ( pm.altUseEvent )
+	{
+		TryAltUse( ent );
 	}
 
 	// link entity now, after any personal teleporters have been used

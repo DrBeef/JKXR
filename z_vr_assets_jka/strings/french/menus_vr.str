@@ -534,7 +534,7 @@ LANG_ENGLISH        "Gesture Triggered Use:"
 LANG_FRENCH         "#same"
 
 REFERENCE           GESTURE_TRIGGERED_USE_DESC
-LANG_ENGLISH        "Toggles triggering of use/action by gesture."
+LANG_ENGLISH        "Toggles triggering of use/action by gesture (not active in 3rd person)."
 LANG_FRENCH         "#same"
 
 REFERENCE           GESTURE_TRIGGERED_USE_OFF_HAND

@@ -652,7 +652,7 @@ INDEX 128
 INDEX 129
 {
    REFERENCE GESTURE_TRIGGERED_USE_DESC
-   TEXT_LANGUAGE1 "Toggles triggering of use/action by gesture."
+   TEXT_LANGUAGE1 "Toggles triggering of use/action by gesture (not active in 3rd person)."
 }
 INDEX 130
 {

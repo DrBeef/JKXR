@@ -893,15 +893,9 @@
 		{
 			name				none
 			group				commoncontrols
-			type				ITEM_TYPE_MULTI
+			type				ITEM_TYPE_YESNO
 			text				@MENUS_VR_GESTURE_TRIGGERED_USE_ITEM
 			cvar				"vr_gesture_triggered_use"
-			cvarFloatList
-			{
-				@MENUS_NO 0
-				@MENUS_VR_GESTURE_TRIGGERED_USE_OFF_HAND 1
-				@MENUS_VR_GESTURE_TRIGGERED_USE_DOMINANT_HAND 2
-			}
 			rect				260 340 340 14
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			174 

@@ -1674,7 +1674,9 @@ qboolean CanUseInfrontOf(gentity_t *ent)
 	//cg.refdef.vieworg, basically
 	if (ent->client->ps.clientNum == 0) {
 		vec3_t angles;
-		if (vr->useGestureActive && gi.cvar("vr_gesture_triggered_use", "2", CVAR_ARCHIVE)->integer == 1) { // defined in VrCvars.h
+        // TODO Not sure with this, function CanUseInfrontOf seems to be used only to
+        //   show "usable hint" which i guess will be better based on gaze direction
+		if (vr->useGestureState & USE_GESTURE_OFF_HAND) {
 			BG_CalculateVROffHandPosition(src, angles);
 		} else {
 			BG_CalculateVRWeaponPosition(src, angles);
@@ -1768,37 +1770,21 @@ Try and use an entity in the world, directly ahead of us
 ==============
 */
 
+#define USE_DISTANCE_BUTTON		64.0f
+#define USE_DISTANCE_GESTURE	16.0f
 
-void TryUse( gentity_t *ent )
+void TryUse_Internal( gentity_t *ent, vec3_t src, vec3_t vf )
 {
 	gentity_t	*target;
 	trace_t		trace;
-	vec3_t		src, dest, vf;
+	vec3_t		dest;
 
-	if (ent->s.number == 0 && g_npcdebug->integer == 1)
-	{
-		DebugTraceForNPC(ent);
-	}
-
-	if ( ent->s.number == 0 && ent->client->NPC_class == CLASS_ATST )
-	{//a player trying to get out of his ATST
-		GEntity_UseFunc( ent->activator, ent, ent );
-		return;
-	}
-
-	// TODO: turo-boost.
-/*	if ( ent->client->ps.vehicleIndex != VEHICLE_NONE )
-	{//in a vehicle, use key makes you turbo-boost
-		return;
-	}*/
-
-	//FIXME: this does not match where the new accurate crosshair aims...
-	//cg.refdef.vieworg, basically
-	VectorCopy( ent->client->renderInfo.eyePoint, src );
-
-	AngleVectors( ent->client->ps.viewangles, vf, NULL, NULL );//ent->client->renderInfo.eyeAngles was cg.refdef.viewangles, basically
 	//extend to find end of use trace
-	VectorMA( src, USE_DISTANCE, vf, dest );
+	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
+	bool useGestureEnabled = gi.cvar("vr_gesture_triggered_use", "0", CVAR_ARCHIVE)->integer; // defined in VrCvars.h
+	bool useGestureAllowed = useGestureEnabled && !thirdPersonActive;
+	float useDistance = useGestureAllowed ? USE_DISTANCE_GESTURE : USE_DISTANCE_BUTTON;
+	VectorMA( src, useDistance, vf, dest );
 
 	//Trace ahead to find a valid target
 	gi.trace( &trace, src, vec3_origin, vec3_origin, dest, ent->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_TERRAIN|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE , G2_NOCOLLIDE, 10);
@@ -1855,6 +1841,66 @@ void TryUse( gentity_t *ent )
 		ForceTelepathy( ent );
 	}
 	*/
+}
+
+void TryUse( gentity_t *ent ) {
+	if (ent->s.number == 0 && g_npcdebug->integer == 1)
+	{
+		DebugTraceForNPC(ent);
+	}
+
+	if ( ent->s.number == 0 && ent->client->NPC_class == CLASS_ATST )
+	{//a player trying to get out of his ATST
+		GEntity_UseFunc( ent->activator, ent, ent );
+		return;
+	}
+
+	// TODO: turo-boost.
+/*	if ( ent->client->ps.vehicleIndex != VEHICLE_NONE )
+	{//in a vehicle, use key makes you turbo-boost
+		return;
+	}*/
+
+	vec3_t src, angles, vf;
+	if (ent->client->ps.clientNum == 0) {
+		BG_CalculateVRWeaponPosition(src, angles);
+		AngleVectors( angles, vf, NULL, NULL );
+		TryUse_Internal(ent, src, vf);
+	} else {
+		VectorCopy(ent->client->renderInfo.eyePoint, src);
+		AngleVectors(ent->client->ps.viewangles, vf, NULL, NULL);
+		TryUse_Internal(ent, src, vf);
+	}
+}
+
+void TryAltUse( gentity_t *ent ) {
+	if (ent->s.number == 0 && g_npcdebug->integer == 1)
+	{
+		DebugTraceForNPC(ent);
+	}
+
+	if ( ent->s.number == 0 && ent->client->NPC_class == CLASS_ATST )
+	{//a player trying to get out of his ATST
+		GEntity_UseFunc( ent->activator, ent, ent );
+		return;
+	}
+
+	// TODO: turo-boost.
+/*	if ( ent->client->ps.vehicleIndex != VEHICLE_NONE )
+	{//in a vehicle, use key makes you turbo-boost
+		return;
+	}*/
+
+	vec3_t src, angles, vf;
+	if (ent->client->ps.clientNum == 0) {
+		BG_CalculateVROffHandPosition(src, angles);
+		AngleVectors( angles, vf, NULL, NULL );
+		TryUse_Internal(ent, src, vf);
+	} else {
+		VectorCopy(ent->client->renderInfo.eyePoint, src);
+		AngleVectors(ent->client->ps.viewangles, vf, NULL, NULL);
+		TryUse_Internal(ent, src, vf);
+	}
 }
 
 extern int killPlayerTimer;

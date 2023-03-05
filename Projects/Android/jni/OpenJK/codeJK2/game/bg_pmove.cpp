@@ -294,7 +294,7 @@ static void PM_Friction( void ) {
 				if ( !(pm->ps->pm_flags & PMF_TIME_KNOCKBACK) && !(pm->ps->pm_flags & PMF_TIME_NOFRICTION) )
 				{
 					//If the use key is pressed. slow the player more quickly
-					if ( pm->cmd.buttons & BUTTON_USE )
+					if ( pm->cmd.buttons & ( BUTTON_USE | BUTTON_ALT_USE ) )
 						friction *= pm_frictionModifier;
 
 					control = speed < pm_stopspeed ? pm_stopspeed : speed;
@@ -5996,6 +5996,32 @@ void PM_Use( void )
 	pm->ps->useTime = USE_DELAY;
 }
 
+void PM_AltUse( void )
+{
+	if ( pm->ps->altUseTime > 0 )
+	{
+		pm->ps->altUseTime -= pml.msec;
+		if ( pm->ps->altUseTime < 0 )
+		{
+			pm->ps->altUseTime = 0;
+		}
+	}
+
+	if ( pm->ps->altUseTime > 0 ) {
+		return;
+	}
+
+	if ( ! (pm->cmd.buttons & BUTTON_ALT_USE ) )
+	{
+		pm->altUseEvent = 0;
+		pm->ps->altUseTime = 0;
+		return;
+	}
+
+	pm->altUseEvent = EV_USE;
+	pm->ps->altUseTime = USE_DELAY;
+}
+
 extern int PM_AttackForEnemyPos( qboolean allowFB );
 int PM_NPCSaberAttackFromQuad( int quad )
 {
@@ -9028,6 +9054,7 @@ void Pmove( pmove_t *pmove )
 	{
 		// Use
 		PM_Use();
+        PM_AltUse();
 	}
 
 	// TEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMPTEMP

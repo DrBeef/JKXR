@@ -664,7 +664,7 @@ static void PM_Friction( void ) {
 						}
 					}
 					/*
-					else if ( pm->cmd.buttons & BUTTON_USE )
+					else if ( pm->cmd.buttons & ( BUTTON_USE | BUTTON_ALT_USE ) )
 					{//If the use key is pressed. slow the player more quickly
 						if ( pm->gent->client->NPC_class != CLASS_VEHICLE )	// if not in a vehicle...
 						{//in a vehicle, use key makes you turbo-boost
@@ -9706,6 +9706,32 @@ void PM_Use( void )
 	pm->ps->useTime = USE_DELAY;
 }
 
+void PM_AltUse( void )
+{
+	if ( pm->ps->altUseTime > 0 )
+	{
+		pm->ps->altUseTime -= pml.msec;
+		if ( pm->ps->altUseTime < 0 )
+		{
+			pm->ps->altUseTime = 0;
+		}
+	}
+
+	if ( pm->ps->altUseTime > 0 ) {
+		return;
+	}
+
+	if ( ! (pm->cmd.buttons & BUTTON_ALT_USE ) )
+	{
+		pm->altUseEvent = 0;
+		pm->ps->altUseTime = 0;
+		return;
+	}
+
+	pm->altUseEvent = EV_USE;
+	pm->ps->altUseTime = USE_DELAY;
+}
+
 extern saberMoveName_t PM_AttackForEnemyPos( qboolean allowFB, qboolean allowStabDown );
 saberMoveName_t PM_NPCSaberAttackFromQuad( int quad )
 {
@@ -15065,6 +15091,7 @@ void Pmove( pmove_t *pmove )
 	{
 		// Use
 		PM_Use();
+        PM_AltUse();
 	}
 
 	// Calculate the resulting speed of the last pmove
