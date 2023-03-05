@@ -1668,7 +1668,6 @@ public:
 	//int			vehicleExplodeTime;				//when it will go BOOM!
 
 	int			useTime;	//not sent
-	int			altUseTime;	//not sent
 	int			lastShotTime;//last time you shot your weapon
 	int			ping;			// server to game info for scoreboard
 	int			lastOnGround;	//last time you were on the ground

@@ -9775,30 +9775,32 @@ void PM_Use( void )
 	pm->ps->useTime = USE_DELAY;
 }
 
+// Not added into PlayerStateBase as it affects save state
+int altUseTime = 0;
 void PM_AltUse( void )
 {
-	if ( pm->ps->altUseTime > 0 )
+	if ( altUseTime > 0 )
 	{
-		pm->ps->altUseTime -= pml.msec;
-		if ( pm->ps->altUseTime < 0 )
+		altUseTime -= pml.msec;
+		if ( altUseTime < 0 )
 		{
-			pm->ps->altUseTime = 0;
+			altUseTime = 0;
 		}
 	}
 
-	if ( pm->ps->altUseTime > 0 ) {
+	if ( altUseTime > 0 ) {
 		return;
 	}
 
 	if ( ! (pm->cmd.buttons & BUTTON_ALT_USE ) )
 	{
 		pm->altUseEvent = 0;
-		pm->ps->altUseTime = 0;
+		altUseTime = 0;
 		return;
 	}
 
 	pm->altUseEvent = EV_USE;
-	pm->ps->altUseTime = USE_DELAY;
+	altUseTime = USE_DELAY;
 }
 
 extern saberMoveName_t PM_AttackForEnemyPos( qboolean allowFB, qboolean allowStabDown );
