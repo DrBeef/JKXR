@@ -27,6 +27,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "w_local.h"
 #include "bg_local.h"
 
+#include <JKXR/VrClientInfo.h>
+
 //-------------------
 //	Wookiee Bowcaster
 //-------------------
@@ -116,7 +118,10 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 
 		AngleVectors( angs, dir, NULL, NULL );
 
-		missile = CreateMissile( start, dir, vel, 10000, ent );
+		vec3_t rotatedDir;
+		VectorRotateAroundAxis(dir, forward, vr->weaponangles[ANGLES_ADJUSTED][ROLL], rotatedDir);
+
+		missile = CreateMissile( start, rotatedDir, vel, 10000, ent );
 
 		missile->classname = "bowcaster_proj";
 		missile->s.weapon = WP_BOWCASTER;
