@@ -1890,6 +1890,7 @@ void CG_Init( int serverCommandSequence ) {
 	}
 
 	cgi_SP_Register("SP_INGAME", qtrue);	//require load and keep around
+	cgi_SP_Register("VR_INGAME", qtrue);	//require load and keep around
 	cgi_SP_Register("OBJECTIVES", qtrue);	//require load and keep around
 
 	CG_LoadHudMenu();      // load new hud stuff

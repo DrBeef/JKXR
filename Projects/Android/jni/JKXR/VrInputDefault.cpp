@@ -245,7 +245,13 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             sendButtonActionSimple("exitscope");
         }
 
-        if (vr.cgzoommode)
+        if (vr.misc_camera)
+        {
+            if (between(-0.2f, primaryJoystickX, 0.2f)) {
+                sendButtonAction("+use", pPrimaryJoystick->y < -0.8f || pPrimaryJoystick->y > 0.8f);
+            }
+        }
+        else if (vr.cgzoommode)
         {
             if (between(-0.2f, primaryJoystickX, 0.2f)) {
                 if (vr.cgzoommode == 2)

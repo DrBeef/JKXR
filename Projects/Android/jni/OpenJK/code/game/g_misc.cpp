@@ -731,11 +731,15 @@ void SP_misc_skyportal (gentity_t *ent)
 extern qboolean G_ClearViewEntity( gentity_t *ent );
 extern void G_SetViewEntity( gentity_t *self, gentity_t *viewEntity );
 extern void SP_fx_runner( gentity_t *ent );
+
+gentity_t *first_camera_view = NULL;
+
 void camera_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod,int dFlags,int hitLoc )
 {
 	if ( player && player->client && player->client->ps.viewEntity == self->s.number )
 	{
-		G_UseTargets2( self, player, self->target4 );
+		first_camera_view = NULL;
+        G_UseTargets2( self, player, self->target4 );
 		G_ClearViewEntity( player );
 		G_Sound( player, self->soundPos2 );
 	}
@@ -776,6 +780,10 @@ void camera_use( gentity_t *self, gentity_t *other, gentity_t *activator )
 		{
 			next = G_Find( NULL, FOFS(targetname), self->target2 );
 		}
+		if ( !next && first_camera_view )
+		{// loop through camera views
+			next = first_camera_view;    
+		}
 		if ( next )
 		{//found another one
 			if ( !Q_stricmp( "misc_camera", next->classname ) )
@@ -785,6 +793,7 @@ void camera_use( gentity_t *self, gentity_t *other, gentity_t *activator )
 		}
 		else //if ( self->health > 0 )
 		{//I was the last (only?) one, clear out the viewentity
+			first_camera_view = NULL;
 			G_UseTargets2( self, activator, self->target4 );
 			G_ClearViewEntity( activator );
 			G_Sound( activator, self->soundPos2 );
@@ -792,6 +801,10 @@ void camera_use( gentity_t *self, gentity_t *other, gentity_t *activator )
 	}
 	else
 	{//set me as view entity
+		if ( !first_camera_view)
+		{
+			first_camera_view = self;
+		}
 		G_UseTargets2( self, activator, self->target3 );
 		self->s.eFlags |= EF_NODRAW;
 		self->s.modelindex = 0;
@@ -807,6 +820,7 @@ void camera_aim( gentity_t *self )
 	{//I am the viewEntity
 		if ( /* player->client->usercmd.forwardmove || player->client->usercmd.rightmove ||*/  player->client->usercmd.upmove )
 		{//player wants to back out of camera
+			first_camera_view = NULL;
 			G_UseTargets2( self, player, self->target4 );
 			G_ClearViewEntity( player );
 			G_Sound( player, self->soundPos2 );

@@ -279,7 +279,7 @@ void G_SetViewEntity( gentity_t *self, gentity_t *viewEntity )
 	}
 	if ( !self->s.number )
 	{
-		CG_CenterPrint( "@SP_INGAME_EXIT_VIEW", SCREEN_HEIGHT * 0.95 );
+		CG_CenterPrint( "@VR_INGAME_EXIT_CAMERA_VIEW", SCREEN_HEIGHT * 0.95 );
 	}
 }
 
