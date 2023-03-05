@@ -2208,6 +2208,38 @@
 
 		itemDef 
 		{	
+			name				usablehint
+			group				options
+      type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_USABLE_OBJECT_HINT_ITEM
+			cvar				"cg_usableObjectsHint"
+			rect				260 244 340 14
+	   	textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font 				4
+			textscale 			1
+			forecolor			.615 .615 .956 1
+			visible			0
+			descText			@MENUS_VR_USABLE_OBJECT_HINT_DESC
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+			}
+			mouseenter 
+			{ 
+				show			highlight5
+			}
+			mouseexit 
+			{ 
+				hide			highlight5
+			} 
+		}
+
+
+		itemDef 
+		{	
 			name				slowmo
 			group				options
       			type				ITEM_TYPE_MULTI
@@ -2223,7 +2255,7 @@
 				@MENUS_FREQUENTLY		5
 				@MENUS_EXCESSIVELY		6
 			}
-			rect				260 244 340 14
+			rect				260 258 340 14
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -2239,11 +2271,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight5
+				show			highlight6
 			}
 			mouseexit 
 			{ 
-				hide			highlight5
+				hide			highlight6
 			} 
 		}
 
@@ -2262,7 +2294,7 @@
 				@MENUS_SOUNDS_AND_EFFECTS	2
 				@MENUS_SOUNDS_EFFECTS_GRAPHICS	3
 			}
-			rect				260 258 340 14
+			rect				260 272 340 14
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -2276,11 +2308,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight6
+				show			highlight7
 			}
 			mouseexit 
 			{ 
-				hide			highlight6
+				hide			highlight7
 			} 
 		}
 

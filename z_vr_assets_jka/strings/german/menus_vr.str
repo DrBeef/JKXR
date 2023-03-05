@@ -585,4 +585,12 @@ REFERENCE           HUD_YOFFSET_DESC
 LANG_ENGLISH        "Y-Offset of the HUD in VR."
 LANG_GERMAN         "#same"
 
+REFERENCE           USABLE_OBJECT_HINT_ITEM
+LANG_ENGLISH        "Usable Objects Hint:"
+LANG_GERMAN         "#same"
+
+REFERENCE           USABLE_OBJECT_HINT_DESC
+LANG_ENGLISH        "Show icon when looking at objects that can be used."
+LANG_GERMAN         "#same"
+
 ENDMARKER

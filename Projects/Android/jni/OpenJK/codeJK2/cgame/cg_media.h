@@ -239,6 +239,7 @@ typedef struct {
 	qhandle_t	messageObjCircle;
 
 	qhandle_t	batteryChargeShader;
+	qhandle_t	useableHint;
 
 	qhandle_t	levelLoad;
 

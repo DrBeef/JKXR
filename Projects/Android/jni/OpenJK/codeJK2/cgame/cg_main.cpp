@@ -302,6 +302,7 @@ vmCvar_t	cg_gunAutoFirst;
 vmCvar_t	cg_debugSaberCombat;
 vmCvar_t	cg_saberBurnMarkCoolDownTime;
 vmCvar_t	cg_autoUseBacta;
+vmCvar_t	cg_usableObjectsHint;
 
 vmCvar_t	cg_thirdPersonAlpha;
 vmCvar_t	cg_thirdPersonAutoAlpha;
@@ -457,6 +458,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_debugSaberCombat, "cg_debugSaberCombat", "0", CVAR_ARCHIVE },
 	{ &cg_saberBurnMarkCoolDownTime, "cg_saberBurnMarkCoolDownTime", "0", CVAR_ARCHIVE },
 	{ &cg_autoUseBacta, "cg_autoUseBacta", "0", CVAR_ARCHIVE },
+	{ &cg_usableObjectsHint, "cg_usableObjectsHint", "1", CVAR_ARCHIVE },
 
 	{ &cg_pano, "pano", "0", 0 },
 	{ &cg_panoNumShots, "panoNumShots", "10", 0 },
@@ -1405,6 +1407,7 @@ static void CG_RegisterGraphics( void ) {
 	// battery charge shader when using a gonk
 	cgs.media.batteryChargeShader = cgi_R_RegisterShader( "gfx/2d/battery" );
 	cgi_R_RegisterShader( "gfx/2d/droid_view" );
+	cgs.media.useableHint = cgi_R_RegisterShader("gfx/hud/useableHint");
 
 	// Load force tics
 	for (i=0;i<MAX_TICS;i++)

@@ -3695,11 +3695,13 @@ qboolean cg_usingInFrontOf = qfalse;
 qboolean CanUseInfrontOf(gentity_t*);
 static void CG_UseIcon()
 {
-	cg_usingInFrontOf = CanUseInfrontOf(cg_entities[cg.snap->ps.clientNum].gent);
-	if (cg_usingInFrontOf)
-	{
-		cgi_R_SetColor( NULL );
-		CG_DrawPic( 50, 285, 64, 64, cgs.media.useableHint );
+	if (cg_usableObjectsHint.integer) {
+		cg_usingInFrontOf = CanUseInfrontOf(cg_entities[cg.snap->ps.clientNum].gent);
+		if (cg_usingInFrontOf)
+		{
+			cgi_R_SetColor( NULL );
+			CG_DrawPic( 50, 285, 64, 64, cgs.media.useableHint );
+		}
 	}
 }
 

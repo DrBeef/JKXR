@@ -310,6 +310,7 @@ vmCvar_t	cg_gunAutoFirst;
 vmCvar_t	cg_debugSaberCombat;
 vmCvar_t	cg_saberBurnMarkCoolDownTime;
 vmCvar_t	cg_autoUseBacta;
+vmCvar_t	cg_usableObjectsHint;
 
 vmCvar_t	cg_thirdPersonAlpha;
 vmCvar_t	cg_thirdPersonAutoAlpha;
@@ -470,6 +471,8 @@ static cvarTable_t cvarTable[] = {
 	// NOTE: also declare this in UI_Init
 	{ &cg_saberAutoThird, "cg_saberAutoThird", "0", CVAR_ARCHIVE },
 	{ &cg_gunAutoFirst, "cg_gunAutoFirst", "1", CVAR_ARCHIVE },
+
+	{ &cg_usableObjectsHint, "cg_usableObjectsHint", "1", CVAR_ARCHIVE },
 
 	{ &cg_pano, "pano", "0", 0 },
 	{ &cg_panoNumShots, "panoNumShots", "10", 0 },

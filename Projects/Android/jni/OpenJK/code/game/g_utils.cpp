@@ -1672,23 +1672,9 @@ qboolean CanUseInfrontOf(gentity_t *ent)
 
 	//FIXME: this does not match where the new accurate crosshair aims...
 	//cg.refdef.vieworg, basically
-	if (ent->client->ps.clientNum == 0) {
-		vec3_t angles;
-        // TODO Not sure with this, function CanUseInfrontOf seems to be used only to
-        //   show "usable hint" which i guess will be better based on gaze direction
-		if (vr->useGestureState & USE_GESTURE_OFF_HAND) {
-			BG_CalculateVROffHandPosition(src, angles);
-		} else {
-			BG_CalculateVRWeaponPosition(src, angles);
-		}
-		AngleVectors(angles, vf, NULL, NULL);
-	} else {
-		VectorCopy(ent->client->renderInfo.eyePoint, src);
+	VectorCopy( ent->client->renderInfo.eyePoint, src );
 
-		AngleVectors(ent->client->ps.viewangles, vf, NULL,
-					 NULL);//ent->client->renderInfo.eyeAngles was cg.refdef.viewangles, basically
-	}
-
+	AngleVectors( ent->client->ps.viewangles, vf, NULL, NULL );
 	//extend to find end of use trace
 	VectorMA( src, USE_DISTANCE, vf, dest );
 

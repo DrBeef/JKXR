@@ -1260,6 +1260,260 @@ qboolean ValidUseTarget( gentity_t *ent )
 	return qtrue;
 }
 
+static qboolean G_ValidActivateBehavior (gentity_t* self, int bset)
+{
+	if ( !self )
+	{
+		return qfalse;
+	}
+
+	const char *bs_name = self->behaviorSet[bset];
+
+	if( !(VALIDSTRING( bs_name )) )
+	{
+		return qfalse;
+	}
+
+	return qtrue;
+}
+
+static qboolean G_IsTriggerUsable(gentity_t* self, gentity_t* other)
+{
+	if ( self->svFlags & SVF_INACTIVE )
+	{//set by target_deactivate
+		return qfalse;
+	}
+
+	if( self->noDamageTeam )
+	{
+		if ( other->client->playerTeam != self->noDamageTeam )
+		{
+			return qfalse;
+		}
+	}
+
+
+	if ( self->spawnflags & 4 )
+	{//USE_BUTTON
+		if ( !other->client )
+		{
+			return qfalse;
+		}
+	}
+	else
+	{
+		return qfalse;
+	}
+
+	if ( self->spawnflags & 2 )
+	{//FACING
+		vec3_t	forward;
+
+		if ( other->client )
+		{
+			AngleVectors( other->client->ps.viewangles, forward, NULL, NULL );
+		}
+		else
+		{
+			AngleVectors( other->currentAngles, forward, NULL, NULL );
+		}
+
+		if ( DotProduct( self->movedir, forward ) < 0.5 )
+		{//Not Within 45 degrees
+			return qfalse;
+		}
+	}
+
+	if ((!G_ValidActivateBehavior (self, BSET_USE) && !self->target) ||
+		(self->target &&
+		(Q_stricmp(self->target, "n") == 0 ||
+		(Q_stricmp(self->target, "neveropen") == 0 ||
+		(Q_stricmp(self->target, "run_gran_drop") == 0) ||
+		(Q_stricmp(self->target, "speaker") == 0) ||
+		(Q_stricmp(self->target, "locked") == 0)
+		))))
+	{
+		return qfalse;
+	}
+
+
+	/*
+	//NOTE: This doesn't stop you from using it, just delays the use action!
+	if(self->delay && self->painDebounceTime < (level.time + self->delay) )
+	{
+		return qfalse;
+	}
+	*/
+
+	return qtrue;
+}
+
+static qboolean CanUseInfrontOfPartOfLevel(gentity_t* ent )	//originally from VV
+{
+	int			i, num;
+	gentity_t	*touch[MAX_GENTITIES], *hit;
+	vec3_t		mins, maxs;
+	const vec3_t	range = { 40, 40, 52 };
+
+	if ( !ent->client ) {
+		return qfalse;
+	}
+
+	VectorSubtract( ent->client->ps.origin, range, mins );
+	VectorAdd( ent->client->ps.origin, range, maxs );
+
+	num = gi.EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
+
+	// can't use ent->absmin, because that has a one unit pad
+	VectorAdd( ent->client->ps.origin, ent->mins, mins );
+	VectorAdd( ent->client->ps.origin, ent->maxs, maxs );
+
+	for ( i=0 ; i<num ; i++ ) {
+		hit = touch[i];
+
+		if ( (hit->e_TouchFunc == touchF_NULL) && (ent->e_TouchFunc == touchF_NULL) ) {
+			continue;
+		}
+		if ( !( hit->contents & CONTENTS_TRIGGER ) ) {
+			continue;
+		}
+
+		if ( !gi.EntityContact( mins, maxs, hit ) ) {
+			continue;
+		}
+
+		if ( hit->e_TouchFunc != touchF_NULL ) {
+			switch (hit->e_TouchFunc )
+			{
+			case touchF_Touch_Multi:
+				if (G_IsTriggerUsable(hit, ent))
+				{
+					return qtrue;
+				}
+				continue;
+				break;
+			default:
+				continue;
+			}
+		}
+	}
+	return qfalse;
+}
+
+#define USE_DISTANCE	64.0f
+qboolean CanUseInfrontOf(gentity_t *ent)
+{
+	gentity_t	*target;
+	trace_t		trace;
+	vec3_t		src, dest, vf;
+
+	if ( ent->s.number && ent->client->NPC_class == CLASS_ATST )
+	{//a player trying to get out of his ATST
+//		GEntity_UseFunc( ent->activator, ent, ent );
+		return qfalse;
+	}
+
+	if (ent->client->ps.viewEntity != ent->s.number)
+	{
+		ent = &g_entities[ent->client->ps.viewEntity];
+
+		if ( !Q_stricmp( "misc_camera", ent->classname ) )
+		{	// we are in a camera
+			gentity_t *next = 0;
+			if ( ent->target2 != NULL )
+			{
+				next = G_Find( NULL, FOFS(targetname), ent->target2 );
+			}
+			if ( next )
+			{//found another one
+				if ( !Q_stricmp( "misc_camera", next->classname ) )
+				{//make sure it's another camera
+					return qtrue;
+				}
+			}
+			else //if ( ent->health > 0 )
+			{//I was the last (only?) one, clear out the viewentity
+				return qfalse;
+			}
+		}
+	}
+
+	if ( !ent->client ) {
+		return qfalse;
+	}
+
+
+	//FIXME: this does not match where the new accurate crosshair aims...
+	//cg.refdef.vieworg, basically
+	VectorCopy( ent->client->renderInfo.eyePoint, src );
+
+	AngleVectors( ent->client->ps.viewangles, vf, NULL, NULL );
+	//extend to find end of use trace
+	VectorMA( src, USE_DISTANCE, vf, dest );
+
+	//Trace ahead to find a valid target
+	gi.trace( &trace, src, vec3_origin, vec3_origin, dest, ent->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_TERRAIN|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE , G2_NOCOLLIDE, 10);
+
+	if ( trace.fraction == 1.0f || trace.entityNum >= ENTITYNUM_WORLD )
+	{
+		return (CanUseInfrontOfPartOfLevel(ent));
+	}
+
+	target = &g_entities[trace.entityNum];
+
+	if ( target && target->client && target->client->NPC_class == CLASS_ATST )
+	{
+		// Attempt to board this vehicle.
+		return qtrue;
+	}
+	//Check for a use command
+	if (ValidUseTarget( target )) {
+		if ( target->s.eType == ET_ITEM )
+		{//item, see if we could actually pick it up
+			if ( (target->spawnflags&128/*ITMSF_USEPICKUP*/) )
+			{//player has to be touching me and hit use to pick it up, so don't allow this
+				if ( !G_BoundsOverlap( target->absmin, target->absmax, ent->absmin, ent->absmax ) )
+				{//not touching
+					return qfalse;
+				}
+			}
+			if ( !BG_CanItemBeGrabbed( &target->s, &ent->client->ps ) )
+			{//nope, so don't indicate that we can use it
+				return qfalse;
+			}
+		}
+		else if ( target->e_UseFunc == useF_misc_atst_use )
+		{//drivable AT-ST from JK2
+			if ( ent->client->ps.groundEntityNum != target->s.number )
+			{//must be standing on it to use it
+				return qfalse;
+			}
+		}
+		else if ( target->NPC!=NULL && target->health<=0 )
+		{
+			return qfalse;
+		}
+		return qtrue;
+	}
+
+	if ( target->client
+		&& target->client->ps.pm_type < PM_DEAD
+		&& target->NPC!=NULL
+		&& target->client->playerTeam
+		&& (target->client->playerTeam == ent->client->playerTeam || target->client->playerTeam == TEAM_NEUTRAL)
+		&& !(target->NPC->scriptFlags&SCF_NO_RESPONSE)
+		&& G_ValidActivateBehavior (target, BSET_USE))
+	{
+		return qtrue;
+	}
+
+	if (CanUseInfrontOfPartOfLevel(ent)) {
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 /*
 ==============
 TryUse

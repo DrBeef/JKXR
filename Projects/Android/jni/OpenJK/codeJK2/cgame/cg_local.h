@@ -631,6 +631,7 @@ extern	vmCvar_t		cg_gunAutoFirst;
 extern	vmCvar_t		cg_debugSaberCombat;
 extern	vmCvar_t		cg_saberBurnMarkCoolDownTime;
 extern	vmCvar_t		cg_autoUseBacta;
+extern	vmCvar_t		cg_usableObjectsHint;
 
 extern	vmCvar_t		cg_zProj;
 extern	vmCvar_t		cg_stereoSeparation;
