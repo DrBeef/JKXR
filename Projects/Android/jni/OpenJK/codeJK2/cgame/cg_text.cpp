@@ -727,7 +727,7 @@ void CG_DrawCenterString( void )
 		return;
 	}
 
-	color = CG_FadeColor( cg.centerPrintTime, 1000 * 3 );
+	color = CG_FadeColor( cg.centerPrintTime, 1000 * 2 );
 	if ( !color ) {
 		return;
 	}

@@ -2212,7 +2212,9 @@ void CG_DrawWeaponSelect( void )
 		{
 			int w = cgi_R_Font_StrLenPixels(text, cgs.media.qhFontSmall, 1.0f);
 			int x = ( SCREEN_WIDTH - w ) / 2;
-			cgi_R_Font_DrawString(x, (SCREEN_HEIGHT - 24)+yOffset, text, textColor, cgs.media.qhFontSmall, -1, 1.0f);
+			int y = (SCREEN_HEIGHT - 24);
+			CG_AdjustFrom640Int(&x, &y, NULL, NULL);
+			cgi_R_Font_DrawString(x, y, text, textColor, cgs.media.qhFontSmall, -1, FONT_SCALE);
 		}
 	}
 

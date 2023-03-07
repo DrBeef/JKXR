@@ -811,7 +811,7 @@ static float CG_CalculateWeaponPositionAndScale( playerState_t *ps, vec3_t origi
 
 		int w = cgi_R_Font_StrLenPixels(vr->test_name, cgs.media.qhFontSmall, 1.0f);
 		int x = ( SCREEN_WIDTH - w ) / 2;
-		cgi_R_Font_DrawString(x, (SCREEN_HEIGHT / 2), vr->test_name, colorTable[CT_ICON_BLUE], cgs.media.qhFontSmall, -1, 1.0f);
+		cgi_R_Font_DrawString(x, (SCREEN_HEIGHT / 2), vr->test_name, colorTable[CT_ICON_BLUE], cgs.media.qhFontSmall, -1, FONT_SCALE);
 	} else {
 		if (ps->weapon != 0)
 		{
@@ -2181,7 +2181,7 @@ void CG_DrawWeaponSelect( void )
 			int x = ( SCREEN_WIDTH - w ) / 2;
 			int y = (SCREEN_HEIGHT - 24);
 			CG_AdjustFrom640Int(&x, &y, NULL, NULL);
-			cgi_R_Font_DrawString(x, y, text, textColor, cgs.media.qhFontSmall, -1, 1.0f);
+			cgi_R_Font_DrawString(x, y, text, textColor, cgs.media.qhFontSmall, -1, FONT_SCALE);
 		}
 	}
 

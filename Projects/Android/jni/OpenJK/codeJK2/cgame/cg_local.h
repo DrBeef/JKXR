@@ -50,7 +50,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define	STEP_TIME			200
 #define	DUCK_TIME			100
 #define	PAIN_TWITCH_TIME	200
-#define	WEAPON_SELECT_TIME	1400
+#define	WEAPON_SELECT_TIME	1900
 #define	ITEM_SCALEUP_TIME	1000
 // Zoom vars
 #define	ZOOM_TIME			150		// not currently used?
@@ -760,7 +760,7 @@ Ghoul2 Insert End
 #define CG_UNDERLINE	0x00008000
 #define CG_TINYFONT		0x00010000
 
-#define FONT_SCALE	0.5f
+#define FONT_SCALE	(1.0f / cg_hudScale.value)
 
 void CG_FillRect( float x, float y, float width, float height, const float *color );
 void CG_Scissor( float x, float y, float width, float height);
