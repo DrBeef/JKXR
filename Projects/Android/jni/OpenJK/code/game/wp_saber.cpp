@@ -10432,6 +10432,10 @@ void ForceTelepathy( gentity_t *self )
 					override = 50;
 					if ( self->client->ps.forcePower < 50 )
 					{
+						if (self->client->ps.clientNum == 0)
+						{
+							CG_CenterPrint("Force Power Low", 440);
+						}
 						return;
 					}
 					if ( traceEnt->enemy )
@@ -10561,6 +10565,10 @@ void ForceGrip( gentity_t *self )
 
 	if ( self->client->ps.forcePower < 26 )
 	{//need 20 to start, 6 to hold it for any decent amount of time...
+		if (self->client->ps.clientNum == 0)
+		{
+			CG_CenterPrint("Force Power Low", 440);
+		}
 		return;
 	}
 
@@ -10931,6 +10939,10 @@ void ForceLightning( gentity_t *self )
 	}
 	if ( self->client->ps.forcePower < 25 || !WP_ForcePowerUsable( self, FP_LIGHTNING, 0 ) )
 	{
+		if (self->client->ps.clientNum == 0)
+		{
+			CG_CenterPrint("Force Power Low", 440);
+		}
 		return;
 	}
 	if ( self->client->ps.forcePowerDebounce[FP_LIGHTNING] > level.time )
@@ -11414,6 +11426,10 @@ qboolean ForceDrain2( gentity_t *self )
 
 	if ( self->client->ps.forcePower < 25 || !WP_ForcePowerUsable( self, FP_DRAIN, 0 ) )
 	{
+		if (self->client->ps.clientNum == 0)
+		{
+			CG_CenterPrint("Force Power Low", 440);
+		}
 		return qtrue;
 	}
 
@@ -11590,6 +11606,10 @@ void ForceDrain( gentity_t *self, qboolean triedDrain2 )
 
 	if ( self->client->ps.forcePower < 25 || !WP_ForcePowerUsable( self, FP_DRAIN, 0 ) )
 	{
+		if (self->client->ps.clientNum == 0)
+		{
+			CG_CenterPrint("Force Power Low", 440);
+		}
 		return;
 	}
 	if ( self->client->ps.forcePowerDebounce[FP_DRAIN] > level.time )
@@ -12818,6 +12838,7 @@ void WP_ForcePowerStart( gentity_t *self, forcePowers_t forcePower, int override
 	}
 }
 
+void CG_CenterPrint( const char *str, int y );
 qboolean WP_ForcePowerAvailable( gentity_t *self, forcePowers_t forcePower, int overrideAmt )
 {
 	if ( forcePower == FP_LEVITATION )
@@ -12830,8 +12851,12 @@ qboolean WP_ForcePowerAvailable( gentity_t *self, forcePowers_t forcePower, int 
 		return qtrue;
 	}
 	if ( self->client->ps.forcePower < drain )
-	{
-		//G_AddEvent( self, EV_NOAMMO, 0 );
+    {
+        // Only show low power warning for force powers that aren't duration based
+        if (drain > 1 && self->client->ps.clientNum == 0)
+        {
+            CG_CenterPrint("Force Power Low", 440);
+        }
 		return qfalse;
 	}
 	return qtrue;
