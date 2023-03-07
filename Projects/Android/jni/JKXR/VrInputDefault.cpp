@@ -226,25 +226,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
         }
 
-        //Should we trigger the disruptor scope?
-        if ((cl.frame.ps.weapon == WP_DISRUPTOR ||
-                cl.frame.ps.weapon == WP_BLASTER) &&
-            cl.frame.ps.stats[STAT_HEALTH] > 0)
-        {
-            if (vr.weapon_stabilised &&
-                VectorLength(vr.weaponoffset) < 0.24f &&
-                vr.cgzoommode == 0) {
-                sendButtonAction("enterscope", true);
-            } else if ((VectorLength(vr.weaponoffset) > 0.26f || !vr.weapon_stabilised) &&
-                    (vr.cgzoommode == 2 || vr.cgzoommode == 4)) {
-                sendButtonActionSimple("exitscope");
-            }
-        } else if (vr.cgzoommode == 2 || vr.cgzoommode == 4) {
-            // In case we were using weapon scope and weapon
-            // was changed due to out of ammo, exit scope
-            sendButtonActionSimple("exitscope");
-        }
-
         if (vr.misc_camera)
         {
             if (between(-0.2f, primaryJoystickX, 0.2f)) {
@@ -406,6 +387,25 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 }
             }
 
+            //Should we trigger the disruptor scope?
+            if ((cl.frame.ps.weapon == WP_DISRUPTOR ||
+                 cl.frame.ps.weapon == WP_BLASTER) &&
+                cl.frame.ps.stats[STAT_HEALTH] > 0)
+            {
+                if (vr.weapon_stabilised &&
+                    VectorLength(vr.weaponoffset) < 0.24f &&
+                    vr.cgzoommode == 0) {
+                    sendButtonAction("enterscope", true);
+                } else if ((VectorLength(vr.weaponoffset) > 0.26f || !vr.weapon_stabilised) &&
+                           (vr.cgzoommode == 2 || vr.cgzoommode == 4)) {
+                    sendButtonActionSimple("exitscope");
+                }
+            } else if (vr.cgzoommode == 2 || vr.cgzoommode == 4) {
+                // In case we were using weapon scope and weapon
+                // was changed due to out of ammo, exit scope
+                sendButtonActionSimple("exitscope");
+            }
+
             vec3_t offhandPositionAverage;
             VectorClear(offhandPositionAverage);
             for (int i = 0; i < 5; ++i)
@@ -423,7 +423,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     }
 
                     float x = offhandPositionAverage[0] - (vr.hmdposition[0] + xy[0]);
-                    float y = offhandPositionAverage[1] - (vr.hmdposition[1] - 0.1f);
+                    float y = offhandPositionAverage[1] - (vr.hmdposition[1]);
                     float z = offhandPositionAverage[2] - (vr.hmdposition[2] + xy[1]);
                     float zxDist = length(x, z);
 
@@ -431,6 +431,10 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                         VectorSet(vr.weaponangles[ANGLES_ADJUSTED], -RAD2DEG(atanf(y / zxDist)),
                                   -RAD2DEG(atan2f(x, -z)), vr.weaponangles[ANGLES_ADJUSTED][ROLL] /
                                                            2.0f); //Dampen roll on stabilised weapon
+
+                        // shoot from exactly where we are looking from
+                        VectorClear(vr.weaponoffset);
+                        VectorCopy(vr.hmdposition, vr.weaponposition);
                     }
                 }
                 else
