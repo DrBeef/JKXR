@@ -371,17 +371,23 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     static bool fired = false;
                     vr.primaryVelocityTriggeredAttack = (vr.primaryswingvelocity >
                                                          vr_weapon_velocity_trigger->value);
+                    //player has to be dual wielding for this to be true
+                    vr.secondaryVelocityTriggeredAttack = vr.dualsabers && (vr.secondaryswingvelocity >
+                                                                            vr_weapon_velocity_trigger->value);
 
-                    if (fired != vr.primaryVelocityTriggeredAttack) {
+                    bool triggered = (vr.primaryVelocityTriggeredAttack || vr.secondaryVelocityTriggeredAttack);
+                    if (fired != triggered)
+                    {
                         ALOGV("**WEAPON EVENT**  veocity triggered %s",
-                              vr.primaryVelocityTriggeredAttack ? "+attack" : "-attack");
+                              triggered ? "+attack" : "-attack");
                         //normal attack is a punch with the left hand
-                        sendButtonAction("+attack", vr.primaryVelocityTriggeredAttack);
-                        fired = vr.primaryVelocityTriggeredAttack;
+                        sendButtonAction("+attack", triggered);
+                        fired = triggered;
                     }
-                } else if (vr.primaryVelocityTriggeredAttack) {
+                } else if (vr.primaryVelocityTriggeredAttack || vr.secondaryVelocityTriggeredAttack) {
                     //send a stop attack as we have an unfinished velocity attack
                     vr.primaryVelocityTriggeredAttack = false;
+                    vr.secondaryVelocityTriggeredAttack = false;
                     ALOGV("**WEAPON EVENT**  veocity triggered -attack");
                     sendButtonAction("+attack", vr.primaryVelocityTriggeredAttack);
                 }

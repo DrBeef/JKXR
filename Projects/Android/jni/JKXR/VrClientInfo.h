@@ -34,7 +34,7 @@ typedef struct {
     bool player_moving;
     int move_speed; // 0 (default) = Comfortable (75%) , 1 = Full (100%), 2 = Walk (50%)
     bool crouched;
-    bool dual_wield; // JKA only - is player dual sabers active
+    bool dualsabers; // JKA only - is player dual sabers active
     int cgzoommode;
     int cgzoomdir;
     int saberBlockDebounce; // Amount of time after player is blocked that the saber position is fixed
@@ -103,7 +103,7 @@ typedef struct {
 
 } vr_client_info_t;
 
-#ifndef JKVR_CLIENT
+#ifndef JKXR_CLIENT
 extern vr_client_info_t *vr;
 #endif
 
