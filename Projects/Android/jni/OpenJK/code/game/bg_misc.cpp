@@ -714,7 +714,7 @@ void rotateAboutOrigin(float x, float y, float rotation, vec2_t out)
 
 float getHMDYawForCalc()
 {
-	if (!vr->third_person) {
+	if (!vr->third_person && vr->cgzoommode != 2 && vr->cgzoommode != 4 ) {
 		return vr->hmdorientation[YAW];
 	}
 	return 0.0f;

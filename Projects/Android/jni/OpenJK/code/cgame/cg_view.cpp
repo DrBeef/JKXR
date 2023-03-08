@@ -1325,24 +1325,32 @@ qboolean CG_CalcFOVFromX( float fov_x )
 	return (inwater);
 }
 
-float CG_ForceSpeedFOV( void )
+float CG_ForceSpeedFOV( float infov )
 {
+	if (!cg_forceSpeedFOVAdjust.integer)
+	{
+		return infov;
+	}
+
+	gentity_t	*player = &g_entities[0];
 	float fov;
 	float timeLeft = player->client->ps.forcePowerDuration[FP_SPEED] - cg.time;
 	float length = FORCE_SPEED_DURATION*forceSpeedValue[player->client->ps.forcePowerLevel[FP_SPEED]];
 	float amt = forceSpeedFOVMod[player->client->ps.forcePowerLevel[FP_SPEED]];
-	if ( timeLeft < 500 )
+	if ( timeLeft < 200 )
 	{//start going back
-		fov = cg_fov.value + (timeLeft)/500*amt;
+		fov = infov + sinf(DEG2RAD((timeLeft/400)*180))*amt;
 	}
-	else if ( length - timeLeft < 1000 )
+	else if ( length - timeLeft < 300 )
 	{//start zooming in
-		fov = cg_fov.value + (length - timeLeft)/1000*amt;
+		fov = infov + sinf(DEG2RAD(((length - timeLeft)/600)*180))*amt;
 	}
 	else
 	{//stay at this FOV
-		fov = cg_fov.value+amt;
+		fov = infov;//+amt;
 	}
+
+	cg.refdef.override_fov = true;
 	return fov;
 }
 /*
@@ -1390,13 +1398,13 @@ static qboolean	CG_CalcFov( void ) {
 			else
 			{
 				//fov_x = 120;//FIXME: read from the NPC's fov stats?
-				fov_x = vr ? vr->fov_x : 90.0f;
+				fov_x = vr ? vr->fov_x : cg_fov.value;
 			}
 		}
 	}
 	else if ( (!cg.zoomMode || cg.zoomMode > 2) && (cg.snap->ps.forcePowersActive&(1<<FP_SPEED)) && player->client->ps.forcePowerDuration[FP_SPEED] )//cg.renderingThirdPerson &&
 	{
-		fov_x = CG_ForceSpeedFOV();
+		fov_x = CG_ForceSpeedFOV(vr ? vr->fov_x : cg_fov.value);
 		//fov_x = vr ? vr->fov : 90.0f;
 	} else {
 		/*
@@ -1415,10 +1423,10 @@ static qboolean	CG_CalcFov( void ) {
 			fov_x = 160;
 		}*/
 
-		fov_x = vr ? vr->fov_x : 90.0f;
+		fov_x = vr ? vr->fov_x : cg_fov.value;
 
 		// Disable zooming when in third person
-		if ( cg.zoomMode && cg.zoomMode < 3 )//&& !cg.renderingThirdPerson ) // light amp goggles do none of the zoom silliness
+		if (( cg.zoomMode && cg.zoomMode < 3 ) || cg.zoomMode == 4)//&& !cg.renderingThirdPerson ) // light amp goggles do none of the zoom silliness
 		{
 			if ( !cg.zoomLocked )
 			{
@@ -1430,7 +1438,7 @@ static qboolean	CG_CalcFov( void ) {
 				else
 				{
 					// disruptor zooming in faster
-					cg_zoomFov -= cg.frametime * 0.075f;
+					cg_zoomFov += vr->cgzoomdir * cg.frametime * 0.075f;
 				}
 
 				// Clamp zoomFov
@@ -1931,6 +1939,11 @@ static void CG_DrawSkyBoxPortal(void)
 	cg.refdef.fov_x = fov_x;
 	cg.refdef.fov_y = fov_y;
 */
+
+	//Don't need any special adjustment for the sky box afaik
+	VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
+	AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+
 	//inherit fov and axis from whatever the player is doing (regular, camera overrides or zoomed, whatever)
 	if ( !cg.hyperspace )
 	{
@@ -1944,9 +1957,6 @@ static void CG_DrawSkyBoxPortal(void)
 	cg.refdef.rdflags |= RDF_DRAWSKYBOX;	//drawk portal skies
 
 	cgi_CM_SnapPVS( cg.refdef.vieworg, cg.refdef.areamask );	//fill in my areamask for this view origin
-
-	//Don't need any special adjustment for the sky box afaik
-	VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
 
 	// draw the skybox
 	cgi_R_RenderScene( &cg.refdef );
@@ -2125,6 +2135,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 	);
 
 	vr->third_person = cg.renderingThirdPerson;
+	vr->dualsabers = player->client->ps.dualSabers;
 
 	if ( cg.zoomMode )
 	{

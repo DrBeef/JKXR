@@ -4369,6 +4369,8 @@ static void CG_Draw2D( void )
 		CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 		cgi_R_Font_DrawString(tempX, tempY, text,  colorTable[CT_WHITE], cgs.media.qhFontSmall, -1, FONT_SCALE);
 	}
+
+	cg.drawingHUD = CG_HUD_NORMAL;
 }
 
 /*
@@ -4519,6 +4521,8 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	VectorNormalize( vfwd_n );
 	VectorNormalize( vright_n );
 	VectorNormalize( vup_n );
+
+	vr->cgzoommode = cg.zoomMode;
 
 	switch ( stereoView ) {
 	case STEREO_CENTER:

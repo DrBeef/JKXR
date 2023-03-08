@@ -27,6 +27,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "w_local.h"
 
 #include "bg_local.h"
+#include <JKXR/VrClientInfo.h>
 
 
 //---------------
@@ -153,9 +154,12 @@ void WP_FireBlaster( gentity_t *ent, qboolean alt_fire )
 			}
 			else
 			{
-				// add some slop to the main-fire direction
-				angs[PITCH] += Q_flrand(-1.0f, 1.0f) * BLASTER_MAIN_SPREAD;
-				angs[YAW]	+= Q_flrand(-1.0f, 1.0f) * BLASTER_MAIN_SPREAD;
+				if (vr->cgzoommode != 4)
+				{ // much more accurate if using the scope
+					// add some slop to the main-fire direction
+					angs[PITCH] += Q_flrand(-1.0f, 1.0f) * BLASTER_MAIN_SPREAD;
+					angs[YAW] += Q_flrand(-1.0f, 1.0f) * BLASTER_MAIN_SPREAD;
+				}
 			}
 		}
 	}

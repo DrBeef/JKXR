@@ -338,6 +338,8 @@ vmCvar_t	fx_debug;
 vmCvar_t	cg_missionInfoFlashTime;
 vmCvar_t	cg_hudFiles;
 
+vmCvar_t	cg_forceSpeedFOVAdjust;
+
 vmCvar_t	cg_neverHearThatDumbBeepingSoundAgain;
 
 vmCvar_t vr_weapon_adjustment_1;
@@ -488,6 +490,8 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_skippingcin, "skippingCinematic", "0", CVAR_ROM},
 	{ &cg_missionInfoFlashTime, "cg_missionInfoFlashTime", "10000", 0  },
 	{ &cg_hudFiles, "cg_hudFiles", "ui/jahud.txt", CVAR_ARCHIVE},
+
+	{ &cg_forceSpeedFOVAdjust, "cg_forceSpeedFOVAdjust", "1", CVAR_ARCHIVE},
 
 	//Default Weapon adjustments - these WILL be overridden
 	//  scale,right,up,forward,pitch,yaw,roll
