@@ -13629,8 +13629,9 @@ static void PM_Weapon( void )
 				{
 					PM_SetAnim( pm, SETANIM_LEGS, BOTH_THERMAL_THROW, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 				}
-				PM_SetAnim(pm,SETANIM_TORSO,BOTH_THERMAL_THROW,SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_RESTART|SETANIM_FLAG_HOLD);
-				pm->gent->client->fireDelay = 300;
+				//Don't require a fire delay as the animation is us actually throwing physically!!
+				//PM_SetAnim(pm,SETANIM_TORSO,BOTH_THERMAL_THROW,SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_RESTART|SETANIM_FLAG_HOLD);
+				pm->gent->client->fireDelay = 1;
 				pm->ps->weaponstate = WEAPON_FIRING;
 				pm->gent->alt_fire = (qboolean)(pm->cmd.buttons&BUTTON_ALT_ATTACK);
 				return;
