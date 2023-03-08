@@ -2963,7 +2963,7 @@ static void CG_ScanForRocketLock( void )
 CG_DrawCrosshair3D
 =================
 */
-static void CG_DrawCrosshair3D(void)
+static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 {
 	float		w;
 	qhandle_t	hShader;
@@ -2974,7 +2974,8 @@ static void CG_DrawCrosshair3D(void)
 	vec3_t endpos;
 	refEntity_t ent;
 
-	if ( !cg_drawCrosshair.integer ) {
+	if (( type == 1 && !cg_drawCrosshair.integer) ||
+		(type == 0 && !cg_drawCrosshairForce.integer)) {
 		return;
 	}
 
@@ -2983,20 +2984,37 @@ static void CG_DrawCrosshair3D(void)
 		return;
 	}
 
-	if ( cg.renderingThirdPerson || in_camera) {
+	if ( in_camera ) {
 		return;
 	}
 
-	if ( cg.zoomMode > 0 && cg.zoomMode < 3 )
+	if ( cg.zoomMode )
 	{
 		//not while scoped
 		return;
 	}
 
-	if ( cg.snap->ps.weapon == WP_NONE ||
-		 cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_STUN_BATON )
+	if ( in_misccamera )
+	{
+		//Not while viewing from another entity (such as a camera)
+		return;
+	}
+
+	if ( type == 1 && (cg.snap->ps.weapon == WP_NONE ||
+					   cg.snap->ps.weapon == WP_SABER ||
+					   cg.snap->ps.weapon == WP_THERMAL ))
 	{
 		return;
+	}
+
+	if (type == 0)
+	{
+		if (showPowers[cg.forcepowerSelect] == FP_HEAL ||
+			showPowers[cg.forcepowerSelect] == FP_SPEED ||
+			vr->weapon_stabilised)
+		{
+			return;
+		}
 	}
 
 	w = cg_crosshairSize.value;
@@ -3008,19 +3026,25 @@ static void CG_DrawCrosshair3D(void)
 		w *= ( 1 + f );
 	}
 
-	ca = cg_drawCrosshair.integer;
+	ca = (type == 1) ? cg_drawCrosshair.integer : cg_drawCrosshairForce.integer;
 	if (ca < 0) {
 		ca = 0;
 	}
 	hShader = cgs.media.crosshairShader[ ca % NUM_CROSSHAIRS ];
 
 	float xmax = 64.0f * tan(cg.refdef.fov_x * M_PI / 360.0f);
-	float maxdist = (cgs.glconfig.vidWidth * 64.0f / (2 * xmax)) * 1.5f;
 
 	vec3_t forward, weaponangles, origin;
-	BG_CalculateVRWeaponPosition(origin, weaponangles);
+	if (type == 0)
+	{
+		BG_CalculateVROffHandPosition(origin, weaponangles);
+	}
+	else
+	{
+		BG_CalculateVRWeaponPosition(origin, weaponangles);
+	}
 	AngleVectors(weaponangles, forward, NULL, NULL);
-	VectorMA(origin, maxdist, forward, endpos);
+	VectorMA(origin, 2048, forward, endpos);
 	CG_Trace(&trace, origin, NULL, NULL, endpos, 0, MASK_SHOT);
 
 	if (trace.fraction != 1.0f) {
@@ -3030,10 +3054,10 @@ static void CG_DrawCrosshair3D(void)
 
 		VectorCopy(trace.endpos, ent.origin);
 
-		ent.radius = w / 640 * xmax * trace.fraction * maxdist / 64.0f;
+		ent.radius = w / 640 * xmax * trace.fraction * 2048 / 64.0f;
 		ent.customShader = hShader;
-		ent.shaderRGBA[0] = 255;
-		ent.shaderRGBA[1] = 255;
+		ent.shaderRGBA[0] = (type == 0 && !cg_forceCrosshair) ? 0 : 255;
+		ent.shaderRGBA[1] = (type == 0) ? 0 : 255;
 		ent.shaderRGBA[2] = 255;
 		ent.shaderRGBA[3] = 255;
 
@@ -4237,7 +4261,9 @@ static void CG_Draw2D( void )
 	if ( (cg.snap->ps.forcePowersActive&(1<<FP_SEE)) )
 	{//force sight is on
 		//indicate this with sight cone thingy
-		CG_DrawPic( 0, 0, 640, 480, cgi_R_RegisterShader( "gfx/2d/jsense" ));
+		cg.drawingHUD = CG_HUD_NORMAL;
+		CG_DrawPic( 35, 40, 570, 400, cgi_R_RegisterShader( "gfx/2d/jsense" ));
+		cg.drawingHUD = CG_HUD_SCALED;
 		CG_DrawHealthBars();
 	}
 	else if ( cg_debugHealthBars.integer )
@@ -4511,7 +4537,10 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		return;
 	}
 
-	CG_DrawCrosshair3D();
+	if (!vr->item_selector) {
+		CG_DrawCrosshair3D(0);
+		CG_DrawCrosshair3D(1);
+	}
 
 	//FIXME: these globals done once at start of frame for various funcs
 	AngleVectors (cg.refdefViewAngles, vfwd, vright, vup);

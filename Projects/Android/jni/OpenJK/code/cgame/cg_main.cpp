@@ -258,6 +258,7 @@ vmCvar_t	cg_drawFPS;
 vmCvar_t	cg_drawSnapshot;
 vmCvar_t	cg_drawAmmoWarning;
 vmCvar_t	cg_drawCrosshair;
+vmCvar_t	cg_drawCrosshairForce;
 vmCvar_t	cg_crosshairIdentifyTarget;
 vmCvar_t	cg_dynamicCrosshair;
 vmCvar_t	cg_crosshairForceHint;
@@ -415,6 +416,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
 	{ &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE  },
 	{ &cg_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
+	{ &cg_drawCrosshairForce, "cg_drawCrosshairForce", "4", CVAR_ARCHIVE },
 	{ &cg_dynamicCrosshair, "cg_dynamicCrosshair", "1", CVAR_ARCHIVE },
 	// NOTE : I also create this in UI_Init()
 	{ &cg_crosshairIdentifyTarget, "cg_crosshairIdentifyTarget", "1", CVAR_ARCHIVE },
@@ -1685,6 +1687,12 @@ Ghoul2 Insert Start
 			break;
 		}
 		cgs.skins[i] = cgi_R_RegisterSkin( modelName );
+	}
+
+	//Just register all weapons to avoid a pause when opening the selector for the first time
+	for (i=0; i <= WP_MELEE; i++)
+	{
+		CG_RegisterWeapon(i);
 	}
 
 /*
