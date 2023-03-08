@@ -9,7 +9,7 @@ LOCAL_MODULE    := openjk_ja
 
 
 LOCAL_CFLAGS :=  $(JK3_BASE_CFLAGS)
-LOCAL_CPPFLAGS := $(JK3_BASE_CPPFLAGS) -DBOTLIB -D_JK2EXE -DJKVR_CLIENT
+LOCAL_CPPFLAGS := $(JK3_BASE_CPPFLAGS) -DBOTLIB -D_JK2EXE -DJKXR_CLIENT
 
 LOCAL_LDLIBS := $(JK3_BASE_LDLIBS)
 
@@ -123,7 +123,7 @@ JK3_SRC = \
 		${SHARED_PATH}/qcommon/safe/string.cpp \
 
 
-JKVR_SRC_FILES :=  ${TOP_DIR}/JKXR/JKXR_SurfaceView.cpp \
+JKXR_SRC_FILES :=  ${TOP_DIR}/JKXR/JKXR_SurfaceView.cpp \
                   ${TOP_DIR}/JKXR/TBXR_Common.cpp \
                   ${TOP_DIR}/JKXR/VrInputCommon.cpp \
                   ${TOP_DIR}/JKXR/VrInputDefault.cpp \
@@ -131,7 +131,7 @@ JKVR_SRC_FILES :=  ${TOP_DIR}/JKXR/JKXR_SurfaceView.cpp \
                   ${TOP_DIR}/JKXR/argtable3.c \
                   ${TOP_DIR}/JKXR/OpenXrInput.cpp
 
-LOCAL_SRC_FILES += $(JK3_SRC) $(JKVR_SRC_FILES)
+LOCAL_SRC_FILES += $(JK3_SRC) $(JKXR_SRC_FILES)
 
 
 include $(BUILD_SHARED_LIBRARY)
