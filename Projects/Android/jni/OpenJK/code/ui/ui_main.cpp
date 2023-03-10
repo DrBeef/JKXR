@@ -75,7 +75,7 @@ static struct
 	int				savegameFromFlag;
 } s_savegame;
 
-#define MAX_SAVELOADFILES	100
+#define MAX_SAVELOADFILES	1000
 #define MAX_SAVELOADNAME	32
 
 #ifdef JK2_MODE
@@ -829,9 +829,9 @@ static int CreateNextSaveName(char *fileName)
 	for (i=0;i<MAX_SAVELOADFILES;i++)
 	{
 #ifdef JK2_MODE
-		Com_sprintf( fileName, MAX_SAVELOADNAME, "jkii%02d", i );
+		Com_sprintf( fileName, MAX_SAVELOADNAME, "jkii%03d", i );
 #else
-		Com_sprintf( fileName, MAX_SAVELOADNAME, "jedi_%02d", i );
+		Com_sprintf( fileName, MAX_SAVELOADNAME, "jedi_%03d", i );
 #endif
 
 		if (!ui.SG_GetSaveGameComment(fileName, NULL, NULL))
