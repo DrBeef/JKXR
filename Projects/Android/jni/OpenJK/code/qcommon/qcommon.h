@@ -464,6 +464,7 @@ void FS_Rmdir( const char *osPath, qboolean recursive );
 void FS_HomeRmdir( const char *homePath, qboolean recursive );
 
 qboolean FS_FileExists( const char *file );
+qboolean FS_BaseFileExists( const char *file );
 
 char   *FS_BuildOSPath( const char *base, const char *game, const char *qpath );
 

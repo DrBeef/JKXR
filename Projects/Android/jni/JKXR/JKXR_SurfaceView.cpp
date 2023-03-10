@@ -305,7 +305,7 @@ void VR_Init()
 	vr_use_gesture_boundary = Cvar_Get ("vr_use_gesture_boundary", "0.35", CVAR_ARCHIVE);
 
 	cvar_t *expanded_menu_enabled = Cvar_Get ("expanded_menu_enabled", "0", CVAR_ARCHIVE);
-	if (FS_FileExists("expanded_menu.pk3")) {
+	if (FS_FileExists("expanded_menu.pk3") || FS_BaseFileExists("expanded_menu.pk3")) {
 		Cvar_Set( "expanded_menu_enabled", "1" );
 	} else {
 		Cvar_Set( "expanded_menu_enabled", "0" );
