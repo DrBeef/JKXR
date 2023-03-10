@@ -6459,7 +6459,17 @@ void WP_RunSaber( gentity_t *self, gentity_t *saber )
 		//figure out where saber should be
 		vec3_t	forward, saberHome, saberDest, fwdangles = {0};
 
-		VectorCopy( self->client->ps.viewangles, fwdangles );
+		if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
+		{
+			BG_CalculateVRWeaponPosition(saberHome, fwdangles);
+
+			//Ignore roll
+			fwdangles[ROLL] = 0;
+		}
+		else {
+			VectorCopy(self->client->ps.viewangles, fwdangles);
+		}
+
 		if ( self->s.number )
 		{
 			fwdangles[0] -= 8;
@@ -8942,7 +8952,14 @@ static qboolean ShouldPlayerResistForceThrow( gentity_t *player, gentity_t *atta
 	return qfalse;
 }
 
+
+void ForceThrowEx( gentity_t *self, qboolean pull, qboolean fake, qboolean aimByViewAngles );
 void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
+{
+	ForceThrowEx(self, pull, fake, qfalse);
+}
+
+void ForceThrowEx( gentity_t *self, qboolean pull, qboolean fake, qboolean aimByViewAngles )
 {//FIXME: pass in a target ent so we (an NPC) can push/pull just one targeted ent.
 	//shove things in front of you away
 	float		dist;
@@ -9082,17 +9099,27 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 
 	G_Sound( self, soundIndex );
 
+	vec3_t origin, angles;
+	if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson && !aimByViewAngles)
+	{
+		BG_CalculateVROffHandPosition(origin, fwdangles);
+		AngleVectors( fwdangles, forward, right, NULL );
+		VectorCopy( origin, center );
+	}
+	else
+	{
+		VectorCopy( self->client->ps.viewangles, fwdangles );
+		VectorCopy( self->client->renderInfo.eyePoint, origin );
+		AngleVectors( fwdangles, forward, right, NULL );
+		VectorCopy( self->currentOrigin, center );
+	}
+
 	if ( (!pull && self->client->ps.forcePowersForced&(1<<FP_PUSH))
 		|| (pull && self->client->ps.forcePowersForced&(1<<FP_PULL))
 		|| (pull&&self->client->NPC_class==CLASS_KYLE&&(self->spawnflags&1)&&TIMER_Done( self, "kyleTakesSaber" )) )
 	{
 		noResist = qtrue;
 	}
-
-	VectorCopy( self->client->ps.viewangles, fwdangles );
-	//fwdangles[1] = self->client->ps.viewangles[1];
-	AngleVectors( fwdangles, forward, right, NULL );
-	VectorCopy( self->currentOrigin, center );
 
 	if ( pull )
 	{
@@ -9105,8 +9132,8 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 
 	//	if ( cone >= 1.0f )
 	{//must be pointing right at them
-		VectorMA( self->client->renderInfo.eyePoint, radius, forward, end );
-		gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, end, self->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, (EG2_Collision)0, 0 );//was MASK_SHOT, changed to match crosshair trace
+		VectorMA( origin, radius, forward, end );
+		gi.trace( &tr, origin, vec3_origin, vec3_origin, end, self->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, (EG2_Collision)0, 0 );//was MASK_SHOT, changed to match crosshair trace
 		if ( tr.entityNum < ENTITYNUM_WORLD )
 		{//found something right in front of self,
 			forwardEnt = &g_entities[tr.entityNum];
@@ -9235,7 +9262,7 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 			}
 
 			//in PVS?
-			if ( !ent->bmodel && !gi.inPVS( ent_org, self->client->renderInfo.eyePoint ) )
+			if ( !ent->bmodel && !gi.inPVS( ent_org, origin ) )
 			{//must be in PVS
 				continue;
 			}
@@ -9243,7 +9270,7 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 			if ( ent != forwardEnt )
 			{//don't need to trace against forwardEnt again
 			//really should have a clear LOS to this thing...
-				gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, ent_org, self->s.number, MASK_FORCE_PUSH, (EG2_Collision)0, 0 );//was MASK_SHOT, but changed to match above trace and crosshair trace
+				gi.trace( &tr, origin, vec3_origin, vec3_origin, ent_org, self->s.number, MASK_FORCE_PUSH, (EG2_Collision)0, 0 );//was MASK_SHOT, but changed to match above trace and crosshair trace
 				if ( tr.fraction < 1.0f && tr.entityNum != ent->s.number )
 				{//must have clear LOS
 					continue;
@@ -9320,7 +9347,7 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 				//First, if this is the player we're push/pulling, see if he can counter it
 				if ( modPowerLevel != -1
 					&& !noResist
-					&& InFront( self->currentOrigin, push_list[x]->client->renderInfo.eyePoint, push_list[x]->client->ps.viewangles, 0.3f ) )
+					&& InFront( center, push_list[x]->client->renderInfo.eyePoint, push_list[x]->client->ps.viewangles, 0.3f ) )
 				{//absorbed and I'm in front of them
 					//counter it
 					if ( push_list[x]->client->ps.forcePowerLevel[FP_ABSORB] > FORCE_LEVEL_2 )
@@ -9366,7 +9393,7 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 						&& push_list[x]->client->ps.forceRageRecoveryTime < level.time //not recobering from rage
 						&& ((self->client->NPC_class != CLASS_DESANN&&Q_stricmp("Yoda",self->NPC_type)) || !Q_irand( 0, 2 ) )//only 30% chance of resisting a Desann push
 						&& push_list[x]->client->ps.groundEntityNum != ENTITYNUM_NONE //on the ground
-						&& InFront( self->currentOrigin, push_list[x]->currentOrigin, push_list[x]->client->ps.viewangles, 0.3f ) //I'm in front of him
+						&& InFront( center, push_list[x]->currentOrigin, push_list[x]->client->ps.viewangles, 0.3f ) //I'm in front of him
 						&& ( push_list[x]->client->ps.powerups[PW_FORCE_PUSH] > level.time ||//he's pushing too
 								(push_list[x]->s.number != 0 && push_list[x]->client->ps.weaponTime < level.time)//not the player and not attacking (NPC jedi auto-defend against pushes)
 						   )
@@ -9441,7 +9468,7 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 					}
 					if ( pull )
 					{
-						VectorSubtract( self->currentOrigin, push_list[x]->currentOrigin, pushDir );
+						VectorSubtract( center, push_list[x]->currentOrigin, pushDir );
 						if ( self->client->ps.forcePowerLevel[FP_PULL] >= FORCE_LEVEL_3
 							&& self->client->NPC_class == CLASS_KYLE
 							&& (self->spawnflags&1)
@@ -9491,7 +9518,7 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 							)
 						{//yank the weapon - NOTE: level 1 just knocks them down, not take weapon
 							//FIXME: weapon yank anim if not a knockdown?
-							if ( InFront( self->currentOrigin, push_list[x]->currentOrigin, push_list[x]->client->ps.viewangles, 0.0f ) )
+							if ( InFront( center, push_list[x]->currentOrigin, push_list[x]->client->ps.viewangles, 0.0f ) )
 							{//enemy has to be facing me, too...
 								WP_DropWeapon( push_list[x], pushDir );
 							}
@@ -9508,7 +9535,7 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 					}
 					else
 					{
-						VectorSubtract( push_list[x]->currentOrigin, self->currentOrigin, pushDir );
+						VectorSubtract( push_list[x]->currentOrigin, center, pushDir );
 						knockback -= VectorNormalize( pushDir );
 						if ( knockback < 100 )
 						{
@@ -9609,7 +9636,7 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 					&& (push_list[x]->s.pos.trType != TR_INTERPOLATE||push_list[x]->s.weapon != WP_THERMAL) )//rolling and stationary thermal detonators are dealt with below
 				{
 					vec3_t dir2Me;
-					VectorSubtract( self->currentOrigin, push_list[x]->currentOrigin, dir2Me );
+					VectorSubtract( center, push_list[x]->currentOrigin, dir2Me );
 					float dot = DotProduct( push_list[x]->s.pos.trDelta, dir2Me );
 					if ( pull )
 					{//deflect rather than reflect?
@@ -9651,10 +9678,10 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 					vec3_t	pushDir;
 					float	damage = 800;
 
-					AngleVectors( self->client->ps.viewangles, forward, NULL, NULL );
+					AngleVectors( fwdangles, forward, NULL, NULL );
 					VectorNormalize( forward );
-					VectorMA( self->client->renderInfo.eyePoint, radius, forward, end );
-					gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT, (EG2_Collision)0, 0 );
+					VectorMA( origin, radius, forward, end );
+					gi.trace( &tr, origin, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT, (EG2_Collision)0, 0 );
 					if ( tr.entityNum != push_list[x]->s.number || tr.fraction == 1.0 || tr.allsolid || tr.startsolid )
 					{//must be pointing right at it
 						continue;
@@ -9662,22 +9689,22 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 
 					if ( pull )
 					{
-						VectorSubtract( self->client->renderInfo.eyePoint, tr.endpos, pushDir );
+						VectorSubtract( origin, tr.endpos, pushDir );
 					}
 					else
 					{
-						VectorSubtract( tr.endpos, self->client->renderInfo.eyePoint, pushDir );
+						VectorSubtract( tr.endpos, origin, pushDir );
 					}
 					/*
 					VectorSubtract( push_list[x]->absmax, push_list[x]->absmin, size );
 					VectorMA( push_list[x]->absmin, 0.5, size, center );
 					if ( pull )
 					{
-						VectorSubtract( self->client->renderInfo.eyePoint, center, pushDir );
+						VectorSubtract( origin, center, pushDir );
 					}
 					else
 					{
-						VectorSubtract( center, self->client->renderInfo.eyePoint, pushDir );
+						VectorSubtract( center, origin, pushDir );
 					}
 					*/
 					damage -= VectorNormalize( pushDir );
@@ -9712,10 +9739,10 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 				{//push/pull the door
 					vec3_t	pos1, pos2;
 
-					AngleVectors( self->client->ps.viewangles, forward, NULL, NULL );
+					AngleVectors( fwdangles, forward, NULL, NULL );
 					VectorNormalize( forward );
-					VectorMA( self->client->renderInfo.eyePoint, radius, forward, end );
-					gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT, (EG2_Collision)0, 0 );
+					VectorMA( origin, radius, forward, end );
+					gi.trace( &tr, origin, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT, (EG2_Collision)0, 0 );
 					if ( tr.entityNum != push_list[x]->s.number || tr.fraction == 1.0 || tr.allsolid || tr.startsolid )
 					{//must be pointing right at it
 						continue;
@@ -9743,7 +9770,7 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 						VectorCopy( push_list[x]->pos2, pos2 );
 					}
 
-					if ( Distance( pos1, self->client->renderInfo.eyePoint ) < Distance( pos2, self->client->renderInfo.eyePoint ) )
+					if ( Distance( pos1, origin ) < Distance( pos2, origin ) )
 					{//pos1 is closer
 						if ( push_list[x]->moverState == MOVER_POS1 )
 						{//at the closest pos
@@ -9792,15 +9819,15 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 						if ( push_list[x]->s.eType == ET_ITEM )
 						{//pull it to a little higher point
 							vec3_t	adjustedOrg;
-							VectorCopy( self->currentOrigin, adjustedOrg );
+							VectorCopy( center, adjustedOrg );
 							adjustedOrg[2] += self->maxs[2]/3;
 							VectorSubtract( adjustedOrg, push_list[x]->currentOrigin, pushDir );
 						}
 						else if ( self->enemy //I have an enemy
 							//&& push_list[x]->s.eType != ET_ITEM //not an item
 							&& self->client->ps.forcePowerLevel[FP_PUSH] > FORCE_LEVEL_2 //have push 3 or greater
-							&& InFront(push_list[x]->currentOrigin, self->currentOrigin, self->currentAngles, 0.25f)//object is generally in front of me
-							&& InFront(self->enemy->currentOrigin, self->currentOrigin, self->currentAngles, 0.75f)//enemy is pretty much right in front of me
+							&& InFront(push_list[x]->currentOrigin, center, self->currentAngles, 0.25f)//object is generally in front of me
+							&& InFront(self->enemy->currentOrigin, center, self->currentAngles, 0.75f)//enemy is pretty much right in front of me
 							&& !InFront(push_list[x]->currentOrigin, self->enemy->currentOrigin, self->enemy->currentAngles, -0.25f)//object is generally behind enemy
 							//FIXME: check dist to enemy and clear LOS to enemy and clear Path between object and enemy?
 							&& ( (self->NPC&&(noResist||Q_irand(0,RANK_CAPTAIN)<self->NPC->rank) )//NPC with enough skill
@@ -9819,7 +9846,7 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 						}
 						else
 						{
-							VectorSubtract( self->currentOrigin, push_list[x]->currentOrigin, pushDir );
+							VectorSubtract( center, push_list[x]->currentOrigin, pushDir );
 						}
 						knockback += VectorNormalize( pushDir );
 						if ( knockback > 200 )
@@ -9846,8 +9873,8 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 						if ( self->enemy //I have an enemy
 							&& push_list[x]->s.eType != ET_ITEM //not an item
 							&& self->client->ps.forcePowerLevel[FP_PUSH] > FORCE_LEVEL_2 //have push 3 or greater
-							&& InFront(push_list[x]->currentOrigin, self->currentOrigin, self->currentAngles, 0.25f)//object is generally in front of me
-							&& InFront(self->enemy->currentOrigin, self->currentOrigin, self->currentAngles, 0.75f)//enemy is pretty much right in front of me
+							&& InFront(push_list[x]->currentOrigin, center, self->currentAngles, 0.25f)//object is generally in front of me
+							&& InFront(self->enemy->currentOrigin, center, self->currentAngles, 0.75f)//enemy is pretty much right in front of me
 							&& InFront(push_list[x]->currentOrigin, self->enemy->currentOrigin, self->enemy->currentAngles, 0.25f)//object is generally in front of enemy
 							//FIXME: check dist to enemy and clear LOS to enemy and clear Path between object and enemy?
 							&& ( (self->NPC&&(noResist||Q_irand(0,RANK_CAPTAIN)<self->NPC->rank) )//NPC with enough skill
@@ -9866,7 +9893,7 @@ void ForceThrow( gentity_t *self, qboolean pull, qboolean fake )
 						}
 						else
 						{
-							VectorSubtract( push_list[x]->currentOrigin, self->currentOrigin, pushDir );
+							VectorSubtract( push_list[x]->currentOrigin, center, pushDir );
 						}
 						knockback -= VectorNormalize( pushDir );
 						if ( knockback < 100 )
@@ -10344,9 +10371,20 @@ void ForceTelepathy( gentity_t *self )
 		return;
 	}
 
-	AngleVectors( self->client->ps.viewangles, forward, NULL, NULL );
+	vec3_t origin, angles;
+	if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
+	{
+		BG_CalculateVROffHandPosition(origin, angles);
+		AngleVectors(angles, forward, NULL, NULL);
+	}
+	else
+	{
+		AngleVectors(self->client->ps.viewangles, forward, NULL, NULL);
+		VectorCopy(self->client->ps.viewangles, angles);
+		VectorCopy(self->client->renderInfo.eyePoint, origin);
+	}
 	VectorNormalize( forward );
-	VectorMA( self->client->renderInfo.eyePoint, 2048, forward, end );
+	VectorMA( origin, 2048, forward, end );
 
 	//Cause a distraction if enemy is not fighting
 	gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, end, self->s.number, MASK_OPAQUE|CONTENTS_BODY, (EG2_Collision)0, 0 );
@@ -10592,7 +10630,19 @@ void ForceGrip( gentity_t *self )
 		self->client->ps.weaponTime = floor( self->client->ps.weaponTime * g_timescale->value );
 	}
 
-	AngleVectors( self->client->ps.viewangles, forward, NULL, NULL );
+	vec3_t origin, angles;
+	if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
+	{
+		BG_CalculateVROffHandPosition(origin, angles);
+		AngleVectors(angles, forward, NULL, NULL);
+	}
+	else
+	{
+		AngleVectors(self->client->ps.viewangles, forward, NULL, NULL);
+		VectorCopy(self->client->ps.viewangles, angles);
+		VectorCopy(self->client->renderInfo.eyePoint, origin);
+	}
+
 	VectorNormalize( forward );
 	VectorMA( self->client->renderInfo.handLPoint, FORCE_GRIP_DIST, forward, end );
 
@@ -10608,11 +10658,11 @@ void ForceGrip( gentity_t *self )
 				{//player needs to be facing more directly
 					minDot = 0.2f;
 				}
-				if ( InFront( self->enemy->currentOrigin, self->client->renderInfo.eyePoint, self->client->ps.viewangles, minDot ) ) //self->s.number || //NPCs can always lift enemy since we assume they're looking at them...?
+				if ( InFront( self->enemy->currentOrigin, origin, angles, minDot ) ) //self->s.number || //NPCs can always lift enemy since we assume they're looking at them...?
 				{//need to be facing the enemy
-					if ( gi.inPVS( self->enemy->currentOrigin, self->client->renderInfo.eyePoint ) )
+					if ( gi.inPVS( self->enemy->currentOrigin, origin ) )
 					{//must be in PVS
-						gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, self->enemy->currentOrigin, self->s.number, MASK_SHOT, (EG2_Collision)0, 0 );
+						gi.trace( &tr, origin, vec3_origin, vec3_origin, self->enemy->currentOrigin, self->s.number, MASK_SHOT, (EG2_Collision)0, 0 );
 						if ( tr.fraction == 1.0f || tr.entityNum == self->enemy->s.number )
 						{//must have clear LOS
 							traceEnt = self->enemy;
@@ -10674,7 +10724,7 @@ void ForceGrip( gentity_t *self )
 		if ( !Q_stricmp("Yoda",traceEnt->NPC_type) )
 		{
 			Jedi_PlayDeflectSound( traceEnt );
-			ForceThrow( traceEnt, qfalse );
+			ForceThrowEx( traceEnt, qfalse, qfalse, qtrue );
 			return;
 		}
 
@@ -10729,7 +10779,7 @@ void ForceGrip( gentity_t *self )
 		case CLASS_TAVION:
 		case CLASS_LUKE:
 			Jedi_PlayDeflectSound( traceEnt );
-			ForceThrow( traceEnt, qfalse );
+			ForceThrowEx( traceEnt, qfalse, qfalse, qtrue );
 			return;
 			break;
 		case CLASS_REBORN:
@@ -10739,7 +10789,7 @@ void ForceGrip( gentity_t *self )
 			if ( traceEnt->NPC && traceEnt->NPC->rank > RANK_CIVILIAN && self->client->ps.forcePowerLevel[FP_GRIP] < FORCE_LEVEL_2 )
 			{
 				Jedi_PlayDeflectSound( traceEnt );
-				ForceThrow( traceEnt, qfalse );
+				ForceThrowEx( traceEnt, qfalse, qfalse, qtrue );
 				return;
 			}
 			break;
@@ -11445,12 +11495,23 @@ qboolean ForceDrain2( gentity_t *self )
 	}
 
 	//Cause choking anim + health drain in ent in front of me
-	AngleVectors( self->client->ps.viewangles, forward, NULL, NULL );
+	vec3_t origin, angles;
+	if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
+	{
+		BG_CalculateVROffHandPosition(origin, angles);
+		AngleVectors(angles, forward, NULL, NULL);
+	}
+	else
+	{
+		AngleVectors(self->client->ps.viewangles, forward, NULL, NULL);
+		VectorCopy(self->client->ps.viewangles, angles);
+		VectorCopy(self->client->renderInfo.eyePoint, origin);
+	}
 	VectorNormalize( forward );
-	VectorMA( self->client->renderInfo.eyePoint, FORCE_DRAIN_DIST, forward, end );
+	VectorMA( origin, FORCE_DRAIN_DIST, forward, end );
 
 	//okay, trace straight ahead and see what's there
-	gi.trace( &tr, self->client->renderInfo.eyePoint, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT, (EG2_Collision)0, 0 );
+	gi.trace( &tr, origin, vec3_origin, vec3_origin, end, self->s.number, MASK_SHOT, (EG2_Collision)0, 0 );
 	if ( tr.entityNum >= ENTITYNUM_WORLD || tr.fraction == 1.0 || tr.allsolid || tr.startsolid )
 	{
 		return qfalse;
@@ -11474,7 +11535,7 @@ qboolean ForceDrain2( gentity_t *self )
 		if ( !Q_stricmp("Yoda",traceEnt->NPC_type) )
 		{
 			Jedi_PlayDeflectSound( traceEnt );
-			ForceThrow( traceEnt, qfalse );
+			ForceThrowEx( traceEnt, qfalse, qfalse, qtrue );
 			return qtrue;
 		}
 		switch ( traceEnt->client->NPC_class )
@@ -11514,7 +11575,7 @@ qboolean ForceDrain2( gentity_t *self )
 		case CLASS_TAVION:
 		case CLASS_LUKE:
 			Jedi_PlayDeflectSound( traceEnt );
-			ForceThrow( traceEnt, qfalse );
+			ForceThrowEx( traceEnt, qfalse, qfalse, qtrue );
 			return qtrue;
 			break;
 		case CLASS_REBORN:
@@ -11528,7 +11589,7 @@ qboolean ForceDrain2( gentity_t *self )
 			{
 				ForceDrainGrabStart( self );
 				Jedi_PlayDeflectSound( traceEnt );
-				ForceThrow( traceEnt, qfalse );
+				ForceThrowEx( traceEnt, qfalse, qfalse, qtrue );
 				return qtrue;
 			}
 			break;
@@ -11837,7 +11898,7 @@ qboolean WP_CheckForceDraineeStopMe( gentity_t *self, gentity_t *drainee )
 		&& level.time-(self->client->ps.forcePowerDebounce[FP_DRAIN]>self->client->ps.forcePowerLevel[FP_DRAIN]*500)//at level 1, I always get at least 500ms of drain, at level 3 I get 1500ms
 		&& !Q_irand( 0, 100-(drainee->NPC->stats.evasion*10)-(g_spskill->integer*12) ) )
 	{//a jedi who broke free
-		ForceThrow( drainee, qfalse );
+		ForceThrowEx( drainee, qfalse, qfalse, qtrue );
 		//FIXME: I need to go into some pushed back anim...
 		WP_ForcePowerStop( self, FP_DRAIN );
 		//can't drain again for 2 seconds
@@ -11859,11 +11920,21 @@ void ForceShootDrain( gentity_t *self )
 		return;
 	}
 
+	vec3_t origin, angles;
+	if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
+	{
+		BG_CalculateVROffHandPosition(origin, angles);
+		AngleVectors(angles, forward, NULL, NULL);
+	}
+	else
+	{
+		AngleVectors( self->client->ps.viewangles, forward, NULL, NULL);
+		VectorCopy( self->client->ps.origin, origin );
+	}
+	VectorNormalize( forward );
+
 	if ( self->client->ps.forcePowerDebounce[FP_DRAIN] <= level.time )
 	{
-		AngleVectors( self->client->ps.viewangles, forward, NULL, NULL );
-		VectorNormalize( forward );
-
 		if ( self->client->ps.forcePowerLevel[FP_DRAIN] > FORCE_LEVEL_2 )
 		{//arc
 			vec3_t	center, mins, maxs, dir, ent_org, size, v;
@@ -11871,7 +11942,7 @@ void ForceShootDrain( gentity_t *self )
 			gentity_t	*entityList[MAX_GENTITIES];
 			int		e, numListedEntities, i;
 
-			VectorCopy( self->client->ps.origin, center );
+			VectorCopy( origin, center );
 			for ( i = 0 ; i < 3 ; i++ )
 			{
 				mins[i] = center[i] - radius;
@@ -11944,7 +12015,7 @@ void ForceShootDrain( gentity_t *self )
 				}
 
 				//Now check and see if we can actually hit it
-				gi.trace( &tr, self->client->ps.origin, vec3_origin, vec3_origin, ent_org, self->s.number, MASK_SHOT, G2_RETURNONHIT, 10 );
+				gi.trace( &tr, origin, vec3_origin, vec3_origin, ent_org, self->s.number, MASK_SHOT, G2_RETURNONHIT, 10 );
 				if ( tr.fraction < 1.0f && tr.entityNum != traceEnt->s.number )
 				{//must have clear LOS
 					continue;
@@ -12039,6 +12110,19 @@ void ForceDrainEnt( gentity_t *self, gentity_t *drainEnt )
 		return;
 	}
 
+	vec3_t origin, angles, fwd;
+	if (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
+	{
+		BG_CalculateVROffHandPosition(origin, angles);
+		AngleVectors(angles, fwd, NULL, NULL);
+	}
+	else
+	{
+		AngleVectors( self->client->ps.viewangles, fwd, NULL, NULL);
+		VectorCopy( self->client->ps.origin, origin );
+	}
+	VectorNormalize( fwd );
+
 	if ( self->client->ps.forcePowerDebounce[FP_DRAIN] <= level.time )
 	{
 		if ( !drainEnt )
@@ -12055,9 +12139,6 @@ void ForceDrainEnt( gentity_t *self, gentity_t *drainEnt )
 			return;
 		if (OnSameTeam(self, drainEnt))
 			return;
-
-		vec3_t fwd;
-		AngleVectors( self->client->ps.viewangles, fwd, NULL, NULL );
 
 		drainEnt->painDebounceTime = 0;
 		ForceDrainDamage( self, drainEnt, fwd, drainEnt->currentOrigin );
@@ -13375,7 +13456,7 @@ void WP_ForceForceThrow( gentity_t *thrower )
 		relock = qtrue;
 	}
 
-	ForceThrow( thrower, qfalse );
+	ForceThrowEx( thrower, qfalse, qfalse, qtrue );
 
 	if ( relock )
 	{
@@ -13634,8 +13715,19 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 						self->client->ps.torsoAnimTimer = 100;
 					}
 				}
+
+				bool isFirstPersonPlayer = (self->client->ps.clientNum == 0 && !cg.renderingThirdPerson);
 				//get their org
-				VectorCopy( self->client->ps.viewangles, angles );
+				if (isFirstPersonPlayer)
+				{
+					vec3_t origin;
+					BG_CalculateVROffHandPosition(origin, angles);
+				}
+				else
+				{
+					VectorCopy( self->client->ps.viewangles, angles );
+				}
+
 				angles[0] -= 10;
 				AngleVectors( angles, dir, NULL, NULL );
 				if ( gripEnt->client )
@@ -13645,6 +13737,15 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 				else
 				{
 					VectorCopy( gripEnt->currentOrigin, gripEntOrg );
+				}
+
+				if (isFirstPersonPlayer &&
+					self->client->ps.forcePowerLevel[FP_GRIP] > FORCE_LEVEL_2 &&
+					self->client->ps.forceGripEntityInitialDist == ENTITYNUM_NONE)
+				{
+					vec3_t diff;
+					VectorSubtract(vr->offhandposition[0], vr->hmdposition, diff);
+					self->client->ps.forceGripEntityInitialDist = VectorLength(diff);
 				}
 
 				//how far are they
@@ -13661,15 +13762,33 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 				if ( self->client->ps.forcePowerLevel[FP_GRIP] > FORCE_LEVEL_2
 					&& (!gripEnt->client || (!gripEnt->message&&!(gripEnt->flags&FL_NO_KNOCKBACK))) )
 				{//carry
-					//cap dist
-					if ( dist > FORCE_GRIP_3_MAX_DIST )
-					{
-						dist = FORCE_GRIP_3_MAX_DIST;
+					if (isFirstPersonPlayer) {
+						vec3_t diff;
+						VectorSubtract(vr->offhandposition[0], vr->hmdposition, diff);
+						float length = VectorLength(diff);
+						float movedLength = (length - self->client->ps.forceGripEntityInitialDist) * cg_worldScale.value;
+						if (fabs(movedLength) > 1.0f) {
+							dist += movedLength * 5.0f;
+						}
+						if (dist > 384) {
+							dist = 384;
+						} else if (dist < 32) {
+							dist = 32;
+						}
 					}
-					else if ( dist < FORCE_GRIP_3_MIN_DIST )
+					else
 					{
-						dist = FORCE_GRIP_3_MIN_DIST;
+						//cap dist
+						if (dist > FORCE_GRIP_3_MAX_DIST)
+						{
+							dist = FORCE_GRIP_3_MAX_DIST;
+						}
+						else if (dist < FORCE_GRIP_3_MIN_DIST)
+						{
+							dist = FORCE_GRIP_3_MIN_DIST;
+						}
 					}
+
 					VectorMA( self->client->renderInfo.handLPoint, dist, dir, gripOrg );
 				}
 				else if ( self->client->ps.forcePowerLevel[FP_GRIP] > FORCE_LEVEL_1 )
@@ -14229,12 +14348,12 @@ void WP_CheckForcedPowers( gentity_t *self, usercmd_t *ucmd )
 				self->client->ps.forcePowersForced &= ~(1<<forcePower);
 				break;
 			case FP_PUSH:
-				ForceThrow( self, qfalse );
+				ForceThrowEx( self, qfalse, qfalse, qtrue );
 				//do only once
 				self->client->ps.forcePowersForced &= ~(1<<forcePower);
 				break;
 			case FP_PULL:
-				ForceThrow( self, qtrue );
+				ForceThrowEx( self, qtrue, qfalse, qtrue );
 				//do only once
 				self->client->ps.forcePowersForced &= ~(1<<forcePower);
 				break;

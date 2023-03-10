@@ -4768,6 +4768,7 @@ extern void ForceSeeing(gentity_t *ent);
 extern void ForceTelepathy(gentity_t *ent);
 extern void ForceAbsorb(gentity_t *ent);
 extern void ForceHeal(gentity_t *ent);
+extern void ForceThrowEx( gentity_t *self, qboolean pull, qboolean fake, qboolean aimByViewAngles );
 static void ProcessGenericCmd(gentity_t *ent, byte cmd)
 {
 	switch(cmd) {
@@ -4780,10 +4781,10 @@ static void ProcessGenericCmd(gentity_t *ent, byte cmd)
 		ForceSpeed( ent );
 		break;
 	case GENCMD_FORCE_THROW:
-		ForceThrow(ent, qfalse);
+		ForceThrowEx(ent, qfalse, qfalse, qtrue);
 		break;
 	case GENCMD_FORCE_PULL:
-		ForceThrow(ent, qtrue);
+		ForceThrowEx(ent, qtrue, qfalse, qtrue);
 		break;
 	case GENCMD_FORCE_DISTRACT:
 		ForceTelepathy(ent);

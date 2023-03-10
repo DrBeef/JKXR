@@ -4262,7 +4262,7 @@ static void CG_Draw2D( void )
 	{//force sight is on
 		//indicate this with sight cone thingy
 		cg.drawingHUD = CG_HUD_NORMAL;
-		CG_DrawPic( 35, 40, 570, 400, cgi_R_RegisterShader( "gfx/2d/jsense" ));
+		CG_DrawPic( 35, 50, 570, 400, cgi_R_RegisterShader( "gfx/2d/jsense" ));
 		cg.drawingHUD = CG_HUD_SCALED;
 		CG_DrawHealthBars();
 	}
