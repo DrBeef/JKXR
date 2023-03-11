@@ -2153,6 +2153,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		CGCam_UpdateFade();
 		// build cg.refdef
 		inwater = CG_CalcViewValues();
+		cg.refdef.override_fov = inwater;
 	}
 
 	if (cg.zoomMode)
