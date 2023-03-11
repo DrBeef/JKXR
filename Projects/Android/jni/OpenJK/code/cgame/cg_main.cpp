@@ -1934,6 +1934,10 @@ static void CG_GameStateReceived( void ) {
 		CG_Init_CG();
 		cg.weaponSelect = WP_NONE;
 		cg.forcepowerSelect = FP_HEAL;
+
+        //reset some of the vr stuff here as we know we are starting afresh
+        vr->saberBlockDebounce = 0;
+        vr->crouched = false;
 	}
 
 	memset( cg_weapons, 0, sizeof(cg_weapons) );

@@ -4668,13 +4668,6 @@ Ghoul2 Insert End
 
 	//Changing
 	saber_colors_t	saberColor = client->ps.saberColor;
-	if (cg_debugSaberCombat.integer)
-	{
-		if (vr->saberBlockDebounce > cg.time)
-		{
-			saberColor = SABER_RED;
-		}
-	}
 
 #define SABER_TRAIL_TIME	60.0f
 
