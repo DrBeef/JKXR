@@ -1940,10 +1940,6 @@ static void CG_DrawSkyBoxPortal(void)
 	cg.refdef.fov_y = fov_y;
 */
 
-	//Don't need any special adjustment for the sky box afaik
-	VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
-	AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
-
 	//inherit fov and axis from whatever the player is doing (regular, camera overrides or zoomed, whatever)
 	if ( !cg.hyperspace )
 	{
@@ -2172,6 +2168,92 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 	}
 
 	cg.refdef.time = cg.time;
+
+
+	//Calculate all angles upfront
+	{
+		//Only vehicle in JK2 is the AT-ST
+		vr->in_vehicle = (g_entities[0].client &&
+						  g_entities[0].client->NPC_class == CLASS_ATST);
+		vr->remote_npc = !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname );
+		vr->remote_droid = false;
+		vr->remote_turret = false;
+		vr->emplaced_gun = ( cg_entities[cg.snap->ps.clientNum].currentState.eFlags & EF_LOCKED_TO_WEAPON );
+		in_misccamera = false;
+
+		if (cg.snap->ps.viewEntity) {
+
+			if (g_entities[cg.snap->ps.viewEntity].NPC_type) {
+				char modelName[256];
+				Q_strncpyz(modelName, g_entities[cg.snap->ps.viewEntity].NPC_type, sizeof modelName);
+
+				vr->remote_droid = vr->remote_npc &&
+								   (!Q_stricmp("gonk", modelName) || !Q_stricmp("seeker", modelName) ||
+									!Q_stricmp("remote", modelName)
+									|| !Q_strncmp("r2d2", modelName, 4) ||
+									!Q_strncmp("r5d2", modelName, 4) || !Q_stricmp("mouse", modelName));
+			}
+
+			vr->remote_turret = (!Q_stricmp("misc_panel_turret",
+											g_entities[cg.snap->ps.viewEntity].classname));
+			in_misccamera = (!Q_stricmp("misc_camera", g_entities[cg.snap->ps.viewEntity].classname))
+							|| vr->remote_droid
+							|| vr->remote_turret;
+		}
+
+		cg.refdef.worldscale = cg_worldScale.value;
+
+		bool usingScope = (cg.zoomMode == 2 || cg.zoomMode == 4);
+		//Normal 1st person view angles
+		if (!in_camera &&
+			!in_misccamera &&
+			!vr->remote_droid &&
+			!vr->remote_npc &&
+			!usingScope &&
+			!cg.renderingThirdPerson)
+		{
+			VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
+			cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
+										SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
+			AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+		}
+
+		//Controlling an NPC that isn't a droid
+		if (vr->remote_npc &&
+			!vr->remote_droid)
+		{
+			if (vr->remote_cooldown > cg.time)
+			{
+				VectorCopy(cg.refdefViewAngles, vr->remote_angles);
+				vr->take_snap = true;
+			}
+			VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
+			cg.refdef.viewangles[YAW] = vr->remote_angles[YAW] + (vr->hmdorientation[YAW] - vr->hmdorientation_snap[YAW]) + (vr->snapTurn - vr->remote_snapTurn);
+			AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+		}
+
+		//Sniper/E11 scope
+		if (usingScope)
+		{
+			cg.refdef.viewangles[ROLL] = vr->clientviewangles[ROLL];
+			cg.refdef.viewangles[PITCH] = vr->weaponangles[ANGLES_ADJUSTED][PITCH];
+			cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW]
+										+ vr->weaponangles[ANGLES_ADJUSTED][YAW] + SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
+			AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+		}
+
+		//Normal 3rd person view angles
+		if (!in_camera &&
+			!in_misccamera &&
+			cg.renderingThirdPerson)
+		{
+			VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
+			cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
+										(vr->hmdorientation[YAW] - vr->hmdorientation_first[YAW]) +
+										SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
+			AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
+		}
+	}
 
 	CG_DrawSkyBoxPortal();
 
