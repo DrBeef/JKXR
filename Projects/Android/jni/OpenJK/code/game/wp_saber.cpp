@@ -160,6 +160,9 @@ void WP_ForcePowerDrain( gentity_t *self, forcePowers_t forcePower, int override
 void WP_DeactivateSaber( gentity_t *self, qboolean clearLength = qfalse );
 qboolean FP_ForceDrainGrippableEnt( gentity_t *victim );
 
+extern cvar_t	*g_TeamBeefDirectorsCut;
+
+extern cvar_t	*g_saberAutoDeflect1stPerson;
 extern cvar_t	*g_saberAutoBlocking;
 extern cvar_t	*g_saberRealisticCombat;
 extern cvar_t	*g_saberDamageCapping;
@@ -7994,9 +7997,12 @@ void WP_SaberUpdate( gentity_t *self, usercmd_t *ucmd )
 		else if ( self->client->ps.saberBlocking == BLK_TIGHT
 			|| self->client->ps.saberBlocking == BLK_WIDE )
 		{//FIXME: keep bbox in front of player, even when wide?
+			bool autoBlocking = (cg_thirdPerson.integer && g_saberAutoBlocking->integer) ||
+								(!cg_thirdPerson.integer && g_saberAutoDeflect1stPerson->integer);
 			vec3_t	saberOrg;
 			if ( !forceBlock
-				&& ( (self->s.number&&!Jedi_SaberBusy(self)&&!g_saberRealisticCombat->integer) || (self->s.number == 0 && self->client->ps.saberBlocking == BLK_WIDE && (g_saberAutoBlocking->integer||self->client->ps.saberBlockingTime>level.time)) )
+				&& ( (self->s.number&&!Jedi_SaberBusy(self)&&!g_saberRealisticCombat->integer) ||
+					(self->s.number == 0 && self->client->ps.saberBlocking == BLK_WIDE && (autoBlocking||self->client->ps.saberBlockingTime>level.time)) )
 				&& self->client->ps.weaponTime <= 0
 				&& !G_InCinematicSaberAnim( self ) )
 			{//full-size blocking for non-attacking player with g_saberAutoBlocking on

@@ -588,7 +588,7 @@ void G_InitCvars( void ) {
 
 	g_TeamBeefDirectorsCut = gi.cvar( "g_TeamBeefDirectorsCut", "1", CVAR_ARCHIVE ); // Team Beef Director's Cut tweaks
 
-	g_saberAutoDeflect1stPerson = gi.cvar( "g_saberAutoDeflect1stPerson", "0", CVAR_ARCHIVE|CVAR_CHEAT );//Whether the saber will auto deflect missiles in first person
+	g_saberAutoDeflect1stPerson = gi.cvar( "g_saberAutoDeflect1stPerson", "0", CVAR_ARCHIVE );//Whether the saber will auto deflect missiles in first person
 	g_saberAutoBlocking = gi.cvar( "g_saberAutoBlocking", "0", CVAR_ARCHIVE|CVAR_CHEAT );//must press +block button to do any blocking
 	g_saberRealisticCombat = gi.cvar( "g_saberRealisticCombat", "1", CVAR_ARCHIVE );//makes collision more precise, increases damage
 	g_saberMoveSpeed = gi.cvar( "g_saberMoveSpeed", "1", CVAR_ARCHIVE|CVAR_CHEAT );//how fast you run while attacking with a saber
