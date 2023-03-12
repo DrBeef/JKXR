@@ -6121,6 +6121,8 @@ Ghoul2 Insert Start
 
 			if (!cent->gent->client->ps.saberInFlight &&
 				CG_getPlayer1stPersonSaber(cent) &&
+				!in_misccamera &&
+				!in_camera &&
 				cent->gent->client->ps.saberLockEnemy == ENTITYNUM_NONE)
 			{
 				vec3_t angles;
@@ -6796,31 +6798,55 @@ Ghoul2 Insert End
 
 		cgi_HapticEvent("shotgun_fire", 0, 0, 100, 0, 0);
 	}
-	
-/*	if (CG_getPlayer1stPersonSaber(cent) &&
+
+	//Draw the saber hilts in the appropriate locked location
+	if (CG_getPlayer1stPersonSaber(cent) &&
 		cent->gent->client->ps.saberLockEnemy != ENTITYNUM_NONE)
 	{
-		refEntity_t hiltEnt;
-		memset( &hiltEnt, 0, sizeof(refEntity_t) );
+		int	numSabers = 1;
+		if ( cent->gent->client->ps.dualSabers )
+		{
+			numSabers = 2;
+		}
+		for ( int saberNum = 0; saberNum < numSabers; saberNum++ )
+		{
+			if (saberNum == 0 && cent->currentState.saberInFlight)
+			{
+				continue;
+			}
 
-		hiltEnt.hModel = cgs.media.saberHilt;
+			refEntity_t hiltEnt;
+			memset( &hiltEnt, 0, sizeof(refEntity_t) );
 
-		VectorCopy(org_, hiltEnt.origin);
-		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
-		vectoangles(axis_[0], hiltEnt.angles);
+			VectorCopy(org_, hiltEnt.origin);
+			VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
+			vectoangles(axis_[0], hiltEnt.angles);
 
-		vec3_t axis[3];
-		AnglesToAxis(hiltEnt.angles, axis);
-		VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
-		VectorCopy(axis[1], hiltEnt.axis[1]);
-		VectorCopy(axis[0], hiltEnt.axis[2]);
-		VectorMA(hiltEnt.origin, 1.0f, hiltEnt.axis[2], hiltEnt.origin);
-		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
+			int saberModelIndex = G_ModelIndex( cent->gent->client->ps.saber[saberNum].model );
+			if (saberModelIndex != cg.saberModelIndex[saberNum])
+			{
+				if (cg.saber_ghoul2[saberNum].size() != 0)
+				{
+					gi.G2API_RemoveGhoul2Model(cg.saber_ghoul2[saberNum], cg.saberG2Num[saberNum]);
+				}
+				cg.saberG2Num[saberNum] = gi.G2API_InitGhoul2Model( cg.saber_ghoul2[saberNum], cent->gent->client->ps.saber[saberNum].model, saberModelIndex , NULL_HANDLE, NULL_HANDLE, 0, 0 );
+				cg.saberModelIndex[saberNum] = saberModelIndex;
+			}
+			hiltEnt.ghoul2 = &cg.saber_ghoul2[saberNum];
+			hiltEnt.hModel = cgs.model_draw[0];
+			VectorSet( hiltEnt.modelScale, 0.8f, 0.8f, 0.8f ); // Scale down slightly or they are all just too big
+			hiltEnt.radius = 60;
 
-		cgi_R_AddRefEntityToScene(&hiltEnt);
+			vec3_t axis[3];
+			AnglesToAxis(hiltEnt.angles, axis);
+			VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
+			VectorCopy(axis[1], hiltEnt.axis[1]);
+			VectorCopy(axis[0], hiltEnt.axis[2]);
+			VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
+
+			cgi_R_AddRefEntityToScene(&hiltEnt);
+		}
 	}
-*/
-
 }
 
 void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, int renderfx, int modelIndex, vec3_t origin, vec3_t angles )
@@ -8480,11 +8506,12 @@ Ghoul2 Insert End
 
 	}
 
-	if (CG_getPlayer1stPersonSaber(cent) && !vr->item_selector &&
-			cent->gent->client->ps.saberLockEnemy == ENTITYNUM_NONE)
+	if (CG_getPlayer1stPersonSaber(cent) &&
+		!vr->item_selector &&
+		!in_misccamera &&
+		!in_camera &&
+		cent->gent->client->ps.saberLockEnemy == ENTITYNUM_NONE)
 	{
-		gentity_t *main_saber = &g_entities[cent->gent->client->ps.saberEntityNum];
-
 		int	numSabers = 1;
 		if ( cent->gent->client->ps.dualSabers )
 		{
@@ -8508,7 +8535,6 @@ Ghoul2 Insert End
 				if (cg.saber_ghoul2[saberNum].size() != 0)
 				{
 					gi.G2API_RemoveGhoul2Model(cg.saber_ghoul2[saberNum], cg.saberG2Num[saberNum]);
-					//cg.saber_ghoul2[saberNum].clear();
 				}
 				cg.saberG2Num[saberNum] = gi.G2API_InitGhoul2Model( cg.saber_ghoul2[saberNum], cent->gent->client->ps.saber[saberNum].model, saberModelIndex , NULL_HANDLE, NULL_HANDLE, 0, 0 );
 				cg.saberModelIndex[saberNum] = saberModelIndex;
