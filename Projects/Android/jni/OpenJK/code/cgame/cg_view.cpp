@@ -2131,7 +2131,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 	);
 
 	vr->third_person = cg.renderingThirdPerson;
-	vr->dualsabers = player->client->ps.dualSabers;
+	vr->dualsabers = player->client->ps.dualSabers && cg.snap->ps.weapon == WP_SABER;
 
 	if ( cg.zoomMode )
 	{
