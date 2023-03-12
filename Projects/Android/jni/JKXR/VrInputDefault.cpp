@@ -372,8 +372,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     vr.primaryVelocityTriggeredAttack = (vr.primaryswingvelocity >
                                                          vr_weapon_velocity_trigger->value);
                     //player has to be dual wielding for this to be true
-                    vr.secondaryVelocityTriggeredAttack = vr.dualsabers && (vr.secondaryswingvelocity >
-                                                                            vr_weapon_velocity_trigger->value);
+                    if (vr.dualsabers)
+                    {
+                        vr.secondaryVelocityTriggeredAttack = (vr.secondaryswingvelocity >
+                                                               vr_weapon_velocity_trigger->value);
+                    }
 
                     bool triggered = (vr.primaryVelocityTriggeredAttack || vr.secondaryVelocityTriggeredAttack);
                     if (fired != triggered)
