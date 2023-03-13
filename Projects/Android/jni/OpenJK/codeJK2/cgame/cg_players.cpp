@@ -4792,6 +4792,8 @@ Ghoul2 Insert End
 	if (CG_getPlayer1stPersonSaber(cent) &&
 			cent->gent->client->ps.saberLockEnemy != ENTITYNUM_NONE)
 	{
+		cgi_HapticEvent("shotgun_fire", 0, 0, 100, 0, 0);
+
 		refEntity_t hiltEnt;
 		memset( &hiltEnt, 0, sizeof(refEntity_t) );
 
