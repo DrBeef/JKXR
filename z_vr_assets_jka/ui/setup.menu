@@ -2418,22 +2418,28 @@
 
 		itemDef 
 		{	
-			name				text
+			name				use_ragdolls
 			group				options
       			type				ITEM_TYPE_MULTI
-			text				@MENUS_TEXT
-			cvar				"se_language"
-			feeder				23	//FEEDER_PLAYER_SPECIES
-			cvarStrList			feeder
-			rect				260 328 340 14
+			text				@MENUS_VR_USE_RAGDOLLS_ITEM
+			cvar				"broadsword"
+			cvarFloatList		
+			{ 
+				@MENUS_VR_USE_RAGDOLLS_NEVER	0
+				@MENUS_VR_USE_RAGDOLLS_DELAYED	1
+				@MENUS_VR_USE_RAGDOLLS_INSTANT	2
+			}
+			cvarTest			ui_iscensored
+			hideCvar			{ 1 }
+			rect				260 314 340 14
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
 			font 				4
 			textscale 			1
 			forecolor			.615 .615 .956 1
-			visible			0
-			descText			@MENUS_CHOOSE_THE_LANGUAGE_FOR
+			visible				0
+			descText			@MENUS_VR_USE_RAGDOLLS_DESC
 
 			action
 			{
@@ -2441,30 +2447,23 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight11
+				show			highlight10
 			}
 			mouseexit 
 			{ 
-				hide			highlight11
+				hide			highlight10
 			} 
 		}
 
 		itemDef 
 		{	
-			name				voice
+			name				text
 			group				options
       			type				ITEM_TYPE_MULTI
-			text				@MENUS_VOICE
-			cvarTest			com_demo
-			hideCvar			{ 1 }     
-			cvar				"s_language"
-			cvarStrList		
-			{ 
-				"English",	"english"
-				@MENUS_LANG_FRENCH 	"francais"
-				"Deutsch"	"deutsch"
-				"Espa�ol"   "espanol"
-			}
+			text				@MENUS_TEXT
+			cvar				"se_language"
+			feeder				23	//FEEDER_PLAYER_SPECIES
+			cvarStrList			feeder
 			rect				260 342 340 14
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
@@ -2473,7 +2472,7 @@
 			textscale 			1
 			forecolor			.615 .615 .956 1
 			visible			0
-			descText			@MENUS_CHOOSE_THE_LANGUAGE_TO
+			descText			@MENUS_CHOOSE_THE_LANGUAGE_FOR
 
 			action
 			{
@@ -2494,6 +2493,46 @@
 			name				voice
 			group				options
       			type				ITEM_TYPE_MULTI
+			text				@MENUS_VOICE
+			cvarTest			com_demo
+			hideCvar			{ 1 }     
+			cvar				"s_language"
+			cvarStrList		
+			{ 
+				"English",	"english"
+				@MENUS_LANG_FRENCH 	"francais"
+				"Deutsch"	"deutsch"
+				"Espa�ol"   "espanol"
+			}
+			rect				260 356 340 14
+	   		textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font 				4
+			textscale 			1
+			forecolor			.615 .615 .956 1
+			visible			0
+			descText			@MENUS_CHOOSE_THE_LANGUAGE_TO
+
+			action
+			{
+				play			"sound/interface/button1.wav"
+			}
+			mouseenter 
+			{ 
+				show			highlight13
+			}
+			mouseexit 
+			{ 
+				hide			highlight13
+			} 
+		}
+
+		itemDef 
+		{	
+			name				voice
+			group				options
+      			type				ITEM_TYPE_MULTI
 			text				@MENUS_SUBTITLES
 			cvar				"g_subtitles"
 			cvarFloatList		
@@ -2502,7 +2541,7 @@
 				@MENUS_IN_CINEMATICS	2 
 //				@MENUS_ALL_VOICEOVERS	1 
 			}
-			rect				260 356 340 14
+			rect				260 370 340 14
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -2518,11 +2557,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight13
+				show			highlight14
 			}
 			mouseexit 
 			{ 
-				hide			highlight13
+				hide			highlight14
 			} 
 		}
 

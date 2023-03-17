@@ -593,4 +593,24 @@ REFERENCE           USABLE_OBJECT_HINT_DESC
 LANG_ENGLISH        "Show icon when looking at objects that can be used."
 LANG_GERMAN         "#same"
 
+REFERENCE           USE_RAGDOLLS_ITEM
+LANG_ENGLISH        "Use Ragdolls:"
+LANG_GERMAN         "#same"
+
+REFERENCE           USE_RAGDOLLS_DESC
+LANG_ENGLISH        "Use ragdolls for dead enemy bodies."
+LANG_GERMAN         "#same"
+
+REFERENCE           USE_RAGDOLLS_NEVER
+LANG_ENGLISH        "Never"
+LANG_GERMAN         "#same"
+
+REFERENCE           USE_RAGDOLLS_DELAYED
+LANG_ENGLISH        "Delayed"
+LANG_GERMAN         "#same"
+
+REFERENCE           USE_RAGDOLLS_INSTANT
+LANG_ENGLISH        "Instant"
+LANG_GERMAN         "#same"
+
 ENDMARKER
