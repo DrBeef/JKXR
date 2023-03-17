@@ -2596,7 +2596,7 @@
 			group				difficulty
       type				ITEM_TYPE_MULTI
 			text				@MENUS_VR_SABER_REALISM_ITEM
-			cvar				"g_saberRealisticCombat"
+			cvar				"g_saberMoreRealistic"
 			cvarFloatList		
 			{ 
 				@MENUS_VR_SABER_REALISM_DEFAULT 0 
