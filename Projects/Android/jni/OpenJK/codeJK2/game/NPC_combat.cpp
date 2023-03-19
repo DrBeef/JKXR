@@ -2036,7 +2036,7 @@ int NPC_ShotEntity( gentity_t *ent, vec3_t impactPos )
 
 	int location = Q_irand(0, 9);
 	if (location <= 4 || cg.renderingThirdPerson ||
-		ent->client->ps.clientNum != 0) { //50% chance (unless ent is not the player, then always go for chest, which is original behaviour)
+			ent->client == NULL || ent->client->ps.clientNum != 0) { //50% chance (unless ent is not the player, then always go for chest, which is original behaviour)
 		CalcEntitySpot(ent, SPOT_CHEST, targ);
 	} else if (location <= 7) { //30% chance
 		CalcEntitySpot(ent, SPOT_LEGS, targ);
