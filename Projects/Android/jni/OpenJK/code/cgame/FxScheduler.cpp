@@ -999,14 +999,41 @@ void CFxScheduler::CreateEffect( CPrimitiveTemplate *fx, int clientID, int delay
 	case Particle:
 	//---------
 
-		FX_AddParticle( clientID, org, vel, accel, fx->mGravity.GetVal(),
-						fx->mSizeStart.GetVal(), fx->mSizeEnd.GetVal(), fx->mSizeParm.GetVal(),
-						fx->mAlphaStart.GetVal(), fx->mAlphaEnd.GetVal(), fx->mAlphaParm.GetVal(),
-						sRGB, eRGB, fx->mRGBParm.GetVal(),
-						fx->mRotation.GetVal(), fx->mRotationDelta.GetVal(),
-						fx->mMin, fx->mMax, fx->mElasticity.GetVal(),
-						fx->mDeathFxHandles.GetHandle(), fx->mImpactFxHandles.GetHandle(),
-						fx->mLife.GetVal(), fx->mMediaHandles.GetHandle(), flags );
+		if ( clientID >= 0 && clientID < ENTITYNUM_WORLD )
+		{
+			if (clientID == 0)
+			{
+				flags = fx->mFlags | FX_DEPTH_HACK;	
+			}
+
+			// ..um, ok.....
+			centity_t *cent = &cg_entities[clientID];
+
+			if (cent && cent->gent && cent->gent->client)
+			{
+				FX_AddParticle(-1, cent->gent->client->renderInfo.muzzlePoint, vel, accel, fx->mGravity.GetVal(),
+							   fx->mSizeStart.GetVal(), fx->mSizeEnd.GetVal(), fx->mSizeParm.GetVal(),
+							   fx->mAlphaStart.GetVal(), fx->mAlphaEnd.GetVal(),
+							   fx->mAlphaParm.GetVal(),
+							   sRGB, eRGB, fx->mRGBParm.GetVal(),
+							   fx->mRotation.GetVal(), fx->mRotationDelta.GetVal(),
+							   fx->mMin, fx->mMax, fx->mElasticity.GetVal(),
+							   fx->mDeathFxHandles.GetHandle(), fx->mImpactFxHandles.GetHandle(),
+							   fx->mLife.GetVal(), fx->mMediaHandles.GetHandle(), flags);
+			}
+		}
+		else
+		{
+			FX_AddParticle(clientID, org, vel, accel, fx->mGravity.GetVal(),
+						   fx->mSizeStart.GetVal(), fx->mSizeEnd.GetVal(), fx->mSizeParm.GetVal(),
+						   fx->mAlphaStart.GetVal(), fx->mAlphaEnd.GetVal(),
+						   fx->mAlphaParm.GetVal(),
+						   sRGB, eRGB, fx->mRGBParm.GetVal(),
+						   fx->mRotation.GetVal(), fx->mRotationDelta.GetVal(),
+						   fx->mMin, fx->mMax, fx->mElasticity.GetVal(),
+						   fx->mDeathFxHandles.GetHandle(), fx->mImpactFxHandles.GetHandle(),
+						   fx->mLife.GetVal(), fx->mMediaHandles.GetHandle(), flags);
+		}
 		break;
 
 	//---------
