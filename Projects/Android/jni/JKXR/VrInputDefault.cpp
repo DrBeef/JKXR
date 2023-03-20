@@ -87,6 +87,20 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         secondaryButton2 = offButton2;
     }
 
+    {
+        bool offhandX = (pOffTrackedRemoteNew->Buttons & xrButton_X);
+        if ((offhandX != (pOffTrackedRemoteOld->Buttons & xrButton_X)) &&
+                offhandX)
+#ifndef DEBUG
+        {
+        }
+#else
+        {
+            //Cvar_Set("vr_control_scheme", "99");
+        }
+#endif
+    }
+
     //Set controller angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
     {
         vec3_t rotation = {0};

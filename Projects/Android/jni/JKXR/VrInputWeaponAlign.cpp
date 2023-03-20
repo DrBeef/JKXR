@@ -151,17 +151,19 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
             }
         }
 
-        bool offhandGripPushed = (pOffTrackedRemoteNew->Buttons & xrButton_GripTrigger);
-        if ( (offhandGripPushed != (pOffTrackedRemoteOld->Buttons & xrButton_GripTrigger)) &&
-             offhandGripPushed)
-#ifndef DEBUG
         {
+            bool offhandX = (pOffTrackedRemoteNew->Buttons & xrButton_X);
+            if ((offhandX != (pOffTrackedRemoteOld->Buttons & xrButton_X)) &&
+                offhandX)
+#ifndef DEBUG
+                {
         }
 #else
-        {
-            Cvar_Set("vr_control_scheme", "0");
-        }
+            {
+                Cvar_Set("vr_control_scheme", "0");
+            }
 #endif
+        }
 
 
         //Next Weapon with A
