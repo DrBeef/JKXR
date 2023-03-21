@@ -129,15 +129,9 @@ float clamp(float _min, float _val, float _max)
     return fmax(fmin(_val, _max), _min);
 }
 
-void interactWithTouchScreen(bool reset, ovrInputStateTrackedRemote *newState, ovrInputStateTrackedRemote *oldState) {
-
-    static float centerYaw = 0;
-    if (reset || Q_isnan(centerYaw) || fabs(sinf(DEG2RAD(vr.weaponangles[ANGLES_ADJUSTED][YAW]-centerYaw))) > 0.9f)
-    {
-        centerYaw = vr.weaponangles[ANGLES_ADJUSTED][YAW];
-    }
-    float cursorX = -sinf(DEG2RAD(vr.weaponangles[ANGLES_ADJUSTED][YAW]-centerYaw)) + 0.5f;
-    float cursorY = (float)(vr.weaponangles[ANGLES_ADJUSTED][PITCH] / 90.0) + 0.5f;
+void interactWithTouchScreen(float menuYaw, vec3_t controllerAngles) {
+    float cursorX = -sinf(DEG2RAD(controllerAngles[YAW] - menuYaw)) + 0.5f;
+    float cursorY = (float)(controllerAngles[PITCH] / 90.0) + 0.5f;
 
     PortableMouseAbs(cursorX, cursorY);
 }
