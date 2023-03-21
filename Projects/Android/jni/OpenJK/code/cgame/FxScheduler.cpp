@@ -999,19 +999,15 @@ void CFxScheduler::CreateEffect( CPrimitiveTemplate *fx, int clientID, int delay
 	case Particle:
 	//---------
 
-		if ( clientID >= 0 && clientID < ENTITYNUM_WORLD )
+        //Special handling for player muzzle flashes
+		if ( clientID == 0 )
 		{
-			if (clientID == 0)
-			{
-				flags = fx->mFlags | FX_DEPTH_HACK;	
-			}
+			flags = fx->mFlags | FX_DEPTH_HACK;
 
-			// ..um, ok.....
 			centity_t *cent = &cg_entities[clientID];
-
 			if (cent && cent->gent && cent->gent->client)
 			{
-				FX_AddParticle(-1, cent->gent->client->renderInfo.muzzlePoint, vel, accel, fx->mGravity.GetVal(),
+                FX_AddParticle(-1, cent->gent->client->renderInfo.muzzlePoint, vel, accel, fx->mGravity.GetVal(),
 							   fx->mSizeStart.GetVal(), fx->mSizeEnd.GetVal(), fx->mSizeParm.GetVal(),
 							   fx->mAlphaStart.GetVal(), fx->mAlphaEnd.GetVal(),
 							   fx->mAlphaParm.GetVal(),
@@ -1024,6 +1020,7 @@ void CFxScheduler::CreateEffect( CPrimitiveTemplate *fx, int clientID, int delay
 		}
 		else
 		{
+            //Default behaviour
 			FX_AddParticle(clientID, org, vel, accel, fx->mGravity.GetVal(),
 						   fx->mSizeStart.GetVal(), fx->mSizeEnd.GetVal(), fx->mSizeParm.GetVal(),
 						   fx->mAlphaStart.GetVal(), fx->mAlphaEnd.GetVal(),

@@ -437,7 +437,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 VectorAdd(offhandPositionAverage, vr.offhandposition[i], offhandPositionAverage);
             }
             VectorScale(offhandPositionAverage, 0.2f, offhandPositionAverage);
-            if (vr.weapon_stabilised) {
+            if (vr.weapon_stabilised && !vr.dualsabers) {
                 if (vr_virtual_stock->integer == 1 || vr.cgzoommode == 2 || vr.cgzoommode == 4) {
                     //offset to the appropriate eye a little bit
                     vec2_t xy = {0, 0};
@@ -463,17 +463,22 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 }
                 else
                 {
-                    float x =
-                            pOff->Pose.position.x - pWeapon->Pose.position.x;
-                    float y =
-                            pOff->Pose.position.y - pWeapon->Pose.position.y;
-                    float z =
-                            pOff->Pose.position.z - pWeapon->Pose.position.z;
-                    float zxDist = length(x, z);
+                    vec3_t delta;
+                    delta[0] = pOff->Pose.position.x - pWeapon->Pose.position.x;
+                    delta[1] = pOff->Pose.position.y - pWeapon->Pose.position.y;
+                    delta[2] = pOff->Pose.position.z - pWeapon->Pose.position.z;
 
-                    if (zxDist != 0.0f && z != 0.0f) {
-                        VectorSet(vr.weaponangles[ANGLES_ADJUSTED], -RAD2DEG(atanf(y / zxDist)),
-                                  -RAD2DEG(atan2f(x, -z)), vr.weaponangles[ANGLES_ADJUSTED][ROLL] /
+                    int anglesToSet = ANGLES_ADJUSTED;
+                    if (cl.frame.ps.weapon == WP_SABER)
+                    {
+                        anglesToSet = ANGLES_SABER;
+                        VectorNegate(delta, delta);
+                    }
+
+                    float zxDist = length(delta[0], delta[2]);
+                    if (zxDist != 0.0f && delta[2] != 0.0f) {
+                        VectorSet(vr.weaponangles[anglesToSet], -RAD2DEG(atanf(delta[1] / zxDist)),
+                                  -RAD2DEG(atan2f(delta[0], -delta[2])), vr.weaponangles[anglesToSet][ROLL] /
                                                            2.0f); //Dampen roll on stabilised weapon
                     }
                 }
@@ -575,21 +580,39 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 */
 
             // Check quicksave
+            static bool indicateQuickSave = true;
             if (canUseQuickSave) {
-                int channel = (vr_control_scheme->integer >= 10) ? 1 : 0;
-                TBXR_Vibrate(40, channel, 0.5); // vibrate to let user know they can switch
-
-                if (((pOffTrackedRemoteNew->Buttons & offButton1) !=
-                     (pOffTrackedRemoteOld->Buttons & offButton1)) &&
-                    (pOffTrackedRemoteNew->Buttons & offButton1)) {
-                    sendButtonActionSimple("savegame quicksave");
+                int channel = (vr_control_scheme->integer >= 10) ? 2 : 1;
+                if (indicateQuickSave)
+                {
+                    TBXR_Vibrate(40, channel, 0.5); // vibrate to let user know they can switch
+                    indicateQuickSave = false;
                 }
 
-                if (((pOffTrackedRemoteNew->Buttons & offButton2) !=
-                     (pOffTrackedRemoteOld->Buttons & offButton2)) &&
-                    (pOffTrackedRemoteNew->Buttons & offButton2)) {
-                    sendButtonActionSimple("loadgame quicksave");
+                if (((secondaryButtonsNew & secondaryButton1) !=
+                     (secondaryButtonsOld & secondaryButton1)) &&
+                    (secondaryButtonsNew & secondaryButton1)) {
+#ifdef JK2_MODE
+                    sendButtonActionSimple("save quik*");
+#else
+                    sendButtonActionSimple("save quick");
+#endif
                 }
+
+                if (((secondaryButtonsNew & secondaryButton2) !=
+                     (secondaryButtonsOld & secondaryButton2)) &&
+                    (secondaryButtonsNew & secondaryButton2)) {
+#ifdef JK2_MODE
+                    sendButtonActionSimple("load quik");
+#else
+                    sendButtonActionSimple("load quick");
+#endif
+                }
+            }
+            else
+            {
+                //Next time we can quick save, allow a haptic blip
+                indicateQuickSave = true;
             }
         }
 
