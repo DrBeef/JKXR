@@ -236,6 +236,17 @@ import java.util.Vector;
 			copy_asset_with_rename("/sdcard/JKXR/JK2/base", "openjo_sp_pico.cfg", "openjo_sp.cfg", false);
 		}
 
+		//Bunch of cool mods and their credits - only copy if user wants them
+		if (!new File("/sdcard/JKXR/JK2/base/no_copy").exists()) {
+			copy_asset("/sdcard/JKXR/JK2/base", "packaged_mods_credits.txt", false);
+			copy_asset("/sdcard/JKXR/JK2/base", "GGDynamicWeapons.pk3", false);
+			copy_asset("/sdcard/JKXR/JK2/base", "Kyle's_lightsaber_hilt_hd.pk3", false);
+
+			//Weapon Models
+			copy_asset("/sdcard/JKXR/JK2/base", "z_Crusty_and_Elin_vr_weapons.pk3", false);
+			copy_asset("/sdcard/JKXR/JK3/base", "z_Crusty_and_Elin_vr_weapons.pk3", false);
+		}
+
 		//Read these from a file and pass through
 		commandLineParams = new String("jo");
 
