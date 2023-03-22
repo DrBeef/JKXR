@@ -464,7 +464,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     }
 
                     float x = offhandPositionAverage[0] - (vr.hmdposition[0] + xy[0]);
-                    float y = offhandPositionAverage[1] - (vr.hmdposition[1]);
+                    float y = (offhandPositionAverage[1] + 0.12f) - (vr.hmdposition[1]);
                     float z = offhandPositionAverage[2] - (vr.hmdposition[2] + xy[1]);
                     float zxDist = length(x, z);
 
