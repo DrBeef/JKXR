@@ -882,6 +882,26 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 {
                     vec3_t start, end, chest;
 
+                    vec3_t offhandRightXY = {};
+                    vec3_t hmdForwardXY = {};
+                    float hmdToOffhandDotProduct = 0;
+                    AngleVectors(vr.hmdorientation, hmdForwardXY, NULL, NULL);
+                    AngleVectors(vr.offhandangles[ANGLES_DEFAULT], NULL, offhandRightXY, NULL);
+
+                    hmdForwardXY[1] = 0;
+                    VectorNormalize(hmdForwardXY);
+
+                    offhandRightXY[1] = 0;
+                    VectorNormalize(offhandRightXY);
+
+                    hmdToOffhandDotProduct = DotProduct(hmdForwardXY, offhandRightXY);
+                    bool palmAway = hmdToOffhandDotProduct > 0;
+                    if (!vr.right_handed)
+                    {
+                        //Opposite direction for the other controller
+                        palmAway = !palmAway;
+                    }
+
                     //Estimate that middle of chest is about 20cm below HMD
                     VectorCopy(vr.hmdposition, chest);
                     chest[1] -= 0.2f;
@@ -889,9 +909,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     VectorSubtract(vr.offhandposition[0], chest, end);
                     float deltaLength = VectorLength(end) - VectorLength(start);
                     if (fabs(deltaLength) > vr_force_distance_trigger->value) {
-                        if (deltaLength < 0) {
+                        if (deltaLength < 0 && !palmAway)
+                        {
                             sendButtonActionSimple(va("useGivenForce %i", FP_PULL));
-                        } else {
+                        }
+                        else if (deltaLength > 0 && palmAway)
+                        {
                             sendButtonActionSimple(va("useGivenForce %i", FP_PUSH));
                         }
 
