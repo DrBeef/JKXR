@@ -1,0 +1,57 @@
+The following excellent mods were included in the apk:
+
+
+Author:
+Grab
+
+File name:
+GGDynamicWeapons v1.0
+
+Description:
+Dynamic light for weapons effects
+
+Instalation:
+Take one of these .pk3's and put it into your base folder.
+
+Known issues:
+Probably only Seeker's shots are missing dynamic lightning. Might be fixed in future.
+
+Copyright:
+Grab
+
+
+
+
+=============================================================================================================================
+
+
+TITLE: KYLE'S LIGHTSABER HILT HD
+AUTHORS: CPT. BROSKI / PUNISHER
+FILE NAME: kyle's_lightsaber_hilt_hd.pk3
+FILE SIZE: 1.6 MB
+DATE RELEASED: 21 JULY 2021
+
+DESCRIPTION: This mod replaces Kyle's original lightsaber with a new model.
+The model is based entirely on the in-game model, but it uses better shaders to shine.
+INSTALL: Put the hilt_lightsaber_kyle's_hd.pk3 to your Jedi Outcast\GameData\base folder.
+UNINSTALL: Remove the hilt_lightsaber_kyle's_hd.pk3 from your Jedi Outcast\GameData\base folder.
+BUGS: none
+
+THIS MODIFICATION IS NOT MADE, DISTRIBUTED, OR SUPPORTED BY ACTIVISION, RAVEN, OR LUCASARTS ENTERTAINMENT COMPANY LLC. ELEMENTS TM & © LUCASARTS ENTERTAINMENT COMPANY LLC AND/OR ITS LICENSORS.
+
+
+
+
+=============================================================================================================================
+
+
+TITLE: Vince Crusty and Elin's VR Fully Modeled Weapons Pack
+AUTHORS: Elin and Vince Crusty
+FILE NAME: z_Crusty_and_Elin_vr_weapons.pk3
+FILE SIZE: 1.0 MB
+DATE RELEASED: 21 MAR 2023
+
+DESCRIPTION: This mod replaces all the Jedi Outcast weapons with fully modeled weapons for use in VR
+
+THIS MODIFICATION IS NOT MADE, DISTRIBUTED, OR SUPPORTED BY ACTIVISION, RAVEN, OR LUCASARTS ENTERTAINMENT COMPANY LLC. ELEMENTS TM & © LUCASARTS ENTERTAINMENT COMPANY LLC AND/OR ITS LICENSORS.
+
