@@ -168,14 +168,7 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
             bool offhandX = (pOffTrackedRemoteNew->Buttons & xrButton_X);
             if ((offhandX != (pOffTrackedRemoteOld->Buttons & xrButton_X)) &&
                 offhandX)
-#ifndef DEBUG
-                {
-        }
-#else
-            {
-                Cvar_Set("vr_control_scheme", "0");
-            }
-#endif
+            Cvar_Set("vr_control_scheme", "0");
         }
 
 
@@ -197,7 +190,7 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
         float* items[7] = {&vr.test_scale, &(vr.test_offset[0]), &(vr.test_offset[1]), &(vr.test_offset[2]),
                            &(vr.test_angles[PITCH]), &(vr.test_angles[YAW]), &(vr.test_angles[ROLL])};
         char*  item_names[7] = {"scale", "right", "up", "forward", "pitch", "yaw", "roll"};
-        float  item_inc[7] = {0.002, 0.02, 0.02, 0.02, 0.1, 0.1, 0.1};
+        float  item_inc[7] = {0.005, 0.02, 0.02, 0.02, 0.1, 0.1, 0.1};
 
 #define JOYX_SAMPLE_COUNT   4
         static float joyx[JOYX_SAMPLE_COUNT] = {0};
@@ -244,14 +237,6 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
 
         //Left-hand specific stuff
         {
-            if (((pOffTrackedRemoteNew->Buttons & offButton1) !=
-                (pOffTrackedRemoteOld->Buttons & offButton1)) &&
-                    (pOffTrackedRemoteOld->Buttons & offButton1)){
-                //If cheats enabled, give all weapons/pickups to player
-                Cbuf_AddText("give all\n");
-            }
-
-
             if (between(-0.2f, primaryJoystickX, 0.2f))
             {
                 if (pDominantTrackedRemoteNew->Joystick.y > 0.6f) {

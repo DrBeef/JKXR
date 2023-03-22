@@ -17,9 +17,9 @@ Authors		:	Simon Brown
 #include <client/client.h>
 #include <statindex.h>
 #include "android/sys_local.h"
-#include "weapons.h"
+
 #ifdef JK2_MODE
-#include "../OpenJK/codeJK2//game/weapons.h"
+#include "../OpenJK/codeJK2/game/weapons.h"
 #else
 #include "../OpenJK/code/game/weapons.h"
 #endif
@@ -91,18 +91,13 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         secondaryButton2 = offButton2;
     }
 
+    //Allow weapon alignment mode toggle on x
+    if (vr_align_weapons->value)
     {
         bool offhandX = (pOffTrackedRemoteNew->Buttons & xrButton_X);
         if ((offhandX != (pOffTrackedRemoteOld->Buttons & xrButton_X)) &&
                 offhandX)
-#ifndef DEBUG
-        {
-        }
-#else
-        {
-            //Cvar_Set("vr_control_scheme", "99");
-        }
-#endif
+        Cvar_Set("vr_control_scheme", "99");
     }
 
     //Set controller angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
