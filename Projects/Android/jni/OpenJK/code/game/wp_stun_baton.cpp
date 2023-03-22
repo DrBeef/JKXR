@@ -39,7 +39,7 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	vec3_t	angs, forward;
 	if ( BG_UseVRPosition(ent))
 	{
-		BG_CalculateVRWeaponPosition(muzzle, angs);
+		BG_CalculateVRSaberPosition(0, muzzle, angs);
 		AngleVectors(angs, forward, NULL, NULL);
 	}
 	else {

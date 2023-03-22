@@ -18,7 +18,11 @@ Authors		:	Simon Brown
 #include <statindex.h>
 #include "android/sys_local.h"
 #include "weapons.h"
-
+#ifdef JK2_MODE
+#include "../OpenJK/codeJK2//game/weapons.h"
+#else
+#include "../OpenJK/code/game/weapons.h"
+#endif
 
 void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, int capsule );
 
@@ -397,7 +401,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     ALOGV("**WEAPON EVENT**  veocity triggered -attack");
                     sendButtonAction("+attack", vr.secondaryVelocityTriggeredAttack);
                 }
-            } else if (cl.frame.ps.weapon == WP_SABER) {
+            } else if (cl.frame.ps.weapon == WP_SABER ||
+                    cl.frame.ps.weapon == WP_STUN_BATON) {
                 //Does weapon velocity trigger attack
                 if (vr.velocitytriggered) {
                     static bool fired = false;
@@ -410,7 +415,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                                                                vr_weapon_velocity_trigger->value);
                     }
 
-                    bool triggered = (vr.primaryVelocityTriggeredAttack || vr.secondaryVelocityTriggeredAttack);
+                    bool triggered = vr.primaryVelocityTriggeredAttack || (vr.dualsabers && vr.secondaryVelocityTriggeredAttack);
                     if (fired != triggered)
                     {
                         ALOGV("**WEAPON EVENT**  veocity triggered %s",
@@ -486,7 +491,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     delta[2] = pOff->Pose.position.z - pWeapon->Pose.position.z;
 
                     int anglesToSet = ANGLES_ADJUSTED;
-                    if (cl.frame.ps.weapon == WP_SABER)
+                    if (cl.frame.ps.weapon == WP_SABER ||
+                            cl.frame.ps.weapon == WP_STUN_BATON)
                     {
                         anglesToSet = ANGLES_SABER;
                         VectorNegate(delta, delta);

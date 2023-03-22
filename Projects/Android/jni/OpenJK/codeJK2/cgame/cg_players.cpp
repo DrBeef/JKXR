@@ -4890,7 +4890,7 @@ void CG_Player(centity_t *cent ) {
 
 	if (cent->gent->client->ps.clientNum == 0) {
 		vr->velocitytriggered = (!cg.renderingThirdPerson &&
-								 (cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE));
+								 (cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE || cg.snap->ps.weapon == WP_STUN_BATON));
 	}
 
 	//Get the player's light level for stealth calculations
