@@ -247,6 +247,24 @@ import java.util.Vector;
 			copy_asset("/sdcard/JKXR/JK3/base", "z_Crusty_and_Elin_vr_weapons.pk3", false);
 		}
 
+		//Copy mods to the demo folder if it exists, since the demo doesn't seem to be able to load mods from base
+		if (new File("/sdcard/JKXR/JK2/jk2demo/assets0.pk3").exists()) {
+
+			//Copy the weapon adjustment config - should we force overwrite?
+			copy_asset("/sdcard/JKXR/JK2/jk2demo", "weapons_vr_jo.cfg", true);
+
+			//Our assets
+			copy_asset("/sdcard/JKXR/JK2/jk2demo", "z_vr_assets.pk3", true);
+
+			//Bunch of cool mods and their credits - only copy if user wants them
+			copy_asset("/sdcard/JKXR/JK2/jk2demo", "packaged_mods_credits.txt", false);
+			copy_asset("/sdcard/JKXR/JK2/jk2demo", "GGDynamicWeapons.pk3", false);
+			copy_asset("/sdcard/JKXR/JK2/jk2demo", "Kyle's_lightsaber_hilt_hd.pk3", false);
+
+			//Weapon Models
+			copy_asset("/sdcard/JKXR/JK2/jk2demo", "z_Crusty_and_Elin_vr_weapons.pk3", false);
+		}
+
 		//Read these from a file and pass through
 		commandLineParams = new String("jo");
 
