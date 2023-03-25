@@ -21,7 +21,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
 // Current version of the single player game
-#include "../win32/AutoVersion.h"
+#define VERSION_STRING_DOTTED		"1.0.1.1"
 
 #ifdef _DEBUG
 	#define	Q3_VERSION		"(debug)OpenJK: v" VERSION_STRING_DOTTED

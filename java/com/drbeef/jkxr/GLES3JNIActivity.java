@@ -45,29 +45,6 @@ import java.util.Vector;
 	// Load the gles3jni library right away to make sure JNI_OnLoad() gets called as the very first thing.
 	static
 	{
-		game = "jo";
-
-		BufferedReader br;
-		try {
-			br = new BufferedReader(new FileReader("/sdcard/JKXR/commandline.txt"));
-			String s;
-			StringBuilder sb = new StringBuilder(0);
-			while ((s = br.readLine()) != null)
-				sb.append(s + " ");
-			br.close();
-
-			if (sb.toString().contains("ja"))
-			{
-				game = "ja";
-			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 		manufacturer = Build.MANUFACTURER.toLowerCase(Locale.ROOT);
 		if (manufacturer.contains("oculus")) // rename oculus to meta as this will probably happen in the future anyway
 		{
@@ -82,7 +59,7 @@ import java.util.Vector;
 		} catch (Exception e)
 		{}
 
-		System.loadLibrary( "openjk_" + game );
+		System.loadLibrary( "openjk_jo" );
 	}
 
 	private static final String TAG = "JKXR";
@@ -214,18 +191,15 @@ import java.util.Vector;
 	public void create() {
 		//Make the directories
 		new File("/sdcard/JKXR/JK2/base").mkdirs();
-		new File("/sdcard/JKXR/JK3/base").mkdirs();
 
 		//Copy the command line params file
 		copy_asset("/sdcard/JKXR", "commandline.txt", false);
 
 		//Copy the weapon adjustment config - should we force overwrite?
 		copy_asset("/sdcard/JKXR/JK2/base", "weapons_vr_jo.cfg", true);
-		copy_asset("/sdcard/JKXR/JK3/base", "weapons_vr_ja.cfg", true);
 
 		//Our assets
 		copy_asset("/sdcard/JKXR/JK2/base", "z_vr_assets.pk3", true);
-		copy_asset("/sdcard/JKXR/JK3/base", "z_vr_assets_jka.pk3", true);
 
 		//Bummser's default configuration
 		if (manufacturer.contains("meta")) {
@@ -244,7 +218,6 @@ import java.util.Vector;
 
 			//Weapon Models
 			copy_asset("/sdcard/JKXR/JK2/base", "z_Crusty_and_Elin_vr_weapons.pk3", false);
-			copy_asset("/sdcard/JKXR/JK3/base", "z_Crusty_and_Elin_vr_weapons.pk3", false);
 		}
 
 		//Read these from a file and pass through
