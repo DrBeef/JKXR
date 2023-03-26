@@ -725,7 +725,7 @@ void BG_CalculateVRSaberPosition( vec3_t origin, vec3_t angles )
 
 bool BG_UseVRPosition( gentity_t *ent )
 {
-	return ( ent->client && (!ent->NPC || ent->client->ps.clientNum == cg_entities[0].gent->client->ps.viewEntity));
+	return ( ent->client && ent->client->ps.clientNum == 0);
 }
 
 /*
