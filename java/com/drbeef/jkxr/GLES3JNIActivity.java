@@ -244,10 +244,15 @@ import java.util.Vector;
 
 			//Weapon Models
 			copy_asset("/sdcard/JKXR/JK2/base", "z_Crusty_and_Elin_vr_weapons.pk3", false);
+		}
+
+		//Bunch of cool mods and their credits - only copy if user wants them
+		if (!new File("/sdcard/JKXR/JK3/base/no_copy").exists()) {
+			//Weapon Models
 			copy_asset("/sdcard/JKXR/JK3/base", "z_Crusty_and_Elin_vr_weapons.pk3", false);
 		}
 
-		//Copy mods to the demo folder if it exists, since the demo doesn't seem to be able to load mods from base
+		//Copy mods to the demo folder if demo assets exist, since the demo doesn't seem to be able to load mods from base
 		if (new File("/sdcard/JKXR/JK2/jk2demo/assets0.pk3").exists()) {
 
 			//Copy the weapon adjustment config - should we force overwrite?
