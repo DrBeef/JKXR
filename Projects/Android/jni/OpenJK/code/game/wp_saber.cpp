@@ -6486,20 +6486,14 @@ void WP_RunSaber( gentity_t *self, gentity_t *saber )
 			|| self->client->ps.saberEntityState == SES_RETURNING
 			|| VectorCompare( saber->s.pos.trDelta, vec3_origin ) )
 		{//control if it's returning or just starting
-			float	saberSpeed = 500;//FIXME: based on force level?
+			float	saberSpeed = self->client->ps.forcePowerLevel[FP_SABERTHROW] == FORCE_LEVEL_1 ? 300 : 500;
 			float	dist;
 			gentity_t *enemy = NULL;
 
 			AngleVectors( fwdangles, forward, NULL, NULL );
 
-			if ( self->client->ps.saberEntityDist < 100 )
-			{//make the saber head to my hand- the bolt it was attached to
-				VectorCopy( self->client->renderInfo.handRPoint, saberHome );
-			}
-			else
-			{//aim saber from eyes
-				VectorCopy( self->client->renderInfo.eyePoint, saberHome );
-			}
+			//Always use right hand as saber home
+			VectorCopy( self->client->renderInfo.handRPoint, saberHome );
 			VectorMA( saberHome, self->client->ps.saberEntityDist, forward, saberDest );
 
 			if ( self->client->ps.forcePowerLevel[FP_SABERTHROW] > FORCE_LEVEL_2
