@@ -1359,8 +1359,8 @@ void CG_AddViewWeapon( playerState_t *ps )
 		}
 		//---------
 
-		//	CG_AddRefEntityWithPowerups( &gun, cent->currentState.powerups, cent->gent );
-			cgi_R_AddRefEntityToScene( &gun );
+			CG_AddRefEntityWithPowerups( &gun, cent->currentState.powerups, cent, true );
+		//	cgi_R_AddRefEntityToScene( &gun );
 
 	/*	if ( ps->weapon == WP_STUN_BATON )
 		{

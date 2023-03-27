@@ -2385,7 +2385,15 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 				VectorScale( handEnt.axis[i], (vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
 			}
 
-			cgi_R_AddRefEntityToScene(&handEnt);
+			centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
+			if (!cent)
+			{
+				cgi_R_AddRefEntityToScene(&handEnt);
+			}
+			else
+			{
+				CG_AddRefEntityWithPowerups(&handEnt, cent->currentState.powerups, cent, true);
+			}
 
 			if (cg.snap->ps.weapon == WP_NONE)
 			{
@@ -2402,7 +2410,8 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 					VectorScale( handEnt.axis[i], (!vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
 				}
 
-				cgi_R_AddRefEntityToScene(&handEnt);
+				//cgi_R_AddRefEntityToScene(&handEnt);
+				CG_AddRefEntityWithPowerups(&handEnt, cent->currentState.powerups, cent, true);
 			}
 		}
 	}

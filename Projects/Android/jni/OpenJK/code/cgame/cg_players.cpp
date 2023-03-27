@@ -4607,7 +4607,7 @@ CG_AddRefEntityWithPowerups
 Adds a piece with modifications or duplications for powerups
 ===============
 */
-void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cent )
+void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cent, bool forceShownInFirstPerson )
 {
 	if ( !cent )
 	{
@@ -4630,17 +4630,15 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		}
 	}
 
-	bool player1stPersonSaber = CG_getPlayer1stPersonSaber(cent);
+	if (CG_getPlayer1stPersonSaber(cent) && !forceShownInFirstPerson) {
+		ent->renderfx = RF_THIRD_PERSON;
+	}
 
 //	if ( gent->client->ps.powerups[PW_WEAPON_OVERCHARGE] > 0 )
 //	{
 //		centity_t *cent = &cg_entities[gent->s.number];
 //		cgi_S_AddLoopingSound( 0, cent->lerpOrigin, vec3_origin, cgs.media.overchargeLoopSound );
 //	}
-
-	if (player1stPersonSaber) {
-		ent->renderfx = RF_THIRD_PERSON;
-	}
 
 	//get the dude's color choice in
 	ent->shaderRGBA[0] = gent->client->renderInfo.customRGBA[0];
@@ -6119,8 +6117,8 @@ Ghoul2 Insert Start
 			gi.G2API_GiveMeVectorFromMatrix(boltMatrix, NEGATIVE_Y, axis_[1]);//right
 			gi.G2API_GiveMeVectorFromMatrix(boltMatrix, POSITIVE_Z, axis_[2]);//up
 
-			if (!cent->gent->client->ps.saberInFlight &&
-				CG_getPlayer1stPersonSaber(cent) &&
+			if (CG_getPlayer1stPersonSaber(cent) &&
+				(!cent->gent->client->ps.saberInFlight || saberNum == 1) &&
 				!in_misccamera &&
 				!in_camera &&
 				cent->gent->client->ps.saberLockEnemy == ENTITYNUM_NONE)
@@ -8412,7 +8410,7 @@ Ghoul2 Insert End
 			{
 				CG_AddRefEntityWithPowerups( &gun,
 					(cent->currentState.powerups & ((1<<PW_CLOAKED)|(1<<PW_BATTLESUIT)) ),
-					cent );
+					cent, true );
 			}
 
 			//
@@ -8508,6 +8506,7 @@ Ghoul2 Insert End
 		{
 			numSabers = 2;
 		}
+
 		for ( int saberNum = 0; saberNum < numSabers; saberNum++ )
 		{
 			if (saberNum == 0 && cent->currentState.saberInFlight)
@@ -8542,7 +8541,7 @@ Ghoul2 Insert End
 			VectorCopy(axis[0], hiltEnt.axis[2]);
 			VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
 
-			cgi_R_AddRefEntityToScene(&hiltEnt);
+            CG_AddRefEntityWithPowerups(&hiltEnt, cent->currentState.powerups, cent, true);
 		}
 	}
 
