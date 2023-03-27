@@ -24,6 +24,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "common_headers.h"
 
 // included in both game dll and client
+#define GAME_INCLUDE
+#include "../cgame/cg_local.h"
 
 #include "g_local.h"
 #include "bg_public.h"
@@ -797,7 +799,7 @@ void BG_CalculateVRSaberPosition( int saberNum, vec3_t origin, vec3_t angles )
 
 bool BG_UseVRPosition( gentity_t *ent )
 {
-	return ( ent->client && ent->client->ps.clientNum == 0 );
+	return ( ent->client && ent->client->ps.clientNum == 0 && !cg.renderingThirdPerson);
 }
 
 /*
