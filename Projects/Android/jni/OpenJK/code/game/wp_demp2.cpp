@@ -210,10 +210,19 @@ static void WP_DEMP2_AltFire( gentity_t *ent )
 {
 	int		damage	= weaponData[WP_REPEATER].altDamage;
 	int		count;
-	vec3_t	start;
+	vec3_t	start, angs, forward;
 	trace_t	tr;
 
-	VectorCopy( muzzle, start );
+	if ( BG_UseVRPosition(ent))
+	{
+		BG_CalculateVRWeaponPosition(start, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy( muzzle, start );
+		VectorCopy(forwardVec, forward);
+	}
+
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
 	count = ( level.time - ent->client->ps.weaponChargeTime ) / DEMP2_CHARGE_UNIT;
@@ -230,8 +239,8 @@ static void WP_DEMP2_AltFire( gentity_t *ent )
 	damage *= ( 1 + ( count * ( count - 1 )));// yields damage of 12,36,84...gives a higher bonus for longer charge
 
 	// the shot can travel a whopping 4096 units in 1 second. Note that the shot will auto-detonate at 4096 units...we'll see if this looks cool or not
-	WP_MissileTargetHint(ent, start, forwardVec);
-	gentity_t *missile = CreateMissile( start, forwardVec, DEMP2_ALT_RANGE, 1000, ent, qtrue );
+	WP_MissileTargetHint(ent, start, forward);
+	gentity_t *missile = CreateMissile( start, forward, DEMP2_ALT_RANGE, 1000, ent, qtrue );
 
 	// letting it know what the charge size is.
 	missile->count = count;
