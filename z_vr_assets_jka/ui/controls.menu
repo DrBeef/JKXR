@@ -38,6 +38,9 @@
 				
 				hide 			comfortcontrols
 				setitemcolor		comfortcontrols 	forecolor .615 .615 .956 0.0
+
+				hide			helpcontrols
+				setitemcolor		helpcontrols 	forecolor .615 .615 .956 0.0
 				
 				show			setup_background
 				
@@ -458,6 +461,9 @@
 				hide 			comfortcontrols 
 				setitemcolor		comfortcontrols 	forecolor .615 .615 .956 0.0
 				
+				hide			helpcontrols
+				setitemcolor		helpcontrols 	forecolor .615 .615 .956 0.0
+
 				setitemcolor		side_buttons		forecolor 1 .682 0 1
 				setitemcolor		commoncontrolbutton 	forecolor 1 1 1 1 				
 			}
@@ -509,6 +515,9 @@
 				
 				hide 			comfortcontrols 
 				setitemcolor		comfortcontrols 	forecolor .615 .615 .956 0.0
+
+				hide			helpcontrols
+				setitemcolor		helpcontrols 	forecolor .615 .615 .956 0.0
 				
 				setitemcolor		side_buttons		forecolor 1 .682 0 1
 				setitemcolor		weaponscontrolbutton 	forecolor 1 1 1 1 
@@ -560,6 +569,9 @@
 				
 				hide 			comfortcontrols 
 				setitemcolor		comfortcontrols 	forecolor .615 .615 .956 0.0
+
+				hide			helpcontrols
+				setitemcolor		helpcontrols 	forecolor .615 .615 .956 0.0
 				
 				setitemcolor		side_buttons		forecolor 1 .682 0 1
 				setitemcolor		forcecontrolbutton 		forecolor 1 1 1 1 
@@ -612,9 +624,69 @@
 				
 				show 			comfortcontrols
 				fadein			comfortcontrols
+
+				hide			helpcontrols
+				setitemcolor		helpcontrols 	forecolor .615 .615 .956 0.0
 				
 				setitemcolor		side_buttons		forecolor 1 .682 0 1
 				setitemcolor		comfortcontrolbutton 	forecolor 1 1 1 1
+			}
+		}
+
+//----------------------------------------------------------------------------------------------
+// HELP  button
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				helpbutton
+			group				side_buttons
+			text				@MENUS_VR_HELP_BUTTON_ITEM
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				80 281 170 24
+			font				3
+			textscale			0.9
+			textalignx			170
+			textaligny			2
+			textalign			ITEM_ALIGN_RIGHT
+			textstyle			1
+			forecolor			1 .682 0 1
+			visible				1
+			descText			@MENUS_VR_HELP_BUTTON_DESC
+			cvarTest			g_JKXRHelpEnabled
+			showCvar			{ 1 }
+
+			mouseEnter 
+			{ 
+				show			sidebutton_glow
+				setitemrect		sidebutton_glow	40 280 220 26
+			}
+			mouseExit 
+			{ 
+				hide			sidebutton_glow
+			}	  	  
+			action 
+			{ 
+				play			sound/interface/sub_select 
+				show			setup_background
+				
+				hide			commoncontrols
+				setitemcolor		commoncontrols 	forecolor .615 .615 .956 0.0
+				
+				hide 			weaponcontrols
+				setitemcolor		weaponcontrols 	forecolor .615 .615 .956 0.0
+				
+				hide			forcecontrols
+				setitemcolor		forcecontrols 	forecolor .615 .615 .956 0.0
+				
+				hide 			comfortcontrols
+				setitemcolor		comfortcontrols 	forecolor .615 .615 .956 0.0
+
+				show			helpcontrols
+				fadein			helpcontrols
+				
+				setitemcolor		side_buttons		forecolor 1 .682 0 1
+				setitemcolor		helpbutton 	forecolor 1 1 1 1
 			}
 		}
 
@@ -1530,6 +1602,299 @@
 			mouseexit
 			{ 
 				hide			button_glow
+			}
+		}
+
+//----------------------------------------------------------------------------------------------
+//
+//	HELP MENU
+//
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				none
+			group				helpcontrols
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			text				@MENUS_VR_CONTROL_SCHEME_HELP
+			rect				260 200 340 14
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			textaligny			0
+			font				4
+			textscale			1       
+			forecolor			.615 .615 .956 0.0
+			visible			0 
+			mouseenter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	260 200 340 20
+			}
+			mouseexit 
+			{ 
+				hide			button_glow
+			}
+			action 
+			{ 
+				play			sound/interface/button1
+				setcvar show_help_item 1
+				open helpPopupMenu
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				helpcontrols
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			text				@MENUS_VR_TUTORIAL_VIDEO_1
+			rect				260 220 340 14
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			textaligny			0
+			font				4
+			textscale			1       
+			forecolor			.615 .615 .956 0.0
+			visible			0 
+			mouseenter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	260 220 340 20
+			}
+			mouseexit 
+			{ 
+				hide			button_glow
+			}
+			action 
+			{ 
+				play			sound/interface/button1
+				setcvar show_help_item 2
+				open helpPopupMenu
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				helpcontrols
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			text				@MENUS_VR_TUTORIAL_VIDEO_2
+			rect				260 240 340 14
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			textaligny			0
+			font				4
+			textscale			1       
+			forecolor			.615 .615 .956 0.0
+			visible			0 
+			mouseenter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	260 240 340 20
+			}
+			mouseexit 
+			{ 
+				hide			button_glow
+			}
+			action 
+			{ 
+				play			sound/interface/button1
+				setcvar show_help_item 3
+				open helpPopupMenu
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				helpcontrols
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			text				@MENUS_VR_TUTORIAL_VIDEO_3
+			rect				260 260 340 14
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			textaligny			0
+			font				4
+			textscale			1       
+			forecolor			.615 .615 .956 0.0
+			visible			0 
+			mouseenter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	260 260 340 20
+			}
+			mouseexit 
+			{ 
+				hide			button_glow
+			}
+			action 
+			{ 
+				play			sound/interface/button1
+				setcvar show_help_item 4
+				open helpPopupMenu
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				helpcontrols
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			text				@MENUS_VR_TUTORIAL_VIDEO_4
+			rect				260 280 340 14
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			textaligny			0
+			font				4
+			textscale			1       
+			forecolor			.615 .615 .956 0.0
+			visible			0 
+			mouseenter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	260 280 340 20
+			}
+			mouseexit 
+			{ 
+				hide			button_glow
+			}
+			action 
+			{ 
+				play			sound/interface/button1
+				setcvar show_help_item 5
+				open helpPopupMenu
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				helpcontrols
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			text				@MENUS_VR_TUTORIAL_VIDEO_5
+			rect				260 300 340 14
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			textaligny			0
+			font				4
+			textscale			1       
+			forecolor			.615 .615 .956 0.0
+			visible			0 
+			mouseenter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	260 300 340 20
+			}
+			mouseexit 
+			{ 
+				hide			button_glow
+			}
+			action 
+			{ 
+				play			sound/interface/button1
+				setcvar show_help_item 6
+				open helpPopupMenu
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				helpcontrols
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			text				@MENUS_VR_TUTORIAL_VIDEO_6
+			rect				260 320 340 14
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			textaligny			0
+			font				4
+			textscale			1       
+			forecolor			.615 .615 .956 0.0
+			visible			0 
+			mouseenter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	260 320 340 20
+			}
+			mouseexit 
+			{ 
+				hide			button_glow
+			}
+			action 
+			{ 
+				play			sound/interface/button1
+				setcvar show_help_item 7
+				open helpPopupMenu
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				helpcontrols
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			text				@MENUS_VR_TUTORIAL_VIDEO_7
+			rect				260 340 340 14
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			textaligny			0
+			font				4
+			textscale			1       
+			forecolor			.615 .615 .956 0.0
+			visible			0 
+			mouseenter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	260 340 340 20
+			}
+			mouseexit 
+			{ 
+				hide			button_glow
+			}
+			action 
+			{ 
+				play			sound/interface/button1
+				setcvar show_help_item 8
+				open helpPopupMenu
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				helpcontrols
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			text				@MENUS_VR_TUTORIAL_VIDEO_8
+			rect				260 360 340 14
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			textaligny			0
+			font				4
+			textscale			1       
+			forecolor			.615 .615 .956 0.0
+			visible			0 
+			mouseenter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	260 360 340 20
+			}
+			mouseexit 
+			{ 
+				hide			button_glow
+			}
+			action 
+			{ 
+				play			sound/interface/button1
+				setcvar show_help_item 9
+				open helpPopupMenu
 			}
 		}
 

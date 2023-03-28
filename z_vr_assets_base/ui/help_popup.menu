@@ -1,0 +1,153 @@
+{
+	menuDef
+	{
+		name							helpPopupMenu
+		visible						0
+		fullScreen				1
+		rect							0 0 640 480
+		focusColor				1 1 1 1
+ 	  style 						WINDOW_STYLE_FILLED
+		outOfBoundsClick
+		popup
+		onESC
+		{ 
+			play						sound/interface/button1.wav
+			close						helpPopupMenu
+		}
+
+		itemDef
+		{
+			group						none
+			name						none
+			rect						0 0 640 480
+			style						WINDOW_STYLE_SHADER
+			type						ITEM_TYPE_BUTTON
+			background			gfx/menus/background_dim
+			forecolor				1 1 1 1
+			visible					1
+			action
+			{
+				play					sound/interface/button1
+				close					helpPopupMenu
+			}
+		}
+
+		itemDef
+		{
+			group						none
+			name						none
+			rect						20 15 600 450
+			style						WINDOW_STYLE_SHADER
+			background			gfx/menus/control_scheme
+			forecolor				1 1 1 1
+      visible 				1
+			cvarTest				show_help_item
+			showCvar				{ 1 }
+		}
+
+		itemDef
+		{
+			group						none
+			name						none
+			rect						160 120 320 240
+			style						WINDOW_STYLE_SHADER
+			background			gfx/menus/tutorial_video_1
+			forecolor				1 1 1 1
+      visible 				1
+			cvarTest				show_help_item
+			showCvar				{ 2 }
+		}
+
+		itemDef
+		{
+			group						none
+			name						none
+			rect						160 120 320 240
+			style						WINDOW_STYLE_SHADER
+			background			gfx/menus/tutorial_video_2
+			forecolor				1 1 1 1
+      visible 				1
+			cvarTest				show_help_item
+			showCvar				{ 3 }
+		}
+
+		itemDef
+		{
+			group						none
+			name						none
+			rect						160 120 320 240
+			style						WINDOW_STYLE_SHADER
+			background			gfx/menus/tutorial_video_3
+			forecolor				1 1 1 1
+      visible 				1
+			cvarTest				show_help_item
+			showCvar				{ 4 }
+		}
+
+		itemDef
+		{
+			group						none
+			name						none
+			rect						160 120 320 240
+			style						WINDOW_STYLE_SHADER
+			background			gfx/menus/tutorial_video_4
+			forecolor				1 1 1 1
+      visible 				1
+			cvarTest				show_help_item
+			showCvar				{ 5 }
+		}
+
+		itemDef
+		{
+			group						none
+			name						none
+			rect						160 120 320 240
+			style						WINDOW_STYLE_SHADER
+			background			gfx/menus/tutorial_video_5
+			forecolor				1 1 1 1
+      visible 				1
+			cvarTest				show_help_item
+			showCvar				{ 6 }
+		}
+
+		itemDef
+		{
+			group						none
+			name						none
+			rect						160 120 320 240
+			style						WINDOW_STYLE_SHADER
+			background			gfx/menus/tutorial_video_6
+			forecolor				1 1 1 1
+      visible 				1
+			cvarTest				show_help_item
+			showCvar				{ 7 }
+		}
+
+		itemDef
+		{
+			group						none
+			name						none
+			rect						160 120 320 240
+			style						WINDOW_STYLE_SHADER
+			background			gfx/menus/tutorial_video_7
+			forecolor				1 1 1 1
+      visible 				1
+			cvarTest				show_help_item
+			showCvar				{ 8 }
+		}
+
+		itemDef
+		{
+			group						none
+			name						none
+			rect						160 120 320 240
+			style						WINDOW_STYLE_SHADER
+			background			gfx/menus/tutorial_video_8
+			forecolor				1 1 1 1
+      visible 				1
+			cvarTest				show_help_item
+			showCvar				{ 9 }
+		}
+
+	}
+}

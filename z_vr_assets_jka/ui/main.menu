@@ -81,7 +81,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_OWNERDRAW
-			rect				140 70 360 340
+			rect				140 50 360 340
 			forecolor			1 1 1 1
 			visible			1
 			decoration

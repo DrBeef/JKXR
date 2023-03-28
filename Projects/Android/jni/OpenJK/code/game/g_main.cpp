@@ -714,6 +714,7 @@ void G_InitCvars( void ) {
 
 	gi.cvar( "g_clearstats", "1", CVAR_ROM|CVAR_NORESTART);
 
+	gi.cvar( "g_JKXRHelpEnabled", "1", CVAR_ARCHIVE ); // Help menu item
 }
 /*
 ============
