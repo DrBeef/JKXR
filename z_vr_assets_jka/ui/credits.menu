@@ -261,7 +261,7 @@
 			name				none
 			type				ITEM_TYPE_TEXT
 			rect				0 455 640 40
-			text				"JKXR: https://www.quakevr.com/jkxr"
+			text				"Join our Patreon:  patreon.com/teambeef"
 			font				2
 			forecolor			1 0 0 1
 			textscale			1.0
@@ -270,6 +270,5 @@
 			visible			1
 			decoration
 		}
-
 	}
 }
