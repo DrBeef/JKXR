@@ -801,7 +801,7 @@ void CG_GameText(int y );
 // cg_text.c
 //
 void CG_DrawScrollText( void );
-void CG_DrawCaptionText( void );
+void CG_DrawCaptionText( bool inImmersiveCamera );
 void CG_DrawCenterString( void ); 
 
 
