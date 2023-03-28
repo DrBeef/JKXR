@@ -36,4 +36,5 @@
 	loadMenu { "ui/cheatsforcepowers.menu"	}
 	loadMenu { "ui/cheatsinventory.menu"	}
 
+	loadMenu { "ui/help_popup.menu" }
 }
