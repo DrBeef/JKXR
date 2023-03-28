@@ -463,8 +463,10 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                                           -vr.hmdorientation[YAW], xy);
                     }
 
+                    //If scope is engaged, lift muzzle slightly so that it aligns with the headset
+                    float muzzleLift = (vr.cgzoommode == 2 || vr.cgzoommode == 4) ? 0.12f : 0.0f;
                     float x = offhandPositionAverage[0] - (vr.hmdposition[0] + xy[0]);
-                    float y = (offhandPositionAverage[1] + 0.12f) - (vr.hmdposition[1]);
+                    float y = (offhandPositionAverage[1] + muzzleLift) - (vr.hmdposition[1]);
                     float z = offhandPositionAverage[2] - (vr.hmdposition[2] + xy[1]);
                     float zxDist = length(x, z);
 
