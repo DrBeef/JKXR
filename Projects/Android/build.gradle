@@ -77,12 +77,6 @@ task packJOResources(type: Zip) {
     archiveName "z_vr_assets_jko.pk3"
 }
 
-task packJAResources(type: Zip) {
-    from "../../z_vr_assets_jka/"
-    destinationDir file("../../assets/")
-    archiveName "z_vr_assets_jka.pk3"
-}
-
 tasks.matching {it.name.startsWith("assemble")}.all { Task task ->
-    task.dependsOn([packBaseResources, packJOResources, packJAResources])
+    task.dependsOn([packBaseResources, packJOResources])
 }
