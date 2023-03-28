@@ -3666,11 +3666,11 @@ static void CG_DrawAmmoWarning( void ) {
 	}
 
 	w = cgi_R_Font_StrLenPixels(text, cgs.media.qhFontSmall, FONT_SCALE);
-
-	int tempX = 320 - w/2;
+	int offset = w / 2;
+	int tempX = SCREEN_WIDTH / 2;
 	int tempY = 64;
 	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
-	cgi_R_Font_DrawString(tempX, tempY, text, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
+	cgi_R_Font_DrawString(tempX - offset, tempY, text, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 }
 
 //---------------------------------------
@@ -4236,9 +4236,7 @@ static void CG_Draw2D( void )
 
 	CG_DrawScrollText();
 
-	if (!vr->immersive_cinematics) {
-		CG_DrawCaptionText();
-	}
+	CG_DrawCaptionText( in_camera && vr->immersive_cinematics );
 
 	if ( in_camera )
 	{//still draw the saber clash flare, but nothing else
@@ -4370,30 +4368,34 @@ static void CG_Draw2D( void )
 			cgi_SP_GetStringTextString( "SP_INGAME_NEW_OBJECTIVE_INFO", text, sizeof(text) );
 
 			int x_pos = 0;
+			int offset = 0;
 			y_pos = 20;
 			w = cgi_R_Font_StrLenPixels(text,cgs.media.qhFontSmall, FONT_SCALE);
-			x_pos = (SCREEN_WIDTH/2)-(w/2);
+			offset = w / 2;
+			x_pos = SCREEN_WIDTH / 2;
 
 			int tempX = x_pos;
 			int tempY = y_pos;
 			CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
-			cgi_R_Font_DrawString(tempX, tempY, text,  colorTable[CT_LTRED1], cgs.media.qhFontSmall, -1, FONT_SCALE);
+			cgi_R_Font_DrawString(tempX - offset, tempY, text,  colorTable[CT_LTRED1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 		}
 	}
 
 	if (cg.weaponPickupTextTime	> cg.time )
 	{
 		int x_pos = 0;
+		int offset = 0;
 		y_pos = 5;
 		gi.Cvar_VariableStringBuffer( "cg_WeaponPickupText", text, sizeof(text) );
 
 		w = cgi_R_Font_StrLenPixels(text,cgs.media.qhFontSmall, FONT_SCALE);
-		x_pos = (SCREEN_WIDTH/2)-(w/2);
+		offset = w / 2;
+		x_pos = SCREEN_WIDTH / 2;
 
 		int tempX = x_pos;
 		int tempY = y_pos;
 		CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
-		cgi_R_Font_DrawString(tempX, tempY, text,  colorTable[CT_WHITE], cgs.media.qhFontSmall, -1, FONT_SCALE);
+		cgi_R_Font_DrawString(tempX - offset, tempY, text,  colorTable[CT_WHITE], cgs.media.qhFontSmall, -1, FONT_SCALE);
 	}
 
 	cg.drawingHUD = CG_HUD_NORMAL;
