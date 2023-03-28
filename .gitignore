@@ -23,7 +23,7 @@ $RECYCLE.BIN/
 *.apk
 *.ap_
 *.class
-projects/Android/build/*
+Projects/Android/build/*
 assets/oculussig*
 Projects/Android/.cxx/*
 *.json
@@ -41,6 +41,10 @@ assets/pak0.pk3
 assets/sp_pak_weapons.pk3
 assets/z_zvr_weapons.pk3
 assets/sp_vpak8.pk3
+assets/z_vr_assets.pk3
+assets/z_vr_assets_base.pk3
+assets/z_vr_assets_jka.pk3
+assets/z_vr_assets_jko.pk3
 Projects/Android/jni/SupportLibs/liboggvorbis/libs/armeabi-v7a/libogg.so
 Projects/Android/jni/SupportLibs/liboggvorbis/libs/armeabi-v7a/libvorbis-jni.so
 Projects/Android/jni/SupportLibs/liboggvorbis/libs/armeabi-v7a/libvorbis.so
