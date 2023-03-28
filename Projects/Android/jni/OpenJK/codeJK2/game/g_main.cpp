@@ -601,6 +601,8 @@ void G_InitCvars( void ) {
 	gi.cvar( "newTotalSecrets", "0", CVAR_ROM );
 	gi.cvar_set("newTotalSecrets", "0");//used to carry over the count from SP_target_secret to ClientBegin
 	g_iscensored = gi.cvar( "ui_iscensored", "0", CVAR_ARCHIVE|CVAR_ROM|CVAR_INIT|CVAR_CHEAT|CVAR_NORESTART );
+
+	gi.cvar( "g_JKXRHelpEnabled", "1", CVAR_ARCHIVE ); // Help menu item
 }
 
 /*

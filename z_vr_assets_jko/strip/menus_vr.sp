@@ -3,7 +3,7 @@ CONFIG W:\bin\striped.cfg
 ID 100
 REFERENCE MENUS_VR
 DESCRIPTION "VR Menu Localizations"
-COUNT 144
+COUNT 155
 INDEX 0
 {
    REFERENCE COMMON_CONTROLS_ITEM
@@ -723,4 +723,59 @@ INDEX 143
 {
    REFERENCE USABLE_OBJECT_HINT_DESC
    TEXT_LANGUAGE1 "Show icon when looking at objects that can be used."
+}
+INDEX 144
+{
+   REFERENCE HELP_BUTTON_ITEM
+   TEXT_LANGUAGE1 "JKXR Help"
+}
+INDEX 145
+{
+   REFERENCE HELP_BUTTON_DESC
+   TEXT_LANGUAGE1 "Short tutorials explaining various game mechanics."
+}
+INDEX 146
+{
+   REFERENCE TUTORIAL_VIDEO_1
+   TEXT_LANGUAGE1 "How to quick save / load"
+}
+INDEX 147
+{
+   REFERENCE TUTORIAL_VIDEO_2
+   TEXT_LANGUAGE1 "How to use weapon scopes"
+}
+INDEX 148
+{
+   REFERENCE TUTORIAL_VIDEO_3
+   TEXT_LANGUAGE1 "How to use inventory items"
+}
+INDEX 149
+{
+   REFERENCE TUTORIAL_VIDEO_4
+   TEXT_LANGUAGE1 "How to throw the saber"
+}
+INDEX 150
+{
+   REFERENCE TUTORIAL_VIDEO_5
+   TEXT_LANGUAGE1 "How to activate useable things"
+}
+INDEX 151
+{
+   REFERENCE TUTORIAL_VIDEO_6
+   TEXT_LANGUAGE1 "How to use force gesture"
+}
+INDEX 152
+{
+   REFERENCE TUTORIAL_VIDEO_7
+   TEXT_LANGUAGE1 "How to use the weapons / force wheel"
+}
+INDEX 153
+{
+   REFERENCE TUTORIAL_VIDEO_8
+   TEXT_LANGUAGE1 "Introduction to lightsaber duels"
+}
+INDEX 154
+{
+   REFERENCE CONTROL_SCHEME_HELP
+   TEXT_LANGUAGE1 "Default control scheme"
 }

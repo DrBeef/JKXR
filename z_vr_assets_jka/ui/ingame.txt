@@ -31,4 +31,5 @@
 	loadMenu { "ui/loadscreen.menu"						}
 
 	loadMenu { "ui/credits.menu" }
+	loadMenu { "ui/help_popup.menu" }
 }

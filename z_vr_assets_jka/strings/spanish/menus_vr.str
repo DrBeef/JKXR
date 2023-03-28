@@ -613,4 +613,48 @@ REFERENCE           USE_RAGDOLLS_INSTANT
 LANG_ENGLISH        "Instant"
 LANG_SPANISH        "#same"
 
+REFERENCE           HELP_BUTTON_ITEM
+LANG_ENGLISH        "JKXR Help"
+LANG_SPANISH        "#same"
+
+REFERENCE           HELP_BUTTON_DESC
+LANG_ENGLISH        "Short tutorials explaining various game mechanics."
+LANG_SPANISH        "#same"
+
+REFERENCE           TUTORIAL_VIDEO_1
+LANG_ENGLISH        "How to quick save / load"
+LANG_SPANISH        "#same"
+
+REFERENCE           TUTORIAL_VIDEO_2
+LANG_ENGLISH        "How to use weapon scopes"
+LANG_SPANISH        "#same"
+
+REFERENCE           TUTORIAL_VIDEO_3
+LANG_ENGLISH        "How to use inventory items"
+LANG_SPANISH        "#same"
+
+REFERENCE           TUTORIAL_VIDEO_4
+LANG_ENGLISH        "How to throw the saber"
+LANG_SPANISH        "#same"
+
+REFERENCE           TUTORIAL_VIDEO_5
+LANG_ENGLISH        "How to activate useable things"
+LANG_SPANISH        "#same"
+
+REFERENCE           TUTORIAL_VIDEO_6
+LANG_ENGLISH        "How to use force gesture"
+LANG_SPANISH        "#same"
+
+REFERENCE           TUTORIAL_VIDEO_7
+LANG_ENGLISH        "How to use the weapons / force wheel"
+LANG_SPANISH        "#same"
+
+REFERENCE           TUTORIAL_VIDEO_8
+LANG_ENGLISH        "Introduction to lightsaber duels"
+LANG_SPANISH        "#same"
+
+REFERENCE           CONTROL_SCHEME_HELP
+LANG_ENGLISH        "Default control scheme"
+LANG_SPANISH        "#same"
+
 ENDMARKER
