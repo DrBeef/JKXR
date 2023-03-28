@@ -5600,8 +5600,13 @@ extern vmCvar_t	cg_thirdPersonAlpha;
 		}
 
 		if ( cent->gent->client->ps.powerups[PW_FORCE_PUSH] > cg.time || (cent->gent->client->ps.forcePowersActive & (1<<FP_GRIP)) )
-		{//doing the pushing/gripping
-			CG_ForcePushBlur( cent->gent->client->renderInfo.handLPoint );
+		{
+			// Don't draw this blur if the item selector is visible or it obscures it
+			if (cent->gent->client->ps.clientNum != 0 || !vr->item_selector)
+			{
+				//doing the pushing/gripping
+				CG_ForcePushBlur(cent->gent->client->renderInfo.handLPoint);
+			}
 		}
 
 		if ( cent->gent->client->ps.eFlags & EF_FORCE_GRIPPED )
