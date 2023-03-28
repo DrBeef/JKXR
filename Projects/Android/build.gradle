@@ -65,10 +65,16 @@ buildscript {
     }
 }
 
-task packJOResources(type: Zip) {
-    from "../../z_vr_assets/"
+task packBaseResources(type: Zip) {
+    from "../../z_vr_assets_base/"
     destinationDir file("../../assets/")
-    archiveName "z_vr_assets.pk3"
+    archiveName "z_vr_assets_base.pk3"
+}
+
+task packJOResources(type: Zip) {
+    from "../../z_vr_assets_jko/"
+    destinationDir file("../../assets/")
+    archiveName "z_vr_assets_jko.pk3"
 }
 
 task packJAResources(type: Zip) {
@@ -78,5 +84,5 @@ task packJAResources(type: Zip) {
 }
 
 tasks.matching {it.name.startsWith("assemble")}.all { Task task ->
-    task.dependsOn([packJOResources, packJAResources])
+    task.dependsOn([packBaseResources, packJOResources, packJAResources])
 }
