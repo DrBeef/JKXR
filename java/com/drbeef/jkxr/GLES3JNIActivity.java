@@ -199,7 +199,8 @@ import java.util.Vector;
 		copy_asset("/sdcard/JKXR/JK2/base", "weapons_vr_jo.cfg", true);
 
 		//Our assets
-		copy_asset("/sdcard/JKXR/JK2/base", "z_vr_assets.pk3", true);
+		copy_asset("/sdcard/JKXR/JK2/base", "z_vr_assets_base.pk3", true);
+		copy_asset("/sdcard/JKXR/JK2/base", "z_vr_assets_jko.pk3", true);
 
 		//Bummser's default configuration
 		if (manufacturer.contains("meta")) {
