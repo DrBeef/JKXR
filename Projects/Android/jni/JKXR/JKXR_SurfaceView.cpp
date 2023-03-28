@@ -222,7 +222,7 @@ void VR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side
 		*pos_side = 0.0f;
 		*yaw = vr.snapTurn;
 		*pitch = vr.weaponangles[ANGLES_ADJUSTED][PITCH];
-		*roll = vr.hmdorientation[ROLL];
+		*roll = 0.0f;//vr.hmdorientation[ROLL];
 	}
 	else if (vr.remote_npc) {
 		*forward = remote_movementForward;
@@ -243,7 +243,7 @@ void VR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side
 		*pos_side = positional_movementSideways;
 		*yaw = vr.hmdorientation[YAW] + vr.snapTurn;
 		*pitch = vr.hmdorientation[PITCH];
-		*roll = vr.hmdorientation[ROLL];
+		*roll = 0.0f;//vr.hmdorientation[ROLL];
 	} else {
 		//in third person just send the bare minimum
 		*forward = remote_movementForward;
