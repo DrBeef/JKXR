@@ -401,13 +401,15 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 //Does weapon velocity trigger attack
                 if (vr.velocitytriggered) {
                     static bool fired = false;
-                    vr.primaryVelocityTriggeredAttack = (vr.primaryswingvelocity >
-                                                         vr_weapon_velocity_trigger->value);
+
+                    float velocityRequired = (cl.frame.ps.weapon == WP_SABER) ? vr_weapon_velocity_trigger->value :
+                                             (vr_weapon_velocity_trigger->value / 2.0f);
+
+                    vr.primaryVelocityTriggeredAttack = (vr.primaryswingvelocity > velocityRequired);
                     //player has to be dual wielding for this to be true
                     if (vr.dualsabers)
                     {
-                        vr.secondaryVelocityTriggeredAttack = (vr.secondaryswingvelocity >
-                                                               vr_weapon_velocity_trigger->value);
+                        vr.secondaryVelocityTriggeredAttack = (vr.secondaryswingvelocity > velocityRequired);
                     }
 
                     bool triggered = vr.primaryVelocityTriggeredAttack || (vr.dualsabers && vr.secondaryVelocityTriggeredAttack);
