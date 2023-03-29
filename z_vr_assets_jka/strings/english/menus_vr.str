@@ -496,4 +496,19 @@ LANG_ENGLISH        "Introduction to lightsaber duels"
 REFERENCE           CONTROL_SCHEME_HELP
 LANG_ENGLISH        "Default control scheme"
 
+REFERENCE           MODS_BUTTON_DESC
+LANG_ENGLISH        "Load custom mods."
+
+REFERENCE           MODS_WARNING_TEXT_1
+LANG_ENGLISH        "We recommend"
+
+REFERENCE           MODS_WARNING_TEXT_2
+LANG_ENGLISH        "the JKXR Companion App"
+
+REFERENCE           MODS_WARNING_TEXT_3
+LANG_ENGLISH        "to download and launch mods."
+
+REFERENCE           MODS_WARNING_CONFIRM
+LANG_ENGLISH        "Continue"
+
 ENDMARKER

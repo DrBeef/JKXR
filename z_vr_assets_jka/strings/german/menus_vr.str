@@ -657,4 +657,24 @@ REFERENCE           CONTROL_SCHEME_HELP
 LANG_ENGLISH        "Default control scheme"
 LANG_GERMAN         "#same"
 
+REFERENCE           MODS_BUTTON_DESC
+LANG_ENGLISH        "Load custom mods."
+LANG_GERMAN         "#same"
+
+REFERENCE           MODS_WARNING_TEXT_1
+LANG_ENGLISH        "We recommend"
+LANG_GERMAN         "#same"
+
+REFERENCE           MODS_WARNING_TEXT_2
+LANG_ENGLISH        "the JKXR Companion App"
+LANG_GERMAN         "#same"
+
+REFERENCE           MODS_WARNING_TEXT_3
+LANG_ENGLISH        "to download and launch mods."
+LANG_GERMAN         "#same"
+
+REFERENCE           MODS_WARNING_CONFIRM
+LANG_ENGLISH        "Continue"
+LANG_GERMAN         "#same"
+
 ENDMARKER

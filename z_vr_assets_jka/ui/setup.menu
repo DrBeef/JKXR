@@ -26,6 +26,7 @@
 			hide				sound	;
 			hide				options ;
 			hide				difficulty ;
+			hide				mods_warning ;
 			hide				mods	;
 			hide				defaults ;
 			show				video ;
@@ -502,6 +503,7 @@
 				hide			sound	;
 				hide			options ;
 				hide			difficulty ;
+				hide			mods_warning ;
 				hide			mods	;
 				hide			defaults ;
 				setfocus		graphics ;
@@ -556,6 +558,7 @@
 				hide			sound	;
 				hide			options ;
 				hide			difficulty ;
+				hide			mods_warning ;
 				hide			mods	;
 				hide			defaults ;
 				setitemcolor		video1menubutton forecolor 1 .682 0 1;
@@ -609,6 +612,7 @@
 				show			sound	;
 				hide			options ;
 				hide			difficulty ;
+				hide			mods_warning ;
 				hide			mods	;
 				hide			defaults ;
 				setitemcolor		video1menubutton forecolor 1 .682 0 1;
@@ -662,6 +666,7 @@
 				hide			sound	;
 				show			options ;
 				hide			difficulty ;
+				hide			mods_warning ;
 				hide			mods	;
 				hide			defaults ;
 				setitemcolor		video1menubutton forecolor 1 .682 0 1;
@@ -715,6 +720,7 @@
 				hide			sound	;
 				hide			options ;
 				show			difficulty ;
+				hide			mods_warning ;
 				hide			mods	;
 				hide			defaults ;
 				setitemcolor		video1menubutton forecolor 1 .682 0 1;
@@ -744,7 +750,7 @@
 			textstyle			1
 			forecolor			1 .682 0 1
 			visible				1
-			descText			@MENUS_CONFIGURE_GAME_OPTIONS
+			descText			@MENUS_VR_MODS_BUTTON_DESC
 
 			mouseEnter 
 			{ 
@@ -770,7 +776,8 @@
 				hide			sound	;
 				hide			options ;
 				hide			difficulty ;
-				show			mods	;
+				show			mods_warning ;
+				hide			mods	;
 				hide			defaults ;
 				setitemcolor		video1menubutton forecolor 1 .682 0 1;
 				setitemcolor		video2menubutton forecolor 1 .682 0 1;
@@ -824,6 +831,7 @@
 				hide			sound	;
 				hide			options ;
 				hide			difficulty ;
+				hide			mods_warning ;
 				hide			mods	;
 				show			defaults ;
 				setitemcolor		video1menubutton forecolor 1 .682 0 1;
@@ -2705,6 +2713,81 @@
 //----------------------------------------------------------------------------------------------
 //   MOD GAME MENU specific stuff
 //----------------------------------------------------------------------------------------------
+		itemDef
+		{
+			name				none
+			group				mods_warning
+			style				WINDOW_STYLE_SHADER
+			rect				260 185 340 225	
+			background			"gfx/menus/menu_boxred"					// Frame
+			forecolor			1 1 1 0.5
+			visible			0
+			decoration
+		}
+		itemDef
+		{
+			name				none
+			group				mods_warning
+			text				@MENUS_VR_MODS_WARNING_TEXT_1
+			rect				260 230 340 20
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			font				2
+			textscale			1
+			forecolor			1 1 0 1
+			visible			0
+			decoration
+		}
+		itemDef
+		{
+			name				none
+			group				mods_warning
+			text				@MENUS_VR_MODS_WARNING_TEXT_2
+			rect				260 250 340 20
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			font				2
+			textscale			1
+			forecolor			1 1 0 1
+			visible			0
+			decoration
+		}
+		itemDef
+		{
+			name				none
+			group				mods_warning
+			text				@MENUS_VR_MODS_WARNING_TEXT_3
+			rect				260 270 340 20
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			font				2
+			textscale			1
+			forecolor			1 1 0 1
+			visible			0
+			decoration
+		}
+		itemDef
+		{
+			name				none
+			group				mods_warning
+			text				@MENUS_VR_MODS_WARNING_CONFIRM
+			type				ITEM_TYPE_BUTTON
+			rect				260 310 340 20
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			font				2
+			textscale			1    
+			forecolor			1 1 0 1
+			visible			0
+			action
+			{ 
+				play		"sound/interface/button1.wav"
+				hide		mods_warning
+				show		mods
+			}
+		}
+
+
 		itemDef 
 		{
 			name				serverinfo
