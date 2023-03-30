@@ -1385,6 +1385,14 @@ void	G_TouchTriggersWithHand( gentity_t *ent, vec3_t src, vec3_t vf ) {
 			continue;
 		}
 
+		// In case touching button-like entity via use gesture, check activation angle here.
+		// Existing check in g_trigger.cpp Touch_Multi is problematic because we do not have
+		// there information by which hand was entity triggered.
+		if ( DotProduct( hit->movedir, vf ) < 0.5 ) {
+			//Not Within 45 degrees
+			continue;
+		}
+
 		touched[i] = qtrue;
 		memset( &trace, 0, sizeof(trace) );
 		if ( hit->e_TouchFunc != touchF_NULL ) {
