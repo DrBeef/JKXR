@@ -4808,8 +4808,11 @@ Ghoul2 Insert End
 		VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
 		VectorCopy(axis[1], hiltEnt.axis[1]);
 		VectorCopy(axis[0], hiltEnt.axis[2]);
-		VectorMA(hiltEnt.origin, 1.0f, hiltEnt.axis[2], hiltEnt.origin);
+		VectorMA(hiltEnt.origin, 1.2f, hiltEnt.axis[2], hiltEnt.origin);
 		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
+		for (auto & axi : hiltEnt.axis)
+			VectorScale(axi, 0.7f, axi);
+
 
 		cgi_R_AddRefEntityToScene(&hiltEnt);
 	}
@@ -6102,11 +6105,11 @@ Ghoul2 Insert End
 		VectorSubtract(vec3_origin, axis[2], hiltEnt.axis[0]);
 		VectorCopy(axis[1], hiltEnt.axis[1]);
 		VectorCopy(axis[0], hiltEnt.axis[2]);
-		VectorMA(hiltEnt.origin, 1.0f, hiltEnt.axis[2], hiltEnt.origin);
+		VectorMA(hiltEnt.origin, 1.2f, hiltEnt.axis[2], hiltEnt.origin);
 		VectorCopy(hiltEnt.origin, hiltEnt.oldorigin);
 
 		for (auto & axi : hiltEnt.axis)
-			VectorScale(axi, 0.85f, axi);
+			VectorScale(axi, 0.7f, axi);
 
 		cgi_R_AddRefEntityToScene(&hiltEnt);
 
