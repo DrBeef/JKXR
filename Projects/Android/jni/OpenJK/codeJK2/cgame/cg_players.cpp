@@ -6156,6 +6156,7 @@ Ghoul2 Insert End
 				scale = 1.75f;
 			}
 
+            /*
 			if ( val < 0.0f )
 			{
 				val = 0.0f;
@@ -6169,6 +6170,7 @@ Ghoul2 Insert End
 			{
 				CGCam_Shake( val * val * 0.3f, 100 );
 			}
+             */
 
 			val += Q_flrand(0.0f, 1.0f) * 0.5f;
 
