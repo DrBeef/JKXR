@@ -242,16 +242,15 @@ import java.util.Vector;
 		if (!new File("/sdcard/JKXR/JK2/base/no_copy").exists()) {
 			copy_asset("/sdcard/JKXR/JK2/base", "packaged_mods_credits.txt", false);
 			copy_asset("/sdcard/JKXR/JK2/base", "GGDynamicWeapons.pk3", false);
-			copy_asset("/sdcard/JKXR/JK2/base", "Kyle's_lightsaber_hilt_hd.pk3", false);
 
 			//Weapon Models
-			copy_asset("/sdcard/JKXR/JK2/base", "z_Crusty_and_Elin_vr_weapons.pk3", false);
+			copy_asset("/sdcard/JKXR/JK2/base", "z_Crusty_and_Elin_vr_weapons.pk3", true);
 		}
 
 		//Bunch of cool mods and their credits - only copy if user wants them
 		if (!new File("/sdcard/JKXR/JK3/base/no_copy").exists()) {
 			//Weapon Models
-			copy_asset("/sdcard/JKXR/JK3/base", "z_Crusty_and_Elin_vr_weapons.pk3", false);
+			copy_asset("/sdcard/JKXR/JK3/base", "z_Crusty_and_Elin_vr_weapons_JKAcademy.pk3", true);
 		}
 
 		//Copy mods to the demo folder if demo assets exist, since the demo doesn't seem to be able to load mods from base
@@ -261,15 +260,15 @@ import java.util.Vector;
 			copy_asset("/sdcard/JKXR/JK2/jk2demo", "weapons_vr_jo.cfg", true);
 
 			//Our assets
-			copy_asset("/sdcard/JKXR/JK2/jk2demo", "z_vr_assets.pk3", true);
+			copy_asset("/sdcard/JKXR/JK2/jk2demo", "z_vr_assets_base.pk3", true);
+			copy_asset("/sdcard/JKXR/JK2/jk2demo", "z_vr_assets_jko.pk3", true);
 
 			//Bunch of cool mods and their credits - only copy if user wants them
 			copy_asset("/sdcard/JKXR/JK2/jk2demo", "packaged_mods_credits.txt", false);
 			copy_asset("/sdcard/JKXR/JK2/jk2demo", "GGDynamicWeapons.pk3", false);
-			copy_asset("/sdcard/JKXR/JK2/jk2demo", "Kyle's_lightsaber_hilt_hd.pk3", false);
 
 			//Weapon Models
-			copy_asset("/sdcard/JKXR/JK2/jk2demo", "z_Crusty_and_Elin_vr_weapons.pk3", false);
+			copy_asset("/sdcard/JKXR/JK2/jk2demo", "z_Crusty_and_Elin_vr_weapons.pk3", true);
 		}
 
 		//Read these from a file and pass through
