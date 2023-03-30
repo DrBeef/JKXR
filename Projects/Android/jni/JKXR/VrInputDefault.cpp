@@ -457,19 +457,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
             VectorScale(offhandPositionAverage, 0.2f, offhandPositionAverage);
             if (vr.weapon_stabilised && !vr.dualsabers) {
-                if (vr_virtual_stock->integer == 1 || vr.cgzoommode == 2 || vr.cgzoommode == 4) {
-                    //offset to the appropriate eye a little bit
-                    vec2_t xy = {0, 0};
-                    if (vr_virtual_stock->integer == 1 && !vr.cgzoommode) {
-                        rotateAboutOrigin(Cvar_VariableValue("cg_stereoSeparation") / 2.0f, 0.0f,
-                                          -vr.hmdorientation[YAW], xy);
-                    }
-
+                if (vr.cgzoommode == 2 || vr.cgzoommode == 4)
+                {
                     //If scope is engaged, lift muzzle slightly so that it aligns with the headset
-                    float muzzleLift = (vr.cgzoommode == 2 || vr.cgzoommode == 4) ? 0.12f : 0.0f;
-                    float x = offhandPositionAverage[0] - (vr.hmdposition[0] + xy[0]);
-                    float y = (offhandPositionAverage[1] + muzzleLift) - (vr.hmdposition[1]);
-                    float z = offhandPositionAverage[2] - (vr.hmdposition[2] + xy[1]);
+                    float x = offhandPositionAverage[0] - (vr.hmdposition[0]);
+                    float y = (offhandPositionAverage[1] + 0.12f) - (vr.hmdposition[1]);
+                    float z = offhandPositionAverage[2] - (vr.hmdposition[2]);
                     float zxDist = length(x, z);
 
                     if (zxDist != 0.0f && z != 0.0f) {
@@ -480,6 +473,21 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                         // shoot from exactly where we are looking from
                         VectorClear(vr.weaponoffset);
                         VectorCopy(vr.hmdposition, vr.weaponposition);
+                    }
+                }
+                else if (vr_virtual_stock->integer == 1)
+                {
+                    //offset to the appropriate eye a little bit
+                    vec2_t xy = {0, 0};
+                    rotateAboutOrigin(Cvar_VariableValue("cg_stereoSeparation") / 2.0f, 0.0f, -vr.hmdorientation[YAW], xy);
+                    float x = vr.offhandposition[0][0] - (vr.hmdposition[0] + xy[0]);
+                    float y = vr.offhandposition[0][1] - (vr.hmdposition[1] - 0.1f);
+                    float z = vr.offhandposition[0][2] - (vr.hmdposition[2] + xy[1]);
+                    float zxDist = length(x, z);
+
+                    if (zxDist != 0.0f && z != 0.0f) {
+                        VectorSet(vr.weaponangles[ANGLES_ADJUSTED], -RAD2DEG(atanf(y / zxDist)),
+                                  -RAD2DEG(atan2f(x, -z)), 0); //Dampen roll on stabilised weapon
                     }
                 }
                 else
