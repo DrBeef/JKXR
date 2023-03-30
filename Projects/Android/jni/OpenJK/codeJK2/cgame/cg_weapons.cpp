@@ -1230,7 +1230,7 @@ void CG_AddViewWeapon( playerState_t *ps )
 	AnglesToAxis( angles, gun.axis );
 	CG_PositionEntityOnTag( &gun, &hand, weapon->handsModel, "tag_weapon");
 
-    gun.renderfx = RF_DEPTHHACK | RF_FIRST_PERSON | RF_VRVIEWMODEL;
+    gun.renderfx = RF_DEPTHHACK | RF_FIRST_PERSON ;
 
 
 //---------
