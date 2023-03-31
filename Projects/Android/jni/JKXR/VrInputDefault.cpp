@@ -148,7 +148,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
     static float menuYaw = 0;
     static bool switchedMenuControls = qfalse;
-    if (VR_UseScreenLayer() && !vr.misc_camera /*bit of a fiddle, but if we are in a misc camera, we are in the game and shouldn't be in here*/)
+    if (VR_UseScreenLayer() && !vr.misc_camera && !vr.cin_camera /*bit of a fiddle, but if we are in a misc camera or cin camera, we are in the game and shouldn't be in here*/)
     {
         bool controlsLeftHanded = vr_control_scheme->integer >= 10;
         if ((controlsLeftHanded && !switchedMenuControls) || (!controlsLeftHanded && switchedMenuControls)) {
@@ -167,14 +167,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             if ((pOffTrackedRemoteNew->Buttons & xrButton_Trigger) != (pOffTrackedRemoteOld->Buttons & xrButton_Trigger) && (pOffTrackedRemoteNew->Buttons & xrButton_Trigger)) {
                 switchedMenuControls = !switchedMenuControls;
             }
-        }
-
-        //To skip flatscreen cinematic use thumb of any controller
-        if ((primaryButtonsNew & primaryThumb) != (primaryButtonsOld & primaryThumb)) {
-            sendButtonAction("+use", (primaryButtonsNew & primaryThumb));
-        }
-        if ((secondaryButtonsNew & secondaryThumb) != (secondaryButtonsOld & secondaryThumb)) {
-            sendButtonAction("+use", (secondaryButtonsNew & secondaryThumb));
         }
     }
     else
@@ -270,7 +262,27 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
         }
 
-        if (vr.misc_camera)
+        if (vr.cin_camera)
+        {
+            //To skip cinematic use any thumb or trigger
+            if ((primaryButtonsNew & primaryThumb) != (primaryButtonsOld & primaryThumb)) {
+                sendButtonAction("+use", (primaryButtonsNew & primaryThumb));
+            }
+            if ((secondaryButtonsNew & secondaryThumb) != (secondaryButtonsOld & secondaryThumb)) {
+                sendButtonAction("+use", (secondaryButtonsNew & secondaryThumb));
+            }
+            if ((pDominantTrackedRemoteNew->Buttons & xrButton_Trigger) != (pDominantTrackedRemoteOld->Buttons & xrButton_Trigger)) {
+                sendButtonAction("+use", (pDominantTrackedRemoteNew->Buttons & xrButton_Trigger));
+                // mark button as already pressed to prevent firing after entering the game
+                pDominantTrackedRemoteOld->Buttons |= xrButton_Trigger;
+            }
+            if ((pOffTrackedRemoteNew->Buttons & xrButton_Trigger) != (pOffTrackedRemoteOld->Buttons & xrButton_Trigger)) {
+                sendButtonAction("+use", (pOffTrackedRemoteNew->Buttons & xrButton_Trigger));
+                // mark button as already pressed to prevent firing after entering the game
+                pOffTrackedRemoteOld->Buttons |= xrButton_Trigger;
+            }
+        }
+        else if (vr.misc_camera)
         {
             if (between(-0.2f, primaryJoystickX, 0.2f)) {
                 sendButtonAction("+use", pPrimaryJoystick->y < -0.8f || pPrimaryJoystick->y > 0.8f);
