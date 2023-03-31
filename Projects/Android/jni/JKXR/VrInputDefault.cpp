@@ -59,8 +59,23 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     int primaryButton2;
     int secondaryButton1;
     int secondaryButton2;
-    int primaryThumb = (vr_control_scheme->integer == RIGHT_HANDED_DEFAULT || vr_switch_sticks->integer) ? xrButton_RThumb : xrButton_LThumb;
-    int secondaryThumb = (vr_control_scheme->integer == RIGHT_HANDED_DEFAULT || vr_switch_sticks->integer) ? xrButton_LThumb : xrButton_RThumb;
+    int primaryThumb;
+    int secondaryThumb;
+    if (vr_control_scheme->integer == LEFT_HANDED_DEFAULT && vr_switch_sticks->integer)
+    {
+        primaryThumb = xrButton_RThumb;
+        secondaryThumb = xrButton_LThumb;
+    }
+    else if (vr_control_scheme->integer == LEFT_HANDED_DEFAULT || vr_switch_sticks->integer)
+    {
+        primaryThumb = xrButton_LThumb;
+        secondaryThumb = xrButton_RThumb;
+    }
+    else
+    {
+        primaryThumb = xrButton_RThumb;
+        secondaryThumb = xrButton_LThumb;
+    }
     if (vr_switch_sticks->integer)
     {
         //
@@ -155,13 +170,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         }
 
         //To skip flatscreen cinematic use thumb of any controller
-        if ((pDominantTrackedRemoteNew->Buttons & primaryThumb) !=
-            (pDominantTrackedRemoteOld->Buttons & primaryThumb)) {
-            sendButtonAction("+use", (pDominantTrackedRemoteNew->Buttons & primaryThumb));
+        if ((primaryButtonsNew & primaryThumb) != (primaryButtonsOld & primaryThumb)) {
+            sendButtonAction("+use", (primaryButtonsNew & primaryThumb));
         }
-        if ((pOffTrackedRemoteNew->Buttons & secondaryThumb) !=
-            (pOffTrackedRemoteOld->Buttons & secondaryThumb)) {
-            sendButtonAction("+use", (pOffTrackedRemoteNew->Buttons & secondaryThumb));
+        if ((secondaryButtonsNew & secondaryThumb) != (secondaryButtonsOld & secondaryThumb)) {
+            sendButtonAction("+use", (secondaryButtonsNew & secondaryThumb));
         }
     }
     else
@@ -763,10 +776,10 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
 
             //Use
-            if ((pDominantTrackedRemoteNew->Buttons & primaryThumb) !=
-                (pDominantTrackedRemoteOld->Buttons & primaryThumb)) {
+            if ((primaryButtonsNew & primaryThumb) !=
+                (primaryButtonsOld & primaryThumb)) {
 
-                sendButtonAction("+use", (pDominantTrackedRemoteNew->Buttons & primaryThumb));
+                sendButtonAction("+use", (primaryButtonsNew & primaryThumb));
             }
         }
 
