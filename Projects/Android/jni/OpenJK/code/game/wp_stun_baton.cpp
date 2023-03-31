@@ -27,6 +27,9 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "w_local.h"
 #include "bg_local.h"
 
+std::map<int, int> damagedEntities;
+extern weaponData_t weaponData[WP_NUM_WEAPONS];
+
 //---------------------------------------------------------
 void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 {
@@ -34,7 +37,14 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 	trace_t		tr;
 	vec3_t		mins, maxs, end, start;
 
-	G_Sound( ent, G_SoundIndex( "sound/weapons/baton/fire" ));
+	// If alt_fire is false, then this was triggered by the EV_FIRE_WEAPON event, and we should only make the sound
+	// and return, if alt_fire is true, then the stun baton is checked every frame in ClientThink_real and shouldn't play
+	// a sound and should inflict damage
+	if (!alt_fire)
+	{
+		G_Sound(ent, G_SoundIndex("sound/weapons/baton/fire"));
+		return;
+	}
 
 	vec3_t	angs, forward;
 	if ( BG_UseVRPosition(ent))
@@ -61,7 +71,26 @@ void WP_FireStunBaton( gentity_t *ent, qboolean alt_fire )
 		return;
 	}
 
+    //First clear out any entities that can be damaged again
+    std::map<int, int> copyDamagedEntities = damagedEntities;
+    for (auto &damagedEntity : copyDamagedEntities)
+    {
+        if (damagedEntity.second <= level.time)
+        {
+            damagedEntities.erase(damagedEntity.first);
+        }
+    }
+
 	tr_ent = &g_entities[tr.entityNum];
+
+    //Is it too soon to hurt this entity again?
+    if (damagedEntities.find(tr.entityNum) != damagedEntities.end())
+    {
+        return;
+    }
+
+    //We are good to inflict damage, store this entity and the next time we can hurt them
+    damagedEntities[tr.entityNum] = level.time + weaponData[WP_STUN_BATON].fireTime;
 
 	if ( tr_ent && tr_ent->takedamage && tr_ent->client )
 	{

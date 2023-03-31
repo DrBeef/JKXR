@@ -2052,7 +2052,7 @@ wasForceSpeed=isForceSpeed;
 			VectorMA( handEnt.origin, -3.0f, forward, handEnt.origin );
 
 
-			handEnt.renderfx = RF_DEPTHHACK | RF_VRVIEWMODEL;
+			handEnt.renderfx = RF_DEPTHHACK | RF_VRNOCULLFACE;
 
 			if (cg.snap->ps.powerups[PW_FORCE_PUSH] > cg.time ||
 				(cg.snap->ps.forcePowersActive & (1<<FP_GRIP)) ||

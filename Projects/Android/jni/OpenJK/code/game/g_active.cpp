@@ -5536,6 +5536,13 @@ extern cvar_t	*g_skippingcin;
 	// execute client events
 	ClientEvents( ent, oldEventSequence );
 
+	//Stun Baton is _always_ firing
+	if (ent->s.weapon == WP_STUN_BATON)
+	{
+		//Use alt-fire to indicate not to make a noise, but do inflict damage
+		FireWeapon(ent, qtrue);
+	}
+
 	if ( pm.useEvent )
 	{
 		//TODO: Use
