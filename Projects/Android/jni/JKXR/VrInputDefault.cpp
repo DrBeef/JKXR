@@ -147,17 +147,16 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 	handleTrackedControllerButton(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, xrButton_Enter, A_ESCAPE);
 
     static float menuYaw = 0;
-    static bool switchedMenuControls = qfalse;
     if (VR_UseScreenLayer() && !vr.misc_camera && !vr.cin_camera /*bit of a fiddle, but if we are in a misc camera or cin camera, we are in the game and shouldn't be in here*/)
     {
         bool controlsLeftHanded = vr_control_scheme->integer >= 10;
-        if ((controlsLeftHanded && !switchedMenuControls) || (!controlsLeftHanded && switchedMenuControls)) {
+        if (controlsLeftHanded == vr.menu_right_handed) {
             interactWithTouchScreen(menuYaw, vr.offhandangles[ANGLES_DEFAULT]);
             handleTrackedControllerButton(pOffTrackedRemoteNew, pOffTrackedRemoteOld, offButton1, A_MOUSE1);
             handleTrackedControllerButton(pOffTrackedRemoteNew, pOffTrackedRemoteOld, xrButton_Trigger, A_MOUSE1);
             handleTrackedControllerButton(pOffTrackedRemoteNew, pOffTrackedRemoteOld, offButton2, A_ESCAPE);
             if ((pDominantTrackedRemoteNew->Buttons & xrButton_Trigger) != (pDominantTrackedRemoteOld->Buttons & xrButton_Trigger) && (pDominantTrackedRemoteNew->Buttons & xrButton_Trigger)) {
-                switchedMenuControls = !switchedMenuControls;
+                vr.menu_right_handed = !vr.menu_right_handed;
             }
         } else {
             interactWithTouchScreen(menuYaw, vr.weaponangles[ANGLES_DEFAULT]);
@@ -165,7 +164,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, xrButton_Trigger, A_MOUSE1);
             handleTrackedControllerButton(pDominantTrackedRemoteNew, pDominantTrackedRemoteOld, domButton2, A_ESCAPE);
             if ((pOffTrackedRemoteNew->Buttons & xrButton_Trigger) != (pOffTrackedRemoteOld->Buttons & xrButton_Trigger) && (pOffTrackedRemoteNew->Buttons & xrButton_Trigger)) {
-                switchedMenuControls = !switchedMenuControls;
+                vr.menu_right_handed = !vr.menu_right_handed;
             }
         }
     }
