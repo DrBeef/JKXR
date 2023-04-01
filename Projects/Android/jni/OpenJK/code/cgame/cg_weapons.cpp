@@ -1323,7 +1323,7 @@ void CG_AddViewWeapon( playerState_t *ps )
 		AnglesToAxis( angles, gun.axis );
 		CG_PositionEntityOnTag( &gun, &hand, weapon->handsModel, "tag_weapon");
 
-		gun.renderfx = RF_DEPTHHACK | RF_FIRST_PERSON;
+		gun.renderfx = RF_DEPTHHACK | RF_FIRST_PERSON | RF_VRVIEWMODEL;
 
 	//---------
 		// OK, we are making an assumption here that if we have the phaser that it is always on....
