@@ -9250,7 +9250,7 @@ qboolean Item_SetFocus(itemDef_t *item, float x, float y)
 	if (playSound && sfx)
 	{
 		DC->startLocalSound( *sfx, CHAN_LOCAL_SOUND );
-        VR_HapticEvent("selector_icon", 0, vr.right_handed ? 1 : 2, 60, 0, 0);
+		VR_HapticEvent("selector_icon", 0, vr.menu_right_handed ? 1 : 2, 60, 0, 0);
 	}
 
 	for (i = 0; i < parent->itemCount; i++)
