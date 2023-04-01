@@ -10,6 +10,7 @@
 
 #define USE_GESTURE_OFF_HAND      1
 #define USE_GESTURE_WEAPON_HAND   2
+#define USE_HAPTIC_FEEDBACK_DELAY 500
 
 typedef struct {
     bool    loaded;
@@ -102,6 +103,7 @@ typedef struct {
     float   maxHeight;
     float   curHeight;
     int     useGestureState;
+    int     useHapticFeedbackTime[2];
 
 } vr_client_info_t;
 

@@ -234,9 +234,9 @@ void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace )
 
 		if ( other->client )
 		{
-			if ( (other->client->ps.clientNum == 0) && (self->spawnflags & 4) )
+			if ( (other->client->ps.clientNum == 0) && (self->spawnflags & 4) && !thirdPersonActive )
 			{
-				// In case of USE_BUTTON, check facing by controller and not by head
+				// In case of USE_BUTTON, check facing by controller and not by head (if not in 3rd person)
 				vec3_t origin, angles;
 				BG_CalculateVRWeaponPosition(origin, angles);
 				AngleVectors( angles, forward, NULL, NULL );
@@ -323,6 +323,13 @@ void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace )
 
 	if ( self->spawnflags & 4 )
 	{//USE_BUTTON
+		if (other->client->ps.clientNum == 0 && !useGestureAllowed) {
+			int channel = vr->right_handed ? 1 : 2;
+			if (level.time > vr->useHapticFeedbackTime[channel - 1]) {
+				cgi_HapticEvent("use_button", 0, channel, 60, 0, 0);
+				vr->useHapticFeedbackTime[channel - 1] = level.time +  + USE_HAPTIC_FEEDBACK_DELAY;
+			}
+		}
 		NPC_SetAnim( other, SETANIM_TORSO, BOTH_BUTTON_HOLD, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 		/*
 		if ( !VectorLengthSquared( other->client->ps.velocity ) && !PM_CrouchAnim( other->client->ps.legsAnim ) )

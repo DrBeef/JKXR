@@ -1759,7 +1759,7 @@ Try and use an entity in the world, directly ahead of us
 #define USE_DISTANCE_BUTTON		64.0f
 #define USE_DISTANCE_GESTURE	16.0f
 
-void TryUse_Internal( gentity_t *ent, vec3_t src, vec3_t vf )
+void TryUse_Internal( bool offHand, gentity_t *ent, vec3_t src, vec3_t vf )
 {
 	gentity_t	*target;
 	trace_t		trace;
@@ -1808,6 +1808,13 @@ void TryUse_Internal( gentity_t *ent, vec3_t src, vec3_t vf )
 		}
 		*/
 		//ent->client->ps.weaponTime = ent->client->ps.torsoAnimTimer;
+		if (ent->client->ps.clientNum == 0) {
+			int channel = vr->right_handed != offHand ? 1 : 2;
+			if (level.time > vr->useHapticFeedbackTime[channel - 1]) {
+				cgi_HapticEvent("use_button", 0, channel, 60, 0, 0);
+				vr->useHapticFeedbackTime[channel - 1] = level.time +  + USE_HAPTIC_FEEDBACK_DELAY;
+			}
+		}
 		GEntity_UseFunc( target, ent, ent );
 		return;
 	}
@@ -1818,6 +1825,13 @@ void TryUse_Internal( gentity_t *ent, vec3_t src, vec3_t vf )
 		&& (target->client->playerTeam == ent->client->playerTeam || target->client->playerTeam == TEAM_NEUTRAL)
 		&& !(target->NPC->scriptFlags&SCF_NO_RESPONSE) )
 	{
+		if (ent->client->ps.clientNum == 0) {
+			int channel = vr->right_handed != offHand ? 1 : 2;
+			if (level.time > vr->useHapticFeedbackTime[channel - 1]) {
+				cgi_HapticEvent("use_button", 0, channel, 60, 0, 0);
+				vr->useHapticFeedbackTime[channel - 1] = level.time +  + USE_HAPTIC_FEEDBACK_DELAY;
+			}
+		}
 		NPC_UseResponse ( target, ent, qfalse );
 		return;
 	}
@@ -1847,15 +1861,16 @@ void TryUse( gentity_t *ent ) {
 		return;
 	}*/
 
+	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
 	vec3_t src, angles, vf;
-	if (ent->client->ps.clientNum == 0) {
+	if (ent->client->ps.clientNum == 0 && !thirdPersonActive) {
 		BG_CalculateVRWeaponPosition(src, angles);
 		AngleVectors( angles, vf, NULL, NULL );
-		TryUse_Internal(ent, src, vf);
+		TryUse_Internal(false, ent, src, vf);
 	} else {
 		VectorCopy(ent->client->renderInfo.eyePoint, src);
 		AngleVectors(ent->client->ps.viewangles, vf, NULL, NULL);
-		TryUse_Internal(ent, src, vf);
+		TryUse_Internal(false, ent, src, vf);
 	}
 }
 
@@ -1881,11 +1896,11 @@ void TryAltUse( gentity_t *ent ) {
 	if (ent->client->ps.clientNum == 0) {
 		BG_CalculateVROffHandPosition(src, angles);
 		AngleVectors( angles, vf, NULL, NULL );
-		TryUse_Internal(ent, src, vf);
+		TryUse_Internal(true, ent, src, vf);
 	} else {
 		VectorCopy(ent->client->renderInfo.eyePoint, src);
 		AngleVectors(ent->client->ps.viewangles, vf, NULL, NULL);
-		TryUse_Internal(ent, src, vf);
+		TryUse_Internal(false, ent, src, vf);
 	}
 }
 
