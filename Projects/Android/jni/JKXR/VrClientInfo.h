@@ -31,6 +31,7 @@ typedef struct {
     bool immersive_cinematics;
     bool weapon_stabilised;
     bool right_handed;
+    bool menu_right_handed;
     bool player_moving;
     int move_speed; // 0 (default) = Comfortable (75%) , 1 = Full (100%), 2 = Walk (50%)
     bool crouched;
