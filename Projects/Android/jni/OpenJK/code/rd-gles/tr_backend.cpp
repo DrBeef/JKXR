@@ -810,7 +810,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 					depthRange = qtrue;
 				}
 
-				if (backEnd.currentEntity->e.renderfx & RF_VRNOCULLFACE) {
+				if (backEnd.currentEntity->e.renderfx & RF_VRVIEWMODEL) {
 					isVRViewModel = qtrue;
 				}
 			} else {
