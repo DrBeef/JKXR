@@ -29,6 +29,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_vehicles.h"
 #include "b_local.h"
 #include "g_navigator.h"
+#include <JKXR/VrClientInfo.h>
 
 #ifdef _DEBUG
 	#include <float.h>
@@ -1354,7 +1355,7 @@ void ClientImpacts( gentity_t *ent, pmove_t *pm ) {
 const	float	TOUCH_DISTANCE =	1.0f;
 const	vec3_t	TOUCH_RANGE =		{ 4, 4, 4 };
 
-void	G_TouchTriggersWithHand( gentity_t *ent, vec3_t src, vec3_t vf ) {
+void	G_TouchTriggersWithHand( bool offHand, gentity_t *ent, vec3_t src, vec3_t vf ) {
 	vec3_t		dest, mins, maxs;
 	gentity_t	*touch[MAX_GENTITIES], *hit;
 	qboolean	touched[MAX_GENTITIES];
@@ -1396,6 +1397,11 @@ void	G_TouchTriggersWithHand( gentity_t *ent, vec3_t src, vec3_t vf ) {
 		touched[i] = qtrue;
 		memset( &trace, 0, sizeof(trace) );
 		if ( hit->e_TouchFunc != touchF_NULL ) {
+			int channel = vr->right_handed != offHand ? 1 : 2;
+			if (level.time > vr->useHapticFeedbackTime[channel - 1]) {
+				cgi_HapticEvent("use_button", 0, channel, 60, 0, 0);
+				vr->useHapticFeedbackTime[channel - 1] = level.time + USE_HAPTIC_FEEDBACK_DELAY;
+			}
 			GEntity_TouchFunc(hit, ent, &trace);
 		}
 	}
@@ -1540,13 +1546,13 @@ void	G_TouchTriggersLerped( gentity_t *ent ) {
 			vec3_t src, angles, vf;
 			BG_CalculateVRWeaponPosition(src, angles);
 			AngleVectors( angles, vf, NULL, NULL );
-			G_TouchTriggersWithHand( ent, src, vf );
+			G_TouchTriggersWithHand( false, ent, src, vf );
 		}
 		if( ent->client->usercmd.buttons & BUTTON_ALT_USE ) {
 			vec3_t src, angles, vf;
 			BG_CalculateVROffHandPosition(src, angles);
 			AngleVectors( angles, vf, NULL, NULL );
-			G_TouchTriggersWithHand( ent, src, vf );
+			G_TouchTriggersWithHand( true, ent, src, vf );
 		}
 	}
 }

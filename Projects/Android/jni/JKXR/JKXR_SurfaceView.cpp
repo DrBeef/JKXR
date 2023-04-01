@@ -515,7 +515,8 @@ void VR_HapticEvent(const char* event, int position, int flags, int intensity, f
 	{
 		TBXR_Vibrate(400, weaponFireChannel, 1.0);
 	}
-	else if (strcmp(event, "selector_icon") == 0)
+	else if (strcmp(event, "selector_icon") == 0 ||
+			 strcmp(event, "use_button") == 0 )
 	{
 		//Quick blip
 		TBXR_Vibrate(50, flags, 1.0);
