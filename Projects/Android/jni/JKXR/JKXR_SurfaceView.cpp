@@ -272,8 +272,6 @@ void VR_Init()
 	vr.snapTurn = 0.0f;
 	vr.immersive_cinematics = true;
 
-	vr.test_scale = 1.0f;
-
 	//init randomiser
 	srand(time(NULL));
 
