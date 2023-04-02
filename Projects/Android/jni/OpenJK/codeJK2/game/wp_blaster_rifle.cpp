@@ -29,7 +29,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_functions.h"
 #include "bg_local.h"
 #include <JKXR/VrClientInfo.h>
-
+#include <JKXR/VrTBDC.h>
+extern cvar_t	*g_TeamBeefDirectorsCut;
 //---------------
 //	Blaster
 //---------------
@@ -52,6 +53,11 @@ static void WP_FireBlasterMissile( gentity_t *ent, vec3_t start, vec3_t dir, qbo
 		{
 			velocity *= BLASTER_NPC_HARD_VEL_CUT;
 		}
+	}
+
+	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->value)
+	{
+		velocity = TBDC_BLASTER_VELOCITY;
 	}
 
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
@@ -121,9 +127,15 @@ void WP_FireBlaster( gentity_t *ent, qboolean alt_fire )
 
 	if ( alt_fire )
 	{
-		// add some slop to the alt-fire direction
-		angs[PITCH] += Q_flrand(-1.0f, 1.0f) * BLASTER_ALT_SPREAD;
-		angs[YAW]	+= Q_flrand(-1.0f, 1.0f) * BLASTER_ALT_SPREAD;
+        if(vr->weapon_stabilised) {
+            // add some slop to the alt-fire direction
+            angs[PITCH] += Q_flrand(-0.5f, 0.5f) * BLASTER_ALT_SPREAD;
+            angs[YAW] += Q_flrand(-0.5f, 0.5f) * BLASTER_ALT_SPREAD;
+        } else {
+            // add some slop to the alt-fire direction
+            angs[PITCH] += Q_flrand(-1.0f, 1.0f) * BLASTER_ALT_SPREAD;
+            angs[YAW] += Q_flrand(-1.0f, 1.0f) * BLASTER_ALT_SPREAD;
+        }
 	}
 	else
 	{
@@ -138,10 +150,18 @@ void WP_FireBlaster( gentity_t *ent, qboolean alt_fire )
 		}
 		else
 		{
-			if (vr->cgzoommode != 4) { // much more accurate if using the scope
-				// add some slop to the main-fire direction
-				angs[PITCH] += Q_flrand(-1.0f, 1.0f) * BLASTER_MAIN_SPREAD;
-				angs[YAW] += Q_flrand(-1.0f, 1.0f) * BLASTER_MAIN_SPREAD;
+			 if(vr->cgzoommode != 4) { // much more accurate if using the scope
+			     //GB - If double handing reduce by two thirds
+			     if(vr->weapon_stabilised)
+                 {
+                     // 1/3 as much variety if stabilised
+                     angs[PITCH] += Q_flrand(-0.33f, 0.33f) * BLASTER_MAIN_SPREAD;
+                     angs[YAW] += Q_flrand(-0.33f, 0.33f) * BLASTER_MAIN_SPREAD;
+                 } else {
+                     // add some slop to the main-fire direction
+                     angs[PITCH] += Q_flrand(-1.0f, 1.0f) * BLASTER_MAIN_SPREAD;
+                     angs[YAW] += Q_flrand(-1.0f, 1.0f) * BLASTER_MAIN_SPREAD;
+			     }
 			}
 		}
 	}

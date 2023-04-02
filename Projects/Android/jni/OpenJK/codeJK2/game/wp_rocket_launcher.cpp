@@ -28,7 +28,9 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "w_local.h"
 #include "g_functions.h"
 #include "bg_local.h"
-
+#include <JKXR/VrClientInfo.h>
+#include <JKXR/VrTBDC.h>
+extern cvar_t	*g_TeamBeefDirectorsCut;
 //-----------------------
 //	Rocket Launcher
 //-----------------------
@@ -147,6 +149,11 @@ void WP_FireRocket( gentity_t *ent, qboolean alt_fire )
 	int		damage	= weaponData[WP_ROCKET_LAUNCHER].damage;
 	float	vel = ROCKET_VELOCITY;
 
+	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->value)
+	{
+		vel = TBDC_ROCKET_VELOCITY;
+	}
+
 	if ( alt_fire )
 	{
 		vel *= 0.5f;
@@ -164,6 +171,7 @@ void WP_FireRocket( gentity_t *ent, qboolean alt_fire )
 	}
 
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
+
 
 	gentity_t *missile = CreateMissile( start, forward, vel, 10000, ent, alt_fire );
 

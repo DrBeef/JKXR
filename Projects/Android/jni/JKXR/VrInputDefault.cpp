@@ -349,6 +349,27 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
         }
 
+        static bool changed = false;
+        if (between(-0.2f, primaryJoystickX, 0.2f) &&
+            between(0.8f, pPrimaryJoystick->y, 1.0f)) {
+            if(!changed) {
+                vr.tempWeaponVelocity += 25;
+                changed = true;
+                ALOGV("**TBDC** Projectile speed %f",vr.tempWeaponVelocity);
+            }
+       } else if (between(-0.2f, primaryJoystickX, 0.2f) &&
+                    between(-1.0f, pPrimaryJoystick->y, -0.8f)) {
+            if(!changed) {
+                vr.tempWeaponVelocity -= 25;
+                ALOGV("**TBDC** Projectile speed %f",vr.tempWeaponVelocity);
+                changed = true;
+            }
+        }
+        else
+        {
+            changed = false;
+        }
+
         //dominant hand stuff first
         {
             //Record recent weapon position for trajectory based stuff
@@ -647,7 +668,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                      (secondaryButtonsOld & secondaryButton1)) &&
                     (secondaryButtonsNew & secondaryButton1)) {
 #ifdef JK2_MODE
-                    sendButtonActionSimple("save quik*");
+                    //sendButtonActionSimple("save quik*");
 #else
                     sendButtonActionSimple("save quick");
 #endif
