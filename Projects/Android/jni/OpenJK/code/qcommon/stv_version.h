@@ -23,10 +23,12 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 // Current version of the single player game
 #define VERSION_STRING_DOTTED		"1.0.1.1"
 
+#define JKXR_VERSION		"0.8.0"
+
 #ifdef _DEBUG
-	#define	Q3_VERSION		"(debug)OpenJK: v" VERSION_STRING_DOTTED
+	#define	Q3_VERSION		"(debug)OpenJK: v" VERSION_STRING_DOTTED "  JKXR: " JKXR_VERSION
 #elif defined FINAL_BUILD
-	#define	Q3_VERSION		"OpenJK: v" VERSION_STRING_DOTTED
+	#define	Q3_VERSION		"OpenJK: v" VERSION_STRING_DOTTED "  JKXR: " JKXR_VERSION
 #else
 	#define	Q3_VERSION		"(internal)OpenJK: v" VERSION_STRING_DOTTED
 #endif
