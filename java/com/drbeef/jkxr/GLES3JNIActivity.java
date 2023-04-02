@@ -254,21 +254,27 @@ import java.util.Vector;
 		}
 
 		//Copy mods to the demo folder if demo assets exist, since the demo doesn't seem to be able to load mods from base
-		if (new File("/sdcard/JKXR/JK2/jk2demo/assets0.pk3").exists()) {
+		if (new File("/sdcard/JKXR/JK2/jk2demo/assets0.pk3").exists() ||
+			new File("/sdcard/JKXR/JK2/jk2demo/jk2demo/assets0.pk3").exists()) {
 
+			String demoFolder = "/sdcard/JKXR/JK2/jk2demo";
+			if(new File("/sdcard/JKXR/JK2/jk2demo/jk2demo/assets0.pk3").exists())
+			{
+				demoFolder = "/sdcard/JKXR/JK2/jk2demo/jk2demo";
+			}
 			//Copy the weapon adjustment config - should we force overwrite?
-			copy_asset("/sdcard/JKXR/JK2/jk2demo", "weapons_vr_jo.cfg", true);
+			copy_asset(demoFolder, "weapons_vr_jo.cfg", true);
 
 			//Our assets
-			copy_asset("/sdcard/JKXR/JK2/jk2demo", "z_vr_assets_base.pk3", true);
-			copy_asset("/sdcard/JKXR/JK2/jk2demo", "z_vr_assets_jko.pk3", true);
+			copy_asset(demoFolder, "z_vr_assets_base.pk3", true);
+			copy_asset(demoFolder, "z_vr_assets_jko.pk3", true);
 
 			//Bunch of cool mods and their credits - only copy if user wants them
-			copy_asset("/sdcard/JKXR/JK2/jk2demo", "packaged_mods_credits.txt", false);
-			copy_asset("/sdcard/JKXR/JK2/jk2demo", "GGDynamicWeapons.pk3", false);
+			copy_asset(demoFolder, "packaged_mods_credits.txt", false);
+			copy_asset(demoFolder, "GGDynamicWeapons.pk3", false);
 
 			//Weapon Models
-			copy_asset("/sdcard/JKXR/JK2/jk2demo", "z_Crusty_and_Elin_vr_weapons.pk3", true);
+			copy_asset(demoFolder, "z_Crusty_and_Elin_vr_weapons.pk3", true);
 		}
 
 		//Read these from a file and pass through
