@@ -657,7 +657,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             // Check quicksave
             static bool indicateQuickSave = true;
             if (canUseQuickSave) {
-                int channel = (vr_control_scheme->integer >= 10) ? 2 : 1;
+                //GB Fix buzzing left controller not right
+                int channel = (vr_control_scheme->integer >= 10) ? 1 : 2;
                 if (indicateQuickSave)
                 {
                     TBXR_Vibrate(40, channel, 0.5); // vibrate to let user know they can switch
