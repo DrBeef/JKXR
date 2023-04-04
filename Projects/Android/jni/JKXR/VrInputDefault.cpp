@@ -220,7 +220,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
         }
 
-        //Close the datapad 
+        //Close the datapad
         if (((secondaryButtonsNew & secondaryButton2) !=
                  (secondaryButtonsOld & secondaryButton2)) &&
                 (secondaryButtonsNew & secondaryButton2)) {
