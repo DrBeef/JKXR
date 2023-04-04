@@ -1769,7 +1769,10 @@ void *G2_FindSurface(const model_s *mod, int index, int lod)
 
 	mdxmLODSurfOffset_t *indexes = (mdxmLODSurfOffset_t *)current;
 	// we are now looking at the offset array
-	assert(index>=0&&index<mod->mdxm->numSurfaces);
+	if (index >= mod->mdxm->numSurfaces)
+	{
+		index = mod->mdxm->numSurfaces-1;
+	}
 	current += indexes->offsets[index];
 
 	return (void *)current;
