@@ -7498,9 +7498,17 @@ void WP_SaberStartMissileBlockCheck( gentity_t *self, usercmd_t *ucmd  )
 					return;
 				}
 
-				if ( !g_saberAutoBlocking->integer && self->client->ps.saberBlockingTime<level.time )
+				if (cg_thirdPerson.integer) {
+					if (!self->s.number && !g_saberAutoBlocking->integer &&
+						self->client->ps.saberBlockingTime < level.time) {
+						return;
+					}
+				} else // first person
 				{
-					return;
+					if (!self->s.number && !g_saberAutoDeflect1stPerson->integer &&
+						self->client->ps.saberBlockingTime < level.time) {
+						return;
+					}
 				}
 			}
 

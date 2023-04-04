@@ -1814,37 +1814,6 @@
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
 			text				@MENUS_VR_TUTORIAL_VIDEO_1
-			rect				260 220 340 14
-			textalign			ITEM_ALIGN_CENTER
-			textalignx			170
-			textaligny			0
-			font				4
-			textscale			1       
-			forecolor			.615 .615 .956 1.0
-			visible			0 
-			mouseenter 
-			{ 
-				show			highlight2
-			}
-			mouseexit 
-			{ 
-				hide			highlight2
-			}
-			action 
-			{ 
-				play			sound/interface/button1
-				setcvar show_help_item 2
-				open helpPopupMenu
-			}
-		}
-
-		itemDef 
-		{
-			name				none
-			group				helpcontrols
-			type				ITEM_TYPE_BUTTON
-			style				WINDOW_STYLE_EMPTY
-			text				@MENUS_VR_TUTORIAL_VIDEO_2
 			rect				260 240 340 14
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			170
@@ -1864,7 +1833,7 @@
 			action 
 			{ 
 				play			sound/interface/button1
-				setcvar show_help_item 3
+				setcvar show_help_item 2
 				open helpPopupMenu
 			}
 		}
@@ -1875,7 +1844,7 @@
 			group				helpcontrols
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			text				@MENUS_VR_TUTORIAL_VIDEO_3
+			text				@MENUS_VR_TUTORIAL_VIDEO_2
 			rect				260 260 340 14
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			170
@@ -1895,7 +1864,7 @@
 			action 
 			{ 
 				play			sound/interface/button1
-				setcvar show_help_item 4
+				setcvar show_help_item 3
 				open helpPopupMenu
 			}
 		}
@@ -1906,7 +1875,7 @@
 			group				helpcontrols
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			text				@MENUS_VR_TUTORIAL_VIDEO_4
+			text				@MENUS_VR_TUTORIAL_VIDEO_3
 			rect				260 280 340 14
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			170
@@ -1926,7 +1895,7 @@
 			action 
 			{ 
 				play			sound/interface/button1
-				setcvar show_help_item 5
+				setcvar show_help_item 4
 				open helpPopupMenu
 			}
 		}
@@ -1937,7 +1906,7 @@
 			group				helpcontrols
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			text				@MENUS_VR_TUTORIAL_VIDEO_5
+			text				@MENUS_VR_TUTORIAL_VIDEO_4
 			rect				260 300 340 14
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			170
@@ -1957,7 +1926,7 @@
 			action 
 			{ 
 				play			sound/interface/button1
-				setcvar show_help_item 6
+				setcvar show_help_item 5
 				open helpPopupMenu
 			}
 		}
@@ -1968,7 +1937,7 @@
 			group				helpcontrols
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			text				@MENUS_VR_TUTORIAL_VIDEO_6
+			text				@MENUS_VR_TUTORIAL_VIDEO_5
 			rect				260 320 340 14
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			170
@@ -1988,7 +1957,7 @@
 			action 
 			{ 
 				play			sound/interface/button1
-				setcvar show_help_item 7
+				setcvar show_help_item 6
 				open helpPopupMenu
 			}
 		}
@@ -1999,7 +1968,7 @@
 			group				helpcontrols
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			text				@MENUS_VR_TUTORIAL_VIDEO_7
+			text				@MENUS_VR_TUTORIAL_VIDEO_6
 			rect				260 340 340 14
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			170
@@ -2019,7 +1988,7 @@
 			action 
 			{ 
 				play			sound/interface/button1
-				setcvar show_help_item 8
+				setcvar show_help_item 7
 				open helpPopupMenu
 			}
 		}
@@ -2030,7 +1999,7 @@
 			group				helpcontrols
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			text				@MENUS_VR_TUTORIAL_VIDEO_8
+			text				@MENUS_VR_TUTORIAL_VIDEO_7
 			rect				260 360 340 14
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			170
@@ -2050,7 +2019,7 @@
 			action 
 			{ 
 				play			sound/interface/button1
-				setcvar show_help_item 9
+				setcvar show_help_item 8
 				open helpPopupMenu
 			}
 		}

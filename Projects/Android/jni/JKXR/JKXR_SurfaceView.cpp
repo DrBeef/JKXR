@@ -320,6 +320,8 @@ void VR_Init()
 	} else {
 		Cvar_Set( "expanded_menu_enabled", "0" );
 	}
+
+    vr.menu_right_handed = vr_control_scheme->integer == 0;
 }
 
 int VR_main( int argc, char* argv[] );

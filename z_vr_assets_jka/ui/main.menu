@@ -547,6 +547,23 @@
 			}
 		}*/
 
+		itemDef 
+		{
+			name				about
+			rect				90 463 500 24
+			type				0
+			cvar				"version"
+			textalign			ITEM_ALIGN_LEFT		
+			textalignx			150
+			textaligny			2
+			textalign			1    
+			font				2
+			textscale			.5
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+
 	}
 }
 
