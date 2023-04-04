@@ -5355,7 +5355,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				else if(g_TeamBeefDirectorsCut->value)
 				{
 					knockback *= 2;
-				`   }
+				}
 				G_ApplyKnockback( targ, newDir, knockback );
 			}
 

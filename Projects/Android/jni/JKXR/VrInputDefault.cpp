@@ -219,6 +219,14 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 vr.menu_right_handed = !vr.menu_right_handed;
             }
         }
+
+        //Close the datapad 
+        if (((secondaryButtonsNew & secondaryButton2) !=
+                 (secondaryButtonsOld & secondaryButton2)) &&
+                (secondaryButtonsNew & secondaryButton2)) {
+                Sys_QueEvent(0, SE_KEY, A_TAB, true, 0, NULL);
+        }
+
     }
     else
     {
