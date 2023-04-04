@@ -469,32 +469,26 @@ LANG_ENGLISH        "JKXR Help"
 REFERENCE           HELP_BUTTON_DESC
 LANG_ENGLISH        "Short tutorials explaining various game mechanics."
 
+REFERENCE           CONTROL_SCHEME_HELP
+LANG_ENGLISH        "Default Control Scheme"
+
 REFERENCE           TUTORIAL_VIDEO_1
-LANG_ENGLISH        "How to quick save / load"
+LANG_ENGLISH        "Select Weapons / Force / Items"
 
 REFERENCE           TUTORIAL_VIDEO_2
-LANG_ENGLISH        "How to use weapon scopes"
+LANG_ENGLISH        "Weapon Scopes"
 
 REFERENCE           TUTORIAL_VIDEO_3
-LANG_ENGLISH        "How to use inventory items"
+LANG_ENGLISH        "Throw the Saber"
 
 REFERENCE           TUTORIAL_VIDEO_4
-LANG_ENGLISH        "How to throw the saber"
+LANG_ENGLISH        "Force Gestures (Push and Pull)"
 
 REFERENCE           TUTORIAL_VIDEO_5
-LANG_ENGLISH        "How to activate useable things"
+LANG_ENGLISH        "Interact / Use"
 
 REFERENCE           TUTORIAL_VIDEO_6
-LANG_ENGLISH        "How to use force gesture"
-
-REFERENCE           TUTORIAL_VIDEO_7
-LANG_ENGLISH        "How to use the weapons / force wheel"
-
-REFERENCE           TUTORIAL_VIDEO_8
-LANG_ENGLISH        "Introduction to lightsaber duels"
-
-REFERENCE           CONTROL_SCHEME_HELP
-LANG_ENGLISH        "Default control scheme"
+LANG_ENGLISH        "Quick Save / Load"
 
 REFERENCE           MODS_BUTTON_DESC
 LANG_ENGLISH        "Load custom mods."
