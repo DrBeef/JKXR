@@ -32,6 +32,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../game/wp_saber.h"
 #include "bg_local.h"
 #include <JKXR/VrClientInfo.h>
+#include <JKXR/VrTBDC.h>
 
 #define	LOOK_SWING_SCALE	0.5
 
@@ -4780,12 +4781,14 @@ Ghoul2 Insert End
 	CG_DoSaber( org_, axis_[0], length, client->ps.saberLengthMax, saberColor, renderfx );
 
     if (CG_getPlayer1stPersonSaber(cent) &&
-        cent->gent->client->ps.saberEventFlags & (SEF_BLOCKED|SEF_PARRIED) &&
+			cent->gent->client->ps.saberEventFlags & (SEF_BLOCKED|SEF_PARRIED) &&
+    		cent->gent->client->ps.saberBounceMove != LS_NONE &&
 			vr->saberBlockDebounce < cg.time)
     {
-		cvar_t *vr_saber_block_debounce_time = gi.cvar("vr_saber_block_debounce_time", "200", CVAR_ARCHIVE); // defined in VrCvars.h
-		vr->saberBlockDebounce = cg.time + vr_saber_block_debounce_time->integer;
-
+		//cvar_t *vr_saber_block_debounce_time = gi.cvar("vr_saber_block_debounce_time", "1000", CVAR_ARCHIVE); // defined in VrCvars.h
+		//vr->saberBlockDebounce = cg.time + vr_saber_block_debounce_time->integer;
+		vr->saberBlockDebounce = cg.time + TBDC_SABER_BOUNCETIME;
+		vr->saberBounceMove = cent->gent->client->ps.saberBounceMove;
 		cgi_HapticEvent("shotgun_fire", 0, 0, 100, 0, 0);
 	}
 

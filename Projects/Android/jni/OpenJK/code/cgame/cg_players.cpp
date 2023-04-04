@@ -6792,7 +6792,7 @@ Ghoul2 Insert End
 			vr->saberBlockDebounce < cg.time &&
 			bladeNum == 0) // Only need to do this for the first blade
     {
-		cvar_t *vr_saber_block_debounce_time = gi.cvar("vr_saber_block_debounce_time", "200", CVAR_ARCHIVE); // defined in VrCvars.h
+		cvar_t *vr_saber_block_debounce_time = gi.cvar("vr_saber_block_debounce_time", "1000", CVAR_ARCHIVE); // defined in VrCvars.h
 		vr->saberBlockDebounce = cg.time + vr_saber_block_debounce_time->integer;
 
 		cgi_HapticEvent("shotgun_fire", 0, vr->right_handed ? (2 - saberNum) : (1 + saberNum), 100, 0, 0);

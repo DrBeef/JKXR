@@ -5352,10 +5352,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 				{//special case because this is shotgun-ish damage, we need to multiply the knockback
 					knockback *= 12;//*6 for 6 flechette shots
 				}
-				if(g_TeamBeefDirectorsCut->value)
+				else if(g_TeamBeefDirectorsCut->value)
 				{
 					knockback *= 2;
-				}
+				`   }
 				G_ApplyKnockback( targ, newDir, knockback );
 			}
 

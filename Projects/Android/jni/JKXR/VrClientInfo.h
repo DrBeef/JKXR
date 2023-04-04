@@ -43,6 +43,7 @@ typedef struct {
     int cgzoommode;
     int cgzoomdir;
     int saberBlockDebounce; // Amount of time after player is blocked that the saber position is fixed
+    short saberBounceMove;
 
     int forceid;
 
