@@ -621,40 +621,32 @@ REFERENCE           HELP_BUTTON_DESC
 LANG_ENGLISH        "Short tutorials explaining various game mechanics."
 LANG_GERMAN         "#same"
 
+REFERENCE           CONTROL_SCHEME_HELP
+LANG_ENGLISH        "Default Control Scheme"
+LANG_GERMAN         "#same"
+
 REFERENCE           TUTORIAL_VIDEO_1
-LANG_ENGLISH        "How to quick save / load"
+LANG_ENGLISH        "Select Weapons / Force / Items"
 LANG_GERMAN         "#same"
 
 REFERENCE           TUTORIAL_VIDEO_2
-LANG_ENGLISH        "How to use weapon scopes"
+LANG_ENGLISH        "Weapon Scopes"
 LANG_GERMAN         "#same"
 
 REFERENCE           TUTORIAL_VIDEO_3
-LANG_ENGLISH        "How to use inventory items"
+LANG_ENGLISH        "Throw the Saber"
 LANG_GERMAN         "#same"
 
 REFERENCE           TUTORIAL_VIDEO_4
-LANG_ENGLISH        "How to throw the saber"
+LANG_ENGLISH        "Force Gestures (Push and Pull)"
 LANG_GERMAN         "#same"
 
 REFERENCE           TUTORIAL_VIDEO_5
-LANG_ENGLISH        "How to activate useable things"
+LANG_ENGLISH        "Interact / Use"
 LANG_GERMAN         "#same"
 
 REFERENCE           TUTORIAL_VIDEO_6
-LANG_ENGLISH        "How to use force gesture"
-LANG_GERMAN         "#same"
-
-REFERENCE           TUTORIAL_VIDEO_7
-LANG_ENGLISH        "How to use the weapons / force wheel"
-LANG_GERMAN         "#same"
-
-REFERENCE           TUTORIAL_VIDEO_8
-LANG_ENGLISH        "Introduction to lightsaber duels"
-LANG_GERMAN         "#same"
-
-REFERENCE           CONTROL_SCHEME_HELP
-LANG_ENGLISH        "Default control scheme"
+LANG_ENGLISH        "Quick Save / Load"
 LANG_GERMAN         "#same"
 
 REFERENCE           MODS_BUTTON_DESC
