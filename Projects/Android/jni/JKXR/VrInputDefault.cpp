@@ -167,6 +167,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     rotation[PITCH] += lerp * TBDC_SABER_BOUNCEANGLE;
                     rotation[YAW] += lerp * TBDC_SABER_BOUNCEANGLE;
                     break;
+                default:
+                    rotation[PITCH] -= lerp * TBDC_SABER_BOUNCEANGLE;
+                    rotation[YAW] += lerp * (TBDC_SABER_BOUNCEANGLE / 2);
+                    break;
+
             }
         }
         /*else if(cl.serverTime > vr.saberBlockDebounce + 3000)
@@ -729,7 +734,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                      (secondaryButtonsOld & secondaryButton1)) &&
                     (secondaryButtonsNew & secondaryButton1)) {
 #ifdef JK2_MODE
-                    //sendButtonActionSimple("save quik*");
+                    sendButtonActionSimple("save quik*");
 #else
                     sendButtonActionSimple("save quick");
 #endif
