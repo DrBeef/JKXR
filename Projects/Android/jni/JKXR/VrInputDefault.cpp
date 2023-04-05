@@ -414,7 +414,9 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
         }
 
-        static bool changed = false;
+        /*
+        //Parameter Changer
+         static bool changed = false;
         if (between(-0.2f, primaryJoystickX, 0.2f) &&
             between(0.8f, pPrimaryJoystick->y, 1.0f)) {
             if(!changed) {
@@ -433,7 +435,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         else
         {
             changed = false;
-        }
+        }*/
 
         //dominant hand stuff first
         {
@@ -445,7 +447,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             VectorCopy(vr.weaponoffset, vr.weaponoffset_history[0]);
             vr.weaponoffset_history_timestamp[0] = vr.weaponoffset_timestamp;
 
-            //if (vr.saberBlockDebounce < cl.serverTime) {
+
             VectorSet(vr.weaponposition, pWeapon->Pose.position.x,
                       pWeapon->Pose.position.y, pWeapon->Pose.position.z);
 
@@ -454,7 +456,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                       pWeapon->Pose.position.y, pWeapon->Pose.position.z);
             VectorSubtract(vr.weaponoffset, vr.hmdposition, vr.weaponoffset);
             vr.weaponoffset_timestamp = Sys_Milliseconds();
-            //}
+
 
             vec3_t velocity;
             VectorSet(velocity, pWeapon->Velocity.linearVelocity.x,
