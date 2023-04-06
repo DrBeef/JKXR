@@ -123,4 +123,11 @@ JKXR\Projects\Android\libs\arm64-v8a
 
 ## Credits
 
-TODO
+* Team Beef are DrBeef,  Baggyg,  Bummser
+* Lead programmer: DrBeef
+* JKXR Companion App: BaggyG
+* Additional Development Contributions: MuadDib, BaggyG
+* VR Compatible Weapon Models: Vince Crusty  and  Elin
+* With Special Thanks to: Team Beef patrons, all Team Beef discord members, 
+the OpenJK Development Team and Raven Software for
+creating and open-sourcing these wonderful games
