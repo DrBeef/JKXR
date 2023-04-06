@@ -52,8 +52,14 @@ Projectile speeds are faithful to the original game, but enemy movement and aggr
 
 To switch between modes change the option and if already in-game, restart the level you are on.
 
-## IMPORTANT NOTE
+### Companion App
 
+The companion app will be installed at the same time when using the SideQuest official page. This allows you to download mods and addons and switch between launching single player missions and the main game. This also detects if you've correctly set up the main application and asset files so is a good place to look if you are having issues. 
+
+![image](https://user-images.githubusercontent.com/4569081/230429909-2df64bb6-e200-496f-ba5f-bda763539de0.png)
+
+
+## IMPORTANT NOTE
 
 *This is just an engine port*; the apk does not contain any of the of Jedi Knight game assets. If you wish to play the full game you must purchase it yourself, steam is most straightforward:  https://store.steampowered.com/app/6030/STAR_WARS_Jedi_Knight_II__Jedi_Outcast/
 
@@ -95,7 +101,7 @@ You can find tutorial videos on how to use the special VR features in the in-gam
 
 ![image](https://user-images.githubusercontent.com/4569081/230427577-59d77ff2-b960-4817-bbcd-d7722dcd1ead.png)
 
-TUTORIAL PIC
+### Control Scheme
 
 This control scheme on how to play can also be found in the Controls -> JKXR HELP in the game.
 
