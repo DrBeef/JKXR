@@ -20,6 +20,13 @@ The public release of JK XR currently supports the game Jedi Outcast; access to 
 
 
 
+## Team Beef Patreon
+[![Team Beef Patreon](https://github.com/DrBeef/JKXR/blob/main/assets/PatreonBanner.jpg)](https://www.patreon.com/teambeef)
+
+The Team Beef Patreon where you can find all the in-development early-access builds for JK XR with Jedi Academy support, as well as other active projects can be found.
+
+
+
 ## IMPORTANT NOTE
 
 
@@ -66,14 +73,6 @@ https://trello.com/c/Idb627uv/47-pico-4-installation-instructions
 This control scheme and helpful short videos on how to play can be found in the Controls -> JKXR HELP in the game.
 
 ![Control Scheme](https://github.com/DrBeef/JKXR/blob/main/z_vr_assets_base/gfx/menus/control_scheme.jpg)
-
-
-## Team Beef Patreon
-![Team Beef](https://github.com/DrBeef/JKXR/blob/main/assets/PatreonBanner.jpg)
-
-The Team Beef Patreon where you can find all the in-development early-access builds for JK XR with Jedi Academy support, as well as other active projects can be found here:
-
-https://www.patreon.com/teambeef
 
 
 ## Building from Source
