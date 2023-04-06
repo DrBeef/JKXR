@@ -164,6 +164,13 @@ void VR_SetHMDOrientation(float pitch, float yaw, float roll)
 	if (!vr.maxHeight || vr.maxHeight < 1.0) {
 		vr.maxHeight = vr.hmdposition[1];
 	}
+
+	//GB Instantiate initial velocity
+	if(!vr.tempWeaponVelocity)
+	{
+		vr.tempWeaponVelocity = 400.0f;
+	}
+
 	vr.curHeight = vr.hmdposition[1];
 }
 

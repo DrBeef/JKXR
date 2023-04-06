@@ -27,6 +27,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "b_local.h"
 #include "b_public.h"
 #include "anims.h"
+#include <JKXR/VrTBDC.h>
+extern cvar_t	*g_TeamBeefDirectorsCut;
 
 extern qboolean NPCsPrecached;
 extern vec3_t playerMins;
@@ -1082,6 +1084,51 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 		NPCName = "Player";
 	}
 
+    //Override scale due to TBDC
+    if(g_TeamBeefDirectorsCut->value)
+    {
+        if(!Q_stricmp( NPCName, "STOfficer" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_STOFFICER /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "STOfficerAlt" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_STOFFICERALT /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "STCommander" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_STOFFICERALT /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "Imperial" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_IMPERIAL /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "ImpOfficer" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_IMPERIALOFFICER /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "ImpCommander" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_IMPERIALCOMMANDER /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "RebornAcrobat" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_REBORNACROBAT /100.0f;
+        }
+		else if(!Q_stricmp( NPCName, "Reborn" ))
+		{
+			NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_REBORN /100.0f;
+		}
+        else if(!Q_stricmp( NPCName, "RebornForceUser" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_REBORNFORCEUSER /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "RebornFencer" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_REBORNBOSS /100.0f;
+        }
+    }
+
 	if ( NPC->NPC )
 	{
 		stats = &NPC->NPC->stats;
@@ -1221,6 +1268,50 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 
 			if ( !Q_stricmp( token, "}" ) )
 			{
+				//Override scale due to TBDC
+				if(g_TeamBeefDirectorsCut->value)
+				{
+					if(!Q_stricmp( NPCName, "STOfficer" ))
+					{
+						NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_STOFFICER /100.0f;
+					}
+					else if(!Q_stricmp( NPCName, "STOfficerAlt" ))
+					{
+						NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_STOFFICERALT /100.0f;
+					}
+					else if(!Q_stricmp( NPCName, "STCommander" ))
+					{
+						NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_STOFFICERALT /100.0f;
+					}
+					else if(!Q_stricmp( NPCName, "Imperial" ))
+					{
+						NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_IMPERIAL /100.0f;
+					}
+					else if(!Q_stricmp( NPCName, "ImpOfficer" ))
+					{
+						NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_IMPERIALOFFICER /100.0f;
+					}
+					else if(!Q_stricmp( NPCName, "ImpCommander" ))
+					{
+						NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_IMPERIALCOMMANDER /100.0f;
+					}
+					else if(!Q_stricmp( NPCName, "RebornAcrobat" ))
+					{
+						NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_REBORNACROBAT /100.0f;
+					}
+					else if(!Q_stricmp( NPCName, "Reborn" ))
+					{
+						NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_REBORN /100.0f;
+					}
+					else if(!Q_stricmp( NPCName, "RebornForceUser" ))
+					{
+						NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_REBORNFORCEUSER /100.0f;
+					}
+					else if(!Q_stricmp( NPCName, "RebornFencer" ))
+					{
+						NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_REBORNBOSS /100.0f;
+					}
+				}
 				break;
 			}
 	//===MODEL PROPERTIES===========================================================
@@ -2220,15 +2311,21 @@ Ghoul2 Insert End
 	return qtrue;
 }
 
+extern cvar_t	*g_TeamBeefDirectorsCut;
+
 void NPC_LoadParms( void )
 {
 	int			len, totallen, npcExtFNLen, mainBlockLen, fileCnt, i;
-	const char	filename[] = "ext_data/NPCs.cfg";
+
+	char npcs_filename[64];
+	Com_sprintf(npcs_filename, sizeof(npcs_filename), "ext_data/%s.cfg",
+				g_TeamBeefDirectorsCut->integer ? "npcs" : "npcs_og");
+
 	char		*buffer, *holdChar, *marker;
 	char		npcExtensionListBuf[2048];			//	The list of file names read in
 
 	//First, load in the npcs.cfg
-	len = gi.FS_ReadFile( filename, (void **) &buffer );
+	len = gi.FS_ReadFile( npcs_filename, (void **) &buffer );
 	if ( len == -1 ) {
 		gi.Printf( "file not found\n" );
 		return;

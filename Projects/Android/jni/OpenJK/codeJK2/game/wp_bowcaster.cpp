@@ -29,6 +29,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "bg_local.h"
 
 #include <JKXR/VrClientInfo.h>
+#include <JKXR/VrTBDC.h>
+extern cvar_t	*g_TeamBeefDirectorsCut;
 
 //-------------------
 //	Wookiee Bowcaster
@@ -98,7 +100,14 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 	for ( int i = 0; i < count; i++ )
 	{
 		// create a range of different velocities
-		vel = BOWCASTER_VELOCITY * ( Q_flrand(-1.0f, 1.0f) * BOWCASTER_VEL_RANGE + 1.0f );
+		if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->value)
+		{
+			vel = TBDC_BOWCASTER_VELOCITY * ( Q_flrand(-1.0f, 1.0f) * BOWCASTER_VEL_RANGE + 1.0f );;
+		}
+		else
+		{
+			vel = BOWCASTER_VELOCITY * ( Q_flrand(-1.0f, 1.0f) * BOWCASTER_VEL_RANGE + 1.0f );
+		}
 
 		vectoangles( forward, angs );
 
@@ -160,8 +169,12 @@ static void WP_BowcasterAltFire( gentity_t *ent )
 	}
 
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
-
-	gentity_t *missile = CreateMissile( start, forward, BOWCASTER_VELOCITY, 10000, ent, qtrue );
+	float velocity = BOWCASTER_VELOCITY;
+	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->value)
+	{
+		velocity = TBDC_BOWCASTER_VELOCITY;
+	}
+	gentity_t *missile = CreateMissile( start, forward, velocity, 10000, ent, qtrue );
 
 	missile->classname = "bowcaster_alt_proj";
 	missile->s.weapon = WP_BOWCASTER;

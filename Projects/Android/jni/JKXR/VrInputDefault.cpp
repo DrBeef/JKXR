@@ -17,6 +17,7 @@ Authors		:	Simon Brown
 #include <client/client.h>
 #include <statindex.h>
 #include "android/sys_local.h"
+#include "VrTBDC.h"
 
 #ifdef JK2_MODE
 #include "../OpenJK/codeJK2/game/weapons.h"
@@ -121,12 +122,68 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles[ANGLES_DEFAULT]);
         QuatToYawPitchRoll(pOff->Pose.orientation, rotation, vr.offhandangles[ANGLES_DEFAULT]);
 
-        //if we are in saber block debounce, don't update the saber angles
-        if (vr.saberBlockDebounce < cl.serverTime) {
-            rotation[PITCH] = 45;
-            QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles[ANGLES_SABER]);
-            QuatToYawPitchRoll(pOff->Pose.orientation, rotation, vr.offhandangles[ANGLES_SABER]);
+        rotation[PITCH] = 45;
+        //If we are in a saberBlockDebounce thing then add on an angle
+        //Lerped upon how far from the start of the saber move
+        if (vr.saberBlockDebounce > cl.serverTime) {
+            float lerp = 0.0f;
+            //Where are we in the lerp
+            // 0 = vr.saberBlockDebounce - TBDC_SABER_BOUNCETIME
+            // 1 = vr.saberBlockDebounce - TBDC_SABER_BOUNCETIME / 2
+            // 0 (again) = vr.saberBlockDebounce
+            if(cl.serverTime < vr.saberBlockDebounce - TBDC_SABER_BOUNCETIME / 2)
+            {
+                //Somewhere between 0 and 1
+                lerp = float(cl.serverTime - (vr.saberBlockDebounce - TBDC_SABER_BOUNCETIME)) / float((vr.saberBlockDebounce - TBDC_SABER_BOUNCETIME / 2) - (vr.saberBlockDebounce - TBDC_SABER_BOUNCETIME));
+            }
+            else
+            {
+                //Somewhere between 1 and 0
+                lerp = 1 - float(cl.serverTime - (vr.saberBlockDebounce - TBDC_SABER_BOUNCETIME / 2)) / float(vr.saberBlockDebounce - (vr.saberBlockDebounce - TBDC_SABER_BOUNCETIME / 2));
+            }
+            switch(vr.saberBounceMove) {
+                case VRLS_B1_BR:
+                    rotation[PITCH] += lerp * TBDC_SABER_BOUNCEANGLE;
+                    rotation[YAW] -= lerp * TBDC_SABER_BOUNCEANGLE;
+                    break;
+                case VRLS_B1__R:
+                    rotation[YAW] -= lerp * TBDC_SABER_BOUNCEANGLE;
+                    break;
+                case VRLS_B1_TR:
+                    rotation[PITCH] -= lerp * TBDC_SABER_BOUNCEANGLE;
+                    rotation[YAW] -= lerp * TBDC_SABER_BOUNCEANGLE;
+                    break;
+                case VRLS_B1_T_:
+                    rotation[PITCH] -= lerp * TBDC_SABER_BOUNCEANGLE;
+                    break;
+                case VRLS_B1_TL:
+                    rotation[PITCH] -= lerp * TBDC_SABER_BOUNCEANGLE;
+                    rotation[YAW] += lerp * TBDC_SABER_BOUNCEANGLE;
+                    break;
+                case VRLS_B1__L:
+                    rotation[YAW] += lerp * TBDC_SABER_BOUNCEANGLE;
+                    break;
+                case VRLS_B1_BL:
+                    rotation[PITCH] += lerp * TBDC_SABER_BOUNCEANGLE;
+                    rotation[YAW] += lerp * TBDC_SABER_BOUNCEANGLE;
+                    break;
+                default:
+                    rotation[PITCH] -= lerp * TBDC_SABER_BOUNCEANGLE;
+                    rotation[YAW] += lerp * (TBDC_SABER_BOUNCEANGLE / 2);
+                    break;
+
+            }
         }
+        /*else if(cl.serverTime > vr.saberBlockDebounce + 3000)
+        {
+            if(vr.saberBounceMove < 82)
+            {
+                vr.saberBounceMove = 82;
+            }
+            vr.saberBlockDebounce = cl.serverTime + TBDC_SABER_BOUNCETIME;
+        }*/
+        QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles[ANGLES_SABER]);
+        QuatToYawPitchRoll(pOff->Pose.orientation, rotation, vr.offhandangles[ANGLES_SABER]);
 
         rotation[PITCH] = vr_weapon_pitchadjust->value;
         QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles[ANGLES_ADJUSTED]);
@@ -167,6 +224,14 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 vr.menu_right_handed = !vr.menu_right_handed;
             }
         }
+
+        //Close the datapad
+        if (((secondaryButtonsNew & secondaryButton2) !=
+                 (secondaryButtonsOld & secondaryButton2)) &&
+                (secondaryButtonsNew & secondaryButton2)) {
+                Sys_QueEvent(0, SE_KEY, A_TAB, true, 0, NULL);
+        }
+
     }
     else
     {
@@ -349,6 +414,29 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
         }
 
+        /*
+        //Parameter Changer
+         static bool changed = false;
+        if (between(-0.2f, primaryJoystickX, 0.2f) &&
+            between(0.8f, pPrimaryJoystick->y, 1.0f)) {
+            if(!changed) {
+                vr.tempWeaponVelocity += 25;
+                changed = true;
+                ALOGV("**TBDC** Projectile speed %f",vr.tempWeaponVelocity);
+            }
+       } else if (between(-0.2f, primaryJoystickX, 0.2f) &&
+                    between(-1.0f, pPrimaryJoystick->y, -0.8f)) {
+            if(!changed) {
+                vr.tempWeaponVelocity -= 25;
+                ALOGV("**TBDC** Projectile speed %f",vr.tempWeaponVelocity);
+                changed = true;
+            }
+        }
+        else
+        {
+            changed = false;
+        }*/
+
         //dominant hand stuff first
         {
             //Record recent weapon position for trajectory based stuff
@@ -359,16 +447,16 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             VectorCopy(vr.weaponoffset, vr.weaponoffset_history[0]);
             vr.weaponoffset_history_timestamp[0] = vr.weaponoffset_timestamp;
 
-            if (vr.saberBlockDebounce < cl.serverTime) {
-                VectorSet(vr.weaponposition, pWeapon->Pose.position.x,
-                          pWeapon->Pose.position.y, pWeapon->Pose.position.z);
 
-                ///Weapon location relative to view
-                VectorSet(vr.weaponoffset, pWeapon->Pose.position.x,
-                          pWeapon->Pose.position.y, pWeapon->Pose.position.z);
-                VectorSubtract(vr.weaponoffset, vr.hmdposition, vr.weaponoffset);
-                vr.weaponoffset_timestamp = Sys_Milliseconds();
-            }
+            VectorSet(vr.weaponposition, pWeapon->Pose.position.x,
+                      pWeapon->Pose.position.y, pWeapon->Pose.position.z);
+
+            ///Weapon location relative to view
+            VectorSet(vr.weaponoffset, pWeapon->Pose.position.x,
+                      pWeapon->Pose.position.y, pWeapon->Pose.position.z);
+            VectorSubtract(vr.weaponoffset, vr.hmdposition, vr.weaponoffset);
+            vr.weaponoffset_timestamp = Sys_Milliseconds();
+
 
             vec3_t velocity;
             VectorSet(velocity, pWeapon->Velocity.linearVelocity.x,
@@ -636,7 +724,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             // Check quicksave
             static bool indicateQuickSave = true;
             if (canUseQuickSave) {
-                int channel = (vr_control_scheme->integer >= 10) ? 2 : 1;
+                //GB Fix buzzing left controller not right
+                int channel = (vr_control_scheme->integer >= 10) ? 1 : 2;
                 if (indicateQuickSave)
                 {
                     TBXR_Vibrate(40, channel, 0.5); // vibrate to let user know they can switch
