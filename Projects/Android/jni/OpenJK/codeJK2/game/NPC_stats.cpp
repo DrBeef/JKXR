@@ -2220,15 +2220,21 @@ Ghoul2 Insert End
 	return qtrue;
 }
 
+extern cvar_t	*g_TeamBeefDirectorsCut;
+
 void NPC_LoadParms( void )
 {
 	int			len, totallen, npcExtFNLen, mainBlockLen, fileCnt, i;
-	const char	filename[] = "ext_data/NPCs.cfg";
+
+	char npcs_filename[64];
+	Com_sprintf(npcs_filename, sizeof(npcs_filename), "ext_data/%s.cfg",
+				g_TeamBeefDirectorsCut->integer ? "npcs" : "npcs_og");
+
 	char		*buffer, *holdChar, *marker;
 	char		npcExtensionListBuf[2048];			//	The list of file names read in
 
 	//First, load in the npcs.cfg
-	len = gi.FS_ReadFile( filename, (void **) &buffer );
+	len = gi.FS_ReadFile( npcs_filename, (void **) &buffer );
 	if ( len == -1 ) {
 		gi.Printf( "file not found\n" );
 		return;
