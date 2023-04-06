@@ -22,6 +22,21 @@
 #define TBDC_SABER_BOUNCETIME       200
 #define TBDC_SABER_BOUNCEANGLE       90
 
+//SCALES
+#define TBDC_SCALE_STOFFICER            102
+#define TBDC_SCALE_STOFFICERALT         102
+#define TBDC_SCALE_STCOMMANDER          103
+
+#define TBDC_SCALE_IMPERIAL             101
+#define TBDC_SCALE_IMPERIALOFFICER      102
+#define TBDC_SCALE_IMPERIALCOMMANDER    103
+
+#define TBDC_SCALE_REBORN               102
+#define TBDC_SCALE_REBORNFORCEUSER      102
+#define TBDC_SCALE_REBORNBOSS           103
+#define TBDC_SCALE_REBORNACROBAT        102
+
+
 typedef enum {
     // Invalid, or saber not armed
     VRLS_NONE		= 0,

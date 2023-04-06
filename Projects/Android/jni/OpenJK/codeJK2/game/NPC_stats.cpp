@@ -27,6 +27,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "b_local.h"
 #include "b_public.h"
 #include "anims.h"
+#include <JKXR/VrTBDC.h>
+extern cvar_t	*g_TeamBeefDirectorsCut;
 
 extern qboolean NPCsPrecached;
 extern vec3_t playerMins;
@@ -1081,6 +1083,51 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 	{
 		NPCName = "Player";
 	}
+
+    //Override scale due to TBDC
+    if(g_TeamBeefDirectorsCut->value)
+    {
+        if(!Q_stricmp( NPCName, "STOfficer" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_STOFFICER /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "STOfficerAlt" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_STOFFICERALT /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "STCommander" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_STOFFICERALT /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "Imperial" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_IMPERIAL /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "ImpOfficer" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_IMPERIALOFFICER /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "ImpCommander" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_IMPERIALCOMMANDER /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "RebornAcrobat" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_REBORNACROBAT /100.0f;
+        }
+		else if(!Q_stricmp( NPCName, "Reborn" ))
+		{
+			NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_REBORN /100.0f;
+		}
+        else if(!Q_stricmp( NPCName, "RebornForceUser" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_REBORNFORCEUSER /100.0f;
+        }
+        else if(!Q_stricmp( NPCName, "RebornFencer" ))
+        {
+            NPC->s.modelScale[0] = NPC->s.modelScale[1] = NPC->s.modelScale[2] = TBDC_SCALE_REBORNBOSS /100.0f;
+        }
+    }
 
 	if ( NPC->NPC )
 	{
