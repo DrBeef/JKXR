@@ -23,7 +23,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 // Current version of the single player game
 #include "../win32/AutoVersion.h"
 
-#define JKXR_VERSION		"0.8.0"
+#define JKXR_VERSION		"1.0.0"
 
 #ifdef _DEBUG
 	#define	Q3_VERSION		"(debug)OpenJK: v" VERSION_STRING_DOTTED "  JKXR: " JKXR_VERSION
