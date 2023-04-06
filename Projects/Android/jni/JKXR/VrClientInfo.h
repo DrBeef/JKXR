@@ -29,6 +29,9 @@ typedef struct {
     bool third_person;
     float fov_x;
     float fov_y;
+
+    float tempWeaponVelocity;
+
     bool immersive_cinematics;
     bool weapon_stabilised;
     bool right_handed;
@@ -40,6 +43,7 @@ typedef struct {
     int cgzoommode;
     int cgzoomdir;
     int saberBlockDebounce; // Amount of time after player is blocked that the saber position is fixed
+    short saberBounceMove;
 
     int forceid;
 

@@ -28,6 +28,9 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "w_local.h"
 #include "g_functions.h"
 #include "bg_local.h"
+#include <JKXR/VrClientInfo.h>
+#include <JKXR/VrTBDC.h>
+extern cvar_t	*g_TeamBeefDirectorsCut;
 
 //-------------------
 //	Heavy Repeater
@@ -41,7 +44,12 @@ static void WP_RepeaterMainFire( gentity_t *ent, vec3_t dir, vec3_t start )
 
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
-	gentity_t *missile = CreateMissile( start, dir, REPEATER_VELOCITY, 10000, ent );
+	float velocity = REPEATER_VELOCITY;
+	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->value)
+	{
+		velocity = TBDC_REPEATER_VELOCITY;
+	}
+	gentity_t *missile = CreateMissile( start, dir, velocity, 10000, ent );
 
 	missile->classname = "repeater_proj";
 	missile->s.weapon = WP_REPEATER;
@@ -105,7 +113,12 @@ static void WP_RepeaterAltFire( gentity_t *ent )
 	}
 	else
 	{
-		missile = CreateMissile( start, forward, REPEATER_ALT_VELOCITY, 10000, ent, qtrue );
+		float velocity = REPEATER_ALT_VELOCITY;
+		if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->value)
+		{
+			velocity = TBDC_REPEATER_ALT_VELOCITY;
+		}
+		missile = CreateMissile( start, forward, velocity, 10000, ent, qtrue );
 	}
 
 	missile->classname = "repeater_alt_proj";
