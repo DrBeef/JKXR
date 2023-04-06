@@ -93,6 +93,8 @@ Any update will not affect any of your save game files.
 
 You can find tutorial videos on how to use the special VR features in the in-game Controls -> JKXR HELP menu. 
 
+![image](https://user-images.githubusercontent.com/4569081/230427577-59d77ff2-b960-4817-bbcd-d7722dcd1ead.png)
+
 TUTORIAL PIC
 
 This control scheme on how to play can also be found in the Controls -> JKXR HELP in the game.
