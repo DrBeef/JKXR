@@ -39,6 +39,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include <float.h>
 #include <JKXR/VrClientInfo.h>
+#include <JKXR/VrTBDC.h>
+extern cvar_t	*g_TeamBeefDirectorsCut;
 
 extern qboolean G_DoDismemberment( gentity_t *self, vec3_t point, int mod, int damage, int hitLoc, qboolean force = qfalse );
 extern qboolean G_EntIsUnlockedDoor( int entityNum );
@@ -7642,6 +7644,7 @@ void PM_WeaponLightsaber(void)
 		PM_AddEvent( EV_FIRE_WEAPON );
 		if ( !addTime )
 		{
+
 			addTime = weaponData[pm->ps->weapon].fireTime;
 			if ( g_timescale != NULL )
 			{
@@ -8403,7 +8406,20 @@ static void PM_Weapon( void )
 			return;
 		}
 		PM_AddEvent( EV_FIRE_WEAPON );
-		addTime = weaponData[pm->ps->weapon].fireTime;
+
+		if(pm->ps->weapon == WP_BRYAR_PISTOL && g_TeamBeefDirectorsCut->value)
+		{
+			addTime = TBDC_BRYAR_PISTOL_FIRERATE;
+		}
+		else if(pm->ps->weapon == WP_BLASTER && g_TeamBeefDirectorsCut->value)
+		{
+			addTime = TBDC_BLASTER_FIRERATE;
+		}
+		else
+		{
+			addTime = weaponData[pm->ps->weapon].fireTime;
+		}
+
 
 		switch( pm->ps->weapon)
 		{
