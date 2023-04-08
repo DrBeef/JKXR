@@ -1184,6 +1184,7 @@ void CG_AddViewWeapon( playerState_t *ps )
 
 	if (strcmp(cgi_Cvar_Get("vr_control_scheme"), "99") == 0) {
 		vec3_t origin;
+		vec3_t startForward, startRight, startUp;
 		vec3_t endForward, endRight, endUp;
 		vec3_t _angles;
 		BG_CalculateVRWeaponPosition(   origin,        _angles );
@@ -1192,25 +1193,28 @@ void CG_AddViewWeapon( playerState_t *ps )
 		AngleVectors(_angles, forward, right, up);
 
 		trace_t trace;
+		VectorMA(origin, -10, forward, startForward);
 		VectorMA(origin, 256, forward, endForward);
 		static vec3_t RED	= {1.0f,0.0f,0.0f};
-		FX_AddLine( -1, origin, endForward, 0.1f, 4.0f, 0.0f,
+		FX_AddLine( -1, startForward, endForward, 0.1f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					RED, RED, 0.0f,
-					120, cgi_R_RegisterShader( "gfx/effects/whiteline2" ),
+					120, cgi_R_RegisterShader( "gfx/misc/whiteline2" ),
 					0, FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
-		VectorMA(origin, 20, right, endRight);
+		VectorMA(origin, -10, right, startRight);
+		VectorMA(origin, 10, right, endRight);
 		vec3_t	BLUE = {0.0f,0.0f,1.0f};
-		FX_AddLine( -1, origin, endRight, 0.1f, 4.0f, 0.0f,
+		FX_AddLine( -1, startRight, endRight, 0.1f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					BLUE, BLUE, 0.0f,
 					120, cgi_R_RegisterShader( "gfx/misc/whiteline2" ),
 					0, FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
-		VectorMA(origin, 20, up, endUp);
+		VectorMA(origin, -10, up, startUp);
+		VectorMA(origin, 10, up, endUp);
 		vec3_t	GREEN = {0.0f,1.0f,0.0f};
-		FX_AddLine( -1, origin, endUp, 0.1f, 4.0f, 0.0f,
+		FX_AddLine( -1, startUp, endUp, 0.1f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					GREEN, GREEN, 0.0f,
 					120, cgi_R_RegisterShader( "gfx/misc/whiteline2" ),
