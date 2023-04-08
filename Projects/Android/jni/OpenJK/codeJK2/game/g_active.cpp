@@ -819,11 +819,12 @@ void ClientImpacts( gentity_t *ent, pmove_t *pm ) {
 
 }
 
- // Use triggers seems to have bigger "front" boundaries
- // (with longer range player often reaches behind them
- // not activating them at all)
-const	float	TOUCH_DISTANCE =	1.0f;
-const	vec3_t	TOUCH_RANGE =		{ 4, 4, 4 };
+// Use triggers seems to have bigger "front" boundaries allowing
+// user to trigger them from distance while it is possible to reach
+// through them when standing near. To ballance this, move hand
+// origin a bit back
+const float TOUCH_OFFSET = -10.0f;
+const vec3_t TOUCH_RANGE = { 4, 4, 4 };
 
 void	G_TouchTriggersWithHand( bool offHand, gentity_t *ent, vec3_t src, vec3_t vf ) {
 	vec3_t		dest, mins, maxs;
@@ -834,7 +835,7 @@ void	G_TouchTriggersWithHand( bool offHand, gentity_t *ent, vec3_t src, vec3_t v
 
 	memset (touched, qfalse, sizeof(touched) );
 
-	VectorMA( src, TOUCH_DISTANCE, vf, dest );
+	VectorMA( src, TOUCH_OFFSET, vf, dest );
 	VectorSubtract( dest, TOUCH_RANGE, mins );
 	VectorAdd( dest, TOUCH_RANGE, maxs );
 

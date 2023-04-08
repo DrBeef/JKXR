@@ -1669,12 +1669,15 @@ qboolean CanUseInfrontOf(gentity_t *ent)
 		return qfalse;
 	}
 
+	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
+	if (thirdPersonActive) {
+		VectorCopy(ent->currentOrigin, src);
+		AngleVectors(ent->currentAngles, vf, NULL, NULL);
+	} else {
+		VectorCopy( ent->client->renderInfo.eyePoint, src );
+		AngleVectors( ent->client->ps.viewangles, vf, NULL, NULL );
+	}
 
-	//FIXME: this does not match where the new accurate crosshair aims...
-	//cg.refdef.vieworg, basically
-	VectorCopy( ent->client->renderInfo.eyePoint, src );
-
-	AngleVectors( ent->client->ps.viewangles, vf, NULL, NULL );
 	//extend to find end of use trace
 	VectorMA( src, USE_DISTANCE, vf, dest );
 
@@ -1757,7 +1760,10 @@ Try and use an entity in the world, directly ahead of us
 */
 
 #define USE_DISTANCE_BUTTON		64.0f
-#define USE_DISTANCE_GESTURE	16.0f
+#define USE_DISTANCE_GESTURE	26.0f
+// Move controller origin a bit back to prevent reach
+// through usable entities when use gesture is active
+#define USE_OFFSET				-10.0f
 
 void TryUse_Internal( bool offHand, gentity_t *ent, vec3_t src, vec3_t vf )
 {
@@ -1769,7 +1775,9 @@ void TryUse_Internal( bool offHand, gentity_t *ent, vec3_t src, vec3_t vf )
 	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
 	bool useGestureEnabled = gi.cvar("vr_gesture_triggered_use", "1", CVAR_ARCHIVE)->integer; // defined in VrCvars.h
 	bool useGestureAllowed = useGestureEnabled && !thirdPersonActive;
+	float useOffset = useGestureAllowed ? USE_OFFSET : 0.0f;
 	float useDistance = useGestureAllowed ? USE_DISTANCE_GESTURE : USE_DISTANCE_BUTTON;
+	VectorMA( src, useOffset, vf, src );
 	VectorMA( src, useDistance, vf, dest );
 
 	//Trace ahead to find a valid target
@@ -1863,10 +1871,16 @@ void TryUse( gentity_t *ent ) {
 
 	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
 	vec3_t src, angles, vf;
-	if (ent->client->ps.clientNum == 0 && !thirdPersonActive) {
-		BG_CalculateVRWeaponPosition(src, angles);
-		AngleVectors( angles, vf, NULL, NULL );
-		TryUse_Internal(false, ent, src, vf);
+	if (ent->client->ps.clientNum == 0) {
+		if (thirdPersonActive) {
+			VectorCopy(ent->currentOrigin, src);
+			AngleVectors(ent->currentAngles, vf, NULL, NULL);
+			TryUse_Internal(false, ent, src, vf);
+		} else {
+			BG_CalculateVRWeaponPosition(src, angles);
+			AngleVectors( angles, vf, NULL, NULL );
+			TryUse_Internal(false, ent, src, vf);
+		}
 	} else {
 		VectorCopy(ent->client->renderInfo.eyePoint, src);
 		AngleVectors(ent->client->ps.viewangles, vf, NULL, NULL);
