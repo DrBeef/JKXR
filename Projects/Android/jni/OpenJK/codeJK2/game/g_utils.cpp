@@ -1442,6 +1442,14 @@ qboolean CanUseInfrontOf(gentity_t *ent)
 		return qfalse;
 	}
 
+	// Check if player is standing on drivable AT-ST
+	if (ent->client->ps.groundEntityNum < ENTITYNUM_WORLD) {
+		target = &g_entities[ent->client->ps.groundEntityNum];
+		if (target && target->e_UseFunc == useF_misc_atst_use) {
+			return qtrue;
+		}
+	}
+
 	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
 	if (thirdPersonActive) {
 		VectorCopy(ent->currentOrigin, src);
@@ -1482,13 +1490,6 @@ qboolean CanUseInfrontOf(gentity_t *ent)
 			}
 			if ( !BG_CanItemBeGrabbed( &target->s, &ent->client->ps ) )
 			{//nope, so don't indicate that we can use it
-				return qfalse;
-			}
-		}
-		else if ( target->e_UseFunc == useF_misc_atst_use )
-		{//drivable AT-ST from JK2
-			if ( ent->client->ps.groundEntityNum != target->s.number )
-			{//must be standing on it to use it
 				return qfalse;
 			}
 		}
@@ -1535,6 +1536,15 @@ void TryUse_Internal( bool offHand, gentity_t *ent, vec3_t src, vec3_t vf ) {
 	gentity_t *target;
 	trace_t trace;
 	vec3_t dest;
+
+	// Drivable AT-ST can be used if player stands on it
+	if (ent->client->ps.groundEntityNum < ENTITYNUM_WORLD) {
+		target = &g_entities[ent->client->ps.groundEntityNum];
+		if (target && target->e_UseFunc == useF_misc_atst_use) {
+			GEntity_UseFunc( target, ent, ent );
+			return;
+		}
+	}
 
 	//extend to find end of use trace
 	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
