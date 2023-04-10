@@ -105,6 +105,9 @@ typedef struct {
 
 	qhandle_t	iconMoveSpeed[3];
 
+	qhandle_t 	iconSave;
+	qhandle_t 	iconLoad;
+
 	int			currentDataPadIconBackground;
 
 //Chunks

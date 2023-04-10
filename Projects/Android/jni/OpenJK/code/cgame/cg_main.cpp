@@ -1453,6 +1453,9 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.iconMoveSpeed[1] = cgi_R_RegisterShaderNoMip( "gfx/icon_full" );
 	cgs.media.iconMoveSpeed[2] = cgi_R_RegisterShaderNoMip( "gfx/icon_walk" );
 
+	cgs.media.iconSave = cgi_R_RegisterShaderNoMip( "gfx/icon_save" );
+	cgs.media.iconLoad = cgi_R_RegisterShaderNoMip( "gfx/icon_load" );
+
 	// FIXME: do these conditionally
 	cgi_R_RegisterShader( "gfx/2d/workingCamera" );
 	cgi_R_RegisterShader( "gfx/2d/brokenCamera" );
