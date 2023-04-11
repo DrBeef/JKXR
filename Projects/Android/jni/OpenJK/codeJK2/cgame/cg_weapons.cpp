@@ -3079,7 +3079,7 @@ void CG_DrawItemSelector( void )
 				VectorClear(angles);
 				angles[YAW] = wheelAngles[YAW];
 				angles[PITCH] = wheelAngles[PITCH];
-				angles[ROLL] =
+				angles[ROLL] = (cg.itemSelectorType == ST_QUICK_SAVE  ?  270.0f :  0.0f) +
                         (float)(360 / (count - ((cg.itemSelectorType == ST_WEAPON && !vr->in_vehicle) ? 1 : 0))) * index;
 				vec3_t forward, up;
 				AngleVectors(angles, forward, NULL, up);
