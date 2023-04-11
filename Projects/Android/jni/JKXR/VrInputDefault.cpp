@@ -307,22 +307,42 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
 
         //Left/right to switch between which selector we are using
-        if (vr.item_selector) {
-            static bool itemSwitched = false;
+        if (vr.item_selector == 1) {
+            static bool selectorSwitched = false;
             if (between(-0.2f, pPrimaryJoystick->y, 0.2f) &&
                 (primaryJoystickX > 0.8f || primaryJoystickX < -0.8f)) {
 
-                if (!itemSwitched) {
+                if (!selectorSwitched) {
                     if (primaryJoystickX > 0.8f) {
                         sendButtonActionSimple("itemselectornext");
-                        itemSwitched = true;
+                        selectorSwitched = true;
                     } else if (primaryJoystickX < -0.8f) {
                         sendButtonActionSimple("itemselectorprev");
-                        itemSwitched = true;
+                        selectorSwitched = true;
                     }
                 }
             } else if (between(-0.4f, primaryJoystickX, 0.4f)) {
-                itemSwitched = false;
+                selectorSwitched = false;
+            }
+        }
+
+        //Left/right to switch between which selector we are using
+        if (vr.item_selector == 2) {
+            static bool selectorSwitched = false;
+            if (between(-0.2f, pSecondaryJoystick->y, 0.2f) &&
+                (pSecondaryJoystick->x > 0.8f || pSecondaryJoystick->x < -0.8f)) {
+
+                if (!selectorSwitched) {
+                    if (pSecondaryJoystick->x > 0.8f) {
+                        sendButtonActionSimple("itemselectornext");
+                        selectorSwitched = true;
+                    } else if (pSecondaryJoystick->x < -0.8f) {
+                        sendButtonActionSimple("itemselectorprev");
+                        selectorSwitched = true;
+                    }
+                }
+            } else if (between(-0.4f, pSecondaryJoystick->x, 0.4f)) {
+                selectorSwitched = false;
             }
         }
 
@@ -776,7 +796,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
         {
             //Apply a filter and quadratic scaler so small movements are easier to make
-            float dist = length(pSecondaryJoystick->x, pSecondaryJoystick->y);
+            float dist = 0;
+            if (vr.item_selector != 2)
+            {
+                dist = length(pSecondaryJoystick->x, pSecondaryJoystick->y);
+            }
             float nlf = nonLinearFilter(dist);
             dist = (dist > 1.0f) ? dist : 1.0f;
             float x = nlf * (pSecondaryJoystick->x / dist);
