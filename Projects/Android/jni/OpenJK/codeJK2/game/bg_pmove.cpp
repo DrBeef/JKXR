@@ -8407,11 +8407,11 @@ static void PM_Weapon( void )
 		}
 		PM_AddEvent( EV_FIRE_WEAPON );
 
-		if(pm->ps->weapon == WP_BRYAR_PISTOL && g_TeamBeefDirectorsCut->value)
+		if(pm->ps->weapon == WP_BRYAR_PISTOL && g_TeamBeefDirectorsCut->integer == 1)
 		{
 			addTime = TBDC_BRYAR_PISTOL_FIRERATE;
 		}
-		else if(pm->ps->weapon == WP_BLASTER && g_TeamBeefDirectorsCut->value)
+		else if(pm->ps->weapon == WP_BLASTER && g_TeamBeefDirectorsCut->integer == 1)
 		{
 			addTime = TBDC_BLASTER_FIRERATE;
 		}

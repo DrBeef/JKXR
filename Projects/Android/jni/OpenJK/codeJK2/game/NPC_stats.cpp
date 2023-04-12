@@ -1085,7 +1085,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 	}
 
     //Override scale due to TBDC
-    if(g_TeamBeefDirectorsCut->value)
+    if(g_TeamBeefDirectorsCut->integer == 1)
     {
         if(!Q_stricmp( NPCName, "STOfficer" ))
         {
@@ -1269,7 +1269,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 			if ( !Q_stricmp( token, "}" ) )
 			{
 				//Override scale due to TBDC
-				if(g_TeamBeefDirectorsCut->value)
+				if(g_TeamBeefDirectorsCut->integer == 1)
 				{
 					if(!Q_stricmp( NPCName, "STOfficer" ))
 					{
@@ -2319,7 +2319,7 @@ void NPC_LoadParms( void )
 
 	char npcs_filename[64];
 	Com_sprintf(npcs_filename, sizeof(npcs_filename), "ext_data/%s.cfg",
-				g_TeamBeefDirectorsCut->integer ? "npcs" : "npcs_og");
+				g_TeamBeefDirectorsCut->integer != 0 ? "npcs" : "npcs_og");
 
 	char		*buffer, *holdChar, *marker;
 	char		npcExtensionListBuf[2048];			//	The list of file names read in

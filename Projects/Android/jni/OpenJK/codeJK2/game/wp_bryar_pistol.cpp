@@ -73,7 +73,7 @@ void WP_FireBryarPistol( gentity_t *ent, qboolean alt_fire )
 	}
 
 	float velocity = BRYAR_PISTOL_VEL;
-	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->value)
+	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->integer == 1)
 	{
 		velocity = TBDC_BRYAR_PISTOL_VEL;
 	}
