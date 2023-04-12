@@ -100,7 +100,7 @@ static void WP_BowcasterMainFire( gentity_t *ent )
 	for ( int i = 0; i < count; i++ )
 	{
 		// create a range of different velocities
-		if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->value)
+		if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->integer == 1)
 		{
 			vel = TBDC_BOWCASTER_VELOCITY * ( Q_flrand(-1.0f, 1.0f) * BOWCASTER_VEL_RANGE + 1.0f );;
 		}
@@ -170,7 +170,7 @@ static void WP_BowcasterAltFire( gentity_t *ent )
 
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 	float velocity = BOWCASTER_VELOCITY;
-	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->value)
+	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->integer == 1)
 	{
 		velocity = TBDC_BOWCASTER_VELOCITY;
 	}

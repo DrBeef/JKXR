@@ -2809,16 +2809,51 @@
 		//	DIFFICULTY FIELDS
 		//
 		//----------------------------------------------------------------------------------------------
-		itemDef 
+		itemDef
+        {
+            name				none
+            group				difficulty
+            type				ITEM_TYPE_TEXT
+            style				WINDOW_STYLE_EMPTY
+            text				@MENUS_VR_DIRECTORS_CUT_ITEM
+            rect				315 191 300 20
+            textalign			ITEM_ALIGN_LEFT
+            textalignx			0
+            textaligny			-2
+            font				2
+            textscale			0.8
+            forecolor			1 1 1 1
+            visible			0
+            mouseenter
+            {
+
+            }
+            mouseexit
+            {
+
+            }
+            action
+            {
+
+            }
+        }
+
+		itemDef
 		{
 			name				none
 			group				difficulty
-			type				ITEM_TYPE_YESNO
-			text				@MENUS_VR_DIRECTORS_CUT_ITEM
-			cvar			"g_TeamBeefDirectorsCut"
-			rect				315 191 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			151
+			type				ITEM_TYPE_MULTI
+            text				" "
+            cvar			    "g_TeamBeefDirectorsCut"
+            cvarFloatList
+            {
+                @MENUS_VR_TBDC_BUMMSER 0
+                @MENUS_VR_TBDC_BAGGYG 1
+                @MENUS_VR_TBDC_VANILLA 2
+            }
+			rect				315 211 300 20
+			textalign			ITEM_ALIGN_LEFT
+			textalignx			0
 			textaligny			-2
 			font				2
 			textscale			0.8
@@ -2833,12 +2868,12 @@
 
 			mouseenter 
 			{ 
-				show			highlight2
+				show			highlight3
 			}
 
 			mouseexit 
 			{ 
-				hide			highlight2
+				hide			highlight3
 			}			
 
 		}
@@ -2850,7 +2885,7 @@
 			type				ITEM_TYPE_YESNO
 			text				@MENUS_VR_LASER_AUTODEFLECTING_ITEM
 			cvar			"g_saberAutoDeflect1stPerson"
-			rect				315 231 300 20
+			rect				315 251 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -2867,12 +2902,12 @@
 
 			mouseenter 
 			{ 
-				show			highlight4
+				show			highlight5
 			}
 
 			mouseexit 
 			{ 
-				hide			highlight4
+				hide			highlight5
 			}			
 
 		}
@@ -2891,7 +2926,7 @@
 				@MENUS_VR_SABER_REALISM_CRITICAL 2
 				@MENUS_VR_SABER_REALISM_INSTANT 3
 			}
-			rect				315 251 300 20
+			rect				315 271 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -2908,12 +2943,12 @@
 		
 			mouseenter 
 			{ 
-				show			highlight5
+				show			highlight6
 			}
 
 			mouseexit 
 			{ 
-				hide			highlight5
+				hide			highlight6
 			}			
 		}
 
@@ -2930,7 +2965,7 @@
 				@MENUS_VR_FENCING_SPEED_DEFAULT 1.2
 				@MENUS_VR_FENCING_SPEED_FASTER 1.3
 			}
-			rect				315 271 300 20
+			rect				315 311 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -2947,12 +2982,12 @@
 		
 			mouseenter 
 			{ 
-				show			highlight6
+				show			highlight8
 			}
 		
 			mouseexit 
 			{ 
-				hide			highlight6
+				hide			highlight8
 			}			
 		}
 

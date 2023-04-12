@@ -55,7 +55,7 @@ static void WP_FireBlasterMissile( gentity_t *ent, vec3_t start, vec3_t dir, qbo
 		}
 	}
 
-	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->value)
+	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->integer == 1)
 	{
 		velocity = TBDC_BLASTER_VELOCITY;
 	}

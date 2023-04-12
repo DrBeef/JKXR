@@ -149,7 +149,7 @@ void WP_FireRocket( gentity_t *ent, qboolean alt_fire )
 	int		damage	= weaponData[WP_ROCKET_LAUNCHER].damage;
 	float	vel = ROCKET_VELOCITY;
 
-	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->value)
+	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->integer == 1)
 	{
 		vel = TBDC_ROCKET_VELOCITY;
 	}
