@@ -256,7 +256,7 @@ void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace )
 
 	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
 	bool useGestureEnabled = gi.cvar("vr_gesture_triggered_use", "1", CVAR_ARCHIVE)->integer; // defined in VrCvars.h
-	bool useGestureAllowed = useGestureEnabled && !thirdPersonActive;
+	bool useGestureAllowed = useGestureEnabled && !thirdPersonActive && !vr->remote_droid;
 	if ( (self->spawnflags & 2) && ( !( self->spawnflags & 4 ) || (	( self->spawnflags & 4) && !useGestureAllowed ) ) )
 	{ //       FACING and...         ...is not USE_BUTTON or...       ...is USE_BUTTON but use gestures are not active
 		// In case of buttons activated by use gesture, we do not need to check if we are facing them as we are touching them by hand.
@@ -264,9 +264,9 @@ void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace )
 
 		if ( other->client )
 		{
-			if ( (other->client->ps.clientNum == 0) && (self->spawnflags & 4) && !thirdPersonActive )
+			if ( (other->client->ps.clientNum == 0) && (self->spawnflags & 4) && !thirdPersonActive && !vr->remote_droid )
 			{
-				// In case of USE_BUTTON, check facing by controller and not by head (if not in 3rd person)
+				// In case of USE_BUTTON, check facing by controller and not by head (if not in 3rd person or controlling droid)
 				vec3_t origin, angles;
 				BG_CalculateVRWeaponPosition(origin, angles);
 				AngleVectors( angles, forward, NULL, NULL );
