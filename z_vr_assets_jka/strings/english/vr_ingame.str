@@ -19,4 +19,7 @@ LANG_ENGLISH        "Press 'JUMP' to exit, thumbstick 'UP/DOWN' to switch view."
 REFERENCE           EXIT_DROID_VIEW
 LANG_ENGLISH        "Press 'JUMP' to exit, press 'USE' to activate buttons."
 
+REFERENCE           EXIT_TURRET_VIEW
+LANG_ENGLISH        "Press 'JUMP' to exit, use main controller to aim and shoot."
+
 ENDMARKER

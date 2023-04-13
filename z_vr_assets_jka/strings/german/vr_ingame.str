@@ -21,4 +21,8 @@ REFERENCE           EXIT_DROID_VIEW
 LANG_ENGLISH        "Press 'JUMP' to exit, press 'USE' to activate buttons."
 LANG_GERMAN         "#same"
 
+REFERENCE           EXIT_TURRET_VIEW
+LANG_ENGLISH        "Press 'JUMP' to exit, use main controller to aim and shoot."
+LANG_GERMAN         "#same"
+
 ENDMARKER

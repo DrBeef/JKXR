@@ -238,7 +238,9 @@ void G_SetViewEntity( gentity_t *self, gentity_t *viewEntity )
 	if ( !self->s.number )
 	{
 		if (viewEntity->client && viewEntity->client->NPC_class == CLASS_MOUSE) {
-			CG_CenterPrint( "@VR_INGAME_EXIT_DROID_VIEW", SCREEN_HEIGHT * 0.95 );  
+			CG_CenterPrint( "@VR_INGAME_EXIT_DROID_VIEW", SCREEN_HEIGHT * 0.95 );
+		} else if (Q_stricmp( "misc_panel_turret", viewEntity->classname ) == 0) {
+			CG_CenterPrint( "@VR_INGAME_EXIT_TURRET_VIEW", SCREEN_HEIGHT * 0.95 );
 		} else {
 			CG_CenterPrint( "@VR_INGAME_EXIT_CAMERA_VIEW", SCREEN_HEIGHT * 0.95 );
 		}
