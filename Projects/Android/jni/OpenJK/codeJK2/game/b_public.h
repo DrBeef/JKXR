@@ -553,6 +553,9 @@ public:
 		saved_game.read<int32_t>(ffireCount);
 		saved_game.read<int32_t>(ffireDebounce);
 		saved_game.read<int32_t>(ffireFadeDebounce);
+
+		//May fix the save game crash issue?
+		watchTarget = NULL;
 	}
 }; // gNPC_t
 

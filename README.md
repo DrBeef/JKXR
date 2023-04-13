@@ -5,7 +5,7 @@
 
 [SideQuest Latest Version (Meta Headsets)](https://sidequestvr.com/app/15472)
 
-[SideQuest Latest Version (Pico Headsets)](https://sidequestvr.com/app/)
+[SideQuest Latest Version (Pico Headsets)](https://sidequestvr.com/app/15541)
 
 JK XR is a VR port of the Jedi Knight games using OpenXR (the open standard for virtual and augmented reality devices) and is based on the excellent OpenJK port, originally forked from: https://github.com/JACoders/OpenJK
 
@@ -14,7 +14,7 @@ This is currently built for standalone VR HMDs (see the Building section below) 
 Support for PCVR based devices will hopefully come in the future.
 
 The easiest way to install this on your device is using SideQuest. Download SideQuest here:
-https://github.com/the-expanse/SideQuest/releases
+https://sidequestvr.com/setup-howto
 
 
 
@@ -131,3 +131,7 @@ JKXR\Projects\Android\libs\arm64-v8a
 * With Special Thanks to: Team Beef patrons, all Team Beef discord members, 
 the OpenJK Development Team and Raven Software for
 creating and open-sourcing these wonderful games
+
+## DISCLAIMER
+
+THIS ENGINE PORT IS NOT MADE, DISTRIBUTED, OR SUPPORTED BY ACTIVISION PUBLISHING, INC., RAVEN SOFTWARE, OR LUCASARTS ENTERTAINMENT COMPANY, LLC. ELEMENTS™ & © LUCASFILM LTD.™ & DISNEY, INC.™ AND/OR ITS LICENSORS. STAR WARS®, JEDI®, & JEDI KNIGHT® ARE REGISTERED TRADEMARKS OF LUCASFILM LTD™ AND WALT DISNEY, INC.™ STAR WARS®, JEDI®, & JEDI KNIGHT® ARE REGISTERED TRADEMARKS OF LUCASFILM LTD™ & DISNEY, INC.™

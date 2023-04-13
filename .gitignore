@@ -62,3 +62,10 @@ Projects/Android/libs/arm64-v8a/libopenxr_loader_pico.so
 build/intermediates/lint-cache/sdk-registry.xml/sdk-registry.xml
 build/intermediates/lint-cache/maven.google/master-index.xml
 build/intermediates/lint-cache/maven.google/com/android/support/group-index.xml
+gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
+gradlew
+gradlew.bat
+JKXR.iml
+local.properties
+local.properties

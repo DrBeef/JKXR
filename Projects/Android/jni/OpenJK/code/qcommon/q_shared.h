@@ -763,6 +763,17 @@ typedef enum
 
 typedef enum
 {
+	ST_NONE = -1, // Used to indicate no active selection (rather than type)
+
+	ST_WEAPON,
+	ST_GADGET,
+	ST_FIGHTING_STYLE,
+	ST_FORCE_POWER,
+	ST_QUICK_SAVE
+} selectorType_t;
+
+typedef enum
+{
 	SABER_NONE = 0,
 	SABER_SINGLE,
 	SABER_STAFF,

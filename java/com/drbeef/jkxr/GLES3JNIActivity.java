@@ -245,6 +245,7 @@ import java.util.Vector;
 
 			//Weapon Models
 			copy_asset("/sdcard/JKXR/JK2/base", "z_Crusty_and_Elin_vr_weapons.pk3", true);
+			copy_asset("/sdcard/JKXR/JK2/base", "assets6_vr_weapons_shaders.pk3", true);
 		}
 
 		//Bunch of cool mods and their credits - only copy if user wants them
@@ -275,6 +276,7 @@ import java.util.Vector;
 
 			//Weapon Models
 			copy_asset(demoFolder, "z_Crusty_and_Elin_vr_weapons.pk3", true);
+			copy_asset(demoFolder, "assets6_vr_weapons_shaders.pk3", true);
 		}
 
 		//Read these from a file and pass through

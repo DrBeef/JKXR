@@ -56,7 +56,7 @@ static void WP_DEMP2_MainFire( gentity_t *ent )
 	WP_TraceSetStart( ent, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 
 	float velocity = DEMP2_VELOCITY;
-	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->value)
+	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->integer == 1)
 	{
 		velocity = TBDC_DEMP2_VELOCITY;
 	}

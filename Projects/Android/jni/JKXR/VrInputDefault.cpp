@@ -307,22 +307,42 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
 
         //Left/right to switch between which selector we are using
-        if (vr.item_selector) {
-            static bool itemSwitched = false;
+        if (vr.item_selector == 1) {
+            static bool selectorSwitched = false;
             if (between(-0.2f, pPrimaryJoystick->y, 0.2f) &&
                 (primaryJoystickX > 0.8f || primaryJoystickX < -0.8f)) {
 
-                if (!itemSwitched) {
+                if (!selectorSwitched) {
                     if (primaryJoystickX > 0.8f) {
                         sendButtonActionSimple("itemselectornext");
-                        itemSwitched = true;
+                        selectorSwitched = true;
                     } else if (primaryJoystickX < -0.8f) {
                         sendButtonActionSimple("itemselectorprev");
-                        itemSwitched = true;
+                        selectorSwitched = true;
                     }
                 }
             } else if (between(-0.4f, primaryJoystickX, 0.4f)) {
-                itemSwitched = false;
+                selectorSwitched = false;
+            }
+        }
+
+        //Left/right to switch between which selector we are using
+        if (vr.item_selector == 2) {
+            static bool selectorSwitched = false;
+            if (between(-0.2f, pSecondaryJoystick->y, 0.2f) &&
+                (pSecondaryJoystick->x > 0.8f || pSecondaryJoystick->x < -0.8f)) {
+
+                if (!selectorSwitched) {
+                    if (pSecondaryJoystick->x > 0.8f) {
+                        sendButtonActionSimple("itemselectornext");
+                        selectorSwitched = true;
+                    } else if (pSecondaryJoystick->x < -0.8f) {
+                        sendButtonActionSimple("itemselectorprev");
+                        selectorSwitched = true;
+                    }
+                }
+            } else if (between(-0.4f, pSecondaryJoystick->x, 0.4f)) {
+                selectorSwitched = false;
             }
         }
 
@@ -626,35 +646,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 }
             }
 
-            // Calculate if player tries to reach backpack
-            bool handInBackpack = false;
-            bool bpDistToHMDOk = false, bpWeaponHeightOk = false, bpWeaponAngleOk = false, bpHmdToWeaponAngleOk = false;
-            vec3_t hmdForwardXY = {}, weaponForwardXY = {};
-            float weaponToDownAngle = 0, hmdToWeaponDotProduct = 0;
-            static vec3_t downVector = {0.0, 0.0, -1.0};
-
-            if ((bpDistToHMDOk = distanceToHMD >= 0.2 && distanceToHMD <=
-                                                                      0.35)                       // 2) Weapon-to-HMD distance must be within <0.2-0.35> range
-                && (bpWeaponHeightOk = vr.weaponoffset[1] >= -0.10 && vr.weaponoffset[1] <=
-                                                                      0.10)) // 3) Weapon height in relation to HMD must be within <-0.10, 0.10> range
-            {
-                AngleVectors(vr.hmdorientation, hmdForwardXY, NULL, NULL);
-                AngleVectors(vr.weaponangles[ANGLES_ADJUSTED], weaponForwardXY, NULL, NULL);
-
-                float weaponToDownAngle = AngleBetweenVectors(downVector, weaponForwardXY);
-                // 4) Angle between weapon forward vector and a down vector must be within 80-140 degrees
-                if (bpWeaponAngleOk = weaponToDownAngle >= 80.0 && weaponToDownAngle <= 140.0) {
-                    hmdForwardXY[2] = 0;
-                    VectorNormalize(hmdForwardXY);
-
-                    weaponForwardXY[2] = 0;
-                    VectorNormalize(weaponForwardXY);
-
-                    hmdToWeaponDotProduct = DotProduct(hmdForwardXY, weaponForwardXY);
-                    // 5) HMD and weapon forward on XY plane must go in opposite directions (i.e. dot product < 0)
-                    handInBackpack = bpHmdToWeaponAngleOk = hmdToWeaponDotProduct < 0;
-                }
-            }
 
             //off-hand stuff (done here as I reference it in the save state thing
             {
@@ -677,86 +668,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 }
             }
 
-            // Use off hand as well to trigger save condition
-            canUseQuickSave = false;
-            bool bpOffhandDistToHMDOk = false, bpOffhandHeightOk = false, bpOffhandAngleOk = false, bpHmdToOffhandAngleOk = false;
-            vec3_t offhandForwardXY = {};
-            float hmdToOffhandDotProduct = 0;
-            float offhandToDownAngle = 0;
-            if ((bpOffhandDistToHMDOk = distanceToHMDOff >= 0.2 &&
-                                                     distanceToHMDOff <=
-                                                     0.35)   // 2) Off-to-HMD distance must be within <0.2-0.35> range
-                && (bpOffhandHeightOk = vr.offhandoffset[1] >= -0.10 && vr.offhandoffset[1] <=
-                                                                        0.10)) // 3) Offhand height in relation to HMD must be within <-0.10, 0.10> range
-            {
-                //Need to do this again as might not have done it above and cant be bothered to refactor
-                AngleVectors(vr.hmdorientation, hmdForwardXY, NULL, NULL);
-                AngleVectors(vr.offhandangles[ANGLES_ADJUSTED], offhandForwardXY, NULL, NULL);
-
-                offhandToDownAngle = AngleBetweenVectors(downVector, offhandForwardXY);
-
-                // 4) Angle between weapon forward vector and a down vector must be within 80-140 degrees
-                if (bpOffhandAngleOk =
-                            offhandToDownAngle >= 80.0 && offhandToDownAngle <= 140.0) {
-                    hmdForwardXY[2] = 0;
-                    VectorNormalize(hmdForwardXY);
-
-                    offhandForwardXY[2] = 0;
-                    VectorNormalize(offhandForwardXY);
-
-                    hmdToOffhandDotProduct = DotProduct(hmdForwardXY, offhandForwardXY);
-                    // 5) HMD and weapon forward on XY plane must go in opposite directions (i.e. dot product < 0)
-                    canUseQuickSave = bpHmdToOffhandAngleOk = hmdToOffhandDotProduct < 0;
-                }
-            }
-
-            // Uncomment to debug offhand reaching
-
-/*                ALOGV("Quick Save> Dist: %f | OffHandToDownAngle: %f | HandOffs: %f %f %f\nHmdHandDot: %f | HmdFwdXY: %f %f | WpnFwdXY: %f %f\nTrackOk: %i, DistOk: %i, HeightOk: %i, HnadAngleOk: %i, HmdHandDotOk: %i",
-                  distanceToHMDOff, offhandToDownAngle, vr.offhandoffset[0],
-                  vr.offhandoffset[1], vr.offhandoffset[2],
-                  hmdToOffhandDotProduct, hmdForwardXY[0], hmdForwardXY[1], offhandForwardXY[0],
-                  offhandForwardXY[1],
-                  bpTrackOk, bpOffhandDistToHMDOk, bpOffhandHeightOk, bpOffhandAngleOk,
-                  bpHmdToOffhandAngleOk);
-*/
-
-            // Check quicksave
-            static bool indicateQuickSave = true;
-            if (canUseQuickSave) {
-                //GB Fix buzzing left controller not right
-                int channel = (vr_control_scheme->integer >= 10) ? 1 : 2;
-                if (indicateQuickSave)
-                {
-                    TBXR_Vibrate(40, channel, 0.5); // vibrate to let user know they can switch
-                    indicateQuickSave = false;
-                }
-
-                if (((secondaryButtonsNew & secondaryButton1) !=
-                     (secondaryButtonsOld & secondaryButton1)) &&
-                    (secondaryButtonsNew & secondaryButton1)) {
-#ifdef JK2_MODE
-                    sendButtonActionSimple("save quik*");
-#else
-                    sendButtonActionSimple("save quick");
-#endif
-                }
-
-                if (((secondaryButtonsNew & secondaryButton2) !=
-                     (secondaryButtonsOld & secondaryButton2)) &&
-                    (secondaryButtonsNew & secondaryButton2)) {
-#ifdef JK2_MODE
-                    sendButtonActionSimple("load quik");
-#else
-                    sendButtonActionSimple("load quick");
-#endif
-                }
-            }
-            else
-            {
-                //Next time we can quick save, allow a haptic blip
-                indicateQuickSave = true;
-            }
         }
 
         //Right-hand specific stuff
@@ -885,7 +796,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
         {
             //Apply a filter and quadratic scaler so small movements are easier to make
-            float dist = length(pSecondaryJoystick->x, pSecondaryJoystick->y);
+            float dist = 0;
+            if (vr.item_selector != 2)
+            {
+                dist = length(pSecondaryJoystick->x, pSecondaryJoystick->y);
+            }
             float nlf = nonLinearFilter(dist);
             dist = (dist > 1.0f) ? dist : 1.0f;
             float x = nlf * (pSecondaryJoystick->x / dist);

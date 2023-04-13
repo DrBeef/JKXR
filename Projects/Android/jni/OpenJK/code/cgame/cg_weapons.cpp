@@ -2876,12 +2876,12 @@ void CG_ItemSelectorSelect_f( void )
 	cg.itemSelectorTime = 0;
 	cgi_Cvar_Set("timescale", "1.0");
 
-	if (cg.itemSelectorSelection == -1)
+	if (cg.itemSelectorSelection == ST_NONE)
 	{
 		return;
 	}
 
-	if (cg.itemSelectorType == 0) // weapons
+	if (cg.itemSelectorType == ST_WEAPON) // weapons
 	{
 		if (cg.weaponSelect == cg.itemSelectorSelection)
 		{
@@ -2891,7 +2891,7 @@ void CG_ItemSelectorSelect_f( void )
 		cg.weaponSelectTime = cg.time;
 		cg.weaponSelect = cg.itemSelectorSelection;
 	}
-	else if (cg.itemSelectorType == 1) // gadgets
+	else if (cg.itemSelectorType == ST_GADGET) // gadgets
 	{
 		cg.inventorySelectTime = cg.time;
 		cg.inventorySelect = cg.itemSelectorSelection;
@@ -2902,11 +2902,11 @@ void CG_ItemSelectorSelect_f( void )
 			Cmd_UseInventory_f(player);
 		}
 	}
-	else  if (cg.itemSelectorType == 2) //fighting style
+	else  if (cg.itemSelectorType == ST_FIGHTING_STYLE) //fighting style
 	{
 		cgi_SendConsoleCommand(va( "setSaberLevel %i\n", cg.itemSelectorSelection + 1));
 	}
-	else // 3 - force powers
+	else if (cg.itemSelectorType == ST_FORCE_POWER)
 	{
 		if (cg.forcepowerSelect == cg.itemSelectorSelection)
 		{
@@ -2916,15 +2916,24 @@ void CG_ItemSelectorSelect_f( void )
 		cg.forcepowerSelectTime = cg.time;
 		cg.forcepowerSelect = cg.itemSelectorSelection;
 	}
+	else if (cg.itemSelectorType == ST_QUICK_SAVE) {
+		if (cg.itemSelectorSelection == 0) {
+			cgi_SendConsoleCommand("save quick\n");
+			CG_CenterPrint("Quick Saved", 240);
+		} else {
+			cgi_SendConsoleCommand("load quick\n");
+		}
+	}
 
 	//reset ready for next time
-	cg.itemSelectorSelection = -1;
+	cg.itemSelectorSelection = ST_NONE;
 }
 
 void CG_ItemSelectorNext_f( void )
 {
-	if (cg.itemSelectorType  == 3)
+	if (cg.itemSelectorType >= ST_FORCE_POWER)
 	{
+		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_SAVE : ST_FORCE_POWER;
 		return;
 	}
 
@@ -2939,8 +2948,9 @@ void CG_ItemSelectorNext_f( void )
 
 void CG_ItemSelectorPrev_f( void )
 {
-	if (cg.itemSelectorType  == 3)
+	if (cg.itemSelectorType >= ST_FORCE_POWER)
 	{
+		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_SAVE : ST_FORCE_POWER;
 		return;
 	}
 
@@ -2972,12 +2982,12 @@ void CG_DrawItemSelector( void )
 
 		if (vr->item_selector == 2)
 		{
-			cg.itemSelectorType = 3;
+			cg.itemSelectorType = ST_FORCE_POWER;
 			VectorCopy(vr->offhandposition[0], cg.itemSelectorOrigin);
 			VectorCopy(vr->offhandoffset, cg.itemSelectorOffset);
 		}
 		else {
-			cg.itemSelectorType = 0;
+			cg.itemSelectorType = ST_WEAPON;
 			VectorCopy(vr->weaponposition, cg.itemSelectorOrigin);
 			VectorCopy(vr->weaponoffset, cg.itemSelectorOffset);
 		}
@@ -2995,7 +3005,7 @@ void CG_DrawItemSelector( void )
 	cgi_Cvar_Set("timescale", "0.22");
 
 	vec3_t controllerOrigin, controllerAngles, controllerOffset, selectorOrigin;
-	if (cg.itemSelectorType == 3)
+	if (cg.itemSelectorType >= ST_FORCE_POWER)
 	{
 		BG_CalculateVROffHandPosition(controllerOrigin, controllerAngles);
 		VectorSubtract(vr->offhandposition[0], cg.itemSelectorOrigin, controllerOffset);
@@ -3043,7 +3053,7 @@ void CG_DrawItemSelector( void )
 	int count;
 	switch (cg.itemSelectorType)
 	{
-		case 0: //weapons
+		case ST_WEAPON: //weapons
 			if (vr->in_vehicle)
 				count = 2;
 			else
@@ -3052,22 +3062,28 @@ void CG_DrawItemSelector( void )
 			beam.shaderRGBA[1] = 0xae;
 			beam.shaderRGBA[2] = 0x40;
 			break;
-		case 1: //gadgets
+		case ST_GADGET: //gadgets
 			count = INV_GOODIE_KEY;
 			beam.shaderRGBA[0] = 0x00;
 			beam.shaderRGBA[1] = 0xff;
 			beam.shaderRGBA[2] = 0x00;
 			break;
-		case 2: //fighting style
+		case ST_FIGHTING_STYLE: //fighting style
 			count = 3;
 			beam.shaderRGBA[0] = 0xff;
 			beam.shaderRGBA[1] = 0xff;
 			beam.shaderRGBA[2] = 0xff;
 			break;
-		case 3: // force powers
+		case ST_FORCE_POWER: // force powers
 			count = MAX_SHOWPOWERS;
 			beam.shaderRGBA[0] = 0x00;
 			beam.shaderRGBA[1] = 0x00;
+			beam.shaderRGBA[2] = 0xff;
+			break;
+		case ST_QUICK_SAVE:
+			count = 2;
+			beam.shaderRGBA[0] = 0xff;
+			beam.shaderRGBA[1] = 0xff;
 			beam.shaderRGBA[2] = 0xff;
 			break;
 	}
@@ -3081,7 +3097,7 @@ void CG_DrawItemSelector( void )
 	cgi_R_AddRefEntityToScene( &beam );
 
 
-	if (cg.itemSelectorType == 0) // weapons
+	if (cg.itemSelectorType == ST_WEAPON) // weapons
 	{
 		if (cg.weaponSelect != WP_NONE &&
 				cg.weaponSelect != WP_MELEE) {
@@ -3122,7 +3138,7 @@ void CG_DrawItemSelector( void )
 			cgi_R_AddRefEntityToScene(&sprite);
 		}
 	}*/
-	else if (cg.itemSelectorType == 3) // force powers
+	else if (cg.itemSelectorType == ST_FORCE_POWER) // force powers
 	{
 		if (cent->gent->client->ps.forcePowersKnown != 0) {
 			refEntity_t sprite;
@@ -3136,29 +3152,27 @@ void CG_DrawItemSelector( void )
 		}
 	}
 
-	if (cg.itemSelectorType != 3) {
-		for (int s = -1; s < 2; s += 2) {
-			refEntity_t sprite;
-			memset(&sprite, 0, sizeof(sprite));
-			vec3_t right;
-			AngleVectors(wheelAngles, NULL, right, NULL);
-			float offset = ((float) s * 6.0f) + (((float) s * 0.3f) *
-					sinf(DEG2RAD(AngleNormalize360(cg.time - cg.itemSelectorTime))));
-			VectorMA(wheelOrigin, offset, right, sprite.origin);
-			sprite.reType = RT_SPRITE;
-			sprite.customShader = cgs.media.binocularArrow;
-			sprite.radius = 0.6f;
-			sprite.rotation = 180.0f * ((s - 1.0f) / 2.0f);
-			memset(sprite.shaderRGBA, 0xff, 4);
-			cgi_R_AddRefEntityToScene(&sprite);
-		}
+	for (int s = -1; s < 2; s += 2) {
+		refEntity_t sprite;
+		memset(&sprite, 0, sizeof(sprite));
+		vec3_t right;
+		AngleVectors(wheelAngles, NULL, right, NULL);
+		float offset = ((float) s * 6.0f) + (((float) s * 0.3f) *
+				sinf(DEG2RAD(AngleNormalize360(cg.time - cg.itemSelectorTime))));
+		VectorMA(wheelOrigin, offset, right, sprite.origin);
+		sprite.reType = RT_SPRITE;
+		sprite.customShader = cgs.media.binocularArrow;
+		sprite.radius = 0.6f;
+		sprite.rotation = 180.0f * ((s - 1.0f) / 2.0f);
+		memset(sprite.shaderRGBA, 0xff, 4);
+		cgi_R_AddRefEntityToScene(&sprite);
 	}
 
 	qboolean selected = qfalse;
 	for (int index = 0; index < count; ++index)
 	{
 		int itemId = index;
-		if (cg.itemSelectorType == 0) {
+		if (cg.itemSelectorType == ST_WEAPON) {
 			if (vr->in_vehicle)
 			{
 				itemId = WP_ATST_MAIN + index;
@@ -3179,14 +3193,14 @@ void CG_DrawItemSelector( void )
 			bool selectable;
 			switch (cg.itemSelectorType)
 			{
-				case 0: //weapons
+				case ST_WEAPON: //weapons
 					selectable = vr->in_vehicle || // both ATST weapons are always selectable
 							(CG_WeaponSelectable(itemId, cg.weaponSelect, qfalse) && cg.snap->ps.ammo[weaponData[itemId].ammoIndex]);
 					break;
-				case 1: //gadgets
+				case ST_GADGET: //gadgets
 					selectable = CG_InventorySelectable(itemId) && inv_icons[itemId];
 					break;
-				case 2: //fighting style
+				case ST_FIGHTING_STYLE: //fighting style
 					{
 						if (cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) {
 							selectable = itemId < cent->gent->client->ps.forcePowerLevel[FP_SABER_OFFENSE];
@@ -3195,8 +3209,11 @@ void CG_DrawItemSelector( void )
 						}
 					}
 					break;
-				case 3: // force powers
+				case ST_FORCE_POWER: // force powers
 					selectable = ForcePower_Valid(itemId);
+					break;
+				case ST_QUICK_SAVE:
+					selectable = true;
 					break;
 			}
 
@@ -3207,7 +3224,7 @@ void CG_DrawItemSelector( void )
 				angles[YAW] = wheelAngles[YAW];
 				angles[PITCH] = wheelAngles[PITCH];
 				angles[ROLL] =
-                        (float)(360 / (count - ((cg.itemSelectorType == 0 && !vr->in_vehicle) ? 1 : 0))) * index;
+                        (float)(360 / (count - ((cg.itemSelectorType == ST_WEAPON && !vr->in_vehicle) ? 1 : 0))) * index;
 				vec3_t forward, up;
 				AngleVectors(angles, forward, NULL, up);
 
@@ -3226,7 +3243,7 @@ void CG_DrawItemSelector( void )
 							cg.itemSelectorSelection = itemId;
 
 							cgi_HapticEvent("selector_icon", 0, vr->right_handed ?
-								((cg.itemSelectorType == 3) ? 2 : 1) : ((cg.itemSelectorType == 3) ? 1 : 2), 100, 0, 0);
+								((cg.itemSelectorType >= ST_FORCE_POWER) ? 2 : 1) : ((cg.itemSelectorType >= ST_FORCE_POWER) ? 1 : 2), 100, 0, 0);
 						}
 
 						selected = qtrue;
@@ -3260,10 +3277,10 @@ void CG_DrawItemSelector( void )
 					sprite.reType = RT_SPRITE;
 					switch (cg.itemSelectorType)
 					{
-						case 0: //weapons
+						case ST_WEAPON: //weapons
 							sprite.customShader = cg_weapons[itemId].weaponIcon;
 							break;
-						case 1: //gadgets
+						case ST_GADGET: //gadgets
 							sprite.customShader = inv_icons[itemId];
 							break;
 /*						case 2: //fighting style
@@ -3280,8 +3297,11 @@ void CG_DrawItemSelector( void )
 									break;
 							}
 							break;
-*/						case 3: // force powers
+*/						case ST_FORCE_POWER: // force powers
 							sprite.customShader = force_icons[showPowers[itemId]];
+							break;
+						case ST_QUICK_SAVE:
+							sprite.customShader = itemId == 0 ? cgs.media.iconSave : cgs.media.iconLoad;
 							break;
 					}
 
@@ -3299,7 +3319,7 @@ void CG_DrawItemSelector( void )
 
 	if (!selected)
 	{
-		cg.itemSelectorSelection = -1;
+		cg.itemSelectorSelection = ST_NONE;
 	}
 }
 
