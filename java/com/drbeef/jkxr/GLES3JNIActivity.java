@@ -229,15 +229,6 @@ import java.util.Vector;
 		copy_asset("/sdcard/JKXR/JK3/base", "z_vr_assets_base.pk3", true);
 		copy_asset("/sdcard/JKXR/JK3/base", "z_vr_assets_jka.pk3", true);
 
-		//Bummser's default configuration
-		if (manufacturer.contains("meta")) {
-			//Meta Quest
-			copy_asset_with_rename("/sdcard/JKXR/JK2/base", "openjo_sp_quest.cfg", "openjo_sp.cfg", false);
-		} else {
-			//Pico XR
-			copy_asset_with_rename("/sdcard/JKXR/JK2/base", "openjo_sp_pico.cfg", "openjo_sp.cfg", false);
-		}
-
 		//Bunch of cool mods and their credits - only copy if user wants them
 		if (!new File("/sdcard/JKXR/JK2/base/no_copy").exists()) {
 			copy_asset("/sdcard/JKXR/JK2/base", "packaged_mods_credits.txt", false);

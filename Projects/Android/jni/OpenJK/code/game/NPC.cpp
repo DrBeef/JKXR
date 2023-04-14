@@ -2551,7 +2551,7 @@ void NPC_InitAI ( void )
 	//5 = kyle and any enemy
 	//6 = also when kyle takes pain or enemy jedi dodges player saber swing or does an acrobatic evasion
 	// NOTE : I also create this in UI_Init()
-	d_slowmodeath = gi.cvar ( "d_slowmodeath", "3", CVAR_ARCHIVE );//save this setting
+	d_slowmodeath = gi.cvar ( "d_slowmodeath", "4", CVAR_ARCHIVE );//save this setting
 
 	d_saberCombat = gi.cvar ( "d_saberCombat", "0", CVAR_CHEAT );
 }
