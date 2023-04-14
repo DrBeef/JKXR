@@ -1952,9 +1952,24 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 
 		ent.radius = w / 640 * xmax * trace.fraction * 2048 / 64.0f;
         ent.customShader = hShader;
-		ent.shaderRGBA[0] = (type == 0 && !cg_forceCrosshair) ? 0 : 255;
-		ent.shaderRGBA[1] = (type == 0) ? 0 : 255;
-		ent.shaderRGBA[2] = 255;
+		if(type == 0 && !cg_forceCrosshair) //Not Active Force Crosshair
+		{
+			ent.shaderRGBA[0] = 255;
+			ent.shaderRGBA[1] = 180;
+			ent.shaderRGBA[2] = 180;
+		}
+		else if(type == 0) //Active Force Crosshair
+		{
+			ent.shaderRGBA[0] = 255;
+			ent.shaderRGBA[1] = 90;
+			ent.shaderRGBA[2] = 90;
+		}
+		else //Regular Crosshair
+		{
+			ent.shaderRGBA[0] = 255;
+			ent.shaderRGBA[1] = 255;
+			ent.shaderRGBA[2] = 255;
+		}
 		ent.shaderRGBA[3] = 255;
 
 		cgi_R_AddRefEntityToScene(&ent);

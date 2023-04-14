@@ -1774,7 +1774,7 @@
 			group				video2
 			type				ITEM_TYPE_SLIDER
 			text				@MENUS0_VIDEO_BRIGHTNESS
-			cvarfloat			"r_gamma" 0 0.8 1.2
+			cvarfloat			"r_gamma" 1.15 0.8 1.5
 			rect				305 251 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			120
