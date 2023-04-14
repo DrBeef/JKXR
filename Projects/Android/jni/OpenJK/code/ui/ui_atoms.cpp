@@ -274,6 +274,21 @@ void UI_Init( int apiVersion, uiimport_t *uiimport, qboolean inGameLoad )
 	ui.Cvar_Create( "cg_drawCrosshairForce", "9", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_marks", "1", CVAR_ARCHIVE );
 	ui.Cvar_Create ("s_language",			"english",	CVAR_ARCHIVE | CVAR_NORESTART);
+	ui.Cvar_Create( "g_dismemberment", "3", CVAR_ARCHIVE );//0 = none, 1 = arms and hands, 2 = legs, 3 = waist and head
+	ui.Cvar_Create( "g_dismemberProbabilities", "100", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_usableObjectsHint", "1", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_autoUseBacta", "0", CVAR_ARCHIVE );
+	ui.Cvar_Create( "d_slowmodeath", "4", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_forceSpeedFOVAdjust", "1", CVAR_ARCHIVE );
+	ui.Cvar_Create( "g_saberAnimSpeed", "1.2", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_heightAdjust", "0.0", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_hudScale", "2.5", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_hudStereo", "20", CVAR_ARCHIVE );
+	ui.Cvar_Create( "cg_hudYOffset", "0.0", CVAR_ARCHIVE );
+	ui.Cvar_Create( "g_TeamBeefDirectorsCut", "1", CVAR_ARCHIVE );
+#ifdef JK2_MODE
+	ui.Cvar_Create( "g_saberRealisticCombat", "1", CVAR_ARCHIVE );
+#endif
 #ifndef JK2_MODE
 	ui.Cvar_Create( "g_char_model",			"jedi_tf",	CVAR_ARCHIVE|CVAR_SAVEGAME|CVAR_NORESTART );
 	ui.Cvar_Create( "g_char_skin_head",		"head_a1",	CVAR_ARCHIVE|CVAR_SAVEGAME|CVAR_NORESTART );
@@ -294,13 +309,11 @@ void UI_Init( int apiVersion, uiimport_t *uiimport, qboolean inGameLoad )
 	ui.Cvar_Create( "ui_prisonerobj_currtotal", "0",	CVAR_ROM|CVAR_SAVEGAME|CVAR_NORESTART);
 	ui.Cvar_Create( "ui_prisonerobj_mintotal",  "0",	CVAR_ROM|CVAR_SAVEGAME|CVAR_NORESTART);
 
-	ui.Cvar_Create( "g_dismemberment", "3", CVAR_ARCHIVE );//0 = none, 1 = arms and hands, 2 = legs, 3 = waist and head
 	ui.Cvar_Create( "cg_saberAutoThird", "0", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_gunAutoFirst", "1", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_crosshairIdentifyTarget", "1", CVAR_ARCHIVE );
 	ui.Cvar_Create( "g_subtitles", "0", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_marks", "1", CVAR_ARCHIVE );
-	ui.Cvar_Create( "d_slowmodeath", "4", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_shadows", "1", CVAR_ARCHIVE );
 
 	ui.Cvar_Create( "cg_runpitch", "0.0", CVAR_ARCHIVE );
@@ -310,6 +323,8 @@ void UI_Init( int apiVersion, uiimport_t *uiimport, qboolean inGameLoad )
 	ui.Cvar_Create( "cg_bobroll", "0.0", CVAR_ARCHIVE );
 
 	ui.Cvar_Create( "ui_disableWeaponSway", "0", CVAR_ARCHIVE );
+
+	ui.Cvar_Create( "g_saberMoreRealistic", "3", CVAR_ARCHIVE );
 #endif
 
 

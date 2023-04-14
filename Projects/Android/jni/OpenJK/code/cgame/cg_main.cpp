@@ -476,6 +476,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_saberAutoThird, "cg_saberAutoThird", "0", CVAR_ARCHIVE },
 	{ &cg_gunAutoFirst, "cg_gunAutoFirst", "1", CVAR_ARCHIVE },
 
+	{ &cg_autoUseBacta, "cg_autoUseBacta", "0", CVAR_ARCHIVE },
 	{ &cg_usableObjectsHint, "cg_usableObjectsHint", "1", CVAR_ARCHIVE },
 
 	{ &cg_pano, "pano", "0", 0 },
