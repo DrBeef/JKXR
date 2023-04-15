@@ -1343,11 +1343,44 @@
 		//----------------------------------------------------------------------------------------------
 		itemDef 
 		{
+			name				refresh_rate
+			group				video
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_REFRESH_RATE_ITEM
+			rect				305 191 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			165
+			textaligny			-2
+			font				2
+			textscale 			0.8
+			forecolor			1 1 1 1
+			cvarFloatList		{ "60" 60 "72" 72 "80" 80 "90" 90 }
+			descText			@MENUS_VR_REFRESH_RATE_DESC
+			cvar				"vr_refresh"
+
+			visible				0
+
+			mouseenter 
+			{ 
+				show			highlight2
+			}
+			mouseexit 
+			{ 
+				hide			highlight2
+			} 
+			action 
+			{
+				play			"sound/interface/button1.wav" ; 
+			}
+		}
+
+		itemDef 
+		{
 			name				geometric_detail
 			group				video
 			type				ITEM_TYPE_MULTI
 			text				@MENUS0_GEOMETRIC_DETAIL
-			rect				305 191 300 20
+			rect				305 211 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -1362,11 +1395,11 @@
 
 			mouseenter 
 			{ 
-				show			highlight2
+				show			highlight3
 			}
 			mouseexit 
 			{ 
-				hide			highlight2
+				hide			highlight3
 			} 
 			action 
 			{
@@ -1384,7 +1417,7 @@
 			group				video
 			type				ITEM_TYPE_MULTI
 			text				@MENUS0_TEXTURE_DETAIL
-			rect				305 211 300 20
+			rect				305 231 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -1394,42 +1427,6 @@
 			cvarFloatList		{  @MENUS0_LOW 3 @MENUS0_MEDIUM 2 @MENUS0_HIGH 1 @MENUS0_VERY_HIGH 0 }
 			descText			@MENUS1_SELECT_THE_RESOLUTION
 			cvar				"ui_r_picmip"
-
-			visible				0
-
-			mouseenter 
-			{ 
-				show			highlight3
-			}
-			mouseexit 
-			{ 
-				hide			highlight3
-			} 
-			action 
-			{
-				play			"sound/interface/button1.wav" ; 
-				uiScript		glCustom ;
-				setcvar			ui_r_modified	1 ;
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{	
-			name				texture_filter
-			group				video
-			type				ITEM_TYPE_MULTI
-			text				@MENUS0_TEXTURE_FILTER
-			rect				305 231 300 20
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
-			textaligny			-2
-			font				2
-			textscale 			0.8
-			forecolor			1 1 1 1
-			cvarStrList		{  @MENUS1_BILINEAR , "GL_LINEAR_MIPMAP_NEAREST" , @MENUS1_TRILINEAR , "GL_LINEAR_MIPMAP_LINEAR" }
-			descText			@MENUS1_ADJUST_HOW_WELL_THE_TEXTURES
-			cvar				"ui_r_texturemode"
 
 			visible				0
 
@@ -1452,10 +1449,10 @@
 
 		itemDef 
 		{	
-			name				simple_shaders
+			name				texture_filter
 			group				video
 			type				ITEM_TYPE_MULTI
-			text				@MENUS0_DETAILED_SHADERS
+			text				@MENUS0_TEXTURE_FILTER
 			rect				305 251 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
@@ -1463,9 +1460,9 @@
 			font				2
 			textscale 			0.8
 			forecolor			1 1 1 1
-			cvarFloatList		{  @MENUS0_OFF 0 @MENUS0_ON 1 }
-			descText			@MENUS1_HIDE_OR_UNHIDE_TEXTURES
-			cvar				"ui_r_detailtextures"
+			cvarStrList		{  @MENUS1_BILINEAR , "GL_LINEAR_MIPMAP_NEAREST" , @MENUS1_TRILINEAR , "GL_LINEAR_MIPMAP_LINEAR" }
+			descText			@MENUS1_ADJUST_HOW_WELL_THE_TEXTURES
+			cvar				"ui_r_texturemode"
 
 			visible				0
 
@@ -1488,11 +1485,47 @@
 
 		itemDef 
 		{	
+			name				simple_shaders
+			group				video
+			type				ITEM_TYPE_MULTI
+			text				@MENUS0_DETAILED_SHADERS
+			rect				305 271 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			165
+			textaligny			-2
+			font				2
+			textscale 			0.8
+			forecolor			1 1 1 1
+			cvarFloatList		{  @MENUS0_OFF 0 @MENUS0_ON 1 }
+			descText			@MENUS1_HIDE_OR_UNHIDE_TEXTURES
+			cvar				"ui_r_detailtextures"
+
+			visible				0
+
+			mouseenter 
+			{ 
+				show			highlight6
+			}
+			mouseexit 
+			{ 
+				hide			highlight6
+			} 
+			action 
+			{
+				play			"sound/interface/button1.wav" ; 
+				uiScript		glCustom ;
+				setcvar			ui_r_modified	1 ;
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{	
 			name				compress_textures
 			group				video_obsolete
 			type				ITEM_TYPE_MULTI
 			text				@MENUS0_COMPRESSED_TEXTURES
-			rect				305 271 300 20
+			rect				305 291 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -1507,11 +1540,11 @@
 
 			mouseenter 
 			{ 
-				show			highlight6
+				show			highlight7
 			}
 			mouseexit 
 			{ 
-				hide			highlight6
+				hide			highlight7
 			} 
 			action 
 			{
@@ -2465,45 +2498,12 @@
 
 		itemDef 
 		{	
-			name				identifytarget
-			group				options
-      		type				ITEM_TYPE_MULTI
-			text				@MENUS0_IDENTIFY_TARGET
-			cvar				"cg_crosshairIdentifyTarget"
-			cvarFloatList		{  @MENUS0_OFF 0 @MENUS0_ON 1 }
-			rect				305 231 300 20
-	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			165
-			textaligny			-2
-			font 				2
-			textscale 			0.8
-			forecolor			1 1 1 1
-			visible			0
-			descText			@MENUS2_TOGGLE_TO_HAVE_THE_CROSSHAIR
-
-			action
-			{
-				play			"sound/interface/button1.wav"
-			}
-			mouseenter 
-			{ 
-				show			highlight4
-			}
-			mouseexit 
-			{ 
-				hide			highlight4
-			} 
-		}
-
-
-		itemDef 
-		{	
 			name				usablehint
 			group				options
       type				ITEM_TYPE_YESNO
 			text				@MENUS_VR_USABLE_OBJECT_HINT_ITEM
 			cvar				"cg_usableObjectsHint"
-			rect				305 251 300 20
+			rect				305 231 300 20
 	   	textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -2519,11 +2519,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight5
+				show			highlight4
 			}
 			mouseexit 
 			{ 
-				hide			highlight5
+				hide			highlight4
 			} 
 		}
 
@@ -2545,7 +2545,7 @@
 				@MENUS2_FREQUENTLY		5
 				@MENUS2_EXCESSIVELY		6
 			}
-			rect				305 271 300 20
+			rect				305 251 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -2562,11 +2562,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight6
+				show			highlight5
 			}
 			mouseexit 
 			{ 
-				hide			highlight6
+				hide			highlight5
 			} 
 		}
 
@@ -2587,7 +2587,7 @@
 			}
 			cvarTest			ui_iscensored
 			hideCvar			{ 1 }
-			rect				325 291 300 20
+			rect				325 271 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -2604,11 +2604,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight7
+				show			highlight6
 			}
 			mouseexit 
 			{ 
-				hide			highlight7
+				hide			highlight6
 			} 
 		}
 
@@ -2627,7 +2627,7 @@
 			}
 			cvarTest			ui_iscensored
 			hideCvar			{ 1 }
-			rect				325 311 300 20
+			rect				325 291 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -2644,11 +2644,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight8
+				show			highlight7
 			}
 			mouseexit 
 			{ 
-				hide			highlight8
+				hide			highlight7
 			} 
 		}
 
@@ -2810,47 +2810,36 @@
 		//
 		//----------------------------------------------------------------------------------------------
 		itemDef
-        {
-            name				none
-            group				difficulty
-            type				ITEM_TYPE_TEXT
-            style				WINDOW_STYLE_EMPTY
-            text				@MENUS_VR_DIRECTORS_CUT_ITEM
-            rect				315 191 300 20
-            textalign			ITEM_ALIGN_LEFT
-            textalignx			0
-            textaligny			-2
-            font				2
-            textscale			0.8
-            forecolor			1 1 1 1
-            visible			0
-            mouseenter
-            {
-
-            }
-            mouseexit
-            {
-
-            }
-            action
-            {
-
-            }
-        }
+    {
+      name				none
+      group				difficulty
+      type				ITEM_TYPE_TEXT
+      style				WINDOW_STYLE_EMPTY
+      text				@MENUS_VR_DIRECTORS_CUT_ITEM
+      rect				315 191 300 20
+      textalign			ITEM_ALIGN_LEFT
+      textalignx			0
+      textaligny			-2
+      font				2
+      textscale			0.8
+      forecolor			1 1 1 1
+      visible			0
+      decoration
+    }
 
 		itemDef
 		{
 			name				none
 			group				difficulty
 			type				ITEM_TYPE_MULTI
-            text				" "
-            cvar			    "g_TeamBeefDirectorsCut"
-            cvarFloatList
-            {
-                @MENUS_VR_TBDC_BUMMSER 0
-                @MENUS_VR_TBDC_BAGGYG 1
-                @MENUS_VR_TBDC_VANILLA 2
-            }
+      text				" "
+      cvar			    "g_TeamBeefDirectorsCut"
+      cvarFloatList
+      {
+        @MENUS_VR_TBDC_BUMMSER 0
+        @MENUS_VR_TBDC_BAGGYG 1
+        @MENUS_VR_TBDC_VANILLA 2
+      }
 			rect				315 211 300 20
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0

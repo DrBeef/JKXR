@@ -28,6 +28,8 @@
 			hide				sound	;
 			hide				options ;
 			hide				difficulty ;
+			hide				mods_warning ;
+			hide				mods	;
 			hide				defaults
 			show				setup_background ;
 			show 				video ;
@@ -485,6 +487,7 @@
 				hide			sound	;
 				hide			options ;
 				hide			difficulty ;
+				hide			mods_warning ;
 				hide			mods	;
 				hide			defaults ;
 				setfocus		graphics ;
@@ -540,6 +543,7 @@
 				hide			sound	;
 				hide			options ;
 				hide			difficulty ;
+				hide			mods_warning ;
 				hide			mods	;
 				hide			defaults ;
 				setitemcolor	video1menubutton forecolor 1 .682 0 1
@@ -595,6 +599,7 @@
 				show			sound	;
 				hide			options ;
 				hide			difficulty ;
+				hide			mods_warning ;
 				hide			mods	;
 				hide			defaults ;
 				setitemcolor	video1menubutton forecolor 1 .682 0 1
@@ -650,6 +655,7 @@
 				show			options
 				hide			langapply
 				hide			difficulty
+				hide			mods_warning
 				hide			mods
 				hide			defaults
 				setitemcolor	video1menubutton forecolor 1 .682 0 1
@@ -704,6 +710,7 @@
 				hide			sound
 				hide			options
 				show			difficulty
+				hide			mods_warning
 				hide			mods
 				hide			defaults
 				setitemcolor	video1menubutton forecolor 1 .682 0 1
@@ -733,7 +740,7 @@
 			textstyle			1
 			forecolor			1 .682 0 1
 			visible				1
-			descText			@MENUS_CONFIGURE_GAME_OPTIONS
+			descText			@MENUS_VR_MODS_BUTTON_DESC
 
 			mouseEnter 
 			{ 
@@ -760,7 +767,8 @@
 				hide			sound	;
 				hide			options ;
 				hide			difficulty ;
-				show			mods	;
+				show			mods_warning ;
+				hide			mods	;
 				hide			defaults ;
 				setitemcolor	video1menubutton forecolor 1 .682 0 1
 				setitemcolor	video2menubutton forecolor 1 .682 0 1
@@ -815,6 +823,7 @@
 				hide			sound	;
 				hide			options ;
 				hide			difficulty ;
+				hide			mods_warning ;
 				hide			mods	;
 				show			defaults ;
 
@@ -1031,11 +1040,44 @@
 
 		itemDef 
 		{	
+			name				refresh_rate
+			group				video
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_REFRESH_RATE_ITEM
+			rect				260 202 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font 				4					
+			textscale 			1
+			forecolor			.615 .615 .956 1
+			cvarFloatList			{ "60" 60 "72" 72 "80" 80 "90" 90 }
+			descText			@MENUS_VR_REFRESH_RATE_DESC
+			cvar				"vr_refresh"
+
+			visible				0
+
+			mouseenter 
+			{ 
+				show			highlight2
+			}
+			mouseexit 
+			{ 
+				hide			highlight2
+			} 
+			action 
+			{
+				play			"sound/interface/button1.wav" ; 
+			}
+		}
+
+		itemDef 
+		{	
 			name				geometric_detail
 			group				video
 			type				ITEM_TYPE_MULTI
 			text				@MENUS_GEOMETRIC_DETAIL
-			rect				260 202 340 14
+			rect				260 216 340 14
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -1050,11 +1092,11 @@
 
 			mouseenter 
 			{ 
-				show			highlight2
+				show			highlight3
 			}
 			mouseexit 
 			{ 
-				hide			highlight2
+				hide			highlight3
 			} 
 			action 
 			{
@@ -1072,7 +1114,7 @@
 			group				video
 			type				ITEM_TYPE_MULTI
 			text				@MENUS_TEXTURE_DETAIL
-			rect				260 216 340 14
+			rect				260 230 340 14
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -1082,42 +1124,6 @@
 			cvarFloatList			{  @MENUS_LOW 3 @MENUS_MEDIUM 2 @MENUS_HIGH 1 @MENUS_VERY_HIGH 0 }
 			descText			@MENUS_SELECT_THE_RESOLUTION
 			cvar				"ui_r_picmip"
-
-			visible				0
-
-			mouseenter 
-			{ 
-				show			highlight3
-			}
-			mouseexit 
-			{ 
-				hide			highlight3
-			} 
-			action 
-			{
-				play			"sound/interface/button1.wav" ; 
-				uiScript		glCustom ;
-				setcvar			ui_r_modified	1 ;
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{	
-			name				texture_filter
-			group				video
-			type				ITEM_TYPE_MULTI
-			text				@MENUS_TEXTURE_FILTER
-			rect				260 230 340 14
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			174
-			textaligny			0
-			font 				4					
-			textscale 			1
-			forecolor			.615 .615 .956 1
-			cvarStrList			{  @MENUS_BILINEAR , "GL_LINEAR_MIPMAP_NEAREST" , @MENUS_TRILINEAR , "GL_LINEAR_MIPMAP_LINEAR" }
-			descText			@MENUS_ADJUST_HOW_WELL_THE_TEXTURES
-			cvar				"ui_r_texturemode"
 
 			visible				0
 
@@ -1140,10 +1146,10 @@
 
 		itemDef 
 		{	
-			name				simple_shaders
+			name				texture_filter
 			group				video
 			type				ITEM_TYPE_MULTI
-			text				@MENUS_DETAILED_SHADERS
+			text				@MENUS_TEXTURE_FILTER
 			rect				260 244 340 14
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
@@ -1151,9 +1157,9 @@
 			font 				4					
 			textscale 			1
 			forecolor			.615 .615 .956 1
-			cvarFloatList			{  @MENUS_OFF 0 @MENUS_ON 1 }
-			descText			@MENUS_HIDE_OR_UNHIDE_TEXTURES
-			cvar				"ui_r_detailtextures"
+			cvarStrList			{  @MENUS_BILINEAR , "GL_LINEAR_MIPMAP_NEAREST" , @MENUS_TRILINEAR , "GL_LINEAR_MIPMAP_LINEAR" }
+			descText			@MENUS_ADJUST_HOW_WELL_THE_TEXTURES
+			cvar				"ui_r_texturemode"
 
 			visible				0
 
@@ -1176,11 +1182,47 @@
 
 		itemDef 
 		{	
+			name				simple_shaders
+			group				video
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_DETAILED_SHADERS
+			rect				260 258 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font 				4					
+			textscale 			1
+			forecolor			.615 .615 .956 1
+			cvarFloatList			{  @MENUS_OFF 0 @MENUS_ON 1 }
+			descText			@MENUS_HIDE_OR_UNHIDE_TEXTURES
+			cvar				"ui_r_detailtextures"
+
+			visible				0
+
+			mouseenter 
+			{ 
+				show			highlight6
+			}
+			mouseexit 
+			{ 
+				hide			highlight6
+			} 
+			action 
+			{
+				play			"sound/interface/button1.wav" ; 
+				uiScript		glCustom ;
+				setcvar			ui_r_modified	1 ;
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{	
 			name				compress_textures
 			group				video_obsolete
 			type				ITEM_TYPE_MULTI
 			text				@MENUS_COMPRESSED_TEXTURES
-			rect				260 258 340 14
+			rect				260 272 340 14
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -1195,11 +1237,11 @@
 
 			mouseenter 
 			{ 
-				show			highlight6
+				show			highlight7
 			}
 			mouseexit 
 			{ 
-				hide			highlight6
+				hide			highlight7
 			} 
 			action 
 			{
@@ -1453,7 +1495,7 @@
 			group				video2
 			type				ITEM_TYPE_SLIDER
 			text				@MENUS_VIDEO_BRIGHTNESS
-			cvarfloat			"r_gamma" 1 .5 3
+			cvarfloat			"r_gamma" 1.15 0.8 1.5
 			rect				260 267 340 14
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
@@ -2173,38 +2215,6 @@
 			showCvar			{ 9 }
 		}
 
-		itemDef 
-		{	
-			name				identifytarget
-			group				options
-      			type				ITEM_TYPE_MULTI
-			text				@MENUS_IDENTIFY_TARGET
-			cvar				"cg_crosshairIdentifyTarget"
-			cvarFloatList			{  @MENUS_OFF 0 @MENUS_ON 1 }
-			rect				260 230 340 14
-	   		textalign			ITEM_ALIGN_RIGHT
-			textalignx			174
-			textaligny			0
-			font 				4					
-			textscale 			1
-			forecolor			.615 .615 .956 1
-			visible				0
-			descText			@MENUS_TOGGLE_TO_HAVE_THE_CROSSHAIR
-
-			action
-			{
-				play			"sound/interface/button1.wav"
-			}
-			mouseenter 
-			{ 
-				show			highlight4
-			}
-			mouseexit 
-			{ 
-				hide			highlight4
-			} 
-		}
-
 
 		itemDef 
 		{	
@@ -2213,7 +2223,7 @@
       type				ITEM_TYPE_YESNO
 			text				@MENUS_VR_USABLE_OBJECT_HINT_ITEM
 			cvar				"cg_usableObjectsHint"
-			rect				260 244 340 14
+			rect				260 230 340 14
 	   	textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -2229,11 +2239,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight5
+				show			highlight4
 			}
 			mouseexit 
 			{ 
-				hide			highlight5
+				hide			highlight4
 			} 
 		}
 
@@ -2255,7 +2265,7 @@
 				@MENUS_FREQUENTLY		5
 				@MENUS_EXCESSIVELY		6
 			}
-			rect				260 258 340 14
+			rect				260 244 340 14
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -2271,11 +2281,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight6
+				show			highlight5
 			}
 			mouseexit 
 			{ 
-				hide			highlight6
+				hide			highlight5
 			} 
 		}
 
@@ -2294,7 +2304,7 @@
 				@MENUS_SOUNDS_AND_EFFECTS	2
 				@MENUS_SOUNDS_EFFECTS_GRAPHICS	3
 			}
-			rect				260 272 340 14
+			rect				260 258 340 14
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -2308,11 +2318,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight7
+				show			highlight6
 			}
 			mouseexit 
 			{ 
-				hide			highlight7
+				hide			highlight6
 			} 
 		}
 
@@ -2332,7 +2342,7 @@
 			}
 			cvarTest			ui_iscensored
 			hideCvar			{ 1 }
-			rect				260 286 340 14
+			rect				260 272 340 14
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -2348,11 +2358,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight8
+				show			highlight7
 			}
 			mouseexit 
 			{ 
-				hide			highlight8
+				hide			highlight7
 			} 
 		}
 
@@ -2371,7 +2381,7 @@
 			}
 			cvarTest			ui_iscensored
 			hideCvar			{ 1 }
-			rect				260 300 340 14
+			rect				260 286 340 14
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -2387,11 +2397,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight9
+				show			highlight8
 			}
 			mouseexit 
 			{ 
-				hide			highlight9
+				hide			highlight8
 			} 
 		}
 
@@ -2410,7 +2420,7 @@
 			}
 			cvarTest			ui_iscensored
 			hideCvar			{ 1 }
-			rect				260 314 340 14
+			rect				260 300 340 14
 	   		textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -2426,11 +2436,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight10
+				show			highlight9
 			}
 			mouseexit 
 			{ 
-				hide			highlight10
+				hide			highlight9
 			} 
 		}
 
@@ -2589,12 +2599,35 @@
 		{	
 			name				none
 			group				difficulty
-      type				ITEM_TYPE_YESNO
+      type				ITEM_TYPE_TEXT
 			text				@MENUS_VR_DIRECTORS_CUT_ITEM
-			cvar				"g_TeamBeefDirectorsCut"
 			rect				260 202 340 14
 	   	textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
+			textaligny			0
+			font 				4
+			textscale 			1
+			forecolor			.615 .615 .956 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{	
+			name				none
+			group				difficulty
+			text				" "
+      type				ITEM_TYPE_MULTI
+			cvar				"g_TeamBeefDirectorsCut"
+      cvarFloatList
+      {
+        @MENUS_VR_TBDC_BUMMSER 0
+        @MENUS_VR_TBDC_BAGGYG 1
+        @MENUS_VR_TBDC_VANILLA 2
+      }
+			rect				260 216 340 14
+	   	textalign			ITEM_ALIGN_RIGHT
+			textalignx			60
 			textaligny			0
 			font 				4
 			textscale 			1
@@ -2607,11 +2640,11 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight2
+				show			highlight3
 			}
 			mouseexit 
 			{ 
-				hide			highlight2
+				hide			highlight3
 			} 
 		}
 
@@ -2622,43 +2655,6 @@
       type				ITEM_TYPE_YESNO
 			text				@MENUS_VR_LASER_AUTODEFLECTING_ITEM
 			cvar				"g_saberAutoDeflect1stPerson"
-			rect				260 230 340 14
-	   	textalign			ITEM_ALIGN_RIGHT
-			textalignx			174
-			textaligny			0
-			font 				4
-			textscale 			1
-			forecolor			.615 .615 .956 1
-			visible				0
-			descText			@MENUS_VR_LASER_AUTODEFLECTING_DESC
-			action
-			{
-				play			"sound/interface/button1.wav"
-			}
-			mouseenter 
-			{ 
-				show			highlight4
-			}
-			mouseexit 
-			{ 
-				hide			highlight4
-			} 
-		}
-
-		itemDef 
-		{	
-			name				none
-			group				difficulty
-      type				ITEM_TYPE_MULTI
-			text				@MENUS_VR_SABER_REALISM_ITEM
-			cvar				"g_saberMoreRealistic"
-			cvarFloatList		
-			{ 
-				@MENUS_VR_SABER_REALISM_DEFAULT 0 
-				@MENUS_VR_SABER_REALISM_INCREASED 1
-				@MENUS_VR_SABER_REALISM_CRITICAL 2
-				@MENUS_VR_SABER_REALISM_INSTANT 3
-			}
 			rect				260 244 340 14
 	   	textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
@@ -2687,13 +2683,14 @@
 			name				none
 			group				difficulty
       type				ITEM_TYPE_MULTI
-			text				@MENUS_VR_FENCING_SPEED_ITEM
-			cvar				"g_saberAnimSpeed"
+			text				@MENUS_VR_SABER_REALISM_ITEM
+			cvar				"g_saberMoreRealistic"
 			cvarFloatList		
 			{ 
-				@MENUS_VR_FENCING_SPEED_SLOWER 1.0 
-				@MENUS_VR_FENCING_SPEED_DEFAULT 1.2
-				@MENUS_VR_FENCING_SPEED_FASTER 1.3
+				@MENUS_VR_SABER_REALISM_DEFAULT 0 
+				@MENUS_VR_SABER_REALISM_INCREASED 1
+				@MENUS_VR_SABER_REALISM_CRITICAL 2
+				@MENUS_VR_SABER_REALISM_INSTANT 3
 			}
 			rect				260 258 340 14
 	   	textalign			ITEM_ALIGN_RIGHT
@@ -2703,7 +2700,7 @@
 			textscale 			1
 			forecolor			.615 .615 .956 1
 			visible				0
-			descText			@MENUS_VR_FENCING_SPEED_DESC
+			descText			@MENUS_VR_LASER_AUTODEFLECTING_DESC
 			action
 			{
 				play			"sound/interface/button1.wav"
@@ -2723,6 +2720,42 @@
 			name				none
 			group				difficulty
       type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_FENCING_SPEED_ITEM
+			cvar				"g_saberAnimSpeed"
+			cvarFloatList		
+			{ 
+				@MENUS_VR_FENCING_SPEED_SLOWER 1.0 
+				@MENUS_VR_FENCING_SPEED_DEFAULT 1.2
+				@MENUS_VR_FENCING_SPEED_FASTER 1.3
+			}
+			rect				260 272 340 14
+	   	textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font 				4
+			textscale 			1
+			forecolor			.615 .615 .956 1
+			visible				0
+			descText			@MENUS_VR_FENCING_SPEED_DESC
+			action
+			{
+				play			"sound/interface/button1.wav"
+			}
+			mouseenter 
+			{ 
+				show			highlight7
+			}
+			mouseexit 
+			{ 
+				hide			highlight7
+			} 
+		}
+
+		itemDef 
+		{	
+			name				none
+			group				difficulty
+      type				ITEM_TYPE_MULTI
 			text				@MENUS_VR_GAME_DIFFICULTY_ITEM
 			cvar				"g_spskill"
 			cvarFloatList		
@@ -2732,7 +2765,7 @@
 				@MENUS_JEDI_KNIGHT 2
 				@MENUS_JEDI_MASTER 3
 			}
-			rect				260 286 340 14
+			rect				260 300 340 14
 	   	textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -2747,17 +2780,91 @@
 			}
 			mouseenter 
 			{ 
-				show			highlight8
+				show			highlight9
 			}
 			mouseexit 
 			{ 
-				hide			highlight8
+				hide			highlight9
 			} 
 		}
 
 //----------------------------------------------------------------------------------------------
 //   MOD GAME MENU specific stuff
 //----------------------------------------------------------------------------------------------
+		itemDef
+		{
+			name				none
+			group				mods_warning
+			style				WINDOW_STYLE_SHADER
+			rect				260 185 340 225	
+			background			"gfx/menus/menu_boxred"					// Frame
+			forecolor			1 1 1 0.5
+			visible			0
+			decoration
+		}
+		itemDef
+		{
+			name				none
+			group				mods_warning
+			text				@MENUS_VR_MODS_WARNING_TEXT_1
+			rect				260 230 340 20
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			font				2
+			textscale			1
+			forecolor			1 1 0 1
+			visible			0
+			decoration
+		}
+		itemDef
+		{
+			name				none
+			group				mods_warning
+			text				@MENUS_VR_MODS_WARNING_TEXT_2
+			rect				260 250 340 20
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			font				2
+			textscale			1
+			forecolor			1 1 0 1
+			visible			0
+			decoration
+		}
+		itemDef
+		{
+			name				none
+			group				mods_warning
+			text				@MENUS_VR_MODS_WARNING_TEXT_3
+			rect				260 270 340 20
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			font				2
+			textscale			1
+			forecolor			1 1 0 1
+			visible			0
+			decoration
+		}
+		itemDef
+		{
+			name				none
+			group				mods_warning
+			text				@MENUS_VR_MODS_WARNING_CONFIRM
+			type				ITEM_TYPE_BUTTON
+			rect				260 310 340 20
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			170
+			font				2
+			textscale			1    
+			forecolor			1 1 0 1
+			visible			0
+			action
+			{ 
+				play		"sound/interface/button1.wav"
+				hide		mods_warning
+				show		mods
+			}
+		}
+
 		itemDef 
 		{
 			name				serverinfo

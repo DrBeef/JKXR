@@ -505,4 +505,19 @@ LANG_ENGLISH        "to download and launch mods."
 REFERENCE           MODS_WARNING_CONFIRM
 LANG_ENGLISH        "Continue"
 
+REFERENCE           TBDC_BUMMSER
+LANG_ENGLISH        "Slower NPCs (Easy)-Vanilla Player Guns"
+
+REFERENCE           TBDC_BAGGYG
+LANG_ENGLISH        "Vanilla NPCs (Hard)-Stronger Player Guns"
+
+REFERENCE           TBDC_VANILLA
+LANG_ENGLISH        "Vanilla NPCs and Guns"
+
+REFERENCE           REFRESH_RATE_ITEM
+LANG_ENGLISH        "Refresh Rate:"
+
+REFERENCE           REFRESH_RATE_DESC
+LANG_ENGLISH        "Select display refresh rate (72Hz is recommended for default graphics setup)."
+
 ENDMARKER

@@ -3,7 +3,7 @@ CONFIG W:\bin\striped.cfg
 ID 100
 REFERENCE MENUS_VR
 DESCRIPTION "VR Menu Localizations"
-COUNT 161
+COUNT 163
 INDEX 0
 {
    REFERENCE COMMON_CONTROLS_ITEM
@@ -808,4 +808,14 @@ INDEX 160
 {
    REFERENCE TBDC_VANILLA
    TEXT_LANGUAGE1 "Vanilla NPCs and Guns"
+}
+INDEX 161
+{
+   REFERENCE REFRESH_RATE_ITEM
+   TEXT_LANGUAGE1 "Refresh Rate:"
+}
+INDEX 162
+{
+   REFERENCE REFRESH_RATE_DESC
+   TEXT_LANGUAGE1 "Select display refresh rate (72Hz is recommended for default graphics setup)."
 }
