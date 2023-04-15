@@ -36,6 +36,7 @@ cvar_t  *vr_saber_3rdperson_mode;
 cvar_t  *vr_gesture_triggered_use;
 cvar_t  *vr_use_gesture_boundary;
 cvar_t  *vr_align_weapons;
+cvar_t  *vr_refresh;
 
 ovrInputStateTrackedRemote leftTrackedRemoteState_old;
 ovrInputStateTrackedRemote leftTrackedRemoteState_new;
