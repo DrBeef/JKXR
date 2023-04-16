@@ -1472,10 +1472,10 @@ qboolean CanUseInfrontOf(gentity_t *ent)
 
 	target = &g_entities[trace.entityNum];
 
-	if ( target && target->client && target->client->NPC_class == CLASS_ATST )
+	if ( target && target->e_UseFunc == useF_misc_atst_use )
 	{
-		// Attempt to board this vehicle.
-		return qtrue;
+		// Drivable AT-ST can be used only if player is standing on it.
+		return qfalse;
 	}
 	//Check for a use command
 	if (ValidUseTarget( target )) {
