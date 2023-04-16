@@ -2202,6 +2202,12 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 							|| vr->remote_turret;
 		}
 
+		//If viewing a remote turret, take the overridden FOV
+		if (vr->remote_turret)
+		{
+			cg.refdef.override_fov = true;
+		}
+
 		cg.refdef.worldscale = cg_worldScale.value;
 
 		bool usingScope = (cg.zoomMode == 2 || cg.zoomMode == 4);
