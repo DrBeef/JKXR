@@ -3012,6 +3012,12 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}
 
+	//If viewing a remote turret, take the overridden FOV
+	if (vr->remote_turret)
+	{
+		cg.refdef.override_fov = true;
+	}
+
 	//Controlling an NPC that isn't a droid
 	if (vr->remote_npc &&
 		!vr->remote_droid)

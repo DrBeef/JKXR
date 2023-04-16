@@ -143,7 +143,7 @@ void VR_SetHMDOrientation(float pitch, float yaw, float roll)
 	//Keep this for our records
 	VectorCopy(vr.hmdorientation, vr.hmdorientation_last);
 
-	if (!vr.third_person && !vr.remote_npc){
+	if (!vr.third_person && !vr.remote_npc && !vr.remote_turret){
 		VectorCopy(vr.hmdorientation, vr.hmdorientation_first);
 	}
 
