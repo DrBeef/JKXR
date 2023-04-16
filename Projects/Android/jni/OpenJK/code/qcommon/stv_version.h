@@ -25,8 +25,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #define JKXR_VERSION		"1.0.1-ea"
 
-#define JKXR_VERSION		"1.0.1-ea"
-
 #ifdef _DEBUG
 	#define	Q3_VERSION		"(debug)OpenJK: v" VERSION_STRING_DOTTED "  JKXR: " JKXR_VERSION
 #elif defined FINAL_BUILD
