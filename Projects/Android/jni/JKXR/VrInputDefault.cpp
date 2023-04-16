@@ -366,7 +366,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 pOffTrackedRemoteOld->Buttons |= xrButton_Trigger;
             }
         }
-        else if (vr.misc_camera)
+        else if (vr.misc_camera && !vr.remote_droid)
         {
             if (between(-0.2f, primaryJoystickX, 0.2f)) {
                 sendButtonAction("+use", pPrimaryJoystick->y < -0.8f || pPrimaryJoystick->y > 0.8f);

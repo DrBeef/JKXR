@@ -237,7 +237,13 @@ void G_SetViewEntity( gentity_t *self, gentity_t *viewEntity )
 	}
 	if ( !self->s.number )
 	{
-		CG_CenterPrint( "@VR_INGAME_EXIT_CAMERA_VIEW", SCREEN_HEIGHT * 0.95 );
+		if (viewEntity->client && viewEntity->client->NPC_class == CLASS_MOUSE) {
+			CG_CenterPrint( "@VR_INGAME_EXIT_DROID_VIEW", SCREEN_HEIGHT * 0.95 );
+		} else if (Q_stricmp( "misc_panel_turret", viewEntity->classname ) == 0) {
+			CG_CenterPrint( "@VR_INGAME_EXIT_TURRET_VIEW", SCREEN_HEIGHT * 0.95 );
+		} else {
+			CG_CenterPrint( "@VR_INGAME_EXIT_CAMERA_VIEW", SCREEN_HEIGHT * 0.95 );
+		}
 	}
 }
 
@@ -819,11 +825,12 @@ void ClientImpacts( gentity_t *ent, pmove_t *pm ) {
 
 }
 
- // Use triggers seems to have bigger "front" boundaries
- // (with longer range player often reaches behind them
- // not activating them at all)
-const	float	TOUCH_DISTANCE =	1.0f;
-const	vec3_t	TOUCH_RANGE =		{ 4, 4, 4 };
+// Use triggers seems to have bigger "front" boundaries allowing
+// user to trigger them from distance while it is possible to reach
+// through them when standing near. To ballance this, move hand
+// origin a bit back
+const float TOUCH_OFFSET = -10.0f;
+const vec3_t TOUCH_RANGE = { 4, 4, 4 };
 
 void	G_TouchTriggersWithHand( bool offHand, gentity_t *ent, vec3_t src, vec3_t vf ) {
 	vec3_t		dest, mins, maxs;
@@ -834,7 +841,7 @@ void	G_TouchTriggersWithHand( bool offHand, gentity_t *ent, vec3_t src, vec3_t v
 
 	memset (touched, qfalse, sizeof(touched) );
 
-	VectorMA( src, TOUCH_DISTANCE, vf, dest );
+	VectorMA( src, TOUCH_OFFSET, vf, dest );
 	VectorSubtract( dest, TOUCH_RANGE, mins );
 	VectorAdd( dest, TOUCH_RANGE, maxs );
 
@@ -923,7 +930,7 @@ void	G_TouchTriggersLerped( gentity_t *ent ) {
 
 	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
 	bool useGestureEnabled = gi.cvar("vr_gesture_triggered_use", "1", CVAR_ARCHIVE)->integer; // defined in VrCvars.h
-	bool useGestureAllowed = useGestureEnabled && !thirdPersonActive;
+	bool useGestureAllowed = useGestureEnabled && !thirdPersonActive && !(vr && vr->remote_droid);
 
 	for ( curDist = 0; !done && ent->maxs[1]>0; curDist += (float)ent->maxs[1]/2.0f )
 	{

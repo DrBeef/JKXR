@@ -524,6 +524,7 @@ extern void G_SetViewEntity( gentity_t *self, gentity_t *viewEntity );
 extern void SP_fx_runner( gentity_t *ent );
 
 gentity_t *first_camera_view = NULL;
+int nextUseNotBefore = 0;
 
 void camera_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod,int dFlags,int hitLoc )
 {
@@ -533,6 +534,7 @@ void camera_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
         G_UseTargets2( self, player, self->target4 );
 		G_ClearViewEntity( player );
 		G_Sound( player, self->soundPos2 );
+		nextUseNotBefore = level.time + 1000; // wait before allowing to re-enter camera
 	}
 	G_UseTargets2( self, player, self->closetarget );
 	//FIXME: explosion fx/sound
@@ -557,8 +559,8 @@ void camera_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 void camera_use( gentity_t *self, gentity_t *other, gentity_t *activator )
 {
-	if ( !activator || !activator->client || activator->s.number )
-	{//really only usable by the player
+	if ( !activator || !activator->client || activator->s.number || level.time < nextUseNotBefore)
+	{//really only usable by the player when the time to use has come
 		return;
 	}
 	self->painDebounceTime = level.time + (self->wait*1000);//FRAMETIME*5;//don't check for player buttons for 500 ms
@@ -588,6 +590,7 @@ void camera_use( gentity_t *self, gentity_t *other, gentity_t *activator )
 			G_UseTargets2( self, activator, self->target4 );
 			G_ClearViewEntity( activator );
 			G_Sound( activator, self->soundPos2 );
+			nextUseNotBefore = level.time + 1000; // wait before allowing to re-enter camera
 		}
 	}
 	else
@@ -620,6 +623,7 @@ void camera_aim( gentity_t *self )
 			{//stop player from doing anything for a half second after
 				player->aimDebounceTime = level.time + 500;
 			}
+			nextUseNotBefore = level.time + 1000; // wait before allowing to re-enter camera
 		}
 		else if ( self->painDebounceTime < level.time )
 		{//check for use button

@@ -25,7 +25,6 @@ extern "C" {
 
 //Let's go to the maximum!
 extern int NUM_MULTI_SAMPLES;
-extern int REFRESH	         ;
 extern float SS_MULTIPLIER    ;
 
 
@@ -34,7 +33,6 @@ struct arg_dbl *ss;
 struct arg_int *cpu;
 struct arg_int *gpu;
 struct arg_int *msaa;
-struct arg_int *refresh;
 struct arg_end *end;
 
 char **argv;
@@ -279,8 +277,6 @@ void VR_Init()
 	vr.snapTurn = 0.0f;
 	vr.immersive_cinematics = true;
 
-	vr.test_scale = 1.0f;
-
 	//init randomiser
 	srand(time(NULL));
 
@@ -297,9 +293,9 @@ void VR_Init()
 	vr_switch_sticks = Cvar_Get( "vr_switch_sticks", "0", CVAR_ARCHIVE);
 
 	vr_immersive_cinematics = Cvar_Get("vr_immersive_cinematics", "1", CVAR_ARCHIVE);
-	vr_screen_dist = Cvar_Get( "vr_screen_dist", "2.5", CVAR_ARCHIVE);
+	vr_screen_dist = Cvar_Get( "vr_screen_dist", "3.5", CVAR_ARCHIVE);
 	vr_weapon_velocity_trigger = Cvar_Get( "vr_weapon_velocity_trigger", "2.0", CVAR_ARCHIVE);
-	vr_force_velocity_trigger = Cvar_Get( "vr_force_velocity_trigger", "2.0", CVAR_ARCHIVE);
+	vr_force_velocity_trigger = Cvar_Get( "vr_force_velocity_trigger", "2.09", CVAR_ARCHIVE);
 	vr_force_distance_trigger = Cvar_Get( "vr_force_distance_trigger", "0.15", CVAR_ARCHIVE);
     vr_two_handed_weapons = Cvar_Get ("vr_two_handed_weapons", "1", CVAR_ARCHIVE);
 	vr_force_motion_controlled = Cvar_Get ("vr_force_motion_controlled", "1", CVAR_ARCHIVE);
@@ -313,6 +309,7 @@ void VR_Init()
 	vr_gesture_triggered_use = Cvar_Get ("vr_gesture_triggered_use", "1", CVAR_ARCHIVE);
 	vr_use_gesture_boundary = Cvar_Get ("vr_use_gesture_boundary", "0.35", CVAR_ARCHIVE);
 	vr_align_weapons = Cvar_Get ("vr_align_weapons", "0", CVAR_ARCHIVE);
+	vr_refresh = Cvar_Get ("vr_refresh", "72", CVAR_ARCHIVE);
 
 	cvar_t *expanded_menu_enabled = Cvar_Get ("expanded_menu_enabled", "0", CVAR_ARCHIVE);
 	if (FS_FileExists("expanded_menu.pk3") || FS_BaseFileExists("expanded_menu.pk3")) {
@@ -322,6 +319,8 @@ void VR_Init()
 	}
 
     vr.menu_right_handed = vr_control_scheme->integer == 0;
+
+    Cvar_Get ("openXRHMD", gAppState.OpenXRHMD, CVAR_ARCHIVE);
 }
 
 int VR_main( int argc, char* argv[] );
@@ -371,9 +370,27 @@ void * AppThreadFunction(void * parm ) {
 	return NULL;
 }
 
+int VR_SetRefreshRate(int refreshRate)
+{
+	if (strstr(gAppState.OpenXRHMD, "meta") != NULL)
+	{
+		OXR(gAppState.pfnRequestDisplayRefreshRate(gAppState.Session, (float) refreshRate));
+		return refreshRate;
+	}
+
+	return 0;
+}
+
 //All the stuff we want to do each frame specifically for this game
 void VR_FrameSetup()
 {
+	static float refresh = 0;
+	if (refresh != vr_refresh->value)
+	{
+		refresh = vr_refresh->value;
+		VR_SetRefreshRate(vr_refresh->value);
+	}
+
 	//get any cvar values required here
 	vr.immersive_cinematics = (vr_immersive_cinematics->value != 0.0f);
 }
@@ -699,7 +716,6 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_jkxr_GLES3JNILib_onCreate( JNIEnv * env,
             cpu   = arg_int0("c", "cpu", "<int>", "CPU perf index 1-4 (default: 2)"),
             gpu   = arg_int0("g", "gpu", "<int>", "GPU perf index 1-4 (default: 3)"),
             msaa  = arg_int0("m", "msaa", "<int>", "MSAA (default: 1)"),
-            refresh  = arg_int0("r", "refresh", "<int>", "Refresh Rate (default: Q1: 72, Q2: 72)"),
             end   = arg_end(20)
 	};
 
@@ -731,11 +747,6 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_jkxr_GLES3JNILib_onCreate( JNIEnv * env,
         if (msaa->count > 0 && msaa->ival[0] > 0 && msaa->ival[0] < 10)
         {
             NUM_MULTI_SAMPLES = msaa->ival[0];
-        }
-
-        if (refresh->count > 0 && refresh->ival[0] > 0 && refresh->ival[0] <= 120)
-        {
-            REFRESH = refresh->ival[0];
         }
 	}
 

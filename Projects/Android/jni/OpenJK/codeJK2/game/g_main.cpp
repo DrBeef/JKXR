@@ -574,7 +574,7 @@ void G_InitCvars( void ) {
 	g_spskill = gi.cvar ("g_spskill", "0", CVAR_ARCHIVE | CVAR_SAVEGAME|CVAR_NORESTART);
 	g_knockback = gi.cvar( "g_knockback", "1000", CVAR_CHEAT );
 	g_dismemberment = gi.cvar ( "g_dismemberment", "3", CVAR_ARCHIVE );//0 = none, 1 = arms and hands, 2 = legs, 3 = waist and head, 4 = mega dismemberment
-	g_dismemberProbabilities = gi.cvar ( "g_dismemberProbabilities", "1", CVAR_ARCHIVE );//0 = ignore probabilities, 1 = use probabilities
+	g_dismemberProbabilities = gi.cvar ( "g_dismemberProbabilities", "100", CVAR_ARCHIVE );//0 = ignore probabilities, 1 = use probabilities
 	g_synchSplitAnims = gi.cvar ( "g_synchSplitAnims", "1", 0 );
 
 	g_inactivity = gi.cvar ("g_inactivity", "0", 0);
@@ -589,7 +589,7 @@ void G_InitCvars( void ) {
 	g_TeamBeefDirectorsCut = gi.cvar( "g_TeamBeefDirectorsCut", "1", CVAR_ARCHIVE ); // Team Beef Director's Cut tweaks
 
 	g_saberAutoDeflect1stPerson = gi.cvar( "g_saberAutoDeflect1stPerson", "0", CVAR_ARCHIVE );//Whether the saber will auto deflect missiles in first person
-	g_saberAutoBlocking = gi.cvar( "g_saberAutoBlocking", "0", CVAR_ARCHIVE|CVAR_CHEAT );//must press +block button to do any blocking
+	g_saberAutoBlocking = gi.cvar( "g_saberAutoBlocking", "1", CVAR_ARCHIVE|CVAR_CHEAT );//must press +block button to do any blocking
 	g_saberRealisticCombat = gi.cvar( "g_saberRealisticCombat", "1", CVAR_ARCHIVE );//makes collision more precise, increases damage
 	g_saberMoveSpeed = gi.cvar( "g_saberMoveSpeed", "1", CVAR_ARCHIVE|CVAR_CHEAT );//how fast you run while attacking with a saber
 	g_saberAnimSpeed = gi.cvar( "g_saberAnimSpeed", "1.2", CVAR_ARCHIVE|CVAR_CHEAT );//how fast saber animations run

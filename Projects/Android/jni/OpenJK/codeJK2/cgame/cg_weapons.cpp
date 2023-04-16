@@ -781,6 +781,35 @@ void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles )
 	angles[PITCH] += (scale * 0.5f ) * fracsin * 0.01;
 }
 
+static vr_weapon_adjustment_t* LoadWeaponAdjustment( int weapon ) {
+	char cvar_name[64];
+	vr_weapon_adjustment_t *adjustment = &vr->weaponadjustment[weapon];
+	if (!adjustment->loaded) {
+		Com_sprintf(cvar_name, sizeof(cvar_name), "vr_weapon_adjustment_%i", weapon);
+		char* weapon_adjustment = cgi_Cvar_Get(cvar_name);
+		if (strlen(weapon_adjustment) > 0) {
+			sscanf(weapon_adjustment, "%f,%f,%f,%f,%f,%f,%f",
+				&adjustment->scale,
+				&adjustment->offset[0],
+				&adjustment->offset[1],
+				&adjustment->offset[2],
+				&adjustment->angles[PITCH],
+				&adjustment->angles[YAW],
+				&adjustment->angles[ROLL]);
+		} else {
+			adjustment->scale = 1.0f;
+			adjustment->offset[0] = 0.0f;
+			adjustment->offset[1] = 0.0f;
+			adjustment->offset[2] = 0.0f;
+			adjustment->angles[PITCH] = 0.0f;
+			adjustment->angles[YAW] = 0.0f;
+			adjustment->angles[ROLL] = 0.0f;
+		}
+		adjustment->loaded = true;
+	}
+	return adjustment;
+}
+
 static float CG_CalculateWeaponPositionAndScale( playerState_t *ps, vec3_t origin, vec3_t angles ) {
 
 	if (cg.renderingThirdPerson)
@@ -791,64 +820,27 @@ static float CG_CalculateWeaponPositionAndScale( playerState_t *ps, vec3_t origi
 
 	BG_CalculateVRWeaponPosition(origin, angles);
 
+	vr_weapon_adjustment_t *adjustment = LoadWeaponAdjustment(ps->weapon);
+
 	vec3_t offset;
+	VectorScale(adjustment->offset, adjustment->scale, offset);
 
-	//Weapon offset debugging
-	float scale=1.0f;
-	if (strcmp(cgi_Cvar_Get("vr_control_scheme"), "99") == 0) {
-		scale = vr->test_scale;
-
-		//Adjust angles for weapon models that aren't aligned very well
-		matrix4x4 m1, m2, m3;
-		vec3_t zero;
-		VectorClear(zero);
-		Matrix4x4_CreateFromEntity(m1, angles, zero, 1.0);
-		Matrix4x4_CreateFromEntity(m2, vr->test_angles, zero, 1.0);
-		Matrix4x4_Concat(m3, m1, m2);
-		Matrix4x4_ConvertToEntity(m3, angles, zero);
-
-		VectorCopy(vr->test_offset, offset);
-
-		int w = cgi_R_Font_StrLenPixels(vr->test_name, cgs.media.qhFontSmall, 1.0f);
-		int x = ( SCREEN_WIDTH - w ) / 2;
-		cgi_R_Font_DrawString(x, (SCREEN_HEIGHT / 2), vr->test_name, colorTable[CT_ICON_BLUE], cgs.media.qhFontSmall, -1, FONT_SCALE);
-	} else {
-		if (ps->weapon != 0)
-		{
-			char cvar_name[64];
-			Com_sprintf(cvar_name, sizeof(cvar_name), "vr_weapon_adjustment_%i", ps->weapon);
-
-			char* weapon_adjustment = cgi_Cvar_Get(cvar_name);
-
-			if (strlen(weapon_adjustment) > 0) {
-				vec3_t adjust;
-				vec3_t temp_offset;
-				VectorClear(temp_offset);
-				VectorClear(adjust);
-
-				sscanf(weapon_adjustment, "%f,%f,%f,%f,%f,%f,%f", &scale,
-					   &(temp_offset[0]), &(temp_offset[1]), &(temp_offset[2]),
-					   &(adjust[PITCH]), &(adjust[YAW]), &(adjust[ROLL]));
-				VectorScale(temp_offset, scale, offset);
-
-				if (!vr->right_handed)
-				{
-					//yaw needs to go in the other direction as left handed model is reversed
-					adjust[YAW] *= -1.0f;
-				}
-
-				//Adjust angles for weapon models that aren't aligned very well
-				matrix4x4 m1, m2, m3;
-				vec3_t zero;
-				VectorClear(zero);
-				Matrix4x4_CreateFromEntity(m1, angles, zero, 1.0);
-				Matrix4x4_CreateFromEntity(m2, adjust, zero, 1.0);
-				Matrix4x4_Concat(m3, m1, m2);
-				Matrix4x4_ConvertToEntity(m3, angles, zero);
-			}
-		}
+	vec3_t adjust;
+	VectorCopy(adjustment->angles, adjust);
+	if (!vr->right_handed)
+	{
+		//yaw needs to go in the other direction as left handed model is reversed
+		adjust[YAW] *= -1.0f;
 	}
 
+	//Adjust angles for weapon models that aren't aligned very well
+	matrix4x4 m1, m2, m3;
+	vec3_t zero;
+	VectorClear(zero);
+	Matrix4x4_CreateFromEntity(m1, angles, zero, 1.0);
+	Matrix4x4_CreateFromEntity(m2, adjust, zero, 1.0);
+	Matrix4x4_Concat(m3, m1, m2);
+	Matrix4x4_ConvertToEntity(m3, angles, zero);
 
 	//Now move weapon closer to proper origin
 	vec3_t forward, right, up;
@@ -861,7 +853,7 @@ static float CG_CalculateWeaponPositionAndScale( playerState_t *ps, vec3_t origi
 		VectorMA(origin, -offset[0], right, origin);
 	}
 
-	return scale;
+	return adjustment->scale;
 }
 
 /*
@@ -1118,6 +1110,7 @@ void CG_AddViewWeapon( playerState_t *ps )
 
 	if (strcmp(cgi_Cvar_Get("vr_control_scheme"), "99") == 0) {
 		vec3_t origin;
+		vec3_t startForward, startRight, startUp;
 		vec3_t endForward, endRight, endUp;
 		vec3_t _angles;
 		BG_CalculateVRWeaponPosition(   origin,        _angles );
@@ -1126,31 +1119,34 @@ void CG_AddViewWeapon( playerState_t *ps )
 		AngleVectors(_angles, forward, right, up);
 
 		trace_t trace;
+		VectorMA(origin, -10, forward, startForward);
 		VectorMA(origin, 256, forward, endForward);
 		static vec3_t RED	= {1.0f,0.0f,0.0f};
-		FX_AddLine( origin, endForward, 0.1f, 4.0f, 0.0f,
+		FX_AddLine( startForward, endForward, 0.1f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					RED, RED, 0.0f,
-					120, cgi_R_RegisterShader( "gfx/effects/whiteline2" ),
+					120, cgi_R_RegisterShader( "gfx/misc/whiteline2" ),
 					FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
-		VectorMA(origin, 20, right, endRight);
+		VectorMA(origin, -10, right, startRight);
+		VectorMA(origin, 10, right, endRight);
 		vec3_t	BLUE = {0.0f,0.0f,1.0f};
-		FX_AddLine( origin, endRight, 0.1f, 4.0f, 0.0f,
+		FX_AddLine( startRight, endRight, 0.1f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					BLUE, BLUE, 0.0f,
 					120, cgi_R_RegisterShader( "gfx/misc/whiteline2" ),
 					FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
-		VectorMA(origin, 20, up, endUp);
+		VectorMA(origin, -10, up, startUp);
+		VectorMA(origin, 10, up, endUp);
 		vec3_t	GREEN = {0.0f,1.0f,0.0f};
-		FX_AddLine( origin, endUp, 0.1f, 4.0f, 0.0f,
+		FX_AddLine( startUp, endUp, 0.1f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					GREEN, GREEN, 0.0f,
 					120, cgi_R_RegisterShader( "gfx/misc/whiteline2" ),
 					FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
-		CG_CenterPrint(vr->test_name, 240);
+		CG_CenterPrint(vr->weaponadjustment_info, 240);
 
 	}
 

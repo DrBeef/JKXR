@@ -1602,7 +1602,7 @@ void R_Register( void )
 	r_vertexLight = ri.Cvar_Get( "r_vertexLight", "0", CVAR_ARCHIVE | CVAR_LATCH );
 	r_subdivisions = ri.Cvar_Get ("r_subdivisions", "4", CVAR_ARCHIVE_ND | CVAR_LATCH);
 	ri.Cvar_CheckRange( r_subdivisions, 0, 80, qfalse );
-	r_intensity = ri.Cvar_Get ("r_intensity", "1", CVAR_LATCH|CVAR_ARCHIVE_ND );
+	r_intensity = ri.Cvar_Get ("r_intensity", "1.07", CVAR_LATCH|CVAR_ARCHIVE );
 
 	//
 	// temporary latched variables that can only change over a restart
@@ -1632,7 +1632,11 @@ void R_Register( void )
 //	r_dlightBacks = ri.Cvar_Get( "r_dlightBacks", "0", CVAR_ARCHIVE );
 	r_finish = ri.Cvar_Get ("r_finish", "0", CVAR_ARCHIVE_ND);
 	r_textureMode = ri.Cvar_Get( "r_textureMode", "GL_LINEAR_MIPMAP_LINEAR", CVAR_ARCHIVE );
-	r_gamma = ri.Cvar_Get( "r_gamma", "1.027344", CVAR_ARCHIVE_ND );
+	if (strstr(ri.Cvar_VariableString("openXRHMD"), "pico") != NULL) {
+		r_gamma = ri.Cvar_Get( "r_gamma", "1.30", CVAR_ARCHIVE );
+	} else {
+		r_gamma = ri.Cvar_Get( "r_gamma", "1.15", CVAR_ARCHIVE );
+	}
 	r_facePlaneCull = ri.Cvar_Get ("r_facePlaneCull", "1", CVAR_ARCHIVE_ND );
 
 	r_dlightStyle = ri.Cvar_Get ("r_dlightStyle", "1", CVAR_ARCHIVE_ND);

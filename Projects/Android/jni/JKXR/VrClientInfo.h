@@ -13,6 +13,13 @@
 #define USE_HAPTIC_FEEDBACK_DELAY 500
 
 typedef struct {
+    bool    loaded;
+    float   scale;
+    vec3_t  angles;
+    vec3_t  offset;
+} vr_weapon_adjustment_t;
+
+typedef struct {
     bool cin_camera; // cinematic camera taken over
 
     bool misc_camera; // looking through a misc camera view entity
@@ -76,6 +83,9 @@ typedef struct {
     float weaponoffset_timestamp;
     vec3_t weaponoffset_history[NUM_WEAPON_SAMPLES];
     float weaponoffset_history_timestamp[NUM_WEAPON_SAMPLES];
+
+    vr_weapon_adjustment_t weaponadjustment[32];
+    char weaponadjustment_info[256]; // debug message for weapon alignment
 
     int item_selector; // 1 - weapons/gadgets/saber stance, 2 - Force powers
 

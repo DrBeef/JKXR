@@ -186,9 +186,14 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
             sendButtonActionSimple("weapprev");
         }
 
+        vr_weapon_adjustment_t *adjustment = &vr.weaponadjustment[cl.frame.ps.weapon];
+        if (!adjustment->loaded) {
+            return; // will be loaded "next frame"
+        }
+
         static int item_index = 0;
-        float* items[7] = {&vr.test_scale, &(vr.test_offset[0]), &(vr.test_offset[1]), &(vr.test_offset[2]),
-                           &(vr.test_angles[PITCH]), &(vr.test_angles[YAW]), &(vr.test_angles[ROLL])};
+        float* items[7] = {&adjustment->scale, &(adjustment->offset[0]), &(adjustment->offset[1]), &(adjustment->offset[2]),
+                           &(adjustment->angles[PITCH]), &(adjustment->angles[YAW]), &(adjustment->angles[ROLL])};
         char*  item_names[7] = {"scale", "right", "up", "forward", "pitch", "yaw", "roll"};
         float  item_inc[7] = {0.005, 0.02, 0.02, 0.02, 0.1, 0.1, 0.1};
 
@@ -249,14 +254,15 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
             }
         }
 
-        Com_sprintf(vr.test_name, sizeof(vr.test_name), "%s: %.3f", item_names[item_index], *(items[item_index]));
+        Com_sprintf(vr.weaponadjustment_info, sizeof(vr.weaponadjustment_info), "%s: %.3f", item_names[item_index], *(items[item_index]));
 
         char cvar_name[64];
         Com_sprintf(cvar_name, sizeof(cvar_name), "vr_weapon_adjustment_%i", cl.frame.ps.weapon);
 
         char buffer[256];
-        Com_sprintf(buffer, sizeof(buffer), "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f", vr.test_scale, (vr.test_offset[0] / vr.test_scale), (vr.test_offset[1] / vr.test_scale), (vr.test_offset[2] / vr.test_scale),
-                (vr.test_angles[PITCH]), (vr.test_angles[YAW]), (vr.test_angles[ROLL]));
+        Com_sprintf(buffer, sizeof(buffer), "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f", adjustment->scale,
+                adjustment->offset[0], adjustment->offset[1], adjustment->offset[2],
+                adjustment->angles[PITCH], adjustment->angles[YAW], adjustment->angles[ROLL]);
         Cvar_Set(cvar_name, buffer );
     }
 

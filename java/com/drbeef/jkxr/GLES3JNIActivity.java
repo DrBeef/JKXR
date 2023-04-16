@@ -202,15 +202,6 @@ import java.util.Vector;
 		copy_asset("/sdcard/JKXR/JK2/base", "z_vr_assets_base.pk3", true);
 		copy_asset("/sdcard/JKXR/JK2/base", "z_vr_assets_jko.pk3", true);
 
-		//Bummser's default configuration
-		if (manufacturer.contains("meta")) {
-			//Meta Quest
-			copy_asset_with_rename("/sdcard/JKXR/JK2/base", "openjo_sp_quest.cfg", "openjo_sp.cfg", false);
-		} else {
-			//Pico XR
-			copy_asset_with_rename("/sdcard/JKXR/JK2/base", "openjo_sp_pico.cfg", "openjo_sp.cfg", false);
-		}
-
 		//Bunch of cool mods and their credits - only copy if user wants them
 		if (!new File("/sdcard/JKXR/JK2/base/no_copy").exists()) {
 			copy_asset("/sdcard/JKXR/JK2/base", "packaged_mods_credits.txt", false);
@@ -218,6 +209,7 @@ import java.util.Vector;
 
 			//Weapon Models
 			copy_asset("/sdcard/JKXR/JK2/base", "z_Crusty_and_Elin_vr_weapons.pk3", true);
+			copy_asset("/sdcard/JKXR/JK2/base", "assets6_vr_weapons_shaders.pk3", true);
 		}
 
 
@@ -243,6 +235,7 @@ import java.util.Vector;
 
 			//Weapon Models
 			copy_asset(demoFolder, "z_Crusty_and_Elin_vr_weapons.pk3", true);
+			copy_asset(demoFolder, "assets6_vr_weapons_shaders.pk3", true);
 		}
 
 		//Read these from a file and pass through

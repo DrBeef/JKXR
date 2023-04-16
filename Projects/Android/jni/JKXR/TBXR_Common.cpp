@@ -65,7 +65,6 @@ PFNEGLGETSYNCATTRIBKHRPROC		eglGetSyncAttribKHR;
 
 //Let's go to the maximum!
 int NUM_MULTI_SAMPLES	= 2;
-int REFRESH	            = 0;
 float SS_MULTIPLIER    = 0.0f;
 
 GLboolean stageSupported = GL_FALSE;
