@@ -346,9 +346,16 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
         }
 
-        if (vr.cin_camera)
+        static int cinCameraTimestamp = -1;
+        if (vr.cin_camera && cinCameraTimestamp == -1) {
+            cinCameraTimestamp = Sys_Milliseconds();
+        } else if (!vr.cin_camera) {
+            cinCameraTimestamp = -1;
+        }
+        if (vr.cin_camera && cinCameraTimestamp + 1000 < Sys_Milliseconds())
         {
-            //To skip cinematic use any thumb or trigger
+            // To skip cinematic use any thumb or trigger (but wait a while
+            // to prevent skipping when cinematic is started during action)
             if ((primaryButtonsNew & primaryThumb) != (primaryButtonsOld & primaryThumb)) {
                 sendButtonAction("+use", (primaryButtonsNew & primaryThumb));
             }
