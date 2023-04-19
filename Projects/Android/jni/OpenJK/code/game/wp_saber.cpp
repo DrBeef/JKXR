@@ -8106,7 +8106,17 @@ void WP_SaberUpdate( gentity_t *self, usercmd_t *ucmd )
 					}
 				}
 				saberent->contents = CONTENTS_LIGHTSABER;
-				G_SetOrigin( saberent, saberOrg );
+				if (self->client->ps.clientNum == 0 &&
+					self->client->ps.saber[0].numBlades > 1)
+				{
+					vec3_t angles;
+					BG_CalculateVRSaberPosition(0, saberOrg, angles);
+					G_SetOrigin(saberent, saberOrg);
+				}
+				else
+				{
+					G_SetOrigin(saberent, saberOrg);
+				}
 			}
 		}
 		/*
