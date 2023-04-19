@@ -1349,6 +1349,9 @@ void CG_AddViewWeapon( playerState_t *ps )
 			val = 1.0f;
 		}
 
+		int position = vr->weapon_stabilised ? 4 : (vr->right_handed ? 1 : 2);
+		cgi_HapticEvent("chainsaw_fire", position, 0, 60 * val, 0, 0);
+
 		val += Q_flrand(0.0f, 1.0f) * 0.5f;
 
 		FX_AddSprite( flash.origin, NULL, NULL, 3.0f * val * scale, 0.0f, 0.7f, 0.7f, WHITE, WHITE, Q_flrand(0.0f, 1.0f) * 360, 0.0f, 1.0f, shader, FX_USE_ALPHA | FX_DEPTH_HACK );

@@ -1460,6 +1460,9 @@ void CG_AddViewWeapon( playerState_t *ps )
 			val = 1.0f;
 		}
 
+        int position = vr->weapon_stabilised ? 4 : (vr->right_handed ? 1 : 2);
+        cgi_HapticEvent("chainsaw_fire", position, 0, 60 * val, 0, 0);
+
 		val += Q_flrand(0.0f, 1.0f) * 0.5f;
 
 		FX_AddSprite( flash.origin, NULL, NULL, 3.0f * val * scale, 0.0f, 0.7f, 0.7f, WHITE, WHITE, Q_flrand(0.0f, 1.0f) * 360, 0.0f, 1.0f, shader, FX_USE_ALPHA | FX_DEPTH_HACK );
@@ -3446,6 +3449,50 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire )
 */
 			return;
 		}
+	}
+
+	//Are we the player?
+	if (cent->gent->client->ps.clientNum == 0)
+	{
+		int position = vr->weapon_stabilised ? 4 : (vr->right_handed ? 1 : 2);
+
+		//Haptics
+		switch (ent->weapon) {
+			case WP_SABER:
+				if (cent->gent->client->ps.dualSabers) position = 4;
+				cgi_HapticEvent("chainsaw_fire", position, 0, 40, 0, 0);
+				break;
+			case WP_BRYAR_PISTOL:
+			case WP_BOWCASTER:
+			case WP_BLASTER:
+			case WP_ATST_MAIN:
+				cgi_HapticEvent("machinegun_fire", position, 0, (ent->weapon == WP_BRYAR_PISTOL) ? 60 : 100, 0, 0);
+				break;
+			case WP_BLASTER_PISTOL:
+				cgi_HapticEvent("shotgun_fire", position, 0, 100, 0, 0);
+				break;
+			case WP_THERMAL:
+			case WP_DET_PACK:
+			case WP_TRIP_MINE:
+				cgi_HapticEvent("handgrenade_fire", position, 0, 80, 0, 0);
+				break;
+			case WP_ROCKET_LAUNCHER:
+			case WP_ATST_SIDE:
+				cgi_HapticEvent("rocket_fire", position, 0, 100, 0, 0);
+				break;
+			case WP_DISRUPTOR:
+				cgi_HapticEvent("RTCWQuest:fire_sniper", position, 0, 100, 0, 0);
+				break;
+			case WP_FLECHETTE:
+			case WP_REPEATER:
+				cgi_HapticEvent("plasmagun_fire", position, 0, 100, 0, 0);
+				break;
+			case WP_DEMP2:
+			case WP_EMPLACED_GUN:
+				cgi_HapticEvent("bfg_fire", position, 0, 100, 0, 0);
+				break;
+		}
+
 	}
 
 	// Do overcharge sound that get's added to the top
