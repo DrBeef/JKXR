@@ -42,8 +42,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             vr_control_scheme->value == 99; // Always right-handed for weapon calibration
 
     static bool dominantGripPushed = false;
-    static bool canUseBackpack = false;
-    static bool canUseQuickSave = false;
 
     //Need this for the touch screen
     ovrTrackedController * pWeapon = pDominantTracking;
@@ -829,22 +827,18 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                   remote_movementForward);
 
 
-            if (!canUseQuickSave) {
-                if (((secondaryButtonsNew & secondaryButton1) !=
-                    (secondaryButtonsOld & secondaryButton1)) &&
-                        (secondaryButtonsNew & secondaryButton1)) {
-                    //Toggle walk/run somehow?!
-                    vr.move_speed = (++vr.move_speed) % 3;
-                }
+            if (((secondaryButtonsNew & secondaryButton1) !=
+                (secondaryButtonsOld & secondaryButton1)) &&
+                    (secondaryButtonsNew & secondaryButton1)) {
+                //Toggle walk/run somehow?!
+                vr.move_speed = (++vr.move_speed) % 3;
             }
 
             //Open the datapad
-            if (!canUseQuickSave) {
-                if (((secondaryButtonsNew & secondaryButton2) !=
-                     (secondaryButtonsOld & secondaryButton2)) &&
-                    (secondaryButtonsNew & secondaryButton2)) {
-                    Sys_QueEvent(0, SE_KEY, A_TAB, true, 0, NULL);
-                }
+            if (((secondaryButtonsNew & secondaryButton2) !=
+                 (secondaryButtonsOld & secondaryButton2)) &&
+                (secondaryButtonsNew & secondaryButton2)) {
+                Sys_QueEvent(0, SE_KEY, A_TAB, true, 0, NULL);
             }
 
             //Use Force - off hand trigger

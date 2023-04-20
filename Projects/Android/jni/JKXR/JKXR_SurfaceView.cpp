@@ -504,10 +504,7 @@ void VR_HapticEvent(const char* event, int position, int flags, int intensity, f
 
 	//Controller Haptic Support
 	int weaponFireChannel = vr.weapon_stabilised ? 3 : (vr_control_scheme->integer ? 2 : 1);
-	if (cl.frame.ps.weapon == WP_SABER && vr.dualsabers)
-	{
-		weaponFireChannel = 3;
-	}
+
 	if (flags != 0)
 	{
 		weaponFireChannel = flags;
@@ -530,8 +527,34 @@ void VR_HapticEvent(const char* event, int position, int flags, int intensity, f
 	{
 		TBXR_Vibrate(150, 3, fIntensity);
 	}
-	else if (strcmp(event, "chainsaw_fire") == 0 ||
-			 strcmp(event, "RTCWQuest:fire_tesla") == 0)
+	else if (strcmp(event, "chainsaw_fire") == 0) // Saber
+	{
+		//Special handling for dual sabers
+		if (vr.dualsabers)
+		{
+			if (position == 4 ||
+					position == 0) // both hands
+			{
+				weaponFireChannel = 3;
+			}
+			else if (position == 1) // left hand
+			{
+				weaponFireChannel = 2;
+			}
+			else if (position == 2) // right hand
+			{
+				weaponFireChannel = 1;
+			}
+			else
+			{
+				//no longer need to trigger haptic
+				return;
+			}
+		}
+
+		TBXR_Vibrate(200, weaponFireChannel, fIntensity);
+	}
+	else if (strcmp(event, "RTCWQuest:fire_tesla") == 0) // Weapon power build up
 	{
 		TBXR_Vibrate(500, weaponFireChannel, fIntensity);
 	}
