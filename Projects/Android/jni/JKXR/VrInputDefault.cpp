@@ -202,7 +202,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 	handleTrackedControllerButton(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, xrButton_Enter, A_ESCAPE);
 
     static float menuYaw = 0;
-    if (VR_UseScreenLayer())
+    if (VR_UseScreenLayer() && !vr.misc_camera)
     {
         bool controlsLeftHanded = vr_control_scheme->integer >= 10;
         if (controlsLeftHanded == vr.menu_right_handed) {
