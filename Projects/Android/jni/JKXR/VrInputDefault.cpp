@@ -550,14 +550,16 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     }
 
                     bool triggered = vr.primaryVelocityTriggeredAttack || (vr.dualsabers && vr.secondaryVelocityTriggeredAttack);
-                    if (fired != triggered)
+                    if (fired != triggered &&
+                        //Don't trigger regular attack if the trigger is held down as this can cause a special attack to occur in JKA
+                        !(pDominantTrackedRemoteNew->Buttons & xrButton_Trigger))
                     {
                         ALOGV("**WEAPON EVENT**  veocity triggered %s",
                               triggered ? "+attack" : "-attack");
                         //normal attack is a punch with the left hand
                         sendButtonAction("+attack", triggered);
-                        fired = triggered;
                     }
+                    fired = triggered;
                 } else if (vr.primaryVelocityTriggeredAttack || vr.secondaryVelocityTriggeredAttack) {
                     //send a stop attack as we have an unfinished velocity attack
                     vr.primaryVelocityTriggeredAttack = false;
