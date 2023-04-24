@@ -6482,7 +6482,8 @@ void WP_RunSaber( gentity_t *self, gentity_t *saber )
 			fwdangles[0] -= 5;
 		}
 
-		if ( self->client->ps.forcePowerLevel[FP_SABERTHROW] > FORCE_LEVEL_1
+		//For now make FORCE_LEVEL_1 saber throw do the same as FORCE_LEVEL_2, otherwise it is impossible to use
+		if ( self->client->ps.forcePowerLevel[FP_SABERTHROW] >= FORCE_LEVEL_1
 			|| self->client->ps.saberEntityState == SES_RETURNING
 			|| VectorCompare( saber->s.pos.trDelta, vec3_origin ) )
 		{//control if it's returning or just starting
