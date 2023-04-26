@@ -4124,6 +4124,10 @@ qboolean G_TryingKataAttack( gentity_t *self, usercmd_t *cmd )
 			{//haven't been holding alt-attack
 				if ( (cmd->buttons&BUTTON_ATTACK) )
 				{//pressing attack
+                    //If player is not in 3rd person then we don't perform the kata attack
+                    if ( self && self->client && self->client->ps.clientNum == 0 && !cg.renderingThirdPerson)
+                        return qfalse;
+
 					return qtrue;
 				}
 			}
@@ -7017,9 +7021,11 @@ void WP_SaberThrow( gentity_t *self, usercmd_t *ucmd )
 		}
 		if ( (ucmd->buttons&BUTTON_ATTACK)
 			&& (ucmd->buttons&BUTTON_ALT_ATTACK)
-			&& !self->client->ps.saberInFlight )
+			&& !self->client->ps.saberInFlight
+            && self->client->ps.clientNum == 0
+            && cg.renderingThirdPerson)
 		{//trying to do special attack, don't throw it
-			return;
+            return;
 		}
 		else if ( self->client->ps.torsoAnim == BOTH_A1_SPECIAL
 			|| self->client->ps.torsoAnim == BOTH_A2_SPECIAL
