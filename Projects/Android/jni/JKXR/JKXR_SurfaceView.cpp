@@ -552,7 +552,7 @@ void VR_HapticEvent(const char* event, int position, int flags, int intensity, f
 			}
 		}
 
-		TBXR_Vibrate(200, weaponFireChannel, fIntensity);
+		TBXR_Vibrate(300, weaponFireChannel, fIntensity);
 	}
 	else if (strcmp(event, "RTCWQuest:fire_tesla") == 0) // Weapon power build up
 	{

@@ -6496,6 +6496,11 @@ Ghoul2 Insert End
 				{
 					if ( !noMarks )
 					{
+                        int position = (vr->right_handed ?
+                                        ((saberNum == 0) ? 2 : 1) :
+                                        ((saberNum == 0) ? 1 : 2));
+                        cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+
 						/*
 						if ( !(cent->gent->client->ps.saberEventFlags&SEF_INWATER) )
 						{
@@ -6521,6 +6526,11 @@ Ghoul2 Insert End
 				{
 					if ( !noMarks )
 					{
+                        int position = (vr->right_handed ?
+                                        ((saberNum == 0) ? 2 : 1) :
+                                        ((saberNum == 0) ? 1 : 2));
+                        cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+
 						if ( ( !WP_SaberBladeUseSecondBladeStyle( &client->ps.saber[saberNum], bladeNum ) && !(client->ps.saber[saberNum].saberFlags2&SFL2_NO_WALL_MARKS) )
 							|| ( WP_SaberBladeUseSecondBladeStyle( &client->ps.saber[saberNum], bladeNum ) && !(client->ps.saber[saberNum].saberFlags2&SFL2_NO_WALL_MARKS2) ) )
 						{
