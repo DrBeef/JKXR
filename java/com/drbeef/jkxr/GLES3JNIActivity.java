@@ -195,9 +195,6 @@ import java.util.Vector;
 		//Copy the command line params file
 		copy_asset("/sdcard/JKXR", "commandline.txt", false);
 
-		//Copy the weapon adjustment config - should we force overwrite?
-		copy_asset("/sdcard/JKXR/JK2/base", "weapons_vr_jo.cfg", true);
-
 		//Our assets
 		copy_asset("/sdcard/JKXR/JK2/base", "z_vr_assets_base.pk3", true);
 		copy_asset("/sdcard/JKXR/JK2/base", "z_vr_assets_jko.pk3", true);
@@ -208,8 +205,11 @@ import java.util.Vector;
 			copy_asset("/sdcard/JKXR/JK2/base", "GGDynamicWeapons.pk3", false);
 
 			//Weapon Models
-			copy_asset("/sdcard/JKXR/JK2/base", "z_Crusty_and_Elin_vr_weapons.pk3", true);
+			copy_asset("/sdcard/JKXR/JK2/base", "z_vr_weapons_jko_Crusty_and_Elin.pk3", true);
 			copy_asset("/sdcard/JKXR/JK2/base", "assets6_vr_weapons_shaders.pk3", true);
+            //Delete weapons pak and config with old name
+            delete_asset(new File("/sdcard/JKXR/JK2/base/z_Crusty_and_Elin_vr_weapons.pk3"));
+            delete_asset(new File("/sdcard/JKXR/JK2/base/weapons_vr_jo.cfg"));
 		}
 
 
@@ -233,9 +233,12 @@ import java.util.Vector;
 			copy_asset(demoFolder, "packaged_mods_credits.txt", false);
 			copy_asset(demoFolder, "GGDynamicWeapons.pk3", false);
 
-			//Weapon Models
-			copy_asset(demoFolder, "z_Crusty_and_Elin_vr_weapons.pk3", true);
-			copy_asset(demoFolder, "assets6_vr_weapons_shaders.pk3", true);
+            //Weapon Models
+            copy_asset(demoFolder, "z_vr_weapons_jko_Crusty_and_Elin.pk3", true);
+            copy_asset(demoFolder, "assets6_vr_weapons_shaders.pk3", true);
+            //Delete weapons pak and config with old name
+            delete_asset(new File(demoFolder + "/z_Crusty_and_Elin_vr_weapons.pk3"));
+            delete_asset(new File(demoFolder + "/weapons_vr_jo.cfg"));
 		}
 
 		//Read these from a file and pass through
@@ -336,6 +339,18 @@ import java.util.Vector;
 				break;
 			out.write(buf, 0, count);
 		}
+	}
+
+	public void delete_asset(File file) {
+		if (!file.exists()) {
+			return;
+		}
+		if (file.isDirectory()) {
+			for (File nestedFile : file.listFiles()) {
+				delete_asset(nestedFile);
+			}
+		}
+		file.delete();
 	}
 
 	@Override protected void onStart()
