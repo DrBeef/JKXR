@@ -990,13 +990,11 @@ void Com_ExecuteCfg(void)
 		// skip the q3config.cfg and autoexec.cfg if "safe" is on the command line
 		Cbuf_ExecuteText(EXEC_NOW, "exec " Q3CONFIG_NAME "\n");
 		Cbuf_Execute();
-		Cbuf_ExecuteText(EXEC_NOW, "exec autoexec_sp.cfg\n");
 		//Execute to overwrite weapon locations with our desired adjustments
-#ifdef JK2_MODE
-		Cbuf_AddText( "exec weapons_vr_jo.cfg\n" );
-#else
-		Cbuf_AddText( "exec weapons_vr_ja.cfg\n" );
-#endif
+		Cbuf_ExecuteText(EXEC_NOW, "exec weapons_vr.cfg\n" );
+		Cbuf_Execute();
+		// Execute autoexec last (allowing to re-adjust weapons)
+		Cbuf_ExecuteText(EXEC_NOW, "exec autoexec_sp.cfg\n");
 		Cbuf_Execute();
 	}
 }

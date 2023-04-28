@@ -6519,11 +6519,7 @@ void UI_ResetDefaults( void )
 	ui.Cmd_ExecuteText( EXEC_APPEND, "cvar_restart\n");
 	Controls_SetDefaults();
 	ui.Cmd_ExecuteText( EXEC_APPEND, "exec default.cfg\n");
-#ifdef JK2_MODE
-	ui.Cmd_ExecuteText( EXEC_APPEND, "exec weapons_vr_jo.cfg\n");
-#else
-	ui.Cmd_ExecuteText( EXEC_APPEND, "exec weapons_vr_ja.cfg\n");
-#endif
+	ui.Cmd_ExecuteText( EXEC_APPEND, "exec weapons_vr.cfg\n");
 	ui.Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
 }
 
