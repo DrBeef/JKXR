@@ -42,8 +42,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             vr_control_scheme->value == 99; // Always right-handed for weapon calibration
 
     static bool dominantGripPushed = false;
-    static bool canUseBackpack = false;
-    static bool canUseQuickSave = false;
 
     //Need this for the touch screen
     ovrTrackedController * pWeapon = pDominantTracking;
@@ -204,7 +202,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 	handleTrackedControllerButton(&rightTrackedRemoteState_new, &rightTrackedRemoteState_old, xrButton_Enter, A_ESCAPE);
 
     static float menuYaw = 0;
-    if (VR_UseScreenLayer() && !vr.misc_camera && !vr.cin_camera /*bit of a fiddle, but if we are in a misc camera or cin camera, we are in the game and shouldn't be in here*/)
+    if (VR_UseScreenLayer() && !vr.misc_camera)
     {
         bool controlsLeftHanded = vr_control_scheme->integer >= 10;
         if (controlsLeftHanded == vr.menu_right_handed) {
@@ -556,6 +554,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     {
                         ALOGV("**WEAPON EVENT**  veocity triggered %s",
                               triggered ? "+attack" : "-attack");
+
                         //normal attack is a punch with the left hand
                         sendButtonAction("+attack", triggered);
                         fired = triggered;
@@ -829,22 +828,18 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                   remote_movementForward);
 
 
-            if (!canUseQuickSave) {
-                if (((secondaryButtonsNew & secondaryButton1) !=
-                    (secondaryButtonsOld & secondaryButton1)) &&
-                        (secondaryButtonsNew & secondaryButton1)) {
-                    //Toggle walk/run somehow?!
-                    vr.move_speed = (++vr.move_speed) % 3;
-                }
+            if (((secondaryButtonsNew & secondaryButton1) !=
+                (secondaryButtonsOld & secondaryButton1)) &&
+                    (secondaryButtonsNew & secondaryButton1)) {
+                //Toggle walk/run somehow?!
+                vr.move_speed = (++vr.move_speed) % 3;
             }
 
             //Open the datapad
-            if (!canUseQuickSave) {
-                if (((secondaryButtonsNew & secondaryButton2) !=
-                     (secondaryButtonsOld & secondaryButton2)) &&
-                    (secondaryButtonsNew & secondaryButton2)) {
-                    Sys_QueEvent(0, SE_KEY, A_TAB, true, 0, NULL);
-                }
+            if (((secondaryButtonsNew & secondaryButton2) !=
+                 (secondaryButtonsOld & secondaryButton2)) &&
+                (secondaryButtonsNew & secondaryButton2)) {
+                Sys_QueEvent(0, SE_KEY, A_TAB, true, 0, NULL);
             }
 
             //Use Force - off hand trigger

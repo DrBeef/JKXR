@@ -4054,7 +4054,8 @@ static void CG_ForcePushRefraction( vec3_t org, centity_t *cent )
 	float alpha;
 	int tDif;
 
-	if (!cg_renderToTextureFX.integer)
+	//Use classic force push blur - refraction effect not working in GLES
+	//if (!cg_renderToTextureFX.integer)
 	{
 		CG_ForcePushBlur(org);
 		return;
@@ -4746,6 +4747,8 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		}
 		else
 		{
+			//Causes screen to go black - just don't use this at all
+			/*
 			if (cg_renderToTextureFX.integer && cg_shadows.integer != 2 && cgs.glconfig.stencilBits >= 4)
 			{
 				cgi_R_SetRefractProp(1.0f, 0.0f, qfalse, qfalse); //don't need to do this every frame.. but..
@@ -4754,6 +4757,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 				ent->customShader = 0;
 			}
 			else
+			 */
 			{ //stencil buffer's in use, sorry
 				ent->renderfx = 0;//&= ~(RF_RGB_TINT|RF_ALPHA_FADE);
 				ent->shaderRGBA[0] = ent->shaderRGBA[1] = ent->shaderRGBA[2] = ent->shaderRGBA[3] = 255;
@@ -6492,6 +6496,11 @@ Ghoul2 Insert End
 				{
 					if ( !noMarks )
 					{
+                        int position = (vr->right_handed ?
+                                        ((saberNum == 0) ? 2 : 1) :
+                                        ((saberNum == 0) ? 1 : 2));
+                        cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+
 						/*
 						if ( !(cent->gent->client->ps.saberEventFlags&SEF_INWATER) )
 						{
@@ -6517,6 +6526,11 @@ Ghoul2 Insert End
 				{
 					if ( !noMarks )
 					{
+                        int position = (vr->right_handed ?
+                                        ((saberNum == 0) ? 2 : 1) :
+                                        ((saberNum == 0) ? 1 : 2));
+                        cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+
 						if ( ( !WP_SaberBladeUseSecondBladeStyle( &client->ps.saber[saberNum], bladeNum ) && !(client->ps.saber[saberNum].saberFlags2&SFL2_NO_WALL_MARKS) )
 							|| ( WP_SaberBladeUseSecondBladeStyle( &client->ps.saber[saberNum], bladeNum ) && !(client->ps.saber[saberNum].saberFlags2&SFL2_NO_WALL_MARKS2) ) )
 						{

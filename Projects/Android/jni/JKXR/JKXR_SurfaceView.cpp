@@ -18,6 +18,8 @@ extern "C" {
 }
 
 #include <client/client.h>
+#include <weapons.h>
+#include <client_ui.h>
 
 
 //#define ENABLE_GL_DEBUG
@@ -48,7 +50,8 @@ JKXR Stuff
 
 bool VR_UseScreenLayer()
 {
-	vr.using_screen_layer = (bool)((vr.cin_camera && !vr.immersive_cinematics) ||
+	vr.using_screen_layer = _UI_IsFullscreen() ||
+			(bool)((vr.cin_camera && !vr.immersive_cinematics) ||
 			vr.misc_camera ||
 			(CL_IsRunningInGameCinematic() || CL_InGameCinematicOnStandBy()) ||
             (cls.state == CA_CINEMATIC) ||
@@ -497,8 +500,11 @@ void VR_HapticEvent(const char* event, int position, int flags, int intensity, f
 	//Pass on to any external services
 	VR_ExternalHapticEvent(event, position, flags, intensity, angle, yHeight);
 
+	float fIntensity = intensity / 100.0f;
+
 	//Controller Haptic Support
 	int weaponFireChannel = vr.weapon_stabilised ? 3 : (vr_control_scheme->integer ? 2 : 1);
+
 	if (flags != 0)
 	{
 		weaponFireChannel = flags;
@@ -515,37 +521,63 @@ void VR_HapticEvent(const char* event, int position, int flags, int intensity, f
 	}
 	else if (strcmp(event, "shotgun") == 0 || strcmp(event, "fireball") == 0)
 	{
-		TBXR_Vibrate(400, 3, 1.0);
+		TBXR_Vibrate(400, 3, fIntensity);
 	}
 	else if (strcmp(event, "bullet") == 0)
 	{
-		TBXR_Vibrate(150, 3, 1.0);
+		TBXR_Vibrate(150, 3, fIntensity);
 	}
-	else if (strcmp(event, "chainsaw_fire") == 0 ||
-			 strcmp(event, "RTCWQuest:fire_tesla") == 0)
+	else if (strcmp(event, "chainsaw_fire") == 0) // Saber
 	{
-		TBXR_Vibrate(500, weaponFireChannel, 1.0);
+		//Special handling for dual sabers
+		if (vr.dualsabers)
+		{
+			if (position == 4 ||
+					position == 0) // both hands
+			{
+				weaponFireChannel = 3;
+			}
+			else if (position == 1) // left hand
+			{
+				weaponFireChannel = 2;
+			}
+			else if (position == 2) // right hand
+			{
+				weaponFireChannel = 1;
+			}
+			else
+			{
+				//no longer need to trigger haptic
+				return;
+			}
+		}
+
+		TBXR_Vibrate(300, weaponFireChannel, fIntensity);
+	}
+	else if (strcmp(event, "RTCWQuest:fire_tesla") == 0) // Weapon power build up
+	{
+		TBXR_Vibrate(500, weaponFireChannel, fIntensity);
 	}
 	else if (strcmp(event, "machinegun_fire") == 0 || strcmp(event, "plasmagun_fire") == 0)
 	{
-		TBXR_Vibrate(90, weaponFireChannel, 0.8);
+		TBXR_Vibrate(90, weaponFireChannel, fIntensity);
 	}
 	else if (strcmp(event, "shotgun_fire") == 0)
 	{
-		TBXR_Vibrate(250, weaponFireChannel, 1.0);
+		TBXR_Vibrate(250, weaponFireChannel, fIntensity);
 	}
 	else if (strcmp(event, "rocket_fire") == 0 ||
 			 strcmp(event, "RTCWQuest:fire_sniper") == 0 ||
 			 strcmp(event, "bfg_fire") == 0 ||
 			 strcmp(event, "handgrenade_fire") == 0 )
 	{
-		TBXR_Vibrate(400, weaponFireChannel, 1.0);
+		TBXR_Vibrate(400, weaponFireChannel, fIntensity);
 	}
 	else if (strcmp(event, "selector_icon") == 0 ||
 			 strcmp(event, "use_button") == 0 )
 	{
 		//Quick blip
-		TBXR_Vibrate(50, flags, 1.0);
+		TBXR_Vibrate(50, flags, fIntensity);
 	}
 }
 

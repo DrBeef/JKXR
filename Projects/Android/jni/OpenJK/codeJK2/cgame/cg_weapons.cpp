@@ -1349,6 +1349,9 @@ void CG_AddViewWeapon( playerState_t *ps )
 			val = 1.0f;
 		}
 
+		int position = vr->weapon_stabilised ? 4 : (vr->right_handed ? 2 : 1);
+		cgi_HapticEvent("RTCWQuest:fire_tesla", position, 0, 60 * val, 0, 0);
+
 		val += Q_flrand(0.0f, 1.0f) * 0.5f;
 
 		FX_AddSprite( flash.origin, NULL, NULL, 3.0f * val * scale, 0.0f, 0.7f, 0.7f, WHITE, WHITE, Q_flrand(0.0f, 1.0f) * 360, 0.0f, 1.0f, shader, FX_USE_ALPHA | FX_DEPTH_HACK );
@@ -3292,7 +3295,16 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire )
 	//Are we the player?
 	if (cent->gent->client->ps.clientNum == 0)
 	{
-		int position = vr->weapon_stabilised ? 4 : (vr->right_handed ? 1 : 2);
+		/*
+		   These are specific to external haptics vest/arms/face combinations
+           position values:
+               0 - Will play on vest and both arms if pattern files present for both
+               1 - Will play on (left) vest and on left arm only if pattern files present for left
+               2 - Will play on (right) vest and on right arm only if pattern files present for right
+               3 - Will play on head only (if present)
+               4 - Will play on all devices (that have a pattern defined for them)
+               */
+		int position = vr->weapon_stabilised ? 4 : (vr->right_handed ? 2 : 1);
 
 		//Haptics
 		switch (ent->weapon) {

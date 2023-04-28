@@ -1460,6 +1460,9 @@ void CG_AddViewWeapon( playerState_t *ps )
 			val = 1.0f;
 		}
 
+        int position = vr->weapon_stabilised ? 4 : (vr->right_handed ? 2 : 1);
+        cgi_HapticEvent("RTCWQuest:fire_tesla", position, 0, 60 * val, 0, 0);
+
 		val += Q_flrand(0.0f, 1.0f) * 0.5f;
 
 		FX_AddSprite( flash.origin, NULL, NULL, 3.0f * val * scale, 0.0f, 0.7f, 0.7f, WHITE, WHITE, Q_flrand(0.0f, 1.0f) * 360, 0.0f, 1.0f, shader, FX_USE_ALPHA | FX_DEPTH_HACK );
@@ -3448,51 +3451,122 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire )
 		}
 	}
 
-	// Do overcharge sound that get's added to the top
-/*	if (( ent->powerups & ( 1<<PW_WEAPON_OVERCHARGE )))
+	//Are we the player?
+	if (cent->gent->client->ps.clientNum == 0)
 	{
-		if ( alt_fire )
-		{
-			switch( ent->weapon )
-			{
-			case WP_THERMAL:
-			case WP_DET_PACK:
-			case WP_TRIP_MINE:
-			case WP_ROCKET_LAUNCHER:
-			case WP_FLECHETTE:
-				// these weapon fires don't overcharge
-				break;
+		/*
+		   These are specific to external haptics vest/arms/face combinations
+           position values:
+               0 - Will play on vest and both arms if pattern files present for both
+               1 - Will play on (left) vest and on left arm only if pattern files present for left
+               2 - Will play on (right) vest and on right arm only if pattern files present for right
+               3 - Will play on head only (if present)
+               4 - Will play on all devices (that have a pattern defined for them)
+               */
+            int position = vr->weapon_stabilised ? 0 : (vr->right_handed ? 2 : 1);
 
-			case WP_BLASTER:
-				cgi_S_StartSound( NULL, ent->number, CHAN_AUTO, cgs.media.overchargeFastSound );
-				break;
+            //Haptics
+            switch (ent->weapon) {
+                case WP_SABER:
+                    if (cent->gent->client->ps.dualSabers)
+                    {
+                        if (vr->primaryVelocityTriggeredAttack && vr->secondaryVelocityTriggeredAttack)
+                        {
+                            position = 4;
+                        }
+                        else if (vr->primaryVelocityTriggeredAttack)
+                        {
+                            position = (vr->right_handed ? 2 : 1);
+                        }
+                        else if (vr->secondaryVelocityTriggeredAttack) // secondary triggered
+                        {
+                            position = (vr->right_handed ? 1 : 2);
+                        }
+						else
+						{
+							position = -1;
+						}
+                    }
+                    cgi_HapticEvent("chainsaw_fire", position, 0, 40, 0, 0);
+                    break;
+                case WP_BRYAR_PISTOL:
+                case WP_BOWCASTER:
+                case WP_BLASTER:
+                case WP_ATST_MAIN:
+                    cgi_HapticEvent("machinegun_fire", position, 0, (ent->weapon == WP_BRYAR_PISTOL) ? 60 : 100, 0, 0);
+                    break;
+                case WP_BLASTER_PISTOL:
+                    cgi_HapticEvent("shotgun_fire", position, 0, 100, 0, 0);
+                    break;
+                case WP_THERMAL:
+                case WP_DET_PACK:
+                case WP_TRIP_MINE:
+                    cgi_HapticEvent("handgrenade_fire", position, 0, 80, 0, 0);
+                    break;
+                case WP_ROCKET_LAUNCHER:
+                case WP_ATST_SIDE:
+                    cgi_HapticEvent("rocket_fire", position, 0, 100, 0, 0);
+                    break;
+                case WP_DISRUPTOR:
+                    cgi_HapticEvent("RTCWQuest:fire_sniper", position, 0, 100, 0, 0);
+                    break;
+                case WP_FLECHETTE:
+                case WP_REPEATER:
+                    cgi_HapticEvent("plasmagun_fire", position, 0, 100, 0, 0);
+                    break;
+                case WP_DEMP2:
+                case WP_EMPLACED_GUN:
+                    cgi_HapticEvent("bfg_fire", position, 0, 100, 0, 0);
+                    break;
+            }
 
-			default:
-				cgi_S_StartSound( NULL, ent->number, CHAN_AUTO, cgs.media.overchargeSlowSound );
-				break;
-			}
-		}
-		else
-		{
-			switch( ent->weapon )
-			{
-			case WP_THERMAL:
-			case WP_DET_PACK:
-			case WP_TRIP_MINE:
-			case WP_ROCKET_LAUNCHER:
-				// these weapon fires don't overcharge
-				break;
+        }
 
-			case WP_REPEATER:
-				cgi_S_StartSound( NULL, ent->number, CHAN_AUTO, cgs.media.overchargeFastSound );
-				break;
+        // Do overcharge sound that get's added to the top
+    /*	if (( ent->powerups & ( 1<<PW_WEAPON_OVERCHARGE )))
+        {
+            if ( alt_fire )
+            {
+                switch( ent->weapon )
+                {
+                case WP_THERMAL:
+                case WP_DET_PACK:
+                case WP_TRIP_MINE:
+                case WP_ROCKET_LAUNCHER:
+                case WP_FLECHETTE:
+                    // these weapon fires don't overcharge
+                    break;
 
-			default:
-				cgi_S_StartSound( NULL, ent->number, CHAN_AUTO, cgs.media.overchargeSlowSound );
-				break;
-			}
-		}
-	}*/
+                case WP_BLASTER:
+                    cgi_S_StartSound( NULL, ent->number, CHAN_AUTO, cgs.media.overchargeFastSound );
+                    break;
+
+                default:
+                    cgi_S_StartSound( NULL, ent->number, CHAN_AUTO, cgs.media.overchargeSlowSound );
+                    break;
+                }
+            }
+            else
+            {
+                switch( ent->weapon )
+                {
+                case WP_THERMAL:
+                case WP_DET_PACK:
+                case WP_TRIP_MINE:
+                case WP_ROCKET_LAUNCHER:
+                    // these weapon fires don't overcharge
+                    break;
+
+                case WP_REPEATER:
+                    cgi_S_StartSound( NULL, ent->number, CHAN_AUTO, cgs.media.overchargeFastSound );
+                    break;
+
+                default:
+                    cgi_S_StartSound( NULL, ent->number, CHAN_AUTO, cgs.media.overchargeSlowSound );
+                    break;
+                }
+            }
+        }*/
 }
 
 /*
