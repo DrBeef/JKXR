@@ -256,8 +256,6 @@ import java.util.Vector;
 			{
 				demoFolder = "/sdcard/JKXR/JK2/jk2demo/jk2demo";
 			}
-			//Copy the weapon adjustment config - should we force overwrite?
-			copy_asset(demoFolder, "weapons_vr_jo.cfg", true);
 
 			//Our assets
 			copy_asset(demoFolder, "z_vr_assets_base.pk3", true);
