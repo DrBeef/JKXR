@@ -602,7 +602,7 @@ static qboolean Music_ParseLeveldata( gsl::czstring psLevelName )
 				{
 					// then this must be "action" music under current rules...
 					//
-					assert( !strcmp(psMusicStateType, Music_BaseStateToString(eBGRNDTRACK_ACTION) ? Music_BaseStateToString(eBGRNDTRACK_ACTION):"") );
+					//assert( !strcmp(psMusicStateType, Music_BaseStateToString(eBGRNDTRACK_ACTION) ? Music_BaseStateToString(eBGRNDTRACK_ACTION):"") );
 					//
 					// does this marker exist in the explore piece?
 					//
