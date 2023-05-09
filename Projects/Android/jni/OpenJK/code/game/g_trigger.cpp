@@ -254,36 +254,44 @@ void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace )
 		}
 	}
 
-	bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
-	bool useGestureEnabled = gi.cvar("vr_gesture_triggered_use", "1", CVAR_ARCHIVE)->integer; // defined in VrCvars.h
-	bool useGestureAllowed = useGestureEnabled && !thirdPersonActive && !vr->remote_droid;
-	if ( (self->spawnflags & 2) && ( !( self->spawnflags & 4 ) || (	( self->spawnflags & 4) && !useGestureAllowed ) ) )
-	{ //       FACING and...         ...is not USE_BUTTON or...       ...is USE_BUTTON but use gestures are not active
-		// In case of buttons activated by use gesture, we do not need to check if we are facing them as we are touching them by hand.
-		vec3_t	forward;
+	bool useGestureAllowed = false;
+	if (vr)
+	{
+		bool thirdPersonActive = gi.cvar("cg_thirdPerson", "0", CVAR_TEMP)->integer;
+		cvar_t *vr_gesture_triggered_use = gi.cvar("vr_gesture_triggered_use", "1", CVAR_ARCHIVE);
+		bool useGestureEnabled = vr_gesture_triggered_use == nullptr ||
+								 vr_gesture_triggered_use->integer; // defined in VrCvars.h
+		useGestureAllowed = useGestureEnabled && !thirdPersonActive && !vr->remote_droid;
+		if ((self->spawnflags & 2) &&
+			(!(self->spawnflags & 4) || ((self->spawnflags & 4) && !useGestureAllowed)))
+		{ //       FACING and...         ...is not USE_BUTTON or...       ...is USE_BUTTON but use gestures are not active
+			// In case of buttons activated by use gesture, we do not need to check if we are facing them as we are touching them by hand.
+			vec3_t forward;
 
-		if ( other->client )
-		{
-			if ( (other->client->ps.clientNum == 0) && (self->spawnflags & 4) && !thirdPersonActive && !vr->remote_droid )
+			if (other->client)
 			{
-				// In case of USE_BUTTON, check facing by controller and not by head (if not in 3rd person or controlling droid)
-				vec3_t origin, angles;
-				BG_CalculateVRWeaponPosition(origin, angles);
-				AngleVectors( angles, forward, NULL, NULL );
+				if ((other->client->ps.clientNum == 0) && (self->spawnflags & 4) &&
+					!thirdPersonActive && !vr->remote_droid)
+				{
+					// In case of USE_BUTTON, check facing by controller and not by head (if not in 3rd person or controlling droid)
+					vec3_t origin, angles;
+					BG_CalculateVRWeaponPosition(origin, angles);
+					AngleVectors(angles, forward, NULL, NULL);
+				}
+				else
+				{
+					AngleVectors(other->client->ps.viewangles, forward, NULL, NULL);
+				}
 			}
 			else
 			{
-				AngleVectors( other->client->ps.viewangles, forward, NULL, NULL );
+				AngleVectors(other->currentAngles, forward, NULL, NULL);
 			}
-		}
-		else
-		{
-			AngleVectors( other->currentAngles, forward, NULL, NULL );
-		}
 
-		if ( DotProduct( self->movedir, forward ) < 0.5 )
-		{//Not Within 45 degrees
-			return;
+			if (DotProduct(self->movedir, forward) < 0.5)
+			{//Not Within 45 degrees
+				return;
+			}
 		}
 	}
 
