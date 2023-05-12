@@ -2942,8 +2942,8 @@ void CG_ItemSelectorNext_f( void )
 
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
 
-    //Only show the stance selection if using saber and in third person
-	int selectors = ((cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) &&
+	//Only show the stance selection if using saber and in third person and not using dual/staff saber
+	int selectors = (cent->gent->client->ps.saberStylesKnown != SS_NONE &&
 					 cent->currentState.weapon == WP_SABER && cg_thirdPerson.integer) ? 3 : 2;
 	cg.itemSelectorType = (cg.itemSelectorType+1) % selectors;
 	cg.itemSelectorTime = cg.time;
@@ -2959,9 +2959,9 @@ void CG_ItemSelectorPrev_f( void )
 
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
 
-    //Only show the stance selection if using saber and in third person
-	int selectors = ((cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) &&
-							 cent->currentState.weapon == WP_SABER && cg_thirdPerson.integer) ? 3 : 2;
+    //Only show the stance selection if using saber and in third person and not using dual/staff saber
+	int selectors = (cent->gent->client->ps.saberStylesKnown != SS_NONE &&
+			cent->currentState.weapon == WP_SABER && cg_thirdPerson.integer) ? 3 : 2;
 	if (--cg.itemSelectorType < 0)
 		cg.itemSelectorType = selectors-1;
 	cg.itemSelectorTime = cg.time;
@@ -3114,25 +3114,25 @@ void CG_DrawItemSelector( void )
 			cgi_R_AddRefEntityToScene(&sprite);
 		}
 	}
-/*	else if (cg.itemSelectorType == 2) // fighting style
+	else if (cg.itemSelectorType == 2) // fighting style
 	{
 		//For the fighting style show the active one in the middle
-		int level = cent->gent->client->ps.saberAnimLevel;
-		if (cent->gent->client->ps.forcePowersKnown & (1 << FP_SABER_OFFENSE) &&
-			level > FORCE_LEVEL_0) {
+		if (cent->gent->client->ps.saberStylesKnown != SS_NONE) {
 			refEntity_t sprite;
 			memset(&sprite, 0, sizeof(sprite));
 			VectorCopy(wheelOrigin, sprite.origin);
 			sprite.reType = RT_SPRITE;
-			switch (level) {
-				case FORCE_LEVEL_1:
-					sprite.customShader = cgs.media.HUDSaberStyleFast;
+			switch (cent->gent->client->ps.saberAnimLevel) {
+				case SS_FAST:
+					sprite.customShader = otherHUDBits[OHB_SABERSTYLE_FAST].background;
 					break;
-				case FORCE_LEVEL_2:
-					sprite.customShader = cgs.media.HUDSaberStyleMed;
+				case SS_MEDIUM:
+				case SS_DUAL:
+				case SS_STAFF:
+					sprite.customShader = otherHUDBits[OHB_SABERSTYLE_MEDIUM].background;
 					break;
-				case FORCE_LEVEL_3:
-					sprite.customShader = cgs.media.HUDSaberStyleStrong;
+				default:
+					sprite.customShader = otherHUDBits[OHB_SABERSTYLE_STRONG].background;
 					break;
 			}
 
@@ -3140,7 +3140,7 @@ void CG_DrawItemSelector( void )
 			memset(sprite.shaderRGBA, 0xff, 4);
 			cgi_R_AddRefEntityToScene(&sprite);
 		}
-	}*/
+	}
 	else if (cg.itemSelectorType == ST_FORCE_POWER) // force powers
 	{
 		if (cent->gent->client->ps.forcePowersKnown != 0) {
@@ -3204,13 +3204,8 @@ void CG_DrawItemSelector( void )
 					selectable = CG_InventorySelectable(itemId) && inv_icons[itemId];
 					break;
 				case ST_FIGHTING_STYLE: //fighting style
-					{
-						if (cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) {
-							selectable = itemId < cent->gent->client->ps.forcePowerLevel[FP_SABER_OFFENSE];
-						} else {
-							selectable = false;
-						}
-					}
+					selectable = cent->gent->client->ps.saberAnimLevel <= SS_STRONG &&
+                                 cent->gent->client->ps.saberStylesKnown & (1<<(itemId+1));
 					break;
 				case ST_FORCE_POWER: // force powers
 					selectable = ForcePower_Valid(itemId);
@@ -3286,21 +3281,21 @@ void CG_DrawItemSelector( void )
 						case ST_GADGET: //gadgets
 							sprite.customShader = inv_icons[itemId];
 							break;
-/*						case 2: //fighting style
-							switch ( itemId )
+						case ST_FIGHTING_STYLE: //fighting style
+							switch ( itemId+1 )
 							{
-								case 0://FORCE_LEVEL_1:
-									sprite.customShader = cgs.media.HUDSaberStyleFast;
+								case SS_FAST:
+									sprite.customShader = otherHUDBits[OHB_SABERSTYLE_FAST].background;
 									break;
-								case 1://FORCE_LEVEL_2:
-									sprite.customShader = cgs.media.HUDSaberStyleMed;
+								case SS_MEDIUM:
+									sprite.customShader = otherHUDBits[OHB_SABERSTYLE_MEDIUM].background;
 									break;
-								case 2://FORCE_LEVEL_3:
-									sprite.customShader = cgs.media.HUDSaberStyleStrong;
+								case SS_STRONG:
+									sprite.customShader = otherHUDBits[OHB_SABERSTYLE_STRONG].background;
 									break;
 							}
 							break;
-*/						case ST_FORCE_POWER: // force powers
+						case ST_FORCE_POWER: // force powers
 							sprite.customShader = force_icons[showPowers[itemId]];
 							break;
 						case ST_QUICK_SAVE:
