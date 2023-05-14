@@ -2886,13 +2886,24 @@ void CG_ItemSelectorSelect_f( void )
 
 	if (cg.itemSelectorType == ST_WEAPON) // weapons
 	{
-		if (cg.weaponSelect == cg.itemSelectorSelection)
+		centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
+		if (vr->in_vehicle
+			&& vr->vehicle_type != VH_WALKER
+			&& cent->currentState.weapon == WP_SABER)
 		{
-			return;
+			//If holding saber, put it away
+			CG_NextWeapon_f();
 		}
+		else
+		{
+			if (cg.weaponSelect == cg.itemSelectorSelection)
+			{
+				return;
+			}
 
-		cg.weaponSelectTime = cg.time;
-		cg.weaponSelect = cg.itemSelectorSelection;
+			cg.weaponSelectTime = cg.time;
+			cg.weaponSelect = cg.itemSelectorSelection;
+		}
 	}
 	else if (cg.itemSelectorType == ST_GADGET) // gadgets
 	{
@@ -3019,6 +3030,11 @@ void CG_DrawItemSelector( void )
 		VectorSubtract(vr->weaponposition, cg.itemSelectorOrigin, controllerOffset);
 	}
 
+	if (vr->in_vehicle)
+	{
+		BG_ConvertFromVR(vr->hmdposition_offset, controllerOrigin, controllerOrigin);
+	}
+
 	vec3_t wheelAngles, wheelOrigin, beamOrigin, wheelForward, wheelRight, wheelUp;
 	vec3_t angles;
 	VectorClear(angles);
@@ -3058,7 +3074,7 @@ void CG_DrawItemSelector( void )
 	{
 		case ST_WEAPON: //weapons
 			if (vr->in_vehicle)
-				count = 2;
+				count = vr->vehicle_type == VH_WALKER ? 2 : 1;
 			else
 				count = WP_MELEE;
 			beam.shaderRGBA[0] = 0xff;
@@ -3178,7 +3194,15 @@ void CG_DrawItemSelector( void )
 		if (cg.itemSelectorType == ST_WEAPON) {
 			if (vr->in_vehicle)
 			{
-				itemId = WP_ATST_MAIN + index;
+				if (vr->vehicle_type == VH_WALKER)
+				{
+					itemId = WP_ATST_MAIN + index;
+				}
+				else
+				{
+					//Only choice on a speeder/animal is the saber
+					itemId = WP_SABER;
+				}
 			}
 			else
 			{
@@ -3197,7 +3221,7 @@ void CG_DrawItemSelector( void )
 			switch (cg.itemSelectorType)
 			{
 				case ST_WEAPON: //weapons
-					selectable = vr->in_vehicle || // both ATST weapons are always selectable
+					selectable = vr->in_vehicle ||
 							(CG_WeaponSelectable(itemId, cg.weaponSelect, qfalse) && cg.snap->ps.ammo[weaponData[itemId].ammoIndex]);
 					break;
 				case ST_GADGET: //gadgets

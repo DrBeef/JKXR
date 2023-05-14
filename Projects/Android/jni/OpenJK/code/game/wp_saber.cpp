@@ -12944,7 +12944,7 @@ void WP_ForcePowerStart( gentity_t *self, forcePowers_t forcePower, int override
 	}
 }
 
-void CG_CenterPrint( const char *str, int y );
+void CG_CenterPrint( const char *str, int y, int delayOverride);
 qboolean WP_ForcePowerAvailable( gentity_t *self, forcePowers_t forcePower, int overrideAmt )
 {
 	if ( forcePower == FP_LEVITATION )

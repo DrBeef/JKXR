@@ -16,7 +16,7 @@ Authors		:	Simon Brown
 
 cvar_t	*sv_cheats;
 
-void CG_CenterPrint( const char *str, int y, int charWidth );
+void CG_CenterPrint( const char *str, int y, int charWidth, int delayOverride );
 
 void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTrackedController* pDominantTracking,
                           ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTrackedController* pOffTracking,

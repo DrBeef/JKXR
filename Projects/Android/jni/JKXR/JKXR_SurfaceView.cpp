@@ -18,8 +18,15 @@ extern "C" {
 }
 
 #include <client/client.h>
-#include <weapons.h>
 #include <client_ui.h>
+
+
+#ifdef JK2_MODE
+#include "../OpenJK/codeJK2/game/weapons.h"
+#else
+#include "../OpenJK/code/game/weapons.h"
+#include "../OpenJK/code/game/g_vehicles.h"
+#endif
 
 
 //#define ENABLE_GL_DEBUG
@@ -146,7 +153,12 @@ void VR_SetHMDOrientation(float pitch, float yaw, float roll)
 	//Keep this for our records
 	VectorCopy(vr.hmdorientation, vr.hmdorientation_last);
 
-	if (!vr.third_person && !vr.remote_npc && !vr.remote_turret){
+	if (!vr.third_person && !vr.remote_npc && !vr.remote_turret
+#ifndef JK2_MODE
+		&& !vr.in_vehicle
+#endif
+	)
+	{
 		VectorCopy(vr.hmdorientation, vr.hmdorientation_first);
 	}
 
@@ -242,6 +254,35 @@ void VR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side
 		*pitch = vr.hmdorientation[PITCH];
 		*roll = 0.0f;
 	}
+#ifndef JK2_MODE
+	//Special code for JKA's vehicles
+	else  if (vr.in_vehicle) {
+		//in vehicle
+		*forward = remote_movementForward;
+		*pos_forward = 0.0f;
+		*up = 0.0f;
+		*side = remote_movementSideways;
+		*pos_side = 0.0f;
+		if (vr_vehicle_use_hmd_direction->integer)
+		{
+			*yaw = vr.hmdorientation[YAW] + vr.snapTurn;
+			*pitch = vr.hmdorientation[PITCH];
+		}
+		else
+		{
+			*yaw = vr.snapTurn + vr.hmdorientation_first[YAW];
+			if (vr.vehicle_type == VH_FIGHTER || vr.vehicle_type == VH_FLIER)
+			{
+				*pitch = (vr.weaponangles[ANGLES_ADJUSTED][PITCH] + vr.offhandangles[ANGLES_ADJUSTED][PITCH]) / 2.0f;
+			}
+			else
+			{
+				*pitch = 0.0f;
+			}
+		}
+		*roll = 0.0f;
+	}
+#endif
 	else if (!vr.third_person) {
 		*forward = remote_movementForward;
 		*pos_forward = positional_movementForward;
@@ -309,6 +350,9 @@ void VR_Init()
 	vr_haptic_intensity = Cvar_Get ("vr_haptic_intensity", "1.0", CVAR_ARCHIVE);
 	vr_comfort_vignette = Cvar_Get ("vr_comfort_vignette", "0.0", CVAR_ARCHIVE);
 	vr_saber_3rdperson_mode = Cvar_Get ("vr_saber_3rdperson_mode", "1", CVAR_ARCHIVE);
+	vr_vehicle_use_hmd_direction = Cvar_Get ("vr_vehicle_use_hmd_direction", "0", CVAR_ARCHIVE);
+	vr_vehicle_use_3rd_person = Cvar_Get ("vr_vehicle_use_3rd_person", "0", CVAR_ARCHIVE);
+	vr_vehicle_use_controller_for_speed = Cvar_Get ("vr_vehicle_use_controller_for_speed", "1", CVAR_ARCHIVE);
 	vr_gesture_triggered_use = Cvar_Get ("vr_gesture_triggered_use", "1", CVAR_ARCHIVE);
 	vr_use_gesture_boundary = Cvar_Get ("vr_use_gesture_boundary", "0.35", CVAR_ARCHIVE);
 	vr_align_weapons = Cvar_Get ("vr_align_weapons", "0", CVAR_ARCHIVE);

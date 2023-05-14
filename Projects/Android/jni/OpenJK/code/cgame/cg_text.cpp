@@ -682,7 +682,7 @@ Called for important messages that should stay in the center of the screen
 for a few moments
 ==============
 */
-void CG_CenterPrint( const char *str, int y) {
+void CG_CenterPrint( const char *str, int y, int delayOverride) {
 	char	*s;
 
 	// Find text to match the str given
@@ -704,6 +704,7 @@ void CG_CenterPrint( const char *str, int y) {
 	}
 
 	cg.centerPrintTime = cg.time;
+	cg.centerPrintDelayOverride = delayOverride;
 	cg.centerPrintY = y;
 
 	// count the number of lines for centering
@@ -734,7 +735,10 @@ void CG_DrawCenterString( void )
 		return;
 	}
 
-	color = CG_FadeColor( cg.centerPrintTime, 1000 * 2 );
+	//Default time is 2 seconds
+	int printTime = cg.centerPrintDelayOverride == -1 ? 2000 : cg.centerPrintDelayOverride;
+
+	color = CG_FadeColor( cg.centerPrintTime, printTime );
 	if ( !color ) {
 		return;
 	}

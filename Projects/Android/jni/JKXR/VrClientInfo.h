@@ -28,6 +28,7 @@ typedef struct {
     bool remote_droid; // controlling a remote droid
     bool remote_npc; // controlling a remote NPC (will also be true when controlling a droid)
     bool in_vehicle; // controlling a vehicle
+    int vehicle_type;
     vec3_t remote_angles; // The view angles of the remote thing we are controlling
     float remote_snapTurn; // how much turn has been applied to the yaw by joystick for a remote controlled entity
     int remote_cooldown;

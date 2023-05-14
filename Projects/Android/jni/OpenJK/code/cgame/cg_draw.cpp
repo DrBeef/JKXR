@@ -2984,7 +2984,7 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 		return;
 	}
 
-	if ( in_camera ) {
+	if ( in_camera || vr->in_vehicle) {
 		return;
 	}
 
@@ -4208,6 +4208,20 @@ static void CG_Draw2D( void )
 		CGCam_DrawWideScreen();
 	}
 
+	static bool was_in_vehicle = false;
+	if (!was_in_vehicle && vr->in_vehicle)
+	{
+		if (vr->vehicle_type == VH_WALKER)
+		{
+			CG_CenterPrint("Tilt controllers to steer. Thumbstick to move.", 240, 5000);
+		}
+		else
+		{
+			CG_CenterPrint("Tilt controllers to steer/move", 240, 5000);
+		}
+	}
+	was_in_vehicle = vr->in_vehicle;
+
     if (cg.zoomMode == 4)
     {
         CG_DrawWeapReticle();
@@ -4571,7 +4585,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	}
 
 	//Immersive cinematic sequence 6DoF
-	if ((in_camera && vr->immersive_cinematics) || vr->emplaced_gun || cg.renderingThirdPerson)
+	if ((in_camera && vr->immersive_cinematics) || vr->emplaced_gun || cg.renderingThirdPerson || vr->in_vehicle)
 	{
 		BG_ConvertFromVR(vr->hmdposition_offset, cg.refdef.vieworg, cg.refdef.vieworg);
 	}

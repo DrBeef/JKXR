@@ -2153,7 +2153,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		CGCam_UpdateFade();
 		// build cg.refdef
 		inwater = CG_CalcViewValues();
-		cg.refdef.override_fov = inwater;
+		cg.refdef.override_fov |= inwater;
 	}
 
 	if (cg.zoomMode)
@@ -2173,9 +2173,15 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 
 	//Calculate all angles upfront
 	{
-		//Only vehicle in JK2 is the AT-ST
 		vr->in_vehicle = (g_entities[0].client &&
-						  g_entities[0].client->NPC_class == CLASS_ATST);
+			(g_entities[0].client->NPC_class == CLASS_VEHICLE || g_entities[0].client->NPC_class == CLASS_ATST ||
+			g_entities[0].s.m_iVehicleNum != 0 ));
+		vr->vehicle_type = VH_NONE;
+		if (vr->in_vehicle)
+		{
+			vr->vehicle_type =  (int)g_entities[g_entities[0].s.m_iVehicleNum].m_pVehicle->m_pVehicleInfo->type;
+		}
+
 		vr->remote_npc = !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname );
 		vr->remote_droid = false;
 		vr->remote_turret = false;
@@ -2216,6 +2222,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 			!in_misccamera &&
 			!vr->remote_droid &&
 			!vr->remote_npc &&
+			!vr->in_vehicle &&
 			!usingScope &&
 			!cg.renderingThirdPerson)
 		{
@@ -2252,7 +2259,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		//Normal 3rd person view angles
 		if (!in_camera &&
 			!in_misccamera &&
-			cg.renderingThirdPerson)
+				(vr->in_vehicle || cg.renderingThirdPerson))
 		{
 			VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
 			cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
@@ -2356,7 +2363,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 			&& !(g_entities[cg.snap->ps.viewEntity].client->ps.dualSabers && cg.snap->ps.weapon == WP_SABER)
 			&& cg.snap->ps.weapon != WP_MELEE
 			&& !vr->weapon_stabilised
-			&& !vr->in_vehicle
+			&& (vr->vehicle_type != VH_WALKER)
 			&& !cg_pano.integer
 			&& (cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD))
 		{
@@ -2376,7 +2383,8 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 				(cg.snap->ps.forcePowersActive & (1<<FP_GRIP)) ||
 				(cg.snap->ps.forcePowersActive & (1<<FP_LIGHTNING)) ||
 				(cg.snap->ps.forcePowersActive & (1<<FP_ABSORB)) ||
-				(cg.snap->ps.forcePowersActive & (1<<FP_DRAIN)))
+				(cg.snap->ps.forcePowersActive & (1<<FP_DRAIN)) ||
+				(cg.snap->ps.forcePowersActive & (1<<FP_RAGE)))
 			{
 				handEnt.hModel = cgs.media.handModel_force;
 			}

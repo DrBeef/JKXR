@@ -5364,9 +5364,10 @@ extern cvar_t	*g_skippingcin;
 		{
 			// Vehicle Camera Overrides
 			//--------------------------
- 			cg.overrides.active					|= ( CG_OVERRIDE_3RD_PERSON_RNG | CG_OVERRIDE_FOV | CG_OVERRIDE_3RD_PERSON_VOF | CG_OVERRIDE_3RD_PERSON_POF );
+			// in VR - Vehicles mustn't affect FOV
+ 			cg.overrides.active					|= ( CG_OVERRIDE_3RD_PERSON_RNG | /*CG_OVERRIDE_FOV |*/ CG_OVERRIDE_3RD_PERSON_VOF | CG_OVERRIDE_3RD_PERSON_POF );
  			cg.overrides.thirdPersonRange		 = pPlayerVeh->m_pVehicleInfo->cameraRange;
-			cg.overrides.fov					 = pPlayerVeh->m_pVehicleInfo->cameraFOV;
+			//cg.overrides.fov					 = pPlayerVeh->m_pVehicleInfo->cameraFOV;
 			cg.overrides.thirdPersonVertOffset	 = pPlayerVeh->m_pVehicleInfo->cameraVertOffset;
 			cg.overrides.thirdPersonPitchOffset  = pPlayerVeh->m_pVehicleInfo->cameraPitchOffset;
 

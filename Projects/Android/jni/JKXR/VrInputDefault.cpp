@@ -23,6 +23,7 @@ Authors		:	Simon Brown
 #include "../OpenJK/codeJK2/game/weapons.h"
 #else
 #include "../OpenJK/code/game/weapons.h"
+#include "../OpenJK/code/game/g_vehicles.h"
 #endif
 
 void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, int capsule );
@@ -851,10 +852,46 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 }
             }
 
+            //JKA stuff for speeder bikes (and other vehicles)
+#ifndef JK2_MODE
+            if (vr.in_vehicle)
+            {
+                //Allow the controllers to affect the yaw rotation of the vehicle
+                if (!vr_vehicle_use_hmd_direction->integer)
+                {
+                    float refresh = TBXR_GetRefresh();
+                    float weaponAngleToUse = cl.frame.ps.weapon == WP_SABER ? vr.offhandangles[ANGLES_ADJUSTED][ROLL] : vr.weaponangles[ANGLES_ADJUSTED][ROLL];
+                    float yawAdjust = (weaponAngleToUse + vr.offhandangles[ANGLES_ADJUSTED][ROLL]) / refresh;
+                    vr.snapTurn -= yawAdjust;
+                }
+
+                //Only use controller angle for forwards on the following types of vehicle
+                if (vr_vehicle_use_controller_for_speed->integer && (
+                        vr.vehicle_type == VH_SPEEDER || vr.vehicle_type == VH_ANIMAL))
+                {
+                    float weaponAngleToUse = cl.frame.ps.weapon == WP_SABER ? vr.offhandangles[ANGLES_ADJUSTED][PITCH] : vr.weaponangles[ANGLES_ADJUSTED][PITCH];
+                    float value = ((weaponAngleToUse +  vr.offhandangles[ANGLES_ADJUSTED][PITCH]) / 2.0f) / 30.0f;
+                    if (fabs(value) < 0.3f)
+                        value = 0.0f;
+                    remote_movementForward = Com_Clamp(-1.0f, 1.0f, value);
+                }
+
+                if (vr_vehicle_use_3rd_person->integer)
+                {
+                    sendButtonActionSimple("cg_thirdPerson 1");
+                }
+                else
+                {
+                    sendButtonActionSimple("cg_thirdPerson 0");
+                }
+            }
+#endif
+
             //Use smooth in 3rd person
             bool usingSnapTurn = vr_turn_mode->integer == 0 ||
                     (!vr.third_person && vr_turn_mode->integer == 1);
 
+            float previousSnap = vr.snapTurn;
             static int increaseSnap = true;
             if (!vr.item_selector) {
                 if (usingSnapTurn) {
@@ -901,6 +938,12 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 } else {
                     increaseSnap = true;
                 }
+            }
+
+            //If we snapped/turned on a vehicle then resync the hmdorientation
+            if (previousSnap != vr.snapTurn && vr.in_vehicle)
+            {
+                VectorCopy(vr.hmdorientation, vr.hmdorientation_first);
             }
         }
 

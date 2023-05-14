@@ -20,6 +20,9 @@ extern cvar_t   *vr_saber_block_debounce_time;
 extern cvar_t   *vr_haptic_intensity;
 extern cvar_t   *vr_comfort_vignette;
 extern cvar_t   *vr_saber_3rdperson_mode;
+extern cvar_t   *vr_vehicle_use_hmd_direction;
+extern cvar_t   *vr_vehicle_use_3rd_person;
+extern cvar_t   *vr_vehicle_use_controller_for_speed;
 extern cvar_t   *vr_gesture_triggered_use;
 extern cvar_t   *vr_use_gesture_boundary;
 extern cvar_t   *vr_align_weapons; // Only used for development
