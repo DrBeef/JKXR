@@ -4652,6 +4652,13 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		!gent->client->ps.powerups[PW_UNCLOAKING] &&
 		!gent->client->ps.powerups[PW_DISRUPTION] )
 	{
+		// HACK HACK HACK
+		// If this entity is a vehicle being piloted by the player, then increase the radius so it doesn't get culled
+		if (gent->m_pVehicle && gent->m_pVehicle->m_pPilot && gent->m_pVehicle->m_pPilot->s.number == 0 )
+		{
+			ent->radius = 80;
+		}
+
 		cgi_R_AddRefEntityToScene( ent );
 	}
 
