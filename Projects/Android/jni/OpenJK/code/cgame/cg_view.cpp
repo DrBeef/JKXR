@@ -2363,7 +2363,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 			&& !(g_entities[cg.snap->ps.viewEntity].client->ps.dualSabers && cg.snap->ps.weapon == WP_SABER)
 			&& cg.snap->ps.weapon != WP_MELEE
 			&& !vr->weapon_stabilised
-			&& (vr->vehicle_type != VH_WALKER)
+			&& !vr->in_vehicle
 			&& !cg_pano.integer
 			&& (cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD))
 		{
