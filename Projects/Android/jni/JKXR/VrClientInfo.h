@@ -90,6 +90,7 @@ typedef struct {
     int item_selector; // 1 - weapons/gadgets/saber stance, 2 - Force powers
 
     bool velocitytriggered;
+    bool velocitytriggeractive;
     float primaryswingvelocity;
     bool primaryVelocityTriggeredAttack;
     float secondaryswingvelocity;

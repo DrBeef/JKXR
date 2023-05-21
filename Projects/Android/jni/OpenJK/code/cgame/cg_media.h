@@ -186,6 +186,7 @@ typedef struct {
 
 	//Hand models
 	qhandle_t	handModel_relaxed;
+	qhandle_t	handModel_fist;
 	qhandle_t	handModel_force;
 
 	qhandle_t	halfShieldModel;

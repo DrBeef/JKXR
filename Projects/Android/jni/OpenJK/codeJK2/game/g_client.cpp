@@ -1645,7 +1645,7 @@ qboolean ClientSpawn(gentity_t *ent, SavedGameJustLoaded_e eSavedGameJustLoaded 
 		client->ps.clientNum = index;
 
 		// give default weapons
-		client->ps.stats[STAT_WEAPONS] = ( 1 << WP_NONE );
+		client->ps.stats[STAT_WEAPONS] = ( 1 << WP_MELEE );
 		client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_BRYAR_PISTOL );	//these are precached in g_items, ClearRegisteredItems()
 		client->ps.inventory[INV_ELECTROBINOCULARS] = 1;
 
@@ -1766,7 +1766,7 @@ qboolean ClientSpawn(gentity_t *ent, SavedGameJustLoaded_e eSavedGameJustLoaded 
 
 		if ( spawnPoint->spawnflags & 64 )
 		{//player starts with absolutely no weapons
-			ent->client->ps.stats[STAT_WEAPONS] = ( 1 << WP_NONE );
+			ent->client->ps.stats[STAT_WEAPONS] = ( 1 << WP_MELEE );
 			ent->client->ps.ammo[weaponData[WP_NONE].ammoIndex] = 32000;	// checkme
 			ent->client->ps.weapon = WP_NONE;
 			ent->client->ps.weaponstate = WEAPON_READY;
