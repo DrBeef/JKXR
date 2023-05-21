@@ -32,7 +32,7 @@ void WP_Melee( gentity_t *ent )
 	gentity_t	*tr_ent;
 	trace_t		tr;
 	vec3_t		mins, maxs, end;
-	int			damage = ent->s.number ? (g_spskill->integer*2)+1 : 3;
+	int			damage = ent->s.number ? (g_spskill->integer*2)+1 : 25;
 	float		range = ent->s.number ? 64 : 32;
 
 	VectorMA( muzzle, range, forwardVec, end );

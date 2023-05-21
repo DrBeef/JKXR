@@ -2355,13 +2355,13 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		}
 
 		//Render hand models when appropriate
-		if (!in_camera
+		if (cg.snap->ps.clientNum == 0
+			&& !in_camera
 			&& !cg.renderingThirdPerson
 			&& cg.predicted_player_state.stats[STAT_HEALTH] > 0
 			&& cg.snap->ps.viewEntity < ENTITYNUM_WORLD
 			&& g_entities[cg.snap->ps.viewEntity].client
 			&& !(g_entities[cg.snap->ps.viewEntity].client->ps.dualSabers && cg.snap->ps.weapon == WP_SABER)
-			&& cg.snap->ps.weapon != WP_MELEE
 			&& !vr->weapon_stabilised
 			&& !vr->in_vehicle
 			&& !cg_pano.integer
@@ -2388,6 +2388,10 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 			{
 				handEnt.hModel = cgs.media.handModel_force;
 			}
+			else if (cg.snap->ps.weapon == WP_MELEE)
+			{
+				handEnt.hModel = cgs.media.handModel_fist;
+			}
 			else
 			{
 				handEnt.hModel = cgs.media.handModel_relaxed;
@@ -2399,19 +2403,27 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 				VectorScale( handEnt.axis[i], (vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
 			}
 
-			centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
-			if (!cent)
-			{
-				cgi_R_AddRefEntityToScene(&handEnt);
-			}
-			else
-			{
-				CG_AddRefEntityWithPowerups(&handEnt, cent->currentState.powerups, cent, true);
-			}
+			centity_t *cent = &cg_entities[0];
+			CG_AddRefEntityWithPowerups(&handEnt, cent->currentState.powerups, cent, true);
 
-			if (cg.snap->ps.weapon == WP_NONE)
+			if (cg.snap->ps.weapon == WP_NONE ||
+				cg.snap->ps.weapon == WP_MELEE ||
+				(cg.snap->ps.weapon == WP_SABER && cg.snap->ps.saberInFlight))
 			{
 				BG_CalculateVRDefaultPosition(0, handEnt.origin, handEnt.angles);
+
+				if (cg.snap->ps.weapon == WP_SABER && cg.snap->ps.saberInFlight)
+				{
+					handEnt.hModel = cgs.media.handModel_force;
+				}
+				else if (cg.snap->ps.weapon == WP_MELEE)
+				{
+					handEnt.hModel = cgs.media.handModel_fist;
+				}
+				else
+				{
+					handEnt.hModel = cgs.media.handModel_relaxed;
+				}
 
 				//Move it back a bit?
 				AngleVectors(handEnt.angles, forward, NULL, NULL);

@@ -2953,8 +2953,7 @@ void CG_DrawItemSelector( void )
 
 	if (cg.itemSelectorType == ST_WEAPON) // weapons
 	{
-		if (cg.weaponSelect != WP_NONE &&
-				cg.weaponSelect != WP_MELEE) {
+		if (cg.weaponSelect != WP_NONE) {
 			refEntity_t sprite;
 			memset(&sprite, 0, sizeof(sprite));
 			VectorCopy(wheelOrigin, sprite.origin);
@@ -3036,10 +3035,9 @@ void CG_DrawItemSelector( void )
 			}
 			else
 			{
-				itemId = index + 1; // We need to ignore WP_NONE for weapons
-				if (itemId == count)
+				if (itemId == WP_NONE)
 				{
-					break;
+					itemId = WP_MELEE;
 				}
 			}
 		}
@@ -3078,8 +3076,7 @@ void CG_DrawItemSelector( void )
 				VectorClear(angles);
 				angles[YAW] = wheelAngles[YAW];
 				angles[PITCH] = wheelAngles[PITCH];
-				angles[ROLL] =
-                        (float)(360 / (count - ((cg.itemSelectorType == ST_WEAPON && !vr->in_vehicle) ? 1 : 0))) * index;
+				angles[ROLL] = (float)(360 / count) * index;
 				vec3_t forward, up;
 				AngleVectors(angles, forward, NULL, up);
 
@@ -3310,6 +3307,28 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire )
 		switch (ent->weapon) {
 			case WP_SABER:
 				cgi_HapticEvent("chainsaw_fire", position, 0, 40, 0, 0);
+				break;
+			case WP_MELEE:
+				{
+					if (vr->primaryVelocityTriggeredAttack && vr->secondaryVelocityTriggeredAttack)
+					{
+						position = 4;
+					}
+					else if (vr->primaryVelocityTriggeredAttack)
+					{
+						position = (vr->right_handed ? 2 : 1);
+					}
+					else if (vr->secondaryVelocityTriggeredAttack) // secondary triggered
+					{
+						position = (vr->right_handed ? 1 : 2);
+					}
+					else
+					{
+						position = -1;
+					}
+
+					cgi_HapticEvent( "chainsaw_fire", position, 0, 50, 0, 0);
+				}
 				break;
 			case WP_BRYAR_PISTOL:
 			case WP_BOWCASTER:
