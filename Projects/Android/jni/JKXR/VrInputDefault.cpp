@@ -956,6 +956,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
         //process force motion controls here
         if (vr_force_motion_controlled->integer &&
+                cl.frame.ps.weapon != WP_MELEE &&
                 !vr.weapon_stabilised &&
                 // If dual sabers we can't really use motion control force as the off hand could be swinging for an attack
                 !vr.dualsabers)

@@ -1405,7 +1405,8 @@ void FireWeapon( gentity_t *ent, qboolean alt_fire )
 		}
 		else
 		{
-			WP_Melee( ent );
+			//Pass true so we know this is actually melee from a tusken rifle
+			WP_Melee( ent, qtrue );
 		}
 		break;
 
@@ -1465,7 +1466,7 @@ void FireWeapon( gentity_t *ent, qboolean alt_fire )
 		alert = 0; // if you want it to alert enemies, remove this
 		if ( !alt_fire || !g_debugMelee->integer )
 		{
-			WP_Melee( ent );
+			WP_Melee( ent, qfalse );
 		}
 		break;
 
