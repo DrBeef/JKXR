@@ -636,7 +636,7 @@ void FireWeapon( gentity_t *ent, qboolean alt_fire )
 
 	case WP_MELEE:
 		alert = 0; // if you want it to alert enemies, remove this
-		WP_Melee( ent );
+		WP_Melee( ent, qfalse );
 		break;
 
 	case WP_ATST_MAIN:

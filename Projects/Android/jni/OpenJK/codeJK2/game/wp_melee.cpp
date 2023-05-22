@@ -30,13 +30,13 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 //	Temp melee attack damage routine
 //---------------------------------------------------------
-void WP_Melee( gentity_t *ent )
+void WP_Melee( gentity_t *ent, qboolean alt_fire )
 //---------------------------------------------------------
 {
 	gentity_t	*tr_ent;
 	trace_t		tr;
 	vec3_t		mins, maxs, end;
-	int			damage = ent->s.number ? (g_spskill->integer*2)+1 : 25;
+	int			damage = ent->s.number ? (g_spskill->integer*2)+1 : 20;
 	float		range = ent->s.number ? 64 : 32;
 
 	VectorMA( wpMuzzle, range, wpFwd, end );
@@ -68,6 +68,6 @@ void WP_Melee( gentity_t *ent )
 	if ( tr_ent && tr_ent->takedamage )
 	{
 		G_Sound( tr_ent, G_SoundIndex( va("sound/weapons/melee/punch%d", Q_irand(1, 4)) ) );
-		G_Damage( tr_ent, ent, ent, wpFwd, tr.endpos, damage, DAMAGE_NO_KNOCKBACK, MOD_MELEE );
+		G_Damage( tr_ent, ent, ent, wpFwd, tr.endpos, damage, DAMAGE_DEATH_KNOCKBACK, MOD_MELEE );
 	}
 }
