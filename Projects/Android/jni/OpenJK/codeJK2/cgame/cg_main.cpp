@@ -1317,7 +1317,7 @@ static void CG_RegisterGraphics( void ) {
 
 	//VR Hand models
 	cgs.media.handModel_relaxed		= cgi_R_RegisterModel( "models/players/kyle/lhand_r.md3" );
-	cgs.media.handModel_fist		= cgi_R_RegisterModel( "models/players/kyle/lhand_r.md3" );
+	cgs.media.handModel_fist		= cgi_R_RegisterModel( "models/players/kyle/lhand_force_fisting.md3" );
 	cgs.media.handModel_force		= cgi_R_RegisterModel( "models/players/kyle/lhand_f.md3" );
 	cgs.media.saberHilt = cgi_R_RegisterModel( "models/weapons2/saber/saber_w.md3" );
 
