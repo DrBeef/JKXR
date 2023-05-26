@@ -1318,7 +1318,6 @@ qboolean CG_CalcFOVFromX( float fov_x )
 	}
 
 	// set it
-	cg.refdef.override_fov = inwater;
 	cg.refdef.fov_x = fov_x;
 	cg.refdef.fov_y = fov_y;
 
@@ -2179,7 +2178,14 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		vr->vehicle_type = VH_NONE;
 		if (vr->in_vehicle)
 		{
-			vr->vehicle_type =  (int)g_entities[g_entities[0].s.m_iVehicleNum].m_pVehicle->m_pVehicleInfo->type;
+			if (g_entities[0].client->NPC_class == CLASS_ATST)
+			{
+				vr->vehicle_type = VH_WALKER;
+			}
+			else if (g_entities[0].s.m_iVehicleNum != 0 && g_entities[g_entities[0].s.m_iVehicleNum].m_pVehicle)
+			{
+				vr->vehicle_type = (int) g_entities[g_entities[0].s.m_iVehicleNum].m_pVehicle->m_pVehicleInfo->type;
+			}
 		}
 
 		vr->remote_npc = !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname );
