@@ -3400,7 +3400,7 @@ CG_AddRefEntityWithPowerups
 Adds a piece with modifications or duplications for powerups
 ===============
 */
-void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cent )
+void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cent, bool forceShownInFirstPerson )
 {
 	if ( !cent )
 	{
@@ -3431,7 +3431,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 //		cgi_S_AddLoopingSound( 0, cent->lerpOrigin, vec3_origin, cgs.media.overchargeLoopSound );
 //	}
 
-	if (player1stPersonSaber) {
+	if (player1stPersonSaber && !forceShownInFirstPerson) {
 		ent->renderfx = RF_THIRD_PERSON;
 	}
 

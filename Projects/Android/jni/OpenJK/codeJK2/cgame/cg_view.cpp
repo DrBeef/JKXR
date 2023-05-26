@@ -2076,7 +2076,7 @@ wasForceSpeed=isForceSpeed;
 			}
 
 			centity_t *cent = &cg_entities[0];
-			CG_AddRefEntityWithPowerups(&handEnt, cent->currentState.powerups, cent);
+			CG_AddRefEntityWithPowerups(&handEnt, cent->currentState.powerups, cent, true);
 
 			if (cg.snap->ps.weapon == WP_NONE ||
 				cg.snap->ps.weapon == WP_MELEE ||
