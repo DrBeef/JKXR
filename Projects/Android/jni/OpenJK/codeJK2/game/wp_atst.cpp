@@ -28,7 +28,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "w_local.h"
 #include "g_functions.h"
 #include "bg_local.h"
-#include <JKXR/VrClientInfo.h>
 
 // ATST Main
 //---------------------------------------------------------
@@ -129,7 +128,7 @@ void WP_ATSTSideAltFire( gentity_t *ent )
 		}
 	}
 
-	VectorCopy( wpFwd, missile->movedir );
+	VectorCopy( dir, missile->movedir );
 
 	// Make it easier to hit things
 	VectorSet( missile->maxs, ATST_SIDE_ALT_ROCKET_SIZE, ATST_SIDE_ALT_ROCKET_SIZE, ATST_SIDE_ALT_ROCKET_SIZE );

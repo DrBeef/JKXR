@@ -2984,7 +2984,13 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 		return;
 	}
 
-	if ( in_camera || vr->in_vehicle) {
+	if ( in_camera) {
+		return;
+	}
+
+	if (vr->in_vehicle &&
+		(type == 0 || vr->vehicle_type != VH_WALKER))
+	{
 		return;
 	}
 
