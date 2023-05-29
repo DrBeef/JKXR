@@ -960,11 +960,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     if (fabs(deltaLength) > vr_force_distance_trigger->value) {
                         if (deltaLength < 0 && !palmAway)
                         {
-                            sendButtonActionSimple(va("useGivenForce %i", FP_PULL));
+                            sendButtonActionSimple(va("useGivenForce %i", vr_force_motion_pull->integer));
                         }
                         else if (deltaLength > 0 && palmAway)
                         {
-                            sendButtonActionSimple(va("useGivenForce %i", FP_PUSH));
+                            sendButtonActionSimple(va("useGivenForce %i", vr_force_motion_push->integer));
                         }
 
                         vr.secondaryVelocityTriggeredAttack = false;

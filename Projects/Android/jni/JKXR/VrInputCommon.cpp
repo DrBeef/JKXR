@@ -26,6 +26,8 @@ cvar_t	*vr_force_velocity_trigger;
 cvar_t	*vr_force_distance_trigger;
 cvar_t	*vr_two_handed_weapons;
 cvar_t	*vr_force_motion_controlled;
+cvar_t	*vr_force_motion_push;
+cvar_t	*vr_force_motion_pull;
 cvar_t	*vr_motion_enable_saber;
 cvar_t	*vr_crouch_toggle;
 cvar_t  *vr_irl_crouch_enabled;
