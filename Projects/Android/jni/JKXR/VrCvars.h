@@ -13,6 +13,8 @@ extern cvar_t   *vr_force_velocity_trigger;
 extern cvar_t   *vr_force_distance_trigger;
 extern cvar_t   *vr_two_handed_weapons;
 extern cvar_t   *vr_force_motion_controlled;
+extern cvar_t   *vr_force_motion_push;
+extern cvar_t   *vr_force_motion_pull;
 extern cvar_t   *vr_motion_enable_saber;
 extern cvar_t   *vr_crouch_toggle;
 extern cvar_t   *vr_irl_crouch_enabled;
