@@ -116,6 +116,12 @@ void CG_RegisterWeapon( int weaponNum ) {
 		weaponInfo->weaponMidpoint[i] = mins[i] + 0.5 * ( maxs[i] - mins[i] );
 	}
 
+	//Bit of a hack - default weapons.dat on JK2 is missing the melee icon!
+	if (weaponNum == WP_MELEE)
+	{
+		strcpy((char *)weaponData[weaponNum].weaponIcon, "gfx/hud/w_icon_melee");
+	}
+
 	// setup the shader we will use for the icon
 	if (weaponData[weaponNum].weaponIcon[0])
 	{

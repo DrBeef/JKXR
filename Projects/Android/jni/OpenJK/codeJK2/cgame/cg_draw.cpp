@@ -1894,6 +1894,7 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 	}
 
 	if ( type == 1 && (cg.snap->ps.weapon == WP_NONE ||
+		 cg.snap->ps.weapon == WP_MELEE ||
 		 cg.snap->ps.weapon == WP_SABER ||
 		 cg.snap->ps.weapon == WP_STUN_BATON ||
 		 cg.snap->ps.weapon == WP_THERMAL ))
