@@ -56,9 +56,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     uint32_t secondaryButtonsNew;
     uint32_t secondaryButtonsOld;
     int primaryButton1;
-    int primaryButton2;
+    bool primaryButton2New;
+    bool primaryButton2Old;
     int secondaryButton1;
-    int secondaryButton2;
+    bool secondaryButton2New;
+    bool secondaryButton2Old;
     int primaryThumb;
     int secondaryThumb;
     if (vr_control_scheme->integer == LEFT_HANDED_DEFAULT && vr_switch_sticks->integer)
@@ -76,6 +78,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         primaryThumb = xrButton_RThumb;
         secondaryThumb = xrButton_LThumb;
     }
+
     if (vr_switch_sticks->integer)
     {
         //
@@ -88,9 +91,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         primaryButtonsNew = pOffTrackedRemoteNew->Buttons;
         primaryButtonsOld = pOffTrackedRemoteOld->Buttons;
         primaryButton1 = offButton1;
-        primaryButton2 = offButton2;
         secondaryButton1 = domButton1;
-        secondaryButton2 = domButton2;
     }
     else
     {
@@ -101,10 +102,14 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         secondaryButtonsNew = pOffTrackedRemoteNew->Buttons;
         secondaryButtonsOld = pOffTrackedRemoteOld->Buttons;
         primaryButton1 = domButton1;
-        primaryButton2 = domButton2;
         secondaryButton1 = offButton1;
-        secondaryButton2 = offButton2;
     }
+
+    //Don't switch B/Y buttons even if switched sticks
+    primaryButton2New = domButton2 & pDominantTrackedRemoteNew->Buttons;
+    primaryButton2Old = domButton2 & pDominantTrackedRemoteOld->Buttons;
+    secondaryButton2New = offButton2 & pOffTrackedRemoteNew->Buttons;
+    secondaryButton2Old = offButton2 & pOffTrackedRemoteOld->Buttons;
 
     //Allow weapon alignment mode toggle on x
     if (vr_align_weapons->value)
@@ -173,14 +178,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             }
         }
-        /*else if(cl.serverTime > vr.saberBlockDebounce + 3000)
-        {
-            if(vr.saberBounceMove < 82)
-            {
-                vr.saberBounceMove = 82;
-            }
-            vr.saberBlockDebounce = cl.serverTime + TBDC_SABER_BOUNCETIME;
-        }*/
+
         QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles[ANGLES_SABER]);
         QuatToYawPitchRoll(pOff->Pose.orientation, rotation, vr.offhandangles[ANGLES_SABER]);
 
@@ -225,9 +223,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         }
 
         //Close the datapad
-        if (((secondaryButtonsNew & secondaryButton2) !=
-                 (secondaryButtonsOld & secondaryButton2)) &&
-                (secondaryButtonsNew & secondaryButton2)) {
+        if (secondaryButton2New && !secondaryButton2Old) {
                 Sys_QueEvent(0, SE_KEY, A_TAB, true, 0, NULL);
         }
 
@@ -307,15 +303,26 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
         //Left/right to switch between which selector we are using
         if (vr.item_selector == 1) {
+            float x, y;
+            if (vr_switch_sticks->integer)
+            {
+                x = pSecondaryJoystick->x;
+                y = pSecondaryJoystick->y;
+            }
+            else
+            {
+                x = pPrimaryJoystick->x;
+                y = pPrimaryJoystick->y;
+            }
             static bool selectorSwitched = false;
-            if (between(-0.2f, pPrimaryJoystick->y, 0.2f) &&
-                (primaryJoystickX > 0.8f || primaryJoystickX < -0.8f)) {
+            if (between(-0.2f, y, 0.2f) &&
+                (x > 0.8f || x < -0.8f)) {
 
                 if (!selectorSwitched) {
-                    if (primaryJoystickX > 0.8f) {
+                    if (x > 0.8f) {
                         sendButtonActionSimple("itemselectornext");
                         selectorSwitched = true;
-                    } else if (primaryJoystickX < -0.8f) {
+                    } else if (x < -0.8f) {
                         sendButtonActionSimple("itemselectorprev");
                         selectorSwitched = true;
                     }
@@ -327,20 +334,31 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
         //Left/right to switch between which selector we are using
         if (vr.item_selector == 2) {
+            float x, y;
+            if (vr_switch_sticks->integer)
+            {
+                x = pPrimaryJoystick->x;
+                y = pPrimaryJoystick->y;
+            }
+            else
+            {
+                x = pSecondaryJoystick->x;
+                y = pSecondaryJoystick->y;
+            }
             static bool selectorSwitched = false;
-            if (between(-0.2f, pSecondaryJoystick->y, 0.2f) &&
-                (pSecondaryJoystick->x > 0.8f || pSecondaryJoystick->x < -0.8f)) {
+            if (between(-0.2f, y, 0.2f) &&
+                (x > 0.8f || x < -0.8f)) {
 
                 if (!selectorSwitched) {
-                    if (pSecondaryJoystick->x > 0.8f) {
+                    if (x > 0.8f) {
                         sendButtonActionSimple("itemselectornext");
                         selectorSwitched = true;
-                    } else if (pSecondaryJoystick->x < -0.8f) {
+                    } else if (x < -0.8f) {
                         sendButtonActionSimple("itemselectorprev");
                         selectorSwitched = true;
                     }
                 }
-            } else if (between(-0.4f, pSecondaryJoystick->x, 0.4f)) {
+            } else if (between(-0.4f, x, 0.4f)) {
                 selectorSwitched = false;
             }
         }
@@ -716,7 +734,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
 
             //B Button
-            if ((primaryButtonsNew & primaryButton2) != (primaryButtonsOld & primaryButton2)) {
+            if (primaryButton2New != primaryButton2Old) {
                 if (vr.cgzoommode == 1 || vr.cgzoommode == 3)
                 {   // Exit scope only when using binoculars or nightvision
                     sendButtonActionSimple("exitscope");
@@ -724,13 +742,13 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 else if (cl.frame.ps.weapon == WP_SABER && vr.velocitytriggered)
                 {
                     //B button toggles saber on/off in first person
-                    if (primaryButtonsNew & primaryButton2) {
+                    if (primaryButton2New && !primaryButton2Old) {
                         sendButtonActionSimple("togglesaber");
                     }
                 }
                 else if (cl.frame.ps.weapon != WP_DISRUPTOR)
                 {
-                    sendButtonAction("+altattack", (primaryButtonsNew & primaryButton2));
+                    sendButtonAction("+altattack", primaryButton2New);
                 }
             }
 
@@ -811,7 +829,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         {
             //Apply a filter and quadratic scaler so small movements are easier to make
             float dist = 0;
-            if (vr.item_selector != 2)
+            if (vr.item_selector != (vr_switch_sticks->integer ? 1 : 2))
             {
                 dist = length(pSecondaryJoystick->x, pSecondaryJoystick->y);
             }
@@ -844,9 +862,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
 
             //Open the datapad
-            if (((secondaryButtonsNew & secondaryButton2) !=
-                 (secondaryButtonsOld & secondaryButton2)) &&
-                (secondaryButtonsNew & secondaryButton2)) {
+            if (secondaryButton2New && !secondaryButton2Old) {
                 Sys_QueEvent(0, SE_KEY, A_TAB, true, 0, NULL);
             }
 

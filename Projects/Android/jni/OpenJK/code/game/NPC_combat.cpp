@@ -2257,11 +2257,40 @@ int NPC_ShotEntity( gentity_t *ent, vec3_t impactPos )
 	}
 
 	int location = Q_irand(0, 99);
-	if (location < 65 || cg.renderingThirdPerson ||
+	int torsoRatio = 65;
+	int legsRatio = 20;
+	int headRatio = 15;
+
+	switch ( g_spskill->integer )
+	{
+		//Easiest difficulty, low chance of hittitng anything else
+		case 0:
+			torsoRatio = 90;
+			legsRatio = 5;
+			headRatio = 5;
+			break;
+
+			//Medium difficulty, half-half chance of picking up the player
+		case 1:
+			torsoRatio = 60;
+			legsRatio = 25;
+			headRatio = 15;
+			break;
+
+			//Hardest difficulty, always turn on attacking player
+		case 2:
+		default:
+			torsoRatio = 50;
+			legsRatio = 35;
+			headRatio = 15;
+			break;
+	}
+
+	if (location < torsoRatio || cg.renderingThirdPerson ||
 		ent->client == NULL || ent->client->ps.clientNum != 0) {
 		// 65% chance (unless ent is not the player, then always go for chest, which is original behaviour)
 		CalcEntitySpot(ent, SPOT_CHEST, targ);
-	} else if (location < 85) {
+	} else if (location < legsRatio + torsoRatio) {
 		// 20% chance
 		CalcEntitySpot(ent, SPOT_LEGS, targ);
 	} else {

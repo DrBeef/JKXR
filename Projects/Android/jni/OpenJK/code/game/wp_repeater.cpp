@@ -26,6 +26,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 #include "bg_local.h"
+#include <JKXR/VrTBDC.h>
+extern cvar_t	*g_TeamBeefDirectorsCut;
 
 //-------------------
 //	Heavy Repeater
@@ -43,7 +45,12 @@ static void WP_RepeaterMainFire( gentity_t *ent, vec3_t dir )
 
 	WP_MissileTargetHint(ent, start, dir);
 
-	gentity_t *missile = CreateMissile( start, dir, REPEATER_VELOCITY, 10000, ent );
+	float velocity = REPEATER_VELOCITY;
+	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->integer == 1)
+	{
+		velocity = TBDC_REPEATER_VELOCITY;
+	}
+	gentity_t *missile = CreateMissile( start, dir, velocity, 10000, ent );
 
 	missile->classname = "repeater_proj";
 	missile->s.weapon = WP_REPEATER;
@@ -109,7 +116,12 @@ static void WP_RepeaterAltFire( gentity_t *ent )
 		}
 
 		WP_MissileTargetHint(ent, start, forward);
-		missile = CreateMissile( start, forward, REPEATER_ALT_VELOCITY, 10000, ent, qtrue );
+		float velocity = REPEATER_ALT_VELOCITY;
+		if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->integer == 1)
+		{
+			velocity = TBDC_REPEATER_ALT_VELOCITY;
+		}
+		missile = CreateMissile( start, forward, velocity, 10000, ent, qtrue );
 	}
 
 	missile->classname = "repeater_alt_proj";

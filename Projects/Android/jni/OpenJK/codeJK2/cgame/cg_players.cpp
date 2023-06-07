@@ -4791,8 +4791,6 @@ Ghoul2 Insert End
     		cent->gent->client->ps.saberBounceMove != LS_NONE &&
 			vr->saberBlockDebounce < cg.time)
     {
-		//cvar_t *vr_saber_block_debounce_time = gi.cvar("vr_saber_block_debounce_time", "1000", CVAR_ARCHIVE); // defined in VrCvars.h
-		//vr->saberBlockDebounce = cg.time + vr_saber_block_debounce_time->integer;
 		vr->saberBlockDebounce = cg.time + TBDC_SABER_BOUNCETIME;
 		vr->saberBounceMove = cent->gent->client->ps.saberBounceMove;
 		cgi_HapticEvent("shotgun_fire", 0, 0, 100, 0, 0);

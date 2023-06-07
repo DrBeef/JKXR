@@ -33,6 +33,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../Rufl/hstring.h"
 #include "bg_local.h"
 #include <JKXR/VrClientInfo.h>
+#include <JKXR/VrTBDC.h>
 
 #define	LOOK_SWING_SCALE	0.5f
 #define	CG_SWINGSPEED		0.3f
@@ -6809,13 +6810,13 @@ Ghoul2 Insert End
 		renderfx, (qboolean)!noDlight );
 		
     if (CG_getPlayer1stPersonSaber(cent) &&
-        cent->gent->client->ps.saberEventFlags & (SEF_BLOCKED|SEF_PARRIED) &&
-			vr->saberBlockDebounce < cg.time &&
+            cent->gent->client->ps.saberEventFlags & (SEF_BLOCKED|SEF_PARRIED) &&
+            cent->gent->client->ps.saberBounceMove != LS_NONE &&
+            vr->saberBlockDebounce < cg.time &&
 			bladeNum == 0) // Only need to do this for the first blade
     {
-		cvar_t *vr_saber_block_debounce_time = gi.cvar("vr_saber_block_debounce_time", "200", CVAR_ARCHIVE); // defined in VrCvars.h
-		vr->saberBlockDebounce = cg.time + vr_saber_block_debounce_time->integer;
-
+		vr->saberBlockDebounce = cg.time + TBDC_SABER_BOUNCETIME;
+		vr->saberBounceMove = cent->gent->client->ps.saberBounceMove;
 		cgi_HapticEvent("shotgun_fire", 0, vr->right_handed ? (2 - saberNum) : (1 + saberNum), 100, 0, 0);
 	}
 
@@ -8532,7 +8533,8 @@ Ghoul2 Insert End
 
 		for ( int saberNum = 0; saberNum < numSabers; saberNum++ )
 		{
-			if (saberNum == 0 && cent->currentState.saberInFlight)
+			if ((saberNum == 0 && cent->currentState.saberInFlight) ||
+					cent->gent->client->ps.saber[saberNum].name == nullptr)
 			{
 				continue;
 			}

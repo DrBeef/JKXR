@@ -29,7 +29,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_functions.h"
 #include "bg_local.h"
 #include <JKXR/VrClientInfo.h>
-extern cvar_t	*g_TeamBeefDirectorsCut;
 
 //-----------------------
 //	Golan Arms Flechette

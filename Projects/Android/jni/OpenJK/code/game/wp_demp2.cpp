@@ -26,6 +26,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 #include "bg_local.h"
+#include <JKXR/VrTBDC.h>
+extern cvar_t	*g_TeamBeefDirectorsCut;
 
 //-------------------
 //	DEMP2
@@ -53,7 +55,12 @@ static void WP_DEMP2_MainFire( gentity_t *ent )
 
 	WP_MissileTargetHint(ent, start, forward);
 
-	gentity_t *missile = CreateMissile( start, forward, DEMP2_VELOCITY, 10000, ent );
+	float velocity = DEMP2_VELOCITY;
+	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->integer == 1)
+	{
+		velocity = TBDC_DEMP2_VELOCITY;
+	}
+	gentity_t *missile = CreateMissile( start, forward, velocity, 10000, ent );
 
 	missile->classname = "demp2_proj";
 	missile->s.weapon = WP_DEMP2;
