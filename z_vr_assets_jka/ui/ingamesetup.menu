@@ -2621,7 +2621,6 @@
 			cvar				"g_TeamBeefDirectorsCut"
       cvarFloatList
       {
-        @MENUS_VR_TBDC_BUMMSER 0
         @MENUS_VR_TBDC_BAGGYG 1
         @MENUS_VR_TBDC_VANILLA 2
       }
