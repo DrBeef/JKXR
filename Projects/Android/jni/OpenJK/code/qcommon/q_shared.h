@@ -1307,6 +1307,7 @@ typedef struct
 		saved_game.read<int32_t>(fullName);
 		saved_game.read<int32_t>(type);
 		saved_game.read<int32_t>(model);
+        model = NULL;
 		saved_game.read<int32_t>(skin);
 		saved_game.read<int32_t>(soundOn);
 		saved_game.read<int32_t>(soundLoop);
@@ -1540,6 +1541,7 @@ public:
 		saved_game.read<int32_t>(fullName);
 		saved_game.read<int32_t>(type);
 		saved_game.read<int32_t>(model);
+        model = NULL;
 		saved_game.read<int32_t>(skin);
 		saved_game.read<int32_t>(soundOn);
 		saved_game.read<int32_t>(soundLoop);

@@ -8533,10 +8533,20 @@ Ghoul2 Insert End
 
 		for ( int saberNum = 0; saberNum < numSabers; saberNum++ )
 		{
-			if ((saberNum == 0 && cent->currentState.saberInFlight) ||
-					cent->gent->client->ps.saber[saberNum].name == nullptr)
+			if (saberNum == 0 && cent->currentState.saberInFlight)
 			{
 				continue;
+			}
+
+			char saberModel[256];
+			if (cent->gent->client->ps.saber[saberNum].model == nullptr)
+			{
+				//Bit of a fiddle, but if we have no saber model for some reason, just use a default one
+				strcpy(saberModel, "models/weapons2/saber_1/saber_1.glm");
+			}
+			else
+			{
+				strcpy(saberModel, cent->gent->client->ps.saber[saberNum].model);
 			}
 
 			refEntity_t hiltEnt;
@@ -8544,14 +8554,14 @@ Ghoul2 Insert End
 
 			BG_CalculateVRSaberPosition(saberNum, hiltEnt.origin, hiltEnt.angles);
 
-			int saberModelIndex = G_ModelIndex( cent->gent->client->ps.saber[saberNum].model );
+			int saberModelIndex = G_ModelIndex( saberModel );
 			if (saberModelIndex != cg.saberModelIndex[saberNum])
 			{
 				if (cg.saber_ghoul2[saberNum].size() != 0)
 				{
 					gi.G2API_RemoveGhoul2Model(cg.saber_ghoul2[saberNum], cg.saberG2Num[saberNum]);
 				}
-				cg.saberG2Num[saberNum] = gi.G2API_InitGhoul2Model( cg.saber_ghoul2[saberNum], cent->gent->client->ps.saber[saberNum].model, saberModelIndex , NULL_HANDLE, NULL_HANDLE, 0, 0 );
+				cg.saberG2Num[saberNum] = gi.G2API_InitGhoul2Model( cg.saber_ghoul2[saberNum], saberModel, saberModelIndex , NULL_HANDLE, NULL_HANDLE, 0, 0 );
 				cg.saberModelIndex[saberNum] = saberModelIndex;
 			}
 			hiltEnt.ghoul2 = &cg.saber_ghoul2[saberNum];
