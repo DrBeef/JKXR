@@ -188,10 +188,10 @@ REFERENCE           SABER_REALISM_DESC
 LANG_ENGLISH        "Choose effectivity of lightsaber. Affects lightsaber duels difficulty mostly."
 
 REFERENCE           SABER_REALISM_DEFAULT
-LANG_ENGLISH        "Default"
+LANG_ENGLISH        "Weak"
 
 REFERENCE           SABER_REALISM_INCREASED
-LANG_ENGLISH        "Increased Damage"
+LANG_ENGLISH        "Team Beef Recommended"
 
 REFERENCE           SABER_REALISM_CRITICAL
 LANG_ENGLISH        "Fatal Critical Hit"
@@ -506,10 +506,10 @@ REFERENCE           MODS_WARNING_CONFIRM
 LANG_ENGLISH        "Continue"
 
 REFERENCE           TBDC_BUMMSER
-LANG_ENGLISH        "Slower NPCs (Easy)-Vanilla Player Guns"
+LANG_ENGLISH        "Slower NPCs and Vanilla Player Guns - Not in JKA"
 
 REFERENCE           TBDC_BAGGYG
-LANG_ENGLISH        "Vanilla NPCs (Hard)-Stronger Player Guns"
+LANG_ENGLISH        "Vanilla NPCs and Stronger Player Guns"
 
 REFERENCE           TBDC_VANILLA
 LANG_ENGLISH        "Vanilla NPCs and Guns"

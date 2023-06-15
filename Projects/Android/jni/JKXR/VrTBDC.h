@@ -37,17 +37,4 @@
 #define TBDC_SCALE_REBORNACROBAT        102
 
 
-typedef enum {
-    // Invalid, or saber not armed
-    VRLS_NONE		= 0,
-    //Bounces
-    VRLS_B1_BR = 82,
-    VRLS_B1__R,
-    VRLS_B1_TR,
-    VRLS_B1_T_,
-    VRLS_B1_TL,
-    VRLS_B1__L,
-    VRLS_B1_BL
-} vrBounce;
-
 #endif //JKXR_VRTBDC_H

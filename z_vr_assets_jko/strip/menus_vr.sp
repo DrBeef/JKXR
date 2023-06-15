@@ -297,12 +297,12 @@ INDEX 57
 INDEX 58
 {
    REFERENCE SABER_REALISM_DEFAULT
-   TEXT_LANGUAGE1 "Default"
+   TEXT_LANGUAGE1 "Weak"
 }
 INDEX 59
 {
    REFERENCE SABER_REALISM_INCREASED
-   TEXT_LANGUAGE1 "Increased Damage"
+   TEXT_LANGUAGE1 "Team Beef Recommended"
 }
 INDEX 60
 {
@@ -802,7 +802,7 @@ INDEX 158
 INDEX 159
 {
    REFERENCE TBDC_BAGGYG
-   TEXT_LANGUAGE1 "Vanilla NPCs (Hard)-Stronger Player Guns"
+   TEXT_LANGUAGE1 "Vanilla NPCs and Stronger Player Guns"
 }
 INDEX 160
 {

@@ -1448,9 +1448,15 @@ qboolean WP_SaberApplyDamage( gentity_t *ent, float baseDamage, int baseDFlags,
 						qboolean vicWasDismembered = qtrue;
 						qboolean vicWasAlive = (qboolean)(victim->health>0);
 
-						if ( baseDamage <= 0.1f )
-						{//just get their attention?
-							dFlags |= DAMAGE_NO_DAMAGE;
+
+						//This will prevent damage being inflicted if no base damage happened at all
+						//this is different to JKO so don't do this in TBDC mode
+						if (!g_TeamBeefDirectorsCut->integer)
+						{
+							if (baseDamage <= 0.1f)
+							{//just get their attention?
+								dFlags |= DAMAGE_NO_DAMAGE;
+							}
 						}
 
 						if( victim->client )
@@ -4656,26 +4662,37 @@ void WP_SaberDamageTrace( gentity_t *ent, int saberNum, int bladeNum )
 			{//don't kill with this hit
 				baseDFlags = DAMAGE_NO_KILL;
 			}
-			if (  (!WP_SaberBladeUseSecondBladeStyle( &ent->client->ps.saber[saberNum], bladeNum )
-						&& (ent->client->ps.saber[saberNum].saberFlags2&SFL2_NO_IDLE_EFFECT) )
-				|| ( WP_SaberBladeUseSecondBladeStyle( &ent->client->ps.saber[saberNum], bladeNum )
-						&& (ent->client->ps.saber[saberNum].saberFlags2&SFL2_NO_IDLE_EFFECT2) )
-				)
-			{//do nothing at all when idle
-				return;
+
+			//This bit isn't in JKO, so only enable it if not in TBDC
+			if ( !g_TeamBeefDirectorsCut->integer)
+			{
+				if ((!WP_SaberBladeUseSecondBladeStyle(&ent->client->ps.saber[saberNum], bladeNum)
+					 && (ent->client->ps.saber[saberNum].saberFlags2 & SFL2_NO_IDLE_EFFECT))
+					|| (WP_SaberBladeUseSecondBladeStyle(&ent->client->ps.saber[saberNum], bladeNum)
+						&& (ent->client->ps.saber[saberNum].saberFlags2 & SFL2_NO_IDLE_EFFECT2))
+						)
+				{//do nothing at all when idle
+					return;
+				}
 			}
+
 			baseDamage = 0;
 		}
 		else if ( ent->client->ps.saberLockTime > level.time )
 		{//just do effects
-			if (  (!WP_SaberBladeUseSecondBladeStyle( &ent->client->ps.saber[saberNum], bladeNum )
-						&& (ent->client->ps.saber[saberNum].saberFlags2&SFL2_NO_IDLE_EFFECT) )
-				|| ( WP_SaberBladeUseSecondBladeStyle( &ent->client->ps.saber[saberNum], bladeNum )
-						&& (ent->client->ps.saber[saberNum].saberFlags2&SFL2_NO_IDLE_EFFECT2) )
-				)
-			{//do nothing at all when idle
-				return;
+			//This bit isn't in JKO, so only enable it if not in TBDC
+			if ( !g_TeamBeefDirectorsCut->integer)
+			{
+				if ((!WP_SaberBladeUseSecondBladeStyle(&ent->client->ps.saber[saberNum], bladeNum)
+					 && (ent->client->ps.saber[saberNum].saberFlags2 & SFL2_NO_IDLE_EFFECT))
+					|| (WP_SaberBladeUseSecondBladeStyle(&ent->client->ps.saber[saberNum], bladeNum)
+						&& (ent->client->ps.saber[saberNum].saberFlags2 & SFL2_NO_IDLE_EFFECT2))
+						)
+				{//do nothing at all when idle
+					return;
+				}
 			}
+
 			baseDamage = 0;
 		}
 		else if ( !WP_SaberBladeUseSecondBladeStyle( &ent->client->ps.saber[saberNum], bladeNum )

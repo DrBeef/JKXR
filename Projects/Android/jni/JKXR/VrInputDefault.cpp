@@ -21,8 +21,12 @@ Authors		:	Simon Brown
 
 #ifdef JK2_MODE
 #include "../OpenJK/codeJK2/game/weapons.h"
+#include "../OpenJK/codeJK2/game/bg_public.h"
+#include "../OpenJK/codeJK2/game/wp_saber.h"
 #else
 #include "../OpenJK/code/game/weapons.h"
+#include "../OpenJK/codeJK2/game/bg_public.h"
+#include "../OpenJK/code/game/wp_saber.h"
 #include "../OpenJK/code/game/g_vehicles.h"
 #endif
 
@@ -146,28 +150,28 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 lerp = 1 - float(cl.serverTime - (vr.saberBlockDebounce - TBDC_SABER_BOUNCETIME / 2)) / float(vr.saberBlockDebounce - (vr.saberBlockDebounce - TBDC_SABER_BOUNCETIME / 2));
             }
             switch(vr.saberBounceMove) {
-                case VRLS_B1_BR:
+                case LS_B1_BR:
                     rotation[PITCH] += lerp * TBDC_SABER_BOUNCEANGLE;
                     rotation[YAW] -= lerp * TBDC_SABER_BOUNCEANGLE;
                     break;
-                case VRLS_B1__R:
+                case LS_B1__R:
                     rotation[YAW] -= lerp * TBDC_SABER_BOUNCEANGLE;
                     break;
-                case VRLS_B1_TR:
+                case LS_B1_TR:
                     rotation[PITCH] -= lerp * TBDC_SABER_BOUNCEANGLE;
                     rotation[YAW] -= lerp * TBDC_SABER_BOUNCEANGLE;
                     break;
-                case VRLS_B1_T_:
+                case LS_B1_T_:
                     rotation[PITCH] -= lerp * TBDC_SABER_BOUNCEANGLE;
                     break;
-                case VRLS_B1_TL:
+                case LS_B1_TL:
                     rotation[PITCH] -= lerp * TBDC_SABER_BOUNCEANGLE;
                     rotation[YAW] += lerp * TBDC_SABER_BOUNCEANGLE;
                     break;
-                case VRLS_B1__L:
+                case LS_B1__L:
                     rotation[YAW] += lerp * TBDC_SABER_BOUNCEANGLE;
                     break;
-                case VRLS_B1_BL:
+                case LS_B1_BL:
                     rotation[PITCH] += lerp * TBDC_SABER_BOUNCEANGLE;
                     rotation[YAW] += lerp * TBDC_SABER_BOUNCEANGLE;
                     break;

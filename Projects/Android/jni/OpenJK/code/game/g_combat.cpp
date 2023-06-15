@@ -1219,7 +1219,8 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 #endif //_DEBUG
 
 	if ( g_saberRealisticCombat->integer > 1
-		|| debug_subdivision->integer )
+		|| debug_subdivision->integer
+        || g_TeamBeefDirectorsCut->integer) // always dismember for TBDC
 	{
 		dismember = qtrue;
 	}
@@ -2239,7 +2240,11 @@ static qboolean G_Dismemberable( gentity_t *self, int hitLoc )
 	{//cannot dismember me right now
 		return qfalse;
 	}
-	if ( !debug_subdivision->integer && g_saberRealisticCombat->integer < 2 )
+    if (g_TeamBeefDirectorsCut->integer)
+    {
+        return qtrue;
+    }
+	if ( !debug_subdivision->integer && g_saberRealisticCombat->integer < 2)
 	{
 		if ( g_dismemberProbabilities->value > 0.0f )
 		{//use the ent-specific dismemberProbabilities
@@ -2291,6 +2296,10 @@ static qboolean G_Dismemberable2( gentity_t *self, int hitLoc )
 	{//cannot dismember me right now
 		return qfalse;
 	}
+    if (g_TeamBeefDirectorsCut->integer)
+    {
+        return qtrue;
+    }
 	if ( !debug_subdivision->integer && g_saberRealisticCombat->integer < 2 )
 	{
 		if ( g_dismemberProbabilities->value <= 0.0f )

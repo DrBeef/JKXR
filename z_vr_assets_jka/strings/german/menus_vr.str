@@ -246,11 +246,11 @@ LANG_ENGLISH        "Choose effectivity of lightsaber. Affects lightsaber duels 
 LANG_GERMAN         "#same"
 
 REFERENCE           SABER_REALISM_DEFAULT
-LANG_ENGLISH        "Default"
+LANG_ENGLISH        "Weak"
 LANG_GERMAN         "#same"
 
 REFERENCE           SABER_REALISM_INCREASED
-LANG_ENGLISH        "Increased Damage"
+LANG_ENGLISH        "Team Beef Recommended"
 LANG_GERMAN         "#same"
 
 REFERENCE           SABER_REALISM_CRITICAL
@@ -674,7 +674,7 @@ LANG_ENGLISH        "Slower NPCs (Easy)-Vanilla Player Guns"
 LANG_GERMAN         "#same"
 
 REFERENCE           TBDC_BAGGYG
-LANG_ENGLISH        "Vanilla NPCs (Hard)-Stronger Player Guns"
+LANG_ENGLISH        "Vanilla NPCs and Stronger Player Guns"
 LANG_GERMAN         "#same"
 
 REFERENCE           TBDC_VANILLA
