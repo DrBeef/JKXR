@@ -6939,7 +6939,7 @@ extern qboolean G_GetRootSurfNameWithVariant( gentity_t *ent, const char *rootSu
 extern qboolean G_ControlledByPlayer( gentity_t *self );
 extern qboolean G_RagDoll(gentity_t *ent, vec3_t forcedAngles);
 int	cg_saberOnSoundTime[MAX_GENTITIES] = {0};
-
+extern void CG_ChangeWeapon( int num );
 void CG_Player( centity_t *cent ) {
 	clientInfo_t	*ci;
 	qboolean		shadow, staticScale = qfalse;
@@ -7004,6 +7004,15 @@ void CG_Player( centity_t *cent ) {
 	{
 		wData = &weaponData[cent->currentState.weapon];
 	}
+
+	//If viewing a remote turret, ensure we have switched to no weapons
+	if (vr->remote_turret &&
+		cg.weaponSelect != WP_NONE)
+	{
+		cg.weaponSelect = WP_NONE;
+		SetWeaponSelectTime();
+	}
+
 /*
 Ghoul2 Insert Start
 */

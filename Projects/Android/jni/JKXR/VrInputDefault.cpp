@@ -30,13 +30,6 @@ Authors		:	Simon Brown
 #include "../OpenJK/code/game/g_vehicles.h"
 #endif
 
-void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, int capsule );
-
-static inline float AngleBetweenVectors(const vec3_t a, const vec3_t b)
-{
-    return RAD2DEG(acosf(DotProduct(a, b)/(VectorLength(a) * VectorLength(b))));
-}
-
 void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTrackedController* pDominantTracking,
                           ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTrackedController* pOffTracking,
                           int domButton1, int domButton2, int offButton1, int offButton2 )
@@ -559,7 +552,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             } else if (cl.frame.ps.weapon == WP_SABER ||
                     cl.frame.ps.weapon == WP_STUN_BATON) {
                 //Does weapon velocity trigger attack
-                if (vr.velocitytriggered) {
+                if (vr.velocitytriggered && !vr.remote_turret) {
                     if (vr.velocitytriggeractive)
                     {
                         static bool fired = false;
@@ -762,7 +755,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
             int thirdPerson = Cvar_VariableIntegerValue("cg_thirdPerson");
 
-            if (cl.frame.ps.weapon == WP_SABER && !thirdPerson &&
+            if (cl.frame.ps.weapon == WP_SABER && !thirdPerson && !vr.remote_turret &&
                 vr.cgzoommode == 0 && cl.frame.ps.stats[STAT_HEALTH] > 0)
             {
                 static bool previous_throwing = false;
@@ -782,7 +775,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     sendButtonAction("+altattack", throwing);
                 }
             }
-            else if (!vr.velocitytriggered) // Don't fire velocity triggered weapons
+            else if (!vr.velocitytriggered || vr.remote_turret) // Don't fire velocity triggered weapons
             {
                 //Fire Primary - Doesn't trigger the saber
                 if ((pDominantTrackedRemoteNew->Buttons & xrButton_Trigger) !=

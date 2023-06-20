@@ -8964,7 +8964,7 @@ static void PM_BeginWeaponChange( int weapon ) {
 		return;
 	}
 
-	if ( !( pm->ps->stats[STAT_WEAPONS] & ( 1 << weapon ) ) ) {
+	if ( weapon != WP_NONE && !( pm->ps->stats[STAT_WEAPONS] & ( 1 << weapon ) ) ) {
 		return;
 	}
 

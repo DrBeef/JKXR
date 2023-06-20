@@ -3281,7 +3281,10 @@ static void CG_ScanForCrosshairEntity( qboolean scanAll )
 	}
 */
 	//draw crosshair at endpoint
-	//CG_DrawCrosshair( trace.endpos );
+	if (vr->remote_turret)
+	{
+		CG_DrawCrosshair(trace.endpos);
+	}
 
 	g_crosshairEntNum = trace.entityNum;
 	g_crosshairEntDist = 4096*trace.fraction;

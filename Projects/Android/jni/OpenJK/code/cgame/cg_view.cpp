@@ -2046,8 +2046,12 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 
 	CG_BuildSolidList();
 
-	// set up cg.snap and possibly cg.nextSnap
-	CG_ProcessSnapshots();
+	if ( stereoView == STEREO_LEFT )
+	{
+		// set up cg.snap and possibly cg.nextSnap
+		CG_ProcessSnapshots();
+	}
+
 	// if we haven't received any snapshots yet, all
 	// we can draw is the information screen
 	if ( !cg.snap ) {
