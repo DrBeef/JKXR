@@ -2326,6 +2326,12 @@ qboolean WP_SaberDamageEffects( trace_t *tr, const vec3_t start, float length, f
 						//make sure the base damage is high against non-jedi, feels better
 						doDmg = 10;
 					}
+
+					// Let the saber cut through sand people like butter...
+					if ( hitEnt->client && hitEnt->client->NPC_class==CLASS_TUSKEN )
+					{
+						doDmg = 10;
+					}
 				}
 			}
 			if ( !hitEntDmgAdd[i] && !hitEntDmgSub[i] )
