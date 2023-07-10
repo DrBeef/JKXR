@@ -2854,14 +2854,32 @@ void CG_EnterScope_f( )
 
 void CG_ToggleSaber_f( )
 {
-	if (player->client->ps.saber->Active())
+    bool deactivated = false;
+    if (player->client->ps.saber[0].numBlades > 1)
+    {
+        if (player->client->ps.saber[0].blade[0].active && player->client->ps.saber[0].blade[1].active)
+        {
+            player->client->ps.SaberBladeActivate( 0, 1, qfalse );
+            deactivated = true;
+        }
+        else if (player->client->ps.saber[0].blade[0].active)
+        {
+            player->client->ps.SaberBladeActivate( 0, 0, qfalse );
+            deactivated = true;
+        }
+        else
+        {
+            player->client->ps.saber[0].Activate();
+        }
+    }
+    else if (player->client->ps.saber->Active())
 	{
 		player->client->ps.saber[0].Deactivate();
 		if (player->client->ps.dualSabers)
 		{
 			player->client->ps.saber[1].Deactivate();
 		}
-		G_SoundOnEnt( player, CHAN_WEAPON, "sound/weapons/saber/saberoffquick.wav" );
+        deactivated = true;
 	}
 	else
 	{
@@ -2871,6 +2889,11 @@ void CG_ToggleSaber_f( )
 			player->client->ps.saber[1].Activate();
 		}
 	}
+
+    if (deactivated)
+    {
+        G_SoundOnEnt( player, CHAN_WEAPON, "sound/weapons/saber/saberoffquick.wav" );
+    }
 }
 
 //Selects the currently selected thing (if one _is_ selected)
