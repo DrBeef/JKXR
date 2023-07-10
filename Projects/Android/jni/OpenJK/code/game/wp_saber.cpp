@@ -6526,6 +6526,24 @@ void WP_RunSaber( gentity_t *self, gentity_t *saber )
 			VectorCopy( self->client->renderInfo.handRPoint, saberHome );
 			VectorMA( saberHome, self->client->ps.saberEntityDist, forward, saberDest );
 
+			/*
+			 * This is JKO's saber level 3 enemy seek code, just seems to work better, especially in VR
+			 * so have re-instated this
+			 */
+			if ( self->client->ps.forcePowerLevel[FP_SABERTHROW] > FORCE_LEVEL_2 && self->client->ps.saberEntityState == SES_LEAVING )
+			{//max level
+				//pick an enemy
+				enemy = WP_SaberFindEnemy( self, saber );
+				if ( enemy )
+				{//home in on enemy
+					float enemyDist = Distance( self->client->renderInfo.handRPoint, enemy->currentOrigin );
+					VectorCopy( enemy->currentOrigin, saberDest );
+					saberDest[2] += enemy->maxs[2]/2.0f;//FIXME: when in a knockdown anim, the saber float above them... do we care?
+					self->client->ps.saberEntityDist = enemyDist;
+				}
+			}
+
+			/*
 			if ( self->client->ps.forcePowerLevel[FP_SABERTHROW] > FORCE_LEVEL_2
 				&& self->client->ps.saberEntityState == SES_LEAVING )
 			{//max level
@@ -6549,6 +6567,7 @@ void WP_RunSaber( gentity_t *self, gentity_t *saber )
 					}
 				}
 			}
+			 */
 
 
 			//Make the saber head there
