@@ -2327,8 +2327,10 @@ qboolean WP_SaberDamageEffects( trace_t *tr, const vec3_t start, float length, f
 						doDmg = 10;
 					}
 
-					// Let the saber cut through sand people like butter...
-					if ( hitEnt->client && hitEnt->client->NPC_class==CLASS_TUSKEN )
+					// Let the saber cut through sand people and Noghri like butter...
+					if ( hitEnt->client && (
+                            hitEnt->client->NPC_class==CLASS_TUSKEN ||
+                            hitEnt->client->NPC_class==CLASS_NOGHRI))
 					{
 						doDmg = 10;
 					}
