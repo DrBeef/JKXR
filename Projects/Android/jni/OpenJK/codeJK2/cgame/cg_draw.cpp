@@ -3036,7 +3036,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	//Sniper/E11 scope
 	if (usingScope)
 	{
-		cg.refdef.viewangles[ROLL] = vr->clientviewangles[ROLL];
+		cg.refdef.viewangles[ROLL] = vr->hmdorientation[ROLL];
 		cg.refdef.viewangles[PITCH] = vr->weaponangles[ANGLES_ADJUSTED][PITCH];
 		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW]
 				+ vr->weaponangles[ANGLES_ADJUSTED][YAW] + SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
