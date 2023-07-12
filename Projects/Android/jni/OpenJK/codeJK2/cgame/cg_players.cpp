@@ -4588,8 +4588,11 @@ Ghoul2 Insert End
 			{
 				if ( (trace.contents&CONTENTS_WATER) || (trace.contents&CONTENTS_SLIME) )
 				{
-					int position = (vr->right_handed ? 2 : 1);
-					cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+					if (!cent->gent->client->ps.saberInFlight)
+					{
+						int position = (vr->right_handed ? 2 : 1);
+						cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+					}
 
 					/*
 					if ( !(cent->gent->client->ps.saberEventFlags&SEF_INWATER) )
@@ -4610,8 +4613,11 @@ Ghoul2 Insert End
 				}
 				else
 				{
-					int position = (vr->right_handed ? 2 : 1);
-					cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+					if (!cent->gent->client->ps.saberInFlight)
+					{
+						int position = (vr->right_handed ? 2 : 1);
+						cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+					}
 
 					theFxScheduler.PlayEffect( "spark", trace.endpos, trace.plane.normal );
 					// All I need is a bool to mark whether I have a previous point to work with.
