@@ -2293,6 +2293,9 @@ void CG_MatrixEffect ( centity_t *cent )
 			cg.overrides.thirdPersonRange += 80.0f;
 		}
 	}
+
+	//Hack for VR - Disable all camera hijacking again, not sure if this will work, but worth a try
+	cg.overrides.active &= ~(/*CG_OVERRIDE_3RD_PERSON_ENT|*/CG_OVERRIDE_3RD_PERSON_RNG|CG_OVERRIDE_3RD_PERSON_ANG|CG_OVERRIDE_3RD_PERSON_POF);
 }
 
 static void CG_Think ( centity_t *cent )
