@@ -2371,7 +2371,6 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 			&& cg.predicted_player_state.stats[STAT_HEALTH] > 0
 			&& cg.snap->ps.viewEntity < ENTITYNUM_WORLD
 			&& g_entities[cg.snap->ps.viewEntity].client
-			&& !(g_entities[cg.snap->ps.viewEntity].client->ps.dualSabers && cg.snap->ps.weapon == WP_SABER)
 			&& !vr->weapon_stabilised
 			&& !vr->in_vehicle
 			&& !cg_pano.integer
@@ -2379,6 +2378,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		{
 			vec3_t end, forward;
 			refEntity_t handEnt;
+			centity_t *cent = &cg_entities[0];
 			memset( &handEnt, 0, sizeof(refEntity_t) );
 			BG_CalculateVRDefaultPosition(1, handEnt.origin, handEnt.angles);
 
@@ -2389,32 +2389,34 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 
 			handEnt.renderfx = RF_DEPTHHACK | RF_VRVIEWMODEL;
 
-			if (cg.snap->ps.powerups[PW_FORCE_PUSH] > cg.time ||
-				(cg.snap->ps.forcePowersActive & (1<<FP_GRIP)) ||
-				(cg.snap->ps.forcePowersActive & (1<<FP_LIGHTNING)) ||
-				(cg.snap->ps.forcePowersActive & (1<<FP_ABSORB)) ||
-				(cg.snap->ps.forcePowersActive & (1<<FP_DRAIN)) ||
-				(cg.snap->ps.forcePowersActive & (1<<FP_RAGE)))
+			if (!g_entities[cg.snap->ps.viewEntity].client->ps.dualSabers)
 			{
-				handEnt.hModel = cgs.media.handModel_force;
-			}
-			else if (cg.snap->ps.weapon == WP_MELEE)
-			{
-				handEnt.hModel = cgs.media.handModel_fist;
-			}
-			else
-			{
-				handEnt.hModel = cgs.media.handModel_relaxed;
-			}
-			VectorCopy(handEnt.origin, handEnt.oldorigin);
+				if (cg.snap->ps.powerups[PW_FORCE_PUSH] > cg.time ||
+					(cg.snap->ps.forcePowersActive & (1<<FP_GRIP)) ||
+					(cg.snap->ps.forcePowersActive & (1<<FP_LIGHTNING)) ||
+					(cg.snap->ps.forcePowersActive & (1<<FP_ABSORB)) ||
+					(cg.snap->ps.forcePowersActive & (1<<FP_DRAIN)) ||
+					(cg.snap->ps.forcePowersActive & (1<<FP_RAGE)))
+				{
+					handEnt.hModel = cgs.media.handModel_force;
+				}
+				else if (cg.snap->ps.weapon == WP_MELEE)
+				{
+					handEnt.hModel = cgs.media.handModel_fist;
+				}
+				else
+				{
+					handEnt.hModel = cgs.media.handModel_relaxed;
+				}
+				VectorCopy(handEnt.origin, handEnt.oldorigin);
 
-			AnglesToAxis(handEnt.angles, handEnt.axis);
-			for ( int i = 0; i < 3; i++ ) {
-				VectorScale( handEnt.axis[i], (vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
-			}
+				AnglesToAxis(handEnt.angles, handEnt.axis);
+				for ( int i = 0; i < 3; i++ ) {
+					VectorScale( handEnt.axis[i], (vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
+				}
 
-			centity_t *cent = &cg_entities[0];
-			CG_AddRefEntityWithPowerups(&handEnt, cent->currentState.powerups, cent, true);
+				CG_AddRefEntityWithPowerups(&handEnt, cent->currentState.powerups, cent, true);
+			}
 
 			if (cg.snap->ps.weapon == WP_NONE ||
 				cg.snap->ps.weapon == WP_MELEE ||
