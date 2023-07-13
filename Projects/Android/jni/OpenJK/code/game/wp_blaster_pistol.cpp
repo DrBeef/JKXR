@@ -45,7 +45,6 @@ void WP_FireBryarPistol( gentity_t *ent, qboolean alt_fire )
 	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(muzzle, angs);
-		AngleVectors(angs, forward, NULL, NULL);
 	}
 	else {
 		vectoangles(forwardVec, angs);
@@ -70,10 +69,10 @@ void WP_FireBryarPistol( gentity_t *ent, qboolean alt_fire )
 				angs[PITCH] += ( Q_flrand(-1.0f, 1.0f) * ((5-ent->NPC->currentAim)*0.25f) );
 				angs[YAW]	+= ( Q_flrand(-1.0f, 1.0f) * ((5-ent->NPC->currentAim)*0.25f) );
 			}
-
-			AngleVectors( angs, forward, NULL, NULL );
 		}
 	}
+
+	AngleVectors( angs, forward, NULL, NULL );
 
 	WP_MissileTargetHint(ent, start, forward);
 
