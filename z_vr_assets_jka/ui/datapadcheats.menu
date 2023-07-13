@@ -292,7 +292,7 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
-				exec			"saber single; vstr set_saber_color"
+				exec			"saber single_1; vstr set_saber_color"
 			}
 		}
 
@@ -316,7 +316,7 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
-				exec			"saber single single; vstr set_saber_color"
+				exec			"saber single 1; vstr set_saber_color"
 			}
 		}
 
@@ -340,7 +340,7 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
-				exec			"saber dual_1; vstr set_saber_color"
+				exec			"saber dual_3; vstr set_saber_color"
 			}
 		}
 
