@@ -280,6 +280,12 @@ LANG_ENGLISH        "Staff"
 REFERENCE           CHEATS_SABER_STYLE_STAFF_DESC
 LANG_ENGLISH        "Use double-bladed lightsaber."
 
+REFERENCE           CHEATS_SABER_STYLE_SITH_ITEM
+LANG_ENGLISH        "Sith Sword"
+
+REFERENCE           CHEATS_SABER_STYLE_SITH_DESC
+LANG_ENGLISH        "Use Sith Sword."
+
 REFERENCE           CHEATS_SABER_COLOR_TITLE
 LANG_ENGLISH        "Lightsaber Color:"
 

@@ -5868,7 +5868,7 @@ static void CG_DoSaber( vec3_t origin, vec3_t dir, float length, float lengthMax
 #define	MAX_MARK_POINTS		768
 extern markPoly_t *CG_AllocMark();
 
-static void CG_CreateSaberMarks( vec3_t start, vec3_t end, vec3_t normal )
+static void CG_CreateSaberMarks( centity_t *cent, vec3_t start, vec3_t end, vec3_t normal )
 {
 //	byte			colors[4];
 	int				i, j, numFragments;
@@ -5955,17 +5955,20 @@ static void CG_CreateSaberMarks( vec3_t start, vec3_t end, vec3_t normal )
 		mark->color[0] = mark->color[1] = mark->color[2] = mark->color[3] = 255;
 		memcpy( mark->verts, verts, mf->numPoints * sizeof( verts[0] ) );
 
-		// And now do a glow pass
-		mark = CG_AllocMark();
-		mark->time = cg.time - 8500 + glowExtraTime;
-		mark->fadeTime = glowFadeTime;
-		mark->alphaFade = qfalse;
-		mark->markShader = cgi_R_RegisterShader("gfx/effects/saberDamageGlow" );
-		mark->poly.numVerts = mf->numPoints;
-		mark->color[0] = 215 + Q_flrand(0.0f, 1.0f) * 40.0f;
-		mark->color[1] = 96 + Q_flrand(0.0f, 1.0f) * 32.0f;
-		mark->color[2] = mark->color[3] = Q_flrand(0.0f, 1.0f)*15.0f;
-		memcpy( mark->verts, verts, mf->numPoints * sizeof( verts[0] ) );
+		if ( cent->gent->client->ps.saber[0].type != SABER_SITH_SWORD )
+		{
+			// And now do a glow pass
+			mark = CG_AllocMark();
+			mark->time = cg.time - 8500 + glowExtraTime;
+			mark->fadeTime = glowFadeTime;
+			mark->alphaFade = qfalse;
+			mark->markShader = cgi_R_RegisterShader("gfx/effects/saberDamageGlow");
+			mark->poly.numVerts = mf->numPoints;
+			mark->color[0] = 215 + Q_flrand(0.0f, 1.0f) * 40.0f;
+			mark->color[1] = 96 + Q_flrand(0.0f, 1.0f) * 32.0f;
+			mark->color[2] = mark->color[3] = Q_flrand(0.0f, 1.0f) * 15.0f;
+			memcpy(mark->verts, verts, mf->numPoints * sizeof(verts[0]));
+		}
 	}
 }
 
@@ -6566,7 +6569,7 @@ Ghoul2 Insert End
 									|| (WP_SaberBladeUseSecondBladeStyle( &client->ps.saber[saberNum], bladeNum ) && !(client->ps.saber[saberNum].saberFlags2&SFL2_NO_WALL_MARKS2)) )
 								{
 									// Let's do some cool burn/glowing mark bits!!!
-									CG_CreateSaberMarks( client->ps.saber[saberNum].blade[bladeNum].trail.oldPos[i], trace.endpos, trace.plane.normal );
+									CG_CreateSaberMarks( cent, client->ps.saber[saberNum].blade[bladeNum].trail.oldPos[i], trace.endpos, trace.plane.normal );
 
 									if ( Q_irand( 1, client->ps.saber[saberNum].numBlades ) == 1 )
 									{
