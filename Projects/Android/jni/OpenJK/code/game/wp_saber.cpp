@@ -6370,6 +6370,75 @@ gentity_t *WP_SaberFindEnemy( gentity_t *self, gentity_t *saber )
 		maxs[i] = center[i] + radius;
 	}
 
+	if ( WP_SaberValidateEnemy( self, self->enemy ) )
+	{
+		bestEnt = self->enemy;
+		bestRating = WP_SaberRateEnemy( bestEnt, center, forward, radius );
+	}
+
+	numListedEntities = gi.EntitiesInBox( mins, maxs, entityList, MAX_GENTITIES );
+
+	if ( !numListedEntities )
+	{//should we clear the enemy?
+		return bestEnt;
+	}
+
+	for ( e = 0 ; e < numListedEntities ; e++ )
+	{
+		ent = entityList[ e ];
+
+		if ( ent == self || ent == saber || ent == bestEnt )
+		{
+			continue;
+		}
+		if ( !WP_SaberValidateEnemy( self, ent ) )
+		{//doesn't meet criteria of valid look enemy (don't check current since we would have done that before this func's call
+			continue;
+		}
+		if ( !gi.inPVS( self->currentOrigin, ent->currentOrigin ) )
+		{//not even potentially visible
+			continue;
+		}
+		if ( !G_ClearLOS( self, self->client->renderInfo.eyePoint, ent ) )
+		{//can't see him
+			continue;
+		}
+		//rate him based on how close & how in front he is
+		rating = WP_SaberRateEnemy( ent, center, forward, radius );
+		if ( rating > bestRating )
+		{
+			bestEnt = ent;
+			bestRating = rating;
+		}
+	}
+	return bestEnt;
+}
+
+/*
+gentity_t *WP_SaberFindEnemy( gentity_t *self, gentity_t *saber )
+{
+//FIXME: should be a more intelligent way of doing this, like auto aim?
+//closest, most in front... did damage to... took damage from?  How do we know who the player is focusing on?
+	gentity_t	*ent, *bestEnt = NULL;
+	gentity_t	*entityList[MAX_GENTITIES];
+	int			numListedEntities;
+	vec3_t		center, mins, maxs, fwdangles, forward;
+	int			i, e;
+	float		radius = 400;
+	float		rating, bestRating = 0.0f;
+
+	//FIXME: no need to do this in 1st person?
+	fwdangles[1] = self->client->ps.viewangles[1];
+	AngleVectors( fwdangles, forward, NULL, NULL );
+
+	VectorCopy( saber->currentOrigin, center );
+
+	for ( i = 0 ; i < 3 ; i++ )
+	{
+		mins[i] = center[i] - radius;
+		maxs[i] = center[i] + radius;
+	}
+
 	//if the saber has an enemy from the last time it looked, init to that one
 	if ( WP_SaberValidateEnemy( self, saber->enemy ) )
 	{
@@ -6437,6 +6506,7 @@ gentity_t *WP_SaberFindEnemy( gentity_t *self, gentity_t *saber )
 	}
 	return bestEnt;
 }
+*/
 
 void WP_RunSaber( gentity_t *self, gentity_t *saber )
 {
