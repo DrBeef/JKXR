@@ -142,6 +142,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 //Somewhere between 1 and 0
                 lerp = 1 - float(cl.serverTime - (vr.saberBlockDebounce - TBDC_SABER_BOUNCETIME / 2)) / float(vr.saberBlockDebounce - (vr.saberBlockDebounce - TBDC_SABER_BOUNCETIME / 2));
             }
+
             switch(vr.saberBounceMove) {
                 case LS_B1_BR:
                     rotation[PITCH] += lerp * TBDC_SABER_BOUNCEANGLE;
@@ -168,10 +169,17 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     rotation[PITCH] += lerp * TBDC_SABER_BOUNCEANGLE;
                     rotation[YAW] += lerp * TBDC_SABER_BOUNCEANGLE;
                     break;
+#ifndef JK2_MODE
+                default:
+                    rotation[PITCH] += lerp * TBDC_SABER_BOUNCEANGLE;
+                    rotation[YAW] += lerp * (TBDC_SABER_BOUNCEANGLE / 2);
+                    break;
+#else
                 default:
                     rotation[PITCH] -= lerp * TBDC_SABER_BOUNCEANGLE;
                     rotation[YAW] += lerp * (TBDC_SABER_BOUNCEANGLE / 2);
                     break;
+#endif
 
             }
         }
