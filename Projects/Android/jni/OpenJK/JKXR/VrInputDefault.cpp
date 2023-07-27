@@ -7,28 +7,28 @@ Authors		:	Simon Brown
 
 *************************************************************************************/
 
-#include <android/keycodes.h>
-
 #include "VrInput.h"
 #include "VrCvars.h"
 
 #include "qcommon/q_shared.h"
 #include <qcommon/qcommon.h>
 #include <client/client.h>
+
+#ifndef _WIN32
+#include <android/keycodes.h>
 #include <statindex.h>
 #include "android/sys_local.h"
+#endif
+
 #include "VrTBDC.h"
 
-#ifdef JK2_MODE
-#include "../OpenJK/codeJK2/game/weapons.h"
-#include "../OpenJK/codeJK2/game/bg_public.h"
-#include "../OpenJK/codeJK2/game/wp_saber.h"
-#else
-#include "../OpenJK/code/game/weapons.h"
-#include "../OpenJK/codeJK2/game/bg_public.h"
-#include "../OpenJK/code/game/wp_saber.h"
-#include "../OpenJK/code/game/g_vehicles.h"
-#endif
+#include "game/weapons.h"
+#include "game/bg_public.h"
+#include "game/wp_saber.h"
+#include "game/g_vehicles.h"
+
+void Sys_QueEvent(int time, sysEventType_t type, int value, int value2, int ptrLength, void* ptr);
+
 
 void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew, ovrInputStateTrackedRemote *pDominantTrackedRemoteOld, ovrTrackedController* pDominantTracking,
                           ovrInputStateTrackedRemote *pOffTrackedRemoteNew, ovrInputStateTrackedRemote *pOffTrackedRemoteOld, ovrTrackedController* pOffTracking,
@@ -58,6 +58,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     int secondaryButton1;
     bool secondaryButton2New;
     bool secondaryButton2Old;
+    bool secondaryButton1New;
+    bool secondaryButton1Old;
     int primaryThumb;
     int secondaryThumb;
     if (vr_control_scheme->integer == LEFT_HANDED_DEFAULT && vr_switch_sticks->integer)
@@ -107,6 +109,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     primaryButton2Old = domButton2 & pDominantTrackedRemoteOld->Buttons;
     secondaryButton2New = offButton2 & pOffTrackedRemoteNew->Buttons;
     secondaryButton2Old = offButton2 & pOffTrackedRemoteOld->Buttons;
+    secondaryButton1New = offButton1 & pOffTrackedRemoteNew->Buttons;
+    secondaryButton1Old = offButton1 & pOffTrackedRemoteOld->Buttons;
 
     //Allow weapon alignment mode toggle on x
     if (vr_align_weapons->value)
@@ -230,6 +234,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         //Close the datapad
         if (secondaryButton2New && !secondaryButton2Old) {
                 Sys_QueEvent(0, SE_KEY, A_TAB, true, 0, NULL);
+        }
+
+        //Close the menu
+        if (secondaryButton1New && !secondaryButton1Old) {
+                Sys_QueEvent(0, SE_KEY, A_ESCAPE, true, 0, NULL);
         }
 
     }
@@ -436,8 +445,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 int mode = (int) Cvar_VariableValue("cg_thirdPerson");
                 static bool switched = false;
                 if (between(-0.2f, primaryJoystickX, 0.2f) &&
-                    (between(0.8f, pPrimaryJoystick->y, 1.0f) ||
-                     between(-1.0f, pPrimaryJoystick->y, -0.8f))) {
+                    between(-1.0f, pPrimaryJoystick->y, -0.8f)) {
                     if (!switched) {
                         mode = 1 - mode;
                         sendButtonActionSimple(va("cg_thirdPerson %i", mode));
@@ -460,6 +468,21 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             if (mode != 0)
             {
                 sendButtonActionSimple("cg_thirdPerson 0");
+            }
+        }
+
+        //Switch movement speed
+        {
+            static bool switched = false;
+            if (between(-0.2f, primaryJoystickX, 0.2f) &&
+                between(0.8f, pPrimaryJoystick->y, 1.0f)) {
+                if (!switched) {
+                    vr.move_speed = (++vr.move_speed) % 3;
+                    switched = true;
+                }
+            }
+            else {
+                switched = false;
             }
         }
 
@@ -715,7 +738,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             //Positional movement speed correction for when we are not hitting target framerate
             static double lastframetime = 0;
             int refresh = TBXR_GetRefresh();
-            double newframetime = TBXR_GetTimeInMilliSeconds();
+            double newframetime = Sys_Milliseconds();
             float multiplier = (float) ((1000.0 / refresh) / (newframetime - lastframetime));
             lastframetime = newframetime;
 
@@ -728,12 +751,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             positional_movementSideways = v[0];
             positional_movementForward = v[1];
 
-            ALOGV("        positional_movementSideways: %f, positional_movementForward: %f",
-                  positional_movementSideways,
-                  positional_movementForward);
-
-
-            //Jump (A Button)
+              //Jump (A Button)
             if ((primaryButtonsNew & primaryButton1) != (primaryButtonsOld & primaryButton1)) {
                 sendButtonAction("+moveup", (primaryButtonsNew & primaryButton1));
             }
@@ -854,16 +872,13 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     v[0] * (vr.move_speed == 0 ? 0.75f : (vr.move_speed == 1 ? 1.0f : 0.5f));
             remote_movementForward =
                     v[1] * (vr.move_speed == 0 ? 0.75f : (vr.move_speed == 1 ? 1.0f : 0.5f));
-            ALOGV("        remote_movementSideways: %f, remote_movementForward: %f",
-                  remote_movementSideways,
-                  remote_movementForward);
+            
 
-
-            if (((secondaryButtonsNew & secondaryButton1) !=
-                (secondaryButtonsOld & secondaryButton1)) &&
-                    (secondaryButtonsNew & secondaryButton1)) {
-                //Toggle walk/run somehow?!
-                vr.move_speed = (++vr.move_speed) % 3;
+            //X button invokes menu now
+            if ((secondaryButtonsNew & secondaryButton1) &&
+                !(secondaryButtonsOld & secondaryButton1))
+            {
+                Sys_QueEvent(0, SE_KEY, A_ESCAPE, true, 0, NULL);
             }
 
             //Open the datapad

@@ -7,8 +7,6 @@ Authors		:	Simon Brown
 
 *************************************************************************************/
 
-#include <android/keycodes.h>
-
 #include "VrInput.h"
 #include "VrCvars.h"
 

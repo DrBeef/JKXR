@@ -320,6 +320,7 @@ void VR_Init()
 	positional_movementForward = 0.0f;
 	vr.snapTurn = 0.0f;
 	vr.immersive_cinematics = true;
+	vr.move_speed = 1; // Default to full speed now
 
 	//init randomiser
 	srand(time(NULL));

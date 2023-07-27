@@ -340,10 +340,10 @@ if(BuildSPEngine OR BuildJK2SPEngine)
 
 	# JKXR files
 	set(SPEngineJKXRFiles
-		"${CMAKE_SOURCE_DIR}/JKXR/JKXR_SurfaceView.cpp"
+		"${CMAKE_SOURCE_DIR}/JKXR/windows/JKXR_SurfaceView.cpp"
+		"${CMAKE_SOURCE_DIR}/JKXR/windows/TBXR_Common.cpp"
+		"${CMAKE_SOURCE_DIR}/JKXR/windows/TBXR_Common.h"
 		"${CMAKE_SOURCE_DIR}/JKXR/OpenXrInput.cpp"
-		"${CMAKE_SOURCE_DIR}/JKXR/TBXR_Common.cpp"
-		"${CMAKE_SOURCE_DIR}/JKXR/TBXR_Common.h"
 		"${CMAKE_SOURCE_DIR}/JKXR/VrClientInfo.h"
 		"${CMAKE_SOURCE_DIR}/JKXR/VrCommon.h"
 		"${CMAKE_SOURCE_DIR}/JKXR/VrInputCommon.cpp"

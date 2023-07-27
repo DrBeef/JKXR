@@ -1654,7 +1654,7 @@ void TBXR_InitialiseOpenXR()
 	instanceInfo.next = NULL;
 	OXR(xrGetInstanceProperties(gAppState.Instance, &instanceInfo));
 	ALOGV(
-			"Runtime %s: Version : %u.%u.%u",
+			"OpenXR Runtime %s: Version : %u.%u.%u",
 			instanceInfo.runtimeName,
 			XR_VERSION_MAJOR(instanceInfo.runtimeVersion),
 			XR_VERSION_MINOR(instanceInfo.runtimeVersion),
@@ -1894,11 +1894,11 @@ void TBXR_finishEyeBuffer(int eye )
 
 void TBXR_updateProjections()
 {
-	XrViewLocateInfo projectionInfo = {};
-	projectionInfo.type = XR_TYPE_VIEW_LOCATE_INFO;
-	projectionInfo.viewConfigurationType = gAppState.ViewportConfig.viewConfigurationType;
-	projectionInfo.displayTime = gAppState.FrameState.predictedDisplayTime;
-	projectionInfo.space = gAppState.LocalSpace;
+	XrViewLocateInfo viewLocateInfo = {};
+	viewLocateInfo.type = XR_TYPE_VIEW_LOCATE_INFO;
+	viewLocateInfo.viewConfigurationType = gAppState.ViewportConfig.viewConfigurationType;
+	viewLocateInfo.displayTime = gAppState.FrameState.predictedDisplayTime;
+	viewLocateInfo.space = gAppState.LocalSpace;
 
 	XrViewState viewState = {XR_TYPE_VIEW_STATE, NULL};
 
@@ -1907,7 +1907,7 @@ void TBXR_updateProjections()
 
 	OXR(xrLocateViews(
 			gAppState.Session,
-			&projectionInfo,
+			&viewLocateInfo,
 			&viewState,
 			projectionCapacityInput,
 			&projectionCountOutput,

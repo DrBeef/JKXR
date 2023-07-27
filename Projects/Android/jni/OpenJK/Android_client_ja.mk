@@ -123,12 +123,12 @@ JK3_SRC = \
 		${SHARED_PATH}/qcommon/safe/string.cpp \
 
 
-JKXR_SRC_FILES :=  ${OPENJK_PATH}/JKXR/JKXR_SurfaceView.cpp \
-                  ${OPENJK_PATH}/JKXR/TBXR_Common.cpp \
+JKXR_SRC_FILES :=  ${OPENJK_PATH}/JKXR/android/JKXR_SurfaceView.cpp \
+                  ${OPENJK_PATH}/JKXR/android/TBXR_Common.cpp \
+                  ${OPENJK_PATH}/JKXR/android/argtable3.c \
                   ${OPENJK_PATH}/JKXR/VrInputCommon.cpp \
                   ${OPENJK_PATH}/JKXR/VrInputDefault.cpp \
                   ${OPENJK_PATH}/JKXR/VrInputWeaponAlign.cpp \
-                  ${OPENJK_PATH}/JKXR/argtable3.c \
                   ${OPENJK_PATH}/JKXR/OpenXrInput.cpp
 
 LOCAL_SRC_FILES += $(JK3_SRC) $(JKXR_SRC_FILES)

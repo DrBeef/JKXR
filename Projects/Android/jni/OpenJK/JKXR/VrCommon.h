@@ -6,7 +6,11 @@
 
 #include "VrClientInfo.h"
 
-#include "TBXR_Common.h"
+#ifdef _WIN32
+#include "windows/TBXR_Common.h"
+#else
+#include "android/TBXR_Common.h"
+#endif
 
 
 extern long long global_time;

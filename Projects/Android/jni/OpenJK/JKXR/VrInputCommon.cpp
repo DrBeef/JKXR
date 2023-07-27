@@ -131,7 +131,19 @@ void sendButtonAction(const char* action, long buttonDown)
     Cbuf_AddText( command );
 }
 
+#ifndef _WIN32
 void PortableMouseAbs(float x,float y);
+#else
+void PortableMouseAbs(float x, float y)
+{
+    int absx = 0, absy = 0;
+    absx = x * 640;
+    absy = y * 480;
+
+    CL_MouseEvent(absx, absy, 0);
+}
+#endif
+
 float clamp(float _min, float _val, float _max)
 {
     return fmax(fmin(_val, _max), _min);
