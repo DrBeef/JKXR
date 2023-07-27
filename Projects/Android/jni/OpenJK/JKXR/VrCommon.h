@@ -1,8 +1,8 @@
 #if !defined(vrcommon_h)
 #define vrcommon_h
 
-#include "../qcommon/q_shared.h"
-#include "../qcommon/qcommon.h"
+#include "qcommon/q_shared.h"
+#include "qcommon/qcommon.h"
 
 #include "VrClientInfo.h"
 

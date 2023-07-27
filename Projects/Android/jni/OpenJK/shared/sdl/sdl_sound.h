@@ -21,9 +21,12 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "qcommon/q_shared.h"
 
-
 // initializes cycling through a DMA buffer and returns information on it
+#ifdef _WIN32
+qboolean SNDDMA_Init(int sampleFrequencyInKHz);
+#else
 int SNDDMA_Init(int sampleFrequencyInKHz);
+#endif
 
 // gets the current DMA position
 int		SNDDMA_GetDMAPos(void);

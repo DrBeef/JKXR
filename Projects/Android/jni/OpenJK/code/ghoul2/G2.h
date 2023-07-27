@@ -24,7 +24,9 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #if !defined(G2_H_INC)
 #define G2_H_INC
 
+#ifndef _WIN32
 #include "tr_local.h"
+#endif
 
 class CMiniHeap;
 

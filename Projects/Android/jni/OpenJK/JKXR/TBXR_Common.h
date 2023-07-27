@@ -237,7 +237,7 @@ typedef struct
     XrSystemId SystemId;
 
     XrSpace LocalSpace;
-    XrSpace HeadSpace;
+    XrSpace ViewSpace;
     XrSpace StageSpace;
 
     GLboolean SessionActive;

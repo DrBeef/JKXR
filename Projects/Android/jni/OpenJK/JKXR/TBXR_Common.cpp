@@ -876,7 +876,7 @@ void ovrApp_Clear(ovrApp* app) {
 	app->SystemId = XR_NULL_SYSTEM_ID;
 
 	app->LocalSpace = XR_NULL_HANDLE;
-	app->HeadSpace = XR_NULL_HANDLE;
+	app->ViewSpace = XR_NULL_HANDLE;
 	app->StageSpace = XR_NULL_HANDLE;
 
 	app->SessionActive = false;
@@ -1420,12 +1420,12 @@ void TBXR_EnterVR( ) {
 	spaceCreateInfo.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
 	spaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_VIEW;
 	spaceCreateInfo.poseInReferenceSpace.orientation.w = 1.0f;
-	OXR(xrCreateReferenceSpace(gAppState.Session, &spaceCreateInfo, &gAppState.HeadSpace));
+	OXR(xrCreateReferenceSpace(gAppState.Session, &spaceCreateInfo, &gAppState.ViewSpace));
 }
 
 void TBXR_LeaveVR( ) {
 	if (gAppState.Session) {
-		OXR(xrDestroySpace(gAppState.HeadSpace));
+		OXR(xrDestroySpace(gAppState.ViewSpace));
 		OXR(xrDestroySpace(gAppState.LocalSpace));
 		OXR(xrDestroySpace(gAppState.StageSpace));
 		OXR(xrDestroySession(gAppState.Session));
@@ -1710,7 +1710,7 @@ void TBXR_Recenter() {
 		vec3_t rotation = {0, 0, 0};
 		XrSpaceLocation loc = {};
 		loc.type = XR_TYPE_SPACE_LOCATION;
-		OXR(xrLocateSpace(gAppState.HeadSpace, gAppState.StageSpace, gAppState.FrameState.predictedDisplayTime, &loc));
+		OXR(xrLocateSpace(gAppState.ViewSpace, gAppState.StageSpace, gAppState.FrameState.predictedDisplayTime, &loc));
 		QuatToYawPitchRoll(loc.pose.orientation, rotation, vr.hmdorientation);
 	}
 
@@ -1754,7 +1754,7 @@ static void TBXR_GetHMDOrientation() {
 	// The better the prediction, the less black will be pulled in at the edges.
 	XrSpaceLocation loc = {};
 	loc.type = XR_TYPE_SPACE_LOCATION;
-	OXR(xrLocateSpace(gAppState.HeadSpace, gAppState.StageSpace, gAppState.FrameState.predictedDisplayTime, &loc));
+	OXR(xrLocateSpace(gAppState.ViewSpace, gAppState.StageSpace, gAppState.FrameState.predictedDisplayTime, &loc));
 	gAppState.xfStageFromHead = loc.pose;
 
 	const XrQuaternionf quatHmd = gAppState.xfStageFromHead.orientation;

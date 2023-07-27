@@ -62,5 +62,5 @@ void CON_Print( const char *msg )
 	char cmsg[MAXPRINTMSG] = { 0 };
 	Q_strncpyz( cmsg, msg, sizeof( cmsg ) );
 	Q_StripColor( cmsg );
-	printf( "%s", cmsg );
+	printf( "%s \n", cmsg );
 }

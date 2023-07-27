@@ -1157,8 +1157,8 @@ void IN_Frame (void) {
 		// Window not got focus
 		IN_DeactivateMouse( );
 	}
-	else
-		IN_ActivateMouse( );
+//	else
+//		IN_ActivateMouse( );
 
 	IN_ProcessEvents( );
 }

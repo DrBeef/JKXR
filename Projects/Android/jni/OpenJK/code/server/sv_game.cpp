@@ -1049,7 +1049,13 @@ void SV_InitGameProgs (void) {
 	import.WE_SetTempGlobalFogColor = SV_WE_SetTempGlobalFogColor;
 
 #ifdef JK2_MODE
+
+#ifdef _WIN32
+	const char *gamename = "jospgame";
+#else
 	const char *gamename = "jogame";
+#endif
+
 #else
 	const char *gamename = "jagame";
 #endif

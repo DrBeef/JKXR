@@ -4056,7 +4056,9 @@ static void CG_ForcePushRefraction( vec3_t org, centity_t *cent )
 	int tDif;
 
 	//Use classic force push blur - refraction effect not working in GLES
-	//if (!cg_renderToTextureFX.integer)
+#ifdef _WIN32	
+	if (!cg_renderToTextureFX.integer)
+#endif
 	{
 		CG_ForcePushBlur(org);
 		return;

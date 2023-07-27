@@ -751,10 +751,17 @@ qboolean FS_FileExists( const char *file )
 	return FS_FileInPathExists(FS_BuildOSPath(fs_homepath->string, fs_gamedir, file));
 }
 
+#ifdef _WIN32
+qboolean FS_BaseFileExists(const char* file)
+{
+	return FS_FileInPathExists(FS_BuildOSPath(fs_basepath->string, fs_gamedir, file));
+}
+#else
 qboolean FS_BaseFileExists( const char *file )
 {
 	return FS_FileInPathExists(FS_BuildOSPath(fs_homepath->string, BASEGAME, file));
 }
+#endif
 
 /*
 ================

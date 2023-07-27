@@ -27,7 +27,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "w_local.h"
 #include "bg_local.h"
 #include <VrClientInfo.h>
-#include <mathlib.h>
 
 //---------------------
 //	Thermal Detonator
@@ -301,6 +300,9 @@ void WP_ThermalThink( gentity_t *ent )
 #define OLDEST_READING			5
 #define NEWEST_READING			2
 #define TD_REAL_THROW_VEL_MULT	4.4f
+
+#define VectorDistance(a, b) (sqrt( VectorDistance2( a, b )))
+#define VectorDistance2(a, b) (((a)[0] - (b)[0]) * ((a)[0] - (b)[0]) + ((a)[1] - (b)[1]) * ((a)[1] - (b)[1]) + ((a)[2] - (b)[2]) * ((a)[2] - (b)[2]))
 
 //---------------------------------------------------------
 gentity_t *WP_FireThermalDetonator( gentity_t *ent, qboolean alt_fire )
