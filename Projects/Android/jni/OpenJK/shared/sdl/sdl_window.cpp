@@ -26,6 +26,24 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "sys/sys_local.h"
 #include "sdl_icon.h"
 
+
+#if defined(_WIN32)
+
+// OpenXR Header
+#define XR_USE_GRAPHICS_API_OPENGL
+#define XR_USE_PLATFORM_WIN32
+#include <Unknwn.h>
+#include <openxr.h>
+#include <openxr_platform.h>
+#include <GL/gl.h>
+#include <GL/glext.h>
+
+#define GL_RGBA16F                        0x881A
+
+
+#endif
+
+
 enum rserr_t
 {
 	RSERR_OK,
@@ -142,11 +160,20 @@ void GLimp_Minimize(void)
 	SDL_MinimizeWindow( screen );
 }
 
+
+void WIN_SwapWindow()
+{
+	SDL_GL_SwapWindow(screen);
+}
+
+void TBXR_submitFrame();
+
 void WIN_Present( window_t *window )
 {
 	if ( window->api == GRAPHICS_API_OPENGL )
 	{
-		SDL_GL_SwapWindow(screen);
+		TBXR_submitFrame();
+
 
 		if ( r_swapInterval->modified )
 		{
@@ -315,6 +342,8 @@ static bool GLimp_DetectAvailableModes(void)
 GLimp_SetMode
 ===============
 */
+
+void TBXR_GetScreenRes(int*, int*);
 static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDesc, const char *windowTitle, int mode, qboolean fullscreen, qboolean noborder)
 {
 	int perChannelColorBits;
@@ -395,6 +424,7 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 		SDL_FreeSurface( icon );
 		return RSERR_INVALID_MODE;
 	}
+
 	Com_Printf( " %d %d\n", glConfig->vidWidth, glConfig->vidHeight);
 
 	// Center window
@@ -723,6 +753,31 @@ static qboolean GLimp_StartDriverAndSetMode(glconfig_t *glConfig, const windowDe
 	return qtrue;
 }
 
+
+bool xr_result(XrInstance instance, XrResult result, const char* format, ...)
+{
+	if (XR_SUCCEEDED(result))
+		return true;
+
+	char resultString[XR_MAX_RESULT_STRING_SIZE];
+	xrResultToString(instance, result, resultString);
+
+	size_t len1 = strlen(format);
+	size_t len2 = strlen(resultString) + 1;
+	char* formatRes = new  char[len1 + len2 + 4]; // + " []\n"
+	sprintf(formatRes, "%s [%s]\n", format, resultString);
+
+	va_list args;
+	va_start(args, format);
+	vprintf(formatRes, args);
+	va_end(args);
+
+	delete[] formatRes;
+	return false;
+}
+
+void VR_Init();
+
 window_t WIN_Init( const windowDesc_t *windowDesc, glconfig_t *glConfig )
 {
 	Cmd_AddCommand("modelist", R_ModeList_f);
@@ -745,9 +800,9 @@ window_t WIN_Init( const windowDesc_t *windowDesc, glconfig_t *glConfig )
 
 	// Window render surface cvars
 	r_stencilbits		= Cvar_Get( "r_stencilbits",		"8",		CVAR_ARCHIVE_ND|CVAR_LATCH );
-	r_depthbits			= Cvar_Get( "r_depthbits",			"24",		CVAR_ARCHIVE_ND|CVAR_LATCH );
-	r_colorbits			= Cvar_Get( "r_colorbits",			"32",		CVAR_ARCHIVE_ND|CVAR_LATCH );
-	r_ignorehwgamma		= Cvar_Get( "r_ignorehwgamma",		"1",		CVAR_ARCHIVE|CVAR_LATCH );
+	r_depthbits			= Cvar_Get( "r_depthbits",			"0",		CVAR_ARCHIVE_ND|CVAR_LATCH );
+	r_colorbits			= Cvar_Get( "r_colorbits",			"0",		CVAR_ARCHIVE_ND|CVAR_LATCH );
+	r_ignorehwgamma		= Cvar_Get( "r_ignorehwgamma",		"0",		CVAR_ARCHIVE_ND|CVAR_LATCH );
 	r_ext_multisample	= Cvar_Get( "r_ext_multisample",	"0",		CVAR_ARCHIVE_ND|CVAR_LATCH );
 	Cvar_Get( "r_availableModes", "", CVAR_ROM );
 
@@ -778,6 +833,7 @@ window_t WIN_Init( const windowDesc_t *windowDesc, glconfig_t *glConfig )
 
 	window.api = windowDesc->api;
 
+
 #if defined(_WIN32)
 	SDL_SysWMinfo info;
 	SDL_VERSION(&info.version);
@@ -793,6 +849,10 @@ window_t WIN_Init( const windowDesc_t *windowDesc, glconfig_t *glConfig )
 				break;
 		}
 	}
+
+	VR_Init();
+	TBXR_GetScreenRes(&glConfig->vidWidth, &glConfig->vidHeight);
+	
 #endif
 
 	return window;

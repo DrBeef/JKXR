@@ -729,7 +729,7 @@ static void InitOpenGL( void )
 
 		// set default state
 		GL_SetDefaultState();
-		R_Splash();	//get something on screen asap
+		//R_Splash();	//get something on screen asap
 	}
 	else
 	{
@@ -2038,6 +2038,7 @@ extern "C" Q_EXPORT refexport_t* QDECL GetRefAPI ( int apiVersion, refimport_t *
 
 	REX(BeginFrame);
 	REX(EndFrame);
+	REX(SubmitStereoFrame);
 
 	REX(ProcessDissolve);
 	REX(InitDissolve);

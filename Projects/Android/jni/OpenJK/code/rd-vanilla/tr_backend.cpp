@@ -493,7 +493,8 @@ static void RB_BeginDrawingView (void) {
 	}
 	else
 	{
-		if ( r_fastsky->integer && !( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) && !g_bRenderGlowingObjects )
+		if ((!hasskybox || r_fastsky->integer) &&
+			!( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) && !g_bRenderGlowingObjects )
 		{
 			if (tr.world && tr.world->globalFog != -1)
 			{
@@ -647,6 +648,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	int				entityNum, oldEntityNum;
 	int				dlighted, oldDlighted;
 	int				depthRange, oldDepthRange;
+	int 			isVRViewModel, oldIsVRViewModel;
 	int				i;
 	drawSurf_t		*drawSurf;
 	unsigned int	oldSort;
@@ -672,9 +674,14 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	oldShader = NULL;
 	oldFogNum = -1;
 	oldDepthRange = qfalse;
+	isVRViewModel = qfalse;
+	oldIsVRViewModel = qfalse;
 	oldDlighted = qfalse;
 	oldSort = (unsigned int) -1;
 	depthRange = qfalse;
+
+	GLint oldFaceCullMode;
+	GLboolean oldFaceCullEnabled;
 
 	backEnd.pc.c_surfaces += numDrawSurfs;
 
@@ -774,6 +781,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		//
 		if ( entityNum != oldEntityNum ) {
 			depthRange = qfalse;
+			isVRViewModel = qfalse;
 
 			if ( entityNum != REFENTITYNUM_WORLD ) {
 				backEnd.currentEntity = &backEnd.refdef.entities[entityNum];
@@ -794,6 +802,10 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 				else if ( backEnd.currentEntity->e.renderfx & RF_DEPTHHACK ) {
 					// hack the depth range to prevent view model from poking into walls
 					depthRange = qtrue;
+				}
+
+				if (backEnd.currentEntity->e.renderfx & RF_VRVIEWMODEL) {
+					isVRViewModel = qtrue;
 				}
 			} else {
 				backEnd.currentEntity = &tr.worldEntity;
@@ -824,6 +836,25 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 				}
 
 				oldDepthRange = depthRange;
+			}
+
+			if (isVRViewModel != oldIsVRViewModel) {
+				if (isVRViewModel) {
+					qglGetBooleanv(GL_CULL_FACE, &oldFaceCullEnabled);
+					qglGetIntegerv(GL_CULL_FACE_MODE, &oldFaceCullMode);
+
+					//Draw all faces on weapons
+					qglDisable(GL_CULL_FACE);
+				} else{
+					if (!oldFaceCullEnabled)
+					{
+						qglDisable(GL_CULL_FACE);
+					} else{
+						qglEnable(GL_CULL_FACE);
+					}
+					qglCullFace( oldFaceCullMode );
+				}
+				oldIsVRViewModel = isVRViewModel;
 			}
 
 			oldEntityNum = entityNum;
@@ -1403,7 +1434,8 @@ const void	*RB_DrawBuffer( const void *data ) {
 
 	cmd = (const drawBufferCommand_t *)data;
 
-	qglDrawBuffer( cmd->buffer );
+
+	//qglDrawBuffer( cmd->buffer );
 
 		// clear screen for debugging
 	if (!( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) && tr.world && tr.refdef.rdflags & RDF_doLAGoggles)
@@ -1524,6 +1556,32 @@ void RB_ShowImages( void ) {
 
 /*
 =============
+RB_Flush
+
+=============
+*/
+const void  *RB_Flush( const void *data ) {
+	const swapBuffersCommand_t *cmd;
+
+	// finish any 2D drawing if needed
+	if ( tess.numIndexes ) {
+		RB_EndSurface();
+	}
+
+	// texture swapping test
+	if ( r_showImages->integer ) {
+		RB_ShowImages();
+	}
+
+	cmd = (const swapBuffersCommand_t *)data;
+
+	backEnd.projection2D = qfalse;
+
+	return (const void *)( cmd + 1 );
+}
+
+/*
+=============
 RB_SwapBuffers
 
 =============
@@ -1636,6 +1694,9 @@ void RB_ExecuteRenderCommands( const void *data ) {
 			break;
 		case RC_WORLD_EFFECTS:
 			data = RB_WorldEffects( data );
+			break;
+		case RC_FLUSH:
+			data = RB_Flush( data );
 			break;
 		case RC_END_OF_LIST:
 		default:
