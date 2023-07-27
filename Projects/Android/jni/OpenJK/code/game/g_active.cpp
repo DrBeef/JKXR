@@ -29,7 +29,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_vehicles.h"
 #include "b_local.h"
 #include "g_navigator.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 #ifdef _DEBUG
 	#include <float.h>

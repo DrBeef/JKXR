@@ -27,7 +27,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../server/exe_headers.h"
 
 #include "tr_local.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 #if !defined(G2_H_INC)
 	#include "../ghoul2/G2.h"

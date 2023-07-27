@@ -27,7 +27,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "client.h"
 #include "client_ui.h"
-#include <JKXR/VrCommon.h>
+#include <VrCommon.h>
 
 #ifndef _WIN32
 #include <cmath>

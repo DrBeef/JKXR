@@ -28,8 +28,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "w_local.h"
 #include "g_functions.h"
 #include "bg_local.h"
-#include <JKXR/VrClientInfo.h>
-#include <JKXR/VrTBDC.h>
+#include <VrClientInfo.h>
+#include <VrTBDC.h>
 extern cvar_t	*g_TeamBeefDirectorsCut;
 //---------------
 //	Blaster

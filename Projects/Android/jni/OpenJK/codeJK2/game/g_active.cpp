@@ -29,7 +29,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "Q3_Interface.h"
 #include "wp_saber.h"
 #include "g_icarus.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 #ifdef _DEBUG
 	#include <float.h>

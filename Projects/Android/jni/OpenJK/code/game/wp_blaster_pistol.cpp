@@ -26,7 +26,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "w_local.h"
 
 #include "bg_local.h"
-#include <JKXR/VrTBDC.h>
+#include <VrTBDC.h>
 extern cvar_t	*g_TeamBeefDirectorsCut;
 
 

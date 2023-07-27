@@ -35,8 +35,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "Q3_Interface.h"
 #include "../../code/qcommon/strippublic.h"
-#include <JKXR/VrClientInfo.h>
-#include <JKXR/VrTBDC.h>
+#include <VrClientInfo.h>
+#include <VrTBDC.h>
 extern cvar_t	*g_TeamBeefDirectorsCut;
 
 extern	cvar_t	*g_debugDamage;

@@ -26,8 +26,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 #include "bg_local.h"
-#include <JKXR/VrClientInfo.h>
-#include <JKXR/mathlib.h>
+#include <VrClientInfo.h>
+#include <mathlib.h>
 
 //---------------------
 //	Thermal Detonator

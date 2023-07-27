@@ -23,7 +23,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "cg_local.h"
 #include "cg_media.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {

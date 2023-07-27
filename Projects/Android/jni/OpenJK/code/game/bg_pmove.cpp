@@ -44,8 +44,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "g_vehicles.h"
 #include <float.h>
-#include <JKXR/VrClientInfo.h>
-#include <JKXR/VrTBDC.h>
+#include <VrClientInfo.h>
+#include <VrTBDC.h>
 
 extern qboolean G_DoDismemberment( gentity_t *self, vec3_t point, int mod, int damage, int hitLoc, qboolean force = qfalse );
 extern qboolean G_EntIsUnlockedDoor( int entityNum );
