@@ -439,7 +439,7 @@ void TBXR_UpdateControllers( )
         XrSpaceLocation loc = {};
         loc.type = XR_TYPE_SPACE_LOCATION;
         loc.next = &vel;
-        XrResult res = xrLocateSpace(aimSpace[i], gAppState.CurrentSpace, gAppState.FrameState.predictedDisplayTime, &loc);
+        XrResult res = xrLocateSpace(aimSpace[i], gAppState.StageSpace, gAppState.FrameState.predictedDisplayTime, &loc);
         if (res != XR_SUCCESS) {
             Com_Printf("xrLocateSpace error: %d", (int)res);
         }

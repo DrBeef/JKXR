@@ -1431,8 +1431,6 @@ const void	*RB_DrawBuffer( const void *data ) {
 
 	cmd = (const drawBufferCommand_t *)data;
 
-	tr.stereoFrame = (stereoFrame_t )cmd->buffer;
-
 	// clear screen for debugging
 	if ( r_clear->integer ) {
 		qglClearColor( 0, 0, 0, 1 );

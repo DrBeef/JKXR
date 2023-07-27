@@ -528,7 +528,7 @@ R_SetupProjection
 void R_SetupProjection( void ) {
 	float	xmin, xmax, ymin, ymax;
 	float	width, height, depth;
-	float	zNear, zFar;
+	float	zNear, zFar, zZoomX, zZoomY;
 
 	// dynamically compute far clip plane distance
 	SetFarClip();
@@ -538,13 +538,19 @@ void R_SetupProjection( void ) {
 	//
 	zNear	= r_znear->value;
 	zFar	= tr.viewParms.zFar;
+	zZoomX	= 1.0f;
+	zZoomY	= 1.0f;
 
-	if (!tr.refdef.override_fov &&
-        ri.TBXR_GetVRProjection((int)tr.stereoFrame, zNear, zFar, tr.viewParms.projectionMatrix))
+	if (tr.refdef.override_fov || vr->cgzoommode)
+	{
+		zZoomX = vr->fov_x / tr.refdef.fov_x;
+		zZoomY = vr->fov_y / tr.refdef.fov_y;
+	}
+
+	if (ri.TBXR_GetVRProjection(vr->eye, zNear, zFar, zZoomX, zZoomY, tr.viewParms.projectionMatrix))
 	{
 		return;
 	}
-
 
 	ymax = zNear * tan( tr.refdef.fov_y * M_PI / 360.0f );
 	ymin = -ymax;

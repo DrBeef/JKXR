@@ -235,14 +235,14 @@ typedef struct
     XrViewConfigurationProperties ViewportConfig;
     XrViewConfigurationView ViewConfigurationView[ovrMaxNumEyes];
     XrSystemId SystemId;
+
+    XrSpace LocalSpace;
     XrSpace HeadSpace;
     XrSpace StageSpace;
-    XrSpace FakeStageSpace;
-    XrSpace CurrentSpace;
+
     GLboolean SessionActive;
     XrPosef xfStageFromHead;
-    XrView* Projections;
-    XrMatrix4x4f ProjectionMatrices[2];
+    XrView* Views;
 
 
     float currentDisplayRefreshRate;
@@ -303,7 +303,7 @@ void surfaceMessageQueue_PostMessage(surfaceMessageQueue * messageQueue, const s
 void VR_FrameSetup();
 bool VR_UseScreenLayer();
 float VR_GetScreenLayerDistance();
-bool VR_GetVRProjection(int eye, float zNear, float zFar, float* projection);
+bool VR_GetVRProjection(int eye, float zNear, float zFar, float zZoomX, float zZoomY, float* projection);
 void VR_HandleControllerInput();
 void VR_SetHMDOrientation(float pitch, float yaw, float roll );
 void VR_SetHMDPosition(float x, float y, float z );

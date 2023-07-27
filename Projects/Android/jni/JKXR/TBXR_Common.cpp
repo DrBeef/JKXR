@@ -874,10 +874,11 @@ void ovrApp_Clear(ovrApp* app) {
 	memset(&app->ViewportConfig, 0, sizeof(XrViewConfigurationProperties));
 	memset(&app->ViewConfigurationView, 0, ovrMaxNumEyes * sizeof(XrViewConfigurationView));
 	app->SystemId = XR_NULL_SYSTEM_ID;
+
+	app->LocalSpace = XR_NULL_HANDLE;
 	app->HeadSpace = XR_NULL_HANDLE;
 	app->StageSpace = XR_NULL_HANDLE;
-	app->FakeStageSpace = XR_NULL_HANDLE;
-	app->CurrentSpace = XR_NULL_HANDLE;
+
 	app->SessionActive = false;
 	app->SupportedDisplayRefreshRates = NULL;
 	app->RequestedDisplayRefreshRateIndex = 0;
@@ -1335,6 +1336,7 @@ void TBXR_InitialiseResolution()
 
 		XrViewConfigurationProperties viewportConfig;
 		viewportConfig.type = XR_TYPE_VIEW_CONFIGURATION_PROPERTIES;
+		viewportConfig.next = NULL;
 		OXR(xrGetViewConfigurationProperties(
 				gAppState.Instance, gAppState.SystemId, viewportConfigType, &viewportConfig));
 		ALOGV(
@@ -1424,12 +1426,8 @@ void TBXR_EnterVR( ) {
 void TBXR_LeaveVR( ) {
 	if (gAppState.Session) {
 		OXR(xrDestroySpace(gAppState.HeadSpace));
-		// StageSpace is optional.
-		if (gAppState.StageSpace != XR_NULL_HANDLE) {
-			OXR(xrDestroySpace(gAppState.StageSpace));
-		}
-		OXR(xrDestroySpace(gAppState.FakeStageSpace));
-		gAppState.CurrentSpace = XR_NULL_HANDLE;
+		OXR(xrDestroySpace(gAppState.LocalSpace));
+		OXR(xrDestroySpace(gAppState.StageSpace));
 		OXR(xrDestroySession(gAppState.Session));
 		gAppState.Session = NULL;
 	}
@@ -1554,14 +1552,12 @@ void TBXR_InitRenderer(  ) {
 
 	free(referenceSpaces);
 
-	if (gAppState.CurrentSpace == XR_NULL_HANDLE) {
-		TBXR_Recenter();
-	}
+	TBXR_Recenter();
 
-    gAppState.Projections = (XrView*)(malloc(ovrMaxNumEyes * sizeof(XrView)));
+    gAppState.Views = (XrView*)(malloc(ovrMaxNumEyes * sizeof(XrView)));
 	for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
-		memset(&gAppState.Projections[eye], 0, sizeof(XrView));
-        gAppState.Projections[eye].type = XR_TYPE_VIEW;
+		memset(&gAppState.Views[eye], 0, sizeof(XrView));
+        gAppState.Views[eye].type = XR_TYPE_VIEW;
 	}
 
 	if (strstr(gAppState.OpenXRHMD, "pico") != NULL)
@@ -1585,7 +1581,7 @@ void TBXR_InitRenderer(  ) {
 void VR_DestroyRenderer(  )
 {
 	ovrRenderer_Destroy(&gAppState.Renderer);
-	free(gAppState.Projections);
+	free(gAppState.Views);
 }
 
 void TBXR_InitialiseOpenXR()
@@ -1710,57 +1706,29 @@ void TBXR_Recenter() {
 	XrReferenceSpaceCreateInfo spaceCreateInfo = {};
 	spaceCreateInfo.type = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
 	spaceCreateInfo.poseInReferenceSpace.orientation.w = 1.0f;
-	if (gAppState.CurrentSpace != XR_NULL_HANDLE) {
+	if (gAppState.StageSpace != XR_NULL_HANDLE) {
 		vec3_t rotation = {0, 0, 0};
 		XrSpaceLocation loc = {};
 		loc.type = XR_TYPE_SPACE_LOCATION;
-		OXR(xrLocateSpace(gAppState.HeadSpace, gAppState.CurrentSpace, gAppState.FrameState.predictedDisplayTime, &loc));
+		OXR(xrLocateSpace(gAppState.HeadSpace, gAppState.StageSpace, gAppState.FrameState.predictedDisplayTime, &loc));
 		QuatToYawPitchRoll(loc.pose.orientation, rotation, vr.hmdorientation);
-
-		spaceCreateInfo.poseInReferenceSpace.orientation.x = 0;
-		spaceCreateInfo.poseInReferenceSpace.orientation.y = 0;
-		spaceCreateInfo.poseInReferenceSpace.orientation.z = 0;
-		spaceCreateInfo.poseInReferenceSpace.orientation.w = 1;
 	}
 
 	// Delete previous space instances
 	if (gAppState.StageSpace != XR_NULL_HANDLE) {
 		OXR(xrDestroySpace(gAppState.StageSpace));
 	}
-	if (gAppState.FakeStageSpace != XR_NULL_HANDLE) {
-		OXR(xrDestroySpace(gAppState.FakeStageSpace));
+	if (gAppState.LocalSpace != XR_NULL_HANDLE) {
+		OXR(xrDestroySpace(gAppState.LocalSpace));
 	}
 
-	// Create a default stage space to use if SPACE_TYPE_STAGE is not
-	// supported, or calls to xrGetReferenceSpaceBoundsRect fail.
+	spaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
+	spaceCreateInfo.poseInReferenceSpace.position.y = 0.0f;
+	OXR(xrCreateReferenceSpace(gAppState.Session, &spaceCreateInfo, &gAppState.StageSpace));
+	ALOGV("Created stage space");
+
 	spaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_LOCAL;
-	spaceCreateInfo.poseInReferenceSpace.position.y = -1.6750f;
-	OXR(xrCreateReferenceSpace(gAppState.Session, &spaceCreateInfo, &gAppState.FakeStageSpace));
-	ALOGV("Created fake stage space from local space with offset");
-	gAppState.CurrentSpace = gAppState.FakeStageSpace;
-
-	if (stageSupported) {
-		spaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
-		spaceCreateInfo.poseInReferenceSpace.position.y = 0.0f;
-		OXR(xrCreateReferenceSpace(gAppState.Session, &spaceCreateInfo, &gAppState.StageSpace));
-		ALOGV("Created stage space");
-		gAppState.CurrentSpace = gAppState.StageSpace;
-	}
-}
-
-void TBXR_UpdateStageBounds() {
-	XrExtent2Df stageBounds = {};
-
-	XrResult result;
-	OXR(result = xrGetReferenceSpaceBoundsRect(
-			gAppState.Session, XR_REFERENCE_SPACE_TYPE_STAGE, &stageBounds));
-	if (result != XR_SUCCESS) {
-		ALOGE("Stage bounds query failed: using small defaults");
-		stageBounds.width = 1.0f;
-		stageBounds.height = 1.0f;
-
-		gAppState.CurrentSpace = gAppState.FakeStageSpace;
-	}
+	OXR(xrCreateReferenceSpace(gAppState.Session, &spaceCreateInfo, &gAppState.LocalSpace));
 }
 
 void TBXR_WaitForSessionActive()
@@ -1786,7 +1754,7 @@ static void TBXR_GetHMDOrientation() {
 	// The better the prediction, the less black will be pulled in at the edges.
 	XrSpaceLocation loc = {};
 	loc.type = XR_TYPE_SPACE_LOCATION;
-	OXR(xrLocateSpace(gAppState.HeadSpace, gAppState.CurrentSpace, gAppState.FrameState.predictedDisplayTime, &loc));
+	OXR(xrLocateSpace(gAppState.HeadSpace, gAppState.StageSpace, gAppState.FrameState.predictedDisplayTime, &loc));
 	gAppState.xfStageFromHead = loc.pose;
 
 	const XrQuaternionf quatHmd = gAppState.xfStageFromHead.orientation;
@@ -1812,7 +1780,6 @@ void TBXR_FrameSetup()
     {
 		TBXR_ProcessMessageQueue();
 
-        GLboolean stageBoundsDirty = GL_TRUE;
         if (ovrApp_HandleXrEvents(&gAppState))
         {
 			TBXR_Recenter();
@@ -1821,12 +1788,6 @@ void TBXR_FrameSetup()
         if (gAppState.SessionActive == GL_FALSE)
         {
             continue;
-        }
-
-        if (stageBoundsDirty)
-        {
-			TBXR_UpdateStageBounds();
-            stageBoundsDirty = GL_FALSE;
         }
 
         break;
@@ -1901,10 +1862,16 @@ void TBXR_ClearFrameBuffer(int width, int height)
 
 void TBXR_prepareEyeBuffer(int eye )
 {
+	vr.eye = eye;
 	ovrFramebuffer* frameBuffer = &(gAppState.Renderer.FrameBuffer[eye]);
 	ovrFramebuffer_Acquire(frameBuffer);
 	ovrFramebuffer_SetCurrent(frameBuffer);
 	TBXR_ClearFrameBuffer(frameBuffer->ColorSwapChain.Width, frameBuffer->ColorSwapChain.Height);
+
+    //Seems odd, but used to move the HUD elements to be central on the player's view
+    //HMDs with a symmetric fov (like the PICO) will have 0 in this value, but the Meta Quest
+    //will have an asymmetric fov and the HUD would be very misaligned as a result
+    vr.off_center_fov = -(gAppState.Views[eye].fov.angleLeft + gAppState.Views[eye].fov.angleRight) / 2.0f;
 }
 
 void TBXR_finishEyeBuffer(int eye )
@@ -1931,7 +1898,7 @@ void TBXR_updateProjections()
 	projectionInfo.type = XR_TYPE_VIEW_LOCATE_INFO;
 	projectionInfo.viewConfigurationType = gAppState.ViewportConfig.viewConfigurationType;
 	projectionInfo.displayTime = gAppState.FrameState.predictedDisplayTime;
-	projectionInfo.space = gAppState.HeadSpace;
+	projectionInfo.space = gAppState.LocalSpace;
 
 	XrViewState viewState = {XR_TYPE_VIEW_STATE, NULL};
 
@@ -1944,7 +1911,7 @@ void TBXR_updateProjections()
 			&viewState,
 			projectionCapacityInput,
 			&projectionCountOutput,
-			gAppState.Projections));
+			gAppState.Views));
 }
 
 void TBXR_submitFrame()
@@ -1955,28 +1922,9 @@ void TBXR_submitFrame()
 
 	TBXR_updateProjections();
 
-	XrFovf fov = {};
-	XrPosef viewTransform[2];
-
-	for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
-		XrPosef xfHeadFromEye = gAppState.Projections[eye].pose;
-		XrPosef xfStageFromEye = XrPosef_Multiply(gAppState.xfStageFromHead, xfHeadFromEye);
-		viewTransform[eye] = XrPosef_Inverse(xfStageFromEye);
-        fov.angleLeft += gAppState.Projections[eye].fov.angleLeft / 2.0f;
-        fov.angleRight += gAppState.Projections[eye].fov.angleRight / 2.0f;
-        fov.angleUp += gAppState.Projections[eye].fov.angleUp / 2.0f;
-        fov.angleDown += gAppState.Projections[eye].fov.angleDown / 2.0f;
-	}
-	vr.fov_x = (fabs(fov.angleLeft) + fabs(fov.angleRight)) * 180.0f / M_PI;
-	vr.fov_y = (fabs(fov.angleUp) + fabs(fov.angleDown)) * 180.0f / M_PI;
-
-	if (vr.cgzoommode)
-	{
-		fov.angleLeft /= 1.3f;
-		fov.angleRight /= 1.3f;
-		fov.angleUp /= 1.3f;
-		fov.angleDown /= 1.3f;
-	}
+	//Calculate the maximum extent fov for use in culling in the engine (we won't want to cull inside this fov)
+	vr.fov_x = (fabs(gAppState.Views[0].fov.angleLeft) + fabs(gAppState.Views[1].fov.angleLeft)) * 180.0f / M_PI;
+	vr.fov_y = (fabs(gAppState.Views[0].fov.angleUp) + fabs(gAppState.Views[0].fov.angleUp)) * 180.0f / M_PI;
 
 	gAppState.LayerCount = 0;
 	memset(gAppState.Layers, 0, sizeof(xrCompositorLayer_Union) * ovrMaxLayerCount);
@@ -1987,16 +1935,26 @@ void TBXR_submitFrame()
 		projection_layer.type = XR_TYPE_COMPOSITION_LAYER_PROJECTION;
 		projection_layer.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
 		projection_layer.layerFlags |= XR_COMPOSITION_LAYER_CORRECT_CHROMATIC_ABERRATION_BIT;
-		projection_layer.space = gAppState.CurrentSpace;
+		projection_layer.space = gAppState.LocalSpace;
 		projection_layer.viewCount = ovrMaxNumEyes;
 		projection_layer.views = projection_layer_elements;
 
 		for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
+
+			XrFovf fov = gAppState.Views[eye].fov;
+			if (vr.cgzoommode)
+			{
+				fov.angleLeft /= 1.3f;
+				fov.angleRight /= 1.3f;
+				fov.angleUp /= 1.3f;
+				fov.angleDown /= 1.3f;
+			}
+
 			ovrFramebuffer* frameBuffer = &gAppState.Renderer.FrameBuffer[eye];
 
 			memset(&projection_layer_elements[eye], 0, sizeof(XrCompositionLayerProjectionView));
 			projection_layer_elements[eye].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
-			projection_layer_elements[eye].pose = gAppState.xfStageFromHead;
+			projection_layer_elements[eye].pose = gAppState.Views[eye].pose;
 			projection_layer_elements[eye].fov = fov;
 			memset(&projection_layer_elements[eye].subImage, 0, sizeof(XrSwapchainSubImage));
 			projection_layer_elements[eye].subImage.swapchain =
@@ -2020,7 +1978,7 @@ void TBXR_submitFrame()
 		quad_layer.type = XR_TYPE_COMPOSITION_LAYER_QUAD;
 		quad_layer.next = NULL;
 		quad_layer.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
-		quad_layer.space = gAppState.CurrentSpace;
+		quad_layer.space = gAppState.StageSpace;
 		quad_layer.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
 		memset(&quad_layer.subImage, 0, sizeof(XrSwapchainSubImage));
 		quad_layer.subImage.swapchain = gAppState.Renderer.FrameBuffer[0].ColorSwapChain.Handle;

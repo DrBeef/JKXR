@@ -445,7 +445,7 @@ void VR_FrameSetup()
 	vr.immersive_cinematics = (vr_immersive_cinematics->value != 0.0f);
 }
 
-bool VR_GetVRProjection(int eye, float zNear, float zFar, float* projection)
+bool VR_GetVRProjection(int eye, float zNear, float zFar, float zZoomX, float zZoomY, float* projection)
 {
 	//Don't use our projection if playing a cinematic and we are not immersive
 	if (vr.cin_camera && !vr.immersive_cinematics)
@@ -453,35 +453,23 @@ bool VR_GetVRProjection(int eye, float zNear, float zFar, float* projection)
 		return false;
 	}
 
-	if (!vr.cgzoommode)
+	//Just use game-calculated FOV when showing the quad screen
+	if (vr.using_screen_layer)
 	{
-
-		if (strstr(gAppState.OpenXRHMD, "meta") != NULL)
-		{
-			XrFovf fov = {};
-			for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
-				fov.angleLeft += gAppState.Projections[eye].fov.angleLeft / 2.0f;
-				fov.angleRight += gAppState.Projections[eye].fov.angleRight / 2.0f;
-				fov.angleUp += gAppState.Projections[eye].fov.angleUp / 2.0f;
-				fov.angleDown += gAppState.Projections[eye].fov.angleDown / 2.0f;
-			}
-			XrMatrix4x4f_CreateProjectionFov(
-					&(gAppState.ProjectionMatrices[eye]), GRAPHICS_OPENGL_ES,
-					fov, zNear, zFar);
-		}
-
-		if (strstr(gAppState.OpenXRHMD, "pico") != NULL)
-		{
-			XrMatrix4x4f_CreateProjectionFov(
-					&(gAppState.ProjectionMatrices[eye]), GRAPHICS_OPENGL_ES,
-					gAppState.Projections[eye].fov, zNear, zFar);
-		}
-
-		memcpy(projection, gAppState.ProjectionMatrices[eye].m, 16 * sizeof(float));
-		return true;
+		return false;
 	}
 
-	return false;
+	XrFovf fov = gAppState.Views[eye].fov;
+	fov.angleLeft /= zZoomX;
+	fov.angleRight /= zZoomX;
+	fov.angleUp /= zZoomY;
+	fov.angleDown /= zZoomY;
+
+	XrMatrix4x4f_CreateProjectionFov(
+			(XrMatrix4x4f*)projection, GRAPHICS_OPENGL,
+			fov, zNear, zFar);
+
+	return true;
 }
 
 

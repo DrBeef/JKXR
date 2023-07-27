@@ -1018,7 +1018,6 @@ typedef struct {
 	model_t					*currentModel;
 
 	viewParms_t				viewParms;
-	stereoFrame_t 			stereoFrame;
 
 	float					identityLight;		// 1.0 / ( 1 << overbrightBits )
 	int						identityLightByte;	// identityLight * 255

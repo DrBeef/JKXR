@@ -38,6 +38,9 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 			xoffset *= -1;
 		}
 
+        //We need to add an offset due to the effect of the compositor projection for asymmetric FOVs
+        xoffset += vr->off_center_fov * 640;
+
 		*x *= screenXScale;
 		*y *= screenYScale;
 		if (w != NULL) {
