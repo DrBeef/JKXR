@@ -1567,7 +1567,7 @@
 			group				weaponcontrols
 			type				ITEM_TYPE_SLIDER
 			text				@MENUS_VR_WEAPON_PITCH_ITEM
-			cvarfloat			"vr_weapon_pitchadjust" 0 -25 5
+			cvarfloat			"vr_weapon_pitchadjust" 20 -45 5
 			rect				305 211 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151

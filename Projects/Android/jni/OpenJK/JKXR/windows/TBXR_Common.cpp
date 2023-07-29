@@ -19,6 +19,8 @@
 int NUM_MULTI_SAMPLES	= 2;
 float SS_MULTIPLIER    = 0.0f;
 
+const float ZOOM_FOV_ADJUST = 1.1f;
+
 GLboolean stageSupported = GL_FALSE;
 
 
@@ -1161,11 +1163,6 @@ void TBXR_finishEyeBuffer(int eye )
 		ovrFramebuffer_Resolve(frameBuffer);
 
 		WIN_SwapWindow();
-
-		//Clear the back buffer so we don't randomly have a little screen copy showing up
-		glViewport(0, 0, gAppState.Width, gAppState.Height);
-		glClearColor(0.0, 0.0, 0.0, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
 	ovrFramebuffer_Release(frameBuffer);
@@ -1234,10 +1231,10 @@ void TBXR_submitFrame()
 			XrFovf fov = gAppState.Views[eye].fov;
 			if (vr.cgzoommode)
 			{
-				fov.angleLeft *= 1.2f;
-				fov.angleRight *= 1.2f;
-				fov.angleUp *= 1.2f;
-				fov.angleDown *= 1.2f;
+				fov.angleLeft /= ZOOM_FOV_ADJUST;
+				fov.angleRight /= ZOOM_FOV_ADJUST;
+				fov.angleUp /= ZOOM_FOV_ADJUST;
+				fov.angleDown /= ZOOM_FOV_ADJUST;
 			}
 
 			memset(&projection_layer_elements[eye], 0, sizeof(XrCompositionLayerProjectionView));

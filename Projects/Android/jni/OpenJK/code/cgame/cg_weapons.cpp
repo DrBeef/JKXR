@@ -3090,53 +3090,51 @@ void CG_DrawItemSelector( void )
 
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
 
-	refEntity_t beam;
-	beam.shaderRGBA[3] = 0xff;
+	vec3_t sRGB;
 	int count;
 	switch (cg.itemSelectorType)
 	{
-		case ST_WEAPON: //weapons
-			if (vr->in_vehicle)
-				count = vr->vehicle_type == VH_WALKER ? 2 : 1;
-			else
-				count = WP_MELEE;
-			beam.shaderRGBA[0] = 0xff;
-			beam.shaderRGBA[1] = 0xae;
-			beam.shaderRGBA[2] = 0x40;
-			break;
-		case ST_GADGET: //gadgets
-			count = INV_GOODIE_KEY;
-			beam.shaderRGBA[0] = 0x00;
-			beam.shaderRGBA[1] = 0xff;
-			beam.shaderRGBA[2] = 0x00;
-			break;
-		case ST_FIGHTING_STYLE: //fighting style
-			count = 3;
-			beam.shaderRGBA[0] = 0xff;
-			beam.shaderRGBA[1] = 0xff;
-			beam.shaderRGBA[2] = 0xff;
-			break;
-		case ST_FORCE_POWER: // force powers
-			count = MAX_SHOWPOWERS;
-			beam.shaderRGBA[0] = 0x00;
-			beam.shaderRGBA[1] = 0x00;
-			beam.shaderRGBA[2] = 0xff;
-			break;
-		case ST_QUICK_SAVE:
+	case ST_WEAPON: //weapons
+		if (vr->in_vehicle)
 			count = 2;
-			beam.shaderRGBA[0] = 0xff;
-			beam.shaderRGBA[1] = 0xff;
-			beam.shaderRGBA[2] = 0xff;
-			break;
+		else
+			count = WP_MELEE;
+		sRGB[0] = 1.0f;
+		sRGB[1] = 0.8f;
+		sRGB[2] = 0.2f;
+		break;
+	case ST_GADGET: //gadgets
+		count = INV_GOODIE_KEY;
+		sRGB[0] = 0.0f;
+		sRGB[1] = 1.0f;
+		sRGB[2] = 0.0f;
+		break;
+	case ST_FIGHTING_STYLE: //fighting style
+		count = 3;
+		sRGB[0] = 0.0f;
+		sRGB[1] = 1.0f;
+		sRGB[2] = 1.0f;
+		break;
+	case ST_FORCE_POWER: // force powers
+		count = MAX_SHOWPOWERS;
+		sRGB[0] = 0.0f;
+		sRGB[1] = 0.0f;
+		sRGB[2] = 1.0f;
+		break;
+	case ST_QUICK_SAVE:
+		count = 2;
+		sRGB[0] = 1.0f;
+		sRGB[1] = 1.0f;
+		sRGB[2] = 1.0f;
+		break;
 	}
 
-	VectorCopy(beamOrigin, beam.oldorigin);
-	VectorCopy(selectorOrigin, beam.origin );
-	beam.customShader = cgi_R_RegisterShader( "gfx/misc/whiteline2" );
-	beam.reType = RT_LINE;
-	beam.radius = 0.3f;
-
-	cgi_R_AddRefEntityToScene( &beam );
+	//cgi_R_AddRefEntityToScene( &beam );
+	FX_AddLine(beamOrigin, selectorOrigin, 1.0f, 0.1f, 0.0f,
+		0.5f, 0.5f,
+		sRGB, sRGB,
+		10, cgi_R_RegisterShader("gfx/misc/whiteline2"),
+		FX_SIZE_LINEAR | FX_ALPHA_LINEAR);
 
 
 	if (cg.itemSelectorType == ST_WEAPON) // weapons
