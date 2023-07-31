@@ -21,11 +21,9 @@ extern "C" {
 #include <client_ui.h>
 
 
-#ifdef JK2_MODE
-#include "../OpenJK/codeJK2/game/weapons.h"
-#else
-#include "../OpenJK/code/game/weapons.h"
-#include "../OpenJK/code/game/g_vehicles.h"
+#include "game/weapons.h"
+#ifndef JK2_MODE
+#include "game/g_vehicles.h"
 #endif
 
 
@@ -461,14 +459,14 @@ bool VR_GetVRProjection(int eye, float zNear, float zFar, float zZoomX, float zZ
 	}
 
 	XrFovf fov = gAppState.Views[eye].fov;
-	fov.angleLeft /= zZoomX;
-	fov.angleRight /= zZoomX;
-	fov.angleUp /= zZoomY;
-	fov.angleDown /= zZoomY;
+    fov.angleLeft = atanf((tanf(fov.angleLeft) / zZoomX));
+    fov.angleRight = atanf((tanf(fov.angleRight) / zZoomX));
+    fov.angleUp = atanf((tanf(fov.angleUp) / zZoomY));
+    fov.angleDown = atanf((tanf(fov.angleDown) / zZoomY));
 
 	XrMatrix4x4f_CreateProjectionFov(
-			(XrMatrix4x4f*)projection, GRAPHICS_OPENGL,
-			fov, zNear, zFar);
+		(XrMatrix4x4f*)projection, GRAPHICS_OPENGL,
+		fov, zNear, zFar);
 
 	return true;
 }

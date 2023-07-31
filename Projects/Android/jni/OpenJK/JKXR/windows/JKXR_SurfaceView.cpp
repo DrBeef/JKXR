@@ -280,18 +280,10 @@ void VR_Init()
 	}
 
     vr.menu_right_handed = vr_control_scheme->integer == 0;
-
-    Cvar_Get ("openXRHMD", gAppState.OpenXRHMD, CVAR_ARCHIVE);
 }
 
 int VR_SetRefreshRate(int refreshRate)
 {
-//	if (strstr(gAppState.OpenXRHMD, "meta") != NULL)
-//	{
-//		OXR(gAppState.pfnRequestDisplayRefreshRate(gAppState.Session, (float) refreshRate));
-//		return refreshRate;
-//	}
-
 	return 0;
 }
 
@@ -324,10 +316,11 @@ bool VR_GetVRProjection(int eye, float zNear, float zFar, float zZoomX, float zZ
 	}
 
 	XrFovf fov = gAppState.Views[eye].fov;
-	fov.angleLeft /= zZoomX;
-	fov.angleRight /= zZoomX;
-	fov.angleUp /= zZoomY;
-	fov.angleDown /= zZoomY;
+	
+	fov.angleLeft = atanf((tanf(fov.angleLeft) / zZoomX));
+	fov.angleRight = atanf((tanf(fov.angleRight) / zZoomX));
+	fov.angleUp = atanf((tanf(fov.angleUp) / zZoomY));
+	fov.angleDown = atanf((tanf(fov.angleDown) / zZoomY));
 
 	XrMatrix4x4f_CreateProjectionFov(
 		(XrMatrix4x4f*)projection, GRAPHICS_OPENGL,
