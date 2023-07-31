@@ -38,7 +38,8 @@ typedef struct {
     bool third_person;
     float fov_x;
     float fov_y;
-    float off_center_fov;
+    float off_center_fov_x;
+    float off_center_fov_y;
 
     float tempWeaponVelocity;
 

@@ -39,7 +39,8 @@ void CG_AdjustFrom640(float* x, float* y, float* w, float* h) {
 		}
 
 		//We need to add an offset due to the effect of the compositor projection for asymmetric FOVs
-		xoffset += vr->off_center_fov * 640;
+		xoffset += vr->off_center_fov_x * 640;
+		float yoffset = vr->off_center_fov_y * 480;
 
 		*x *= screenXScale;
 		*y *= screenYScale;
@@ -51,7 +52,7 @@ void CG_AdjustFrom640(float* x, float* y, float* w, float* h) {
 		}
 
 		*x += (640 - (640 * screenXScale)) / 2.0f + xoffset;
-		*y += (480 - (480 * screenYScale)) / 2.0f - ((cg.drawingHUD != CG_HUD_ZOOM) ? cg_hudYOffset.value : 0);
+		*y += (480 - (480 * screenYScale)) / 2.0f - ((cg.drawingHUD != CG_HUD_ZOOM) ? cg_hudYOffset.value : 0) - yoffset;
 	}
 }
 

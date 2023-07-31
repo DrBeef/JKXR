@@ -1875,8 +1875,8 @@ void TBXR_prepareEyeBuffer(int eye )
 	//Seems odd, but used to move the HUD elements to be central on the player's view
 	//HMDs with a symmetric fov (like the PICO) will have 0 in this value, but the Meta Quest
 	//will have an asymmetric fov and the HUD would be very misaligned as a result
-	vr.off_center_fov = -(gAppState.Views[eye].fov.angleLeft + gAppState.Views[eye].fov.angleRight) / 2.0f;
-}
+	vr.off_center_fov_x = -(gAppState.Views[eye].fov.angleLeft + gAppState.Views[eye].fov.angleRight) / 2.0f;
+	vr.off_center_fov_y = -(gAppState.Views[eye].fov.angleUp + gAppState.Views[eye].fov.angleDown) / 2.0f;}
 
 void TBXR_finishEyeBuffer(int eye )
 {
