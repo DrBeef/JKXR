@@ -4247,6 +4247,7 @@ static void CG_Draw2D( void )
 	}
 	was_in_vehicle = vr->in_vehicle;
 
+	cg.drawingHUD = CG_HUD_ZOOM;
     if (cg.zoomMode == 4)
     {
         CG_DrawWeapReticle();

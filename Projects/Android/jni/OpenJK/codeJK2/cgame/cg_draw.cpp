@@ -2723,7 +2723,8 @@ static void CG_Draw2D( void )
 		CGCam_DrawWideScreen();
 	}
 
-    if (cg.zoomMode == 4)
+	cg.drawingHUD = CG_HUD_ZOOM;
+	if (cg.zoomMode == 4)
     {
         CG_DrawWeapReticle();
     }

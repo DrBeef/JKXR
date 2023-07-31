@@ -278,7 +278,11 @@ unsigned int cgi_AnyLanguage_ReadCharFromString( const char **ppText, int *ppos,
 }
 
 void cgi_R_Font_DrawString(int ox, int oy, const char *text, const float *rgba, const int setIndex, int iMaxPixelWidth, const float scale /*= 1.0f*/) {
-	Q_syscall (CG_R_FONTDRAWSTRING, ox, oy, text, rgba, setIndex, iMaxPixelWidth, PASSFLOAT(scale) );
+	int xx = ox;
+	int yy = oy;
+	CG_AdjustFrom640Int(&xx, &yy, NULL, NULL);
+
+	Q_syscall (CG_R_FONTDRAWSTRING, xx, yy, text, rgba, setIndex, iMaxPixelWidth, PASSFLOAT(scale) );
 }
 
 void	cgi_R_ClearScene( void ) {
@@ -311,7 +315,13 @@ void	cgi_R_SetColor( const float *rgba ) {
 
 void	cgi_R_DrawStretchPic( float x, float y, float w, float h, 
 							   float s1, float t1, float s2, float t2, qhandle_t hShader ) {
-	Q_syscall( CG_R_DRAWSTRETCHPIC, PASSFLOAT(x), PASSFLOAT(y), PASSFLOAT(w), PASSFLOAT(h), PASSFLOAT(s1), PASSFLOAT(t1), PASSFLOAT(s2), PASSFLOAT(t2), hShader );
+	float xx = x;
+	float yy = y;
+	float ww = w;
+	float hh = h;
+	CG_AdjustFrom640(&xx, &yy, &ww, &hh);
+
+	Q_syscall( CG_R_DRAWSTRETCHPIC, PASSFLOAT(xx), PASSFLOAT(yy), PASSFLOAT(ww), PASSFLOAT(hh), PASSFLOAT(s1), PASSFLOAT(t1), PASSFLOAT(s2), PASSFLOAT(t2), hShader );
 }
 
 void	cgi_R_DrawScreenShot( float x, float y, float w, float h){
@@ -330,13 +340,25 @@ void	cgi_R_LerpTag( orientation_t *tag, qhandle_t mod, int startFrame, int endFr
 void	cgi_R_DrawRotatePic( float x, float y, float w, float h, 
 				   float s1, float t1, float s2, float t2,float a, qhandle_t hShader ) 
 {
-	Q_syscall( CG_R_DRAWROTATEPIC, PASSFLOAT(x), PASSFLOAT(y), PASSFLOAT(w), PASSFLOAT(h), PASSFLOAT(s1), PASSFLOAT(t1), PASSFLOAT(s2), PASSFLOAT(t2), PASSFLOAT(a), hShader );
+	float xx = x;
+	float yy = y;
+	float ww = w;
+	float hh = h;
+	CG_AdjustFrom640(&xx, &yy, &ww, &hh);
+
+	Q_syscall( CG_R_DRAWROTATEPIC, PASSFLOAT(xx), PASSFLOAT(yy), PASSFLOAT(ww), PASSFLOAT(hh), PASSFLOAT(s1), PASSFLOAT(t1), PASSFLOAT(s2), PASSFLOAT(t2), PASSFLOAT(a), hShader );
 }
 
 void	cgi_R_DrawRotatePic2( float x, float y, float w, float h, 
 				   float s1, float t1, float s2, float t2,float a, qhandle_t hShader ) 
 {
-	Q_syscall( CG_R_DRAWROTATEPIC2, PASSFLOAT(x), PASSFLOAT(y), PASSFLOAT(w), PASSFLOAT(h), PASSFLOAT(s1), PASSFLOAT(t1), PASSFLOAT(s2), PASSFLOAT(t2), PASSFLOAT(a), hShader );
+	float xx = x;
+	float yy = y;
+	float ww = w;
+	float hh = h;
+	CG_AdjustFrom640(&xx, &yy, &ww, &hh);
+
+	Q_syscall( CG_R_DRAWROTATEPIC2, PASSFLOAT(xx), PASSFLOAT(yy), PASSFLOAT(ww), PASSFLOAT(hh), PASSFLOAT(s1), PASSFLOAT(t1), PASSFLOAT(s2), PASSFLOAT(t2), PASSFLOAT(a), hShader );
 }
 
 void	cgi_R_LAGoggles( void )
@@ -346,7 +368,13 @@ void	cgi_R_LAGoggles( void )
 
 void	cgi_R_Scissor( float x, float y, float w, float h) 
 {
-	Q_syscall( CG_R_SCISSOR, PASSFLOAT(x), PASSFLOAT(y), PASSFLOAT(w), PASSFLOAT(h));
+	float xx = x;
+	float yy = y;
+	float ww = w;
+	float hh = h;
+	CG_AdjustFrom640(&xx, &yy, &ww, &hh);
+
+	Q_syscall( CG_R_SCISSOR, PASSFLOAT(xx), PASSFLOAT(yy), PASSFLOAT(ww), PASSFLOAT(hh));
 }
 
 void		cgi_GetGlconfig( glconfig_t *glconfig ) {

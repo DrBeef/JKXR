@@ -30,7 +30,7 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	if (cg.drawingHUD && (!vr->cin_camera || vr->immersive_cinematics) && !vr->using_screen_layer)
 	{
 		float screenXScale = 1.0f / (cg.drawingHUD == CG_HUD_SCALED ? cg_hudScale.value : 1.0f);
-		float screenYScale = 1.0f / (cg.drawingHUD == CG_HUD_SCALED ? cg_hudScale.value : 1.25f);
+		float screenYScale = 1.0f / (cg.drawingHUD == CG_HUD_SCALED ? cg_hudScale.value : 1.0f);
 
 		float xoffset = cg.drawingHUD == CG_HUD_SCALED ? -cg_hudStereo.value : 0;
 		if (cg.stereoView == STEREO_LEFT) {
@@ -50,7 +50,7 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 		}
 
 		*x += (640 - (640 * screenXScale)) / 2.0f + xoffset;
-		*y += (480 - (480 * screenYScale)) / 2.0f - cg_hudYOffset.value;
+		*y += (480 - (480 * screenYScale)) / 2.0f - ((cg.drawingHUD != CG_HUD_ZOOM) ? cg_hudYOffset.value : 0);
 	}
 }
 
@@ -90,14 +90,12 @@ Coords are virtual 640x480
 */
 void CG_DrawSides(float x, float y, float w, float h, float size) {
 	//size *= cgs.screenXScale;
-	CG_AdjustFrom640(&x, &y, &w, &h);
 	cgi_R_DrawStretchPic( x, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
 	cgi_R_DrawStretchPic( x + w - size, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
 }
 
 void CG_DrawTopBottom(float x, float y, float w, float h, float size) {
 	//size *= cgs.screenYScale;
-	CG_AdjustFrom640(&x, &y, &w, &h);
 	cgi_R_DrawStretchPic( x, y, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
 	cgi_R_DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
 }
@@ -112,7 +110,6 @@ Coordinates are 640*480 virtual values
 void CG_DrawRect( float x, float y, float width, float height, float size, const float *color ) {
 	cgi_R_SetColor( color );
 
-	CG_AdjustFrom640(&x, &y, &width, &height);
 	CG_DrawTopBottom(x, y, width, height, size);
 	CG_DrawSides(x, y, width, height, size);
 
@@ -128,7 +125,6 @@ Coordinates are 640*480 virtual values
 */
 void CG_FillRect( float x, float y, float width, float height, const float *color ) {
 	cgi_R_SetColor( color );
-	CG_AdjustFrom640(&x, &y, &width, &height);
 	cgi_R_DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cgs.media.whiteShader);
 	cgi_R_SetColor( NULL );
 }
@@ -143,8 +139,6 @@ Coordinates are 640*480 virtual values
 */
 void CG_Scissor( float x, float y, float width, float height) 
 {
-
-	CG_AdjustFrom640(&x, &y, &width, &height);
 	cgi_R_Scissor( x, y, width, height);
 
 }
@@ -159,7 +153,6 @@ A width of 0 will draw with the original image width
 =================
 */
 void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader ) {
-	CG_AdjustFrom640(&x, &y, &width, &height);
 	cgi_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
 
@@ -174,7 +167,6 @@ Can also specify the exact texture coordinates
 */
 void CG_DrawPic2( float x, float y, float width, float height, float s1, float t1, float s2, float t2, qhandle_t hShader ) 
 {
-	CG_AdjustFrom640(&x, &y, &width, &height);
 	cgi_R_DrawStretchPic( x, y, width, height, s1, t1, s2, t2, hShader );
 }
 
@@ -188,7 +180,6 @@ rotates around the upper right corner of the passed in point
 =================
 */
 void CG_DrawRotatePic( float x, float y, float width, float height,float angle, qhandle_t hShader ) {
-	CG_AdjustFrom640(&x, &y, &width, &height);
 	cgi_R_DrawRotatePic( x, y, width, height, 0, 0, 1, 1, angle, hShader );
 }
 
@@ -202,7 +193,6 @@ Actually rotates around the center point of the passed in coordinates
 =================
 */
 void CG_DrawRotatePic2( float x, float y, float width, float height,float angle, qhandle_t hShader ) {
-	CG_AdjustFrom640(&x, &y, &width, &height);
 	cgi_R_DrawRotatePic2( x, y, width, height, 0, 0, 1, 1, angle, hShader );
 }
 
@@ -250,7 +240,6 @@ void CG_DrawChar( int x, int y, int width, int height, int ch ) {
 	size = 0.03125;
 	size2 = 0.0625;
 
-	CG_AdjustFrom640(&ax, &ay, &aw, &ah);
 	cgi_R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol + size, frow + size2,
 		cgs.media.charsetShader );
 
@@ -316,7 +305,6 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 void CG_DrawSmallStringColor( int x, int y, const char *s, vec4_t color ) {
 	auto fx = (float)x;
 	auto fy = (float)y;
-	CG_AdjustFrom640(&fx, &fy, NULL, NULL);
 	CG_DrawStringExt( (int)fx, (int)fy, s, color, qtrue, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT );
 }
 
@@ -353,8 +341,6 @@ refresh window.
 */
 static void CG_TileClearBox( int x, int y, int w, int h, qhandle_t hShader ) {
 	float	s1, t1, s2, t2;
-
-//	CG_AdjustFrom640Int(&x, &y, &w, &h);
 
 	s1 = x/64.0;
 	t1 = y/64.0;
@@ -505,7 +491,6 @@ void CG_DrawNumField (int x, int y, int width, int value,int charWidth,int charH
 			int _y = y;
 			int _charWidth = charWidth;
 			int _charHeight = charHeight;
-			//CG_AdjustFrom640Int(&_x, &_y, &_charWidth, &_charHeight);
 			switch(style)
 			{
 			case NUM_FONT_SMALL:
@@ -539,7 +524,6 @@ void CG_DrawNumField (int x, int y, int width, int value,int charWidth,int charH
 		int _y = y;
 		int _charWidth = charWidth;
 		int _charHeight = charHeight;
-		//CG_AdjustFrom640Int(&_x, &_y, &_charWidth, &_charHeight);
 		switch(style)
 		{
 		case NUM_FONT_SMALL:
@@ -570,6 +554,5 @@ CG_DrawProportionalString
 void CG_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color ) 
 {
 	//assert(!style);//call this directly if you need style (OR it into the font handle)
-	CG_AdjustFrom640Int(&x, &y, NULL, NULL);
 	cgi_R_Font_DrawString (x, y, str, color, cgs.media.qhFontMedium, -1, FONT_SCALE);
 }
