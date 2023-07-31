@@ -233,18 +233,14 @@ import java.util.Vector;
 			//Weapon Models
 			copy_asset("/sdcard/JKXR/JK2/base", "z_vr_weapons_jko_Crusty_and_Elin.pk3", true);
 			copy_asset("/sdcard/JKXR/JK2/base", "assets6_vr_weapons_shaders.pk3", true);
-            //Delete weapons pak and config with old name
-            delete_asset(new File("/sdcard/JKXR/JK2/base/z_Crusty_and_Elin_vr_weapons.pk3"));
-            delete_asset(new File("/sdcard/JKXR/JK2/base/weapons_vr_jo.cfg"));
 		}
 
 		//Bunch of cool mods and their credits - only copy if user wants them
 		if (!new File("/sdcard/JKXR/JK3/base/no_copy").exists()) {
+			copy_asset("/sdcard/JKXR/JK3/base", "packaged_mods_credits.txt", false);
+			copy_asset("/sdcard/JKXR/JK3/base", "GGDynamicWeapons.pk3", false);
 			//Weapon Models
 			copy_asset("/sdcard/JKXR/JK3/base", "z_vr_weapons_jka_Crusty_and_Elin.pk3", true);
-            //Delete weapons pak with old name
-            delete_asset(new File("/sdcard/JKXR/JK3/base/z_Crusty_and_Elin_vr_weapons.pk3"));
-            delete_asset(new File("/sdcard/JKXR/JK3/base/weapons_vr_ja.cfg"));
 		}
 
 		//Copy mods to the demo folder if demo assets exist, since the demo doesn't seem to be able to load mods from base
@@ -268,9 +264,6 @@ import java.util.Vector;
             //Weapon Models
             copy_asset(demoFolder, "z_vr_weapons_jko_Crusty_and_Elin.pk3", true);
             copy_asset(demoFolder, "assets6_vr_weapons_shaders.pk3", true);
-            //Delete weapons pak and config with old name
-            delete_asset(new File(demoFolder + "/z_Crusty_and_Elin_vr_weapons.pk3"));
-            delete_asset(new File(demoFolder + "/weapons_vr_jo.cfg"));
 		}
 
 		//Read these from a file and pass through

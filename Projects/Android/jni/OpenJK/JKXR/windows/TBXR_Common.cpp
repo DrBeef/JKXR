@@ -15,14 +15,7 @@
 
 
 
-//Let's go to the maximum!
-int NUM_MULTI_SAMPLES	= 2;
-float SS_MULTIPLIER    = 0.0f;
-
 const float ZOOM_FOV_ADJUST = 1.1f;
-
-GLboolean stageSupported = GL_FALSE;
-
 
 const char* const requiredExtensionNames[] = {
 		XR_KHR_OPENGL_ENABLE_EXTENSION_NAME};
@@ -827,15 +820,8 @@ void TBXR_EnterVR( ) {
 void TBXR_LeaveVR( ) {
 	if (gAppState.Session) {
 		OXR(xrDestroySpace(gAppState.ViewSpace));
-
-		if (gAppState.StageSpace != XR_NULL_HANDLE) {
-			OXR(xrDestroySpace(gAppState.StageSpace));
-		}
-
-		if (gAppState.LocalSpace != XR_NULL_HANDLE) {
-			OXR(xrDestroySpace(gAppState.LocalSpace));
-		}
-
+		OXR(xrDestroySpace(gAppState.LocalSpace));
+		OXR(xrDestroySpace(gAppState.StageSpace));
 		OXR(xrDestroySession(gAppState.Session));
 		gAppState.Session = NULL;
 	}
@@ -850,26 +836,6 @@ void TBXR_InitRenderer(  ) {
 	OXR(xrGetViewConfigurationProperties(
 			gAppState.Instance, gAppState.SystemId, XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO, &gAppState.ViewportConfig));
 
-
-
-
-	uint32_t numOutputSpaces = 0;
-	OXR(xrEnumerateReferenceSpaces(gAppState.Session, 0, &numOutputSpaces, NULL));
-
-	XrReferenceSpaceType* referenceSpaces =
-			(XrReferenceSpaceType*)malloc(numOutputSpaces * sizeof(XrReferenceSpaceType));
-
-	OXR(xrEnumerateReferenceSpaces(
-			gAppState.Session, numOutputSpaces, &numOutputSpaces, referenceSpaces));
-
-	for (uint32_t i = 0; i < numOutputSpaces; i++) {
-		if (referenceSpaces[i] == XR_REFERENCE_SPACE_TYPE_STAGE) {
-			stageSupported = GL_TRUE;
-			break;
-		}
-	}
-
-	free(referenceSpaces);
 
 	TBXR_Recenter();
 
@@ -894,10 +860,6 @@ void VR_DestroyRenderer(  )
 
 void TBXR_InitialiseOpenXR()
 {
-	//First, find out which HMD we are using
-	gAppState.OpenXRHMD = "meta";// (char*)getenv("OPENXR_HMD");
-
-
 	// Create the OpenXR instance.
 	XrApplicationInfo appInfo;
 	memset(&appInfo, 0, sizeof(appInfo));

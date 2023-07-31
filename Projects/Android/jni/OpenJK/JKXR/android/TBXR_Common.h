@@ -32,7 +32,7 @@
 #endif
 
 
-enum { ovrMaxLayerCount = 1 };
+enum { ovrMaxLayerCount = 3 };
 enum { ovrMaxNumEyes = 2 };
 
 typedef enum xrButton_ {
@@ -114,6 +114,7 @@ ovrRenderer
 typedef struct
 {
     ovrFramebuffer	FrameBuffer[ovrMaxNumEyes];
+    ovrFramebuffer	NullFrameBuffer; // Used to draw black projection view when showing quad layer
 } ovrRenderer;
 
 /*
@@ -222,6 +223,7 @@ typedef struct
     ovrJava				Java;
     ovrEgl              Egl;
     ANativeWindow* NativeWindow;
+    bool                Initialised;
     bool				Resumed;
     bool				Focused;
     bool                FrameSetup;
@@ -256,8 +258,7 @@ typedef struct
     int					SwapInterval;
     int					MainThreadTid;
     int					RenderThreadTid;
-    xrCompositorLayer_Union		Layers[ovrMaxLayerCount];
-    int					LayerCount;
+
     ovrRenderer			Renderer;
     ovrTrackedController TrackedController[2];
 } ovrApp;

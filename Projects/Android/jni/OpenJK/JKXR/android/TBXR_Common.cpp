@@ -67,6 +67,8 @@ PFNEGLGETSYNCATTRIBKHRPROC		eglGetSyncAttribKHR;
 int NUM_MULTI_SAMPLES	= 2;
 float SS_MULTIPLIER    = 0.0f;
 
+const float ZOOM_FOV_ADJUST = 1.1f;
+
 GLboolean stageSupported = GL_FALSE;
 
 
@@ -426,6 +428,8 @@ static void ovrFramebuffer_Clear(ovrFramebuffer* frameBuffer) {
     frameBuffer->FrameBuffers = NULL;
 }
 
+void TBXR_ClearFrameBuffer(int width, int height);
+
 static bool ovrFramebuffer_Create(
         XrSession session,
         ovrFramebuffer* frameBuffer,
@@ -547,8 +551,6 @@ void ovrFramebuffer_Destroy(ovrFramebuffer* frameBuffer) {
 
     free(frameBuffer->DepthBuffers);
     free(frameBuffer->FrameBuffers);
-
-    ovrFramebuffer_Clear(frameBuffer);
 }
 
 void ovrFramebuffer_SetCurrent(ovrFramebuffer* frameBuffer) {
@@ -604,11 +606,6 @@ ovrRenderer
 ================================================================================
 */
 
-void ovrRenderer_Clear(ovrRenderer* renderer) {
-	for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
-		ovrFramebuffer_Clear(&renderer->FrameBuffer[eye]);
-	}
-}
 
 void ovrRenderer_Create(
 		XrSession session,
@@ -625,6 +622,14 @@ void ovrRenderer_Create(
 				suggestedEyeTextureHeight,
 				NUM_MULTI_SAMPLES);
 	}
+
+	ovrFramebuffer_Create(
+		session,
+		&renderer->NullFrameBuffer,
+		GL_SRGB8_ALPHA8,
+		suggestedEyeTextureWidth,
+		suggestedEyeTextureHeight,
+		NUM_MULTI_SAMPLES);
 }
 
 void ovrRenderer_Destroy(ovrRenderer* renderer) {
@@ -886,12 +891,8 @@ void ovrApp_Clear(ovrApp* app) {
 	app->pfnGetDisplayRefreshRate = NULL;
 	app->pfnRequestDisplayRefreshRate = NULL;
 	app->SwapInterval = 1;
-	memset(app->Layers, 0, sizeof(xrCompositorLayer_Union) * ovrMaxLayerCount);
-	app->LayerCount = 0;
 	app->MainThreadTid = 0;
 	app->RenderThreadTid = 0;
-	ovrEgl_Clear( &app->Egl );
-	ovrRenderer_Clear(&app->Renderer);
 }
 
 
@@ -1433,8 +1434,6 @@ void TBXR_LeaveVR( ) {
 	}
 
 	ovrRenderer_Destroy( &gAppState.Renderer );
-	ovrEgl_DestroyContext( &gAppState.Egl );
-	java.Vm->DetachCurrentThread( );
 }
 
 void TBXR_InitRenderer(  ) {
@@ -1698,6 +1697,8 @@ void TBXR_InitialiseOpenXR()
 	}
 
 	TBXR_InitialiseResolution();
+
+	gAppState.Initialised = true;
 }
 
 void TBXR_Recenter() {
@@ -1718,17 +1719,13 @@ void TBXR_Recenter() {
 	if (gAppState.StageSpace != XR_NULL_HANDLE) {
 		OXR(xrDestroySpace(gAppState.StageSpace));
 	}
-	if (gAppState.LocalSpace != XR_NULL_HANDLE) {
-		OXR(xrDestroySpace(gAppState.LocalSpace));
-	}
-
-	spaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
-	spaceCreateInfo.poseInReferenceSpace.position.y = 0.0f;
-	OXR(xrCreateReferenceSpace(gAppState.Session, &spaceCreateInfo, &gAppState.StageSpace));
-	ALOGV("Created stage space");
 
 	spaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_LOCAL;
 	OXR(xrCreateReferenceSpace(gAppState.Session, &spaceCreateInfo, &gAppState.LocalSpace));
+
+	spaceCreateInfo.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
+	OXR(xrCreateReferenceSpace(gAppState.Session, &spaceCreateInfo, &gAppState.StageSpace));
+	ALOGV("Created stage space");
 }
 
 void TBXR_WaitForSessionActive()
@@ -1771,6 +1768,11 @@ static void TBXR_GetHMDOrientation() {
 //All the stuff we want to do each frame
 void TBXR_FrameSetup()
 {
+	if (!gAppState.Initialised)
+	{
+		return;
+	}
+
 	if (gAppState.FrameSetup)
 	{
 		return;
@@ -1868,10 +1870,12 @@ void TBXR_prepareEyeBuffer(int eye )
 	ovrFramebuffer_SetCurrent(frameBuffer);
 	TBXR_ClearFrameBuffer(frameBuffer->ColorSwapChain.Width, frameBuffer->ColorSwapChain.Height);
 
-    //Seems odd, but used to move the HUD elements to be central on the player's view
-    //HMDs with a symmetric fov (like the PICO) will have 0 in this value, but the Meta Quest
-    //will have an asymmetric fov and the HUD would be very misaligned as a result
-    vr.off_center_fov = -(gAppState.Views[eye].fov.angleLeft + gAppState.Views[eye].fov.angleRight) / 2.0f;
+	ovrFramebuffer_Acquire(&gAppState.Renderer.NullFrameBuffer);
+
+	//Seems odd, but used to move the HUD elements to be central on the player's view
+	//HMDs with a symmetric fov (like the PICO) will have 0 in this value, but the Meta Quest
+	//will have an asymmetric fov and the HUD would be very misaligned as a result
+	vr.off_center_fov = -(gAppState.Views[eye].fov.angleLeft + gAppState.Views[eye].fov.angleRight) / 2.0f;
 }
 
 void TBXR_finishEyeBuffer(int eye )
@@ -1886,10 +1890,13 @@ void TBXR_finishEyeBuffer(int eye )
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-	//Clear edge to prevent smearing
-	ovrFramebuffer_Resolve(frameBuffer);
-	ovrFramebuffer_Release(frameBuffer);
+	ovrFramebuffer_Release(&gAppState.Renderer.NullFrameBuffer);
+
 	ovrFramebuffer_SetNone();
+
+	ovrFramebuffer_Resolve(frameBuffer);
+
+	ovrFramebuffer_Release(frameBuffer);
 }
 
 void TBXR_updateProjections()
@@ -1926,12 +1933,23 @@ void TBXR_submitFrame()
 	vr.fov_x = (fabs(gAppState.Views[0].fov.angleLeft) + fabs(gAppState.Views[1].fov.angleLeft)) * 180.0f / M_PI;
 	vr.fov_y = (fabs(gAppState.Views[0].fov.angleUp) + fabs(gAppState.Views[0].fov.angleUp)) * 180.0f / M_PI;
 
-	gAppState.LayerCount = 0;
-	memset(gAppState.Layers, 0, sizeof(xrCompositorLayer_Union) * ovrMaxLayerCount);
 
+	XrFrameEndInfo endFrameInfo = {};
+	endFrameInfo.type = XR_TYPE_FRAME_END_INFO;
+	endFrameInfo.displayTime = gAppState.FrameState.predictedDisplayTime;
+	endFrameInfo.environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
+
+	const XrCompositionLayerBaseHeader* layers[ovrMaxLayerCount] = {};
+	int layerCount = 0;
+	endFrameInfo.layers = layers;
+
+	XrCompositionLayerProjection projection_layer;
 	XrCompositionLayerProjectionView projection_layer_elements[2] = {};
-	if (!VR_UseScreenLayer()) {
-		XrCompositionLayerProjection projection_layer = {};
+	XrCompositionLayerQuad quad_layer;
+
+	if (!VR_UseScreenLayer()) 
+	{
+		memset(&projection_layer, 0, sizeof(XrCompositionLayerProjection));
 		projection_layer.type = XR_TYPE_COMPOSITION_LAYER_PROJECTION;
 		projection_layer.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
 		projection_layer.layerFlags |= XR_COMPOSITION_LAYER_CORRECT_CHROMATIC_ABERRATION_BIT;
@@ -1939,55 +1957,66 @@ void TBXR_submitFrame()
 		projection_layer.viewCount = ovrMaxNumEyes;
 		projection_layer.views = projection_layer_elements;
 
-		for (int eye = 0; eye < ovrMaxNumEyes; eye++) {
-
+		for (int eye = 0; eye < ovrMaxNumEyes; eye++) 
+		{
 			XrFovf fov = gAppState.Views[eye].fov;
 			if (vr.cgzoommode)
 			{
-				fov.angleLeft /= 1.3f;
-				fov.angleRight /= 1.3f;
-				fov.angleUp /= 1.3f;
-				fov.angleDown /= 1.3f;
+				fov.angleLeft /= ZOOM_FOV_ADJUST;
+				fov.angleRight /= ZOOM_FOV_ADJUST;
+				fov.angleUp /= ZOOM_FOV_ADJUST;
+				fov.angleDown /= ZOOM_FOV_ADJUST;
 			}
-
-			ovrFramebuffer* frameBuffer = &gAppState.Renderer.FrameBuffer[eye];
 
 			memset(&projection_layer_elements[eye], 0, sizeof(XrCompositionLayerProjectionView));
 			projection_layer_elements[eye].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
 			projection_layer_elements[eye].pose = gAppState.Views[eye].pose;
 			projection_layer_elements[eye].fov = fov;
-			memset(&projection_layer_elements[eye].subImage, 0, sizeof(XrSwapchainSubImage));
-			projection_layer_elements[eye].subImage.swapchain =
-					frameBuffer->ColorSwapChain.Handle;
-			projection_layer_elements[eye].subImage.imageRect.offset.x = 0;
-			projection_layer_elements[eye].subImage.imageRect.offset.y = 0;
-			projection_layer_elements[eye].subImage.imageRect.extent.width =
-					frameBuffer->ColorSwapChain.Width;
-			projection_layer_elements[eye].subImage.imageRect.extent.height =
-					frameBuffer->ColorSwapChain.Height;
-			projection_layer_elements[eye].subImage.imageArrayIndex = 0;
+			projection_layer_elements[eye].subImage.swapchain = gAppState.Renderer.FrameBuffer[eye].ColorSwapChain.Handle;
+			projection_layer_elements[eye].subImage.imageRect.extent.width = gAppState.Renderer.FrameBuffer[eye].ColorSwapChain.Width;
+			projection_layer_elements[eye].subImage.imageRect.extent.height = gAppState.Renderer.FrameBuffer[eye].ColorSwapChain.Height;
 		}
 
-		gAppState.Layers[gAppState.LayerCount++].Projection = projection_layer;
-	} else {
+		// Compose the layers for this frame.
+		layers[layerCount++] = (const XrCompositionLayerBaseHeader*)&projection_layer;		
+	} 
+	else
+	{
+		//Empty black projection for now
+		memset(&projection_layer, 0, sizeof(XrCompositionLayerProjection));
+		projection_layer.type = XR_TYPE_COMPOSITION_LAYER_PROJECTION;
+		projection_layer.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
+		projection_layer.space = gAppState.LocalSpace;
+		projection_layer.viewCount = ovrMaxNumEyes;
+		projection_layer.views = projection_layer_elements;
 
-		// Build the quad layer
-		XrCompositionLayerQuad quad_layer = {};
-		int width = gAppState.Renderer.FrameBuffer[0].ColorSwapChain.Width;
-		int height = gAppState.Renderer.FrameBuffer[0].ColorSwapChain.Height;
+		for (int eye = 0; eye < ovrMaxNumEyes; eye++)
+		{
+			memset(&projection_layer_elements[eye], 0, sizeof(XrCompositionLayerProjectionView));
+			projection_layer_elements[eye].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
+			projection_layer_elements[eye].pose = gAppState.Views[eye].pose;
+			projection_layer_elements[eye].fov = gAppState.Views[eye].fov;
+			projection_layer_elements[eye].subImage.swapchain = gAppState.Renderer.NullFrameBuffer.ColorSwapChain.Handle;
+			projection_layer_elements[eye].subImage.imageRect.extent.width = gAppState.Renderer.NullFrameBuffer.ColorSwapChain.Width;
+			projection_layer_elements[eye].subImage.imageRect.extent.height = gAppState.Renderer.NullFrameBuffer.ColorSwapChain.Height;
+		}
+
+		// Compose the layers for this frame.
+		layers[layerCount++] = (const XrCompositionLayerBaseHeader*)&projection_layer;
+
+		memset(&quad_layer, 0, sizeof(XrCompositionLayerQuad));
+
+		// Build the quad layers
+		int32_t width = gAppState.Renderer.FrameBuffer[0].ColorSwapChain.Width;
+		int32_t height = gAppState.Renderer.FrameBuffer[0].ColorSwapChain.Height;
 		quad_layer.type = XR_TYPE_COMPOSITION_LAYER_QUAD;
-		quad_layer.next = NULL;
 		quad_layer.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
 		quad_layer.space = gAppState.StageSpace;
-		quad_layer.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
-		memset(&quad_layer.subImage, 0, sizeof(XrSwapchainSubImage));
+		quad_layer.eyeVisibility =XR_EYE_VISIBILITY_BOTH;
 		quad_layer.subImage.swapchain = gAppState.Renderer.FrameBuffer[0].ColorSwapChain.Handle;
-		quad_layer.subImage.imageRect.offset.x = 0;
-		quad_layer.subImage.imageRect.offset.y = 0;
 		quad_layer.subImage.imageRect.extent.width = width;
 		quad_layer.subImage.imageRect.extent.height = height;
-		quad_layer.subImage.imageArrayIndex = 0;
-		const XrVector3f axis = {0.0f, 1.0f, 0.0f};
+		const XrVector3f axis = { 0.0f, 1.0f, 0.0f };
 		XrVector3f pos = {
 				gAppState.xfStageFromHead.position.x - sin(DEG2RAD(vr.hmdorientation_snap[YAW])) * VR_GetScreenLayerDistance(),
 				1.0f,
@@ -1995,25 +2024,14 @@ void TBXR_submitFrame()
 		};
 		quad_layer.pose.orientation = XrQuaternionf_CreateFromVectorAngle(axis, DEG2RAD(vr.hmdorientation_snap[YAW]));
 		quad_layer.pose.position = pos;
-		XrExtent2Df size = {5.0f, 4.5f};
+		XrExtent2Df size = { 6.0f, 5.5f };
 		quad_layer.size = size;
 
-		gAppState.Layers[gAppState.LayerCount++].Quad = quad_layer;
+		layers[layerCount++] = (const XrCompositionLayerBaseHeader*)&quad_layer;
 	}
 
-	// Compose the layers for this frame.
-	const XrCompositionLayerBaseHeader* layers[ovrMaxLayerCount] = {};
-	for (int i = 0; i < gAppState.LayerCount; i++) {
-		layers[i] = (const XrCompositionLayerBaseHeader*)&gAppState.Layers[i];
-	}
 
-	XrFrameEndInfo endFrameInfo = {};
-	endFrameInfo.type = XR_TYPE_FRAME_END_INFO;
-	endFrameInfo.displayTime = gAppState.FrameState.predictedDisplayTime;
-	endFrameInfo.environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
-	endFrameInfo.layerCount = gAppState.LayerCount;
-	endFrameInfo.layers = layers;
-
+	endFrameInfo.layerCount = layerCount;
 	OXR(xrEndFrame(gAppState.Session, &endFrameInfo));
 
 	gAppState.FrameSetup = false;

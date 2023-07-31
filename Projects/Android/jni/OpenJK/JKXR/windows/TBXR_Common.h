@@ -154,9 +154,9 @@ OXR_CheckErrors(XrInstance instance, XrResult result, const char* function, bool
         char errorBuffer[XR_MAX_RESULT_STRING_SIZE];
         xrResultToString(instance, result, errorBuffer);
         if (failOnError) {
-            //ALOGE("OpenXR error: %s: %s\n", function, errorBuffer);
+            ALOGE("OpenXR error: %s: %s\n", function, errorBuffer);
         } else {
-            //ALOGV("OpenXR error: %s: %s\n", function, errorBuffer);
+            ALOGV("OpenXR error: %s: %s\n", function, errorBuffer);
         }
     }
 }
@@ -175,7 +175,6 @@ typedef struct
     bool				Resumed;
     bool				Focused;
     bool                FrameSetup;
-    char*               OpenXRHMD;
 
     float               Width;
     float               Height;
@@ -193,7 +192,6 @@ typedef struct
     GLboolean SessionActive;
     XrPosef xfStageFromHead;
     XrView* Views;
-    XrMatrix4x4f ProjectionMatrices[2];
 
 
     float currentDisplayRefreshRate;
