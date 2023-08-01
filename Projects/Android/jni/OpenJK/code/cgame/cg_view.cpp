@@ -2374,6 +2374,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 			&& !vr->weapon_stabilised
 			&& !vr->in_vehicle
 			&& !cg_pano.integer
+			&& cg.zoomMode == 0
 			&& (cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD))
 		{
 			vec3_t end, forward;
@@ -2389,7 +2390,8 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 
 			handEnt.renderfx = RF_DEPTHHACK | RF_VRVIEWMODEL;
 
-			if (!g_entities[cg.snap->ps.viewEntity].client->ps.dualSabers)
+			if (!g_entities[cg.snap->ps.viewEntity].client->ps.dualSabers ||
+				cg.snap->ps.weapon != WP_SABER)
 			{
 				if (cg.snap->ps.powerups[PW_FORCE_PUSH] > cg.time ||
 					(cg.snap->ps.forcePowersActive & (1<<FP_GRIP)) ||

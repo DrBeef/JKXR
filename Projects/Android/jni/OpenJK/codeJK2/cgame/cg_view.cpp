@@ -2040,6 +2040,7 @@ wasForceSpeed=isForceSpeed;
 			&& !vr->weapon_stabilised
 			&& !vr->in_vehicle
 			&& !cg_pano.integer
+			&& cg.zoomMode == 0
 			&& (cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD))
 		{
 			vec3_t end, forward;
