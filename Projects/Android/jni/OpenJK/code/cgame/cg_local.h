@@ -595,6 +595,7 @@ extern	vmCvar_t		cg_bobpitch;
 extern	vmCvar_t		cg_bobroll;
 extern	vmCvar_t		cg_shadows;
 extern	vmCvar_t		cg_renderToTextureFX;
+extern	vmCvar_t		cg_forceBlurRenderToTextureFX;
 extern	vmCvar_t		cg_shadowCullDistance;
 extern	vmCvar_t		cg_paused;
 extern	vmCvar_t		cg_drawTimer;

@@ -249,6 +249,7 @@ vmCvar_t	cg_bobpitch;
 vmCvar_t	cg_bobroll;
 vmCvar_t	cg_shadows;
 vmCvar_t	cg_renderToTextureFX;
+vmCvar_t	cg_forceBlurRenderToTextureFX;
 vmCvar_t	cg_shadowCullDistance;
 vmCvar_t	cg_footsteps;
 vmCvar_t	cg_saberEntMarks;
@@ -400,6 +401,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_heightAdjust, "cg_heightAdjust", "0.0", CVAR_ARCHIVE  },
 	{ &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE  },
 	{ &cg_renderToTextureFX, "cg_renderToTextureFX", "1", CVAR_ARCHIVE  },
+	{ &cg_forceBlurRenderToTextureFX, "cg_forceBlurRenderToTextureFX", "0", CVAR_ARCHIVE  },
 	{ &cg_shadowCullDistance, "r_shadowRange", "1000", CVAR_ARCHIVE },
 	{ &cg_footsteps, "cg_footsteps", "3", CVAR_ARCHIVE  },//1 = sounds, 2 = sounds & effects, 3 = sounds, effects & marks, 4 = always
 	{ &cg_saberEntMarks, "cg_saberEntMarks", "1", CVAR_ARCHIVE  },
