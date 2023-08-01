@@ -2408,7 +2408,6 @@ static float CG_DrawSnapshot( float y ) {
 
 	int tempX = 635 - w;
 	int tempY = y+2;
-	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX, tempY, s, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 	return y + BIGCHAR_HEIGHT + 10;
@@ -2455,7 +2454,6 @@ static float CG_DrawFPS( float y ) {
 
 	int tempX = 635 - w;
 	int tempY = y+2;
-	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX, tempY, s, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 	return y + BIGCHAR_HEIGHT + 10;
@@ -2483,7 +2481,6 @@ static float CG_DrawTimer( float y ) {
 
 	int tempX = 635 - w;
 	int tempY = y+2;
-	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX, tempY, s, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 	return y + BIGCHAR_HEIGHT + 10;
 }
@@ -2522,7 +2519,6 @@ static void CG_DrawAmmoWarning( void ) {
 	int offset = w / 2;
 	int tempX = SCREEN_WIDTH / 2;
 	int tempY = 64;
-	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX - offset, tempY, text, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 }
 
@@ -2870,7 +2866,6 @@ static void CG_Draw2D( void )
 
 			int tempX = x_pos;
 			int tempY = y_pos;
-			CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 			cgi_R_Font_DrawString(tempX - offset, tempY, text,  colorTable[CT_LTRED1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 			if (cg_updatedDataPadForcePower1.integer) 
@@ -2886,7 +2881,6 @@ static void CG_Draw2D( void )
 
 				tempX = x_pos;
 				tempY = y_pos;
-				CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 				cgi_R_Font_DrawString(tempX - offset, tempY, text,  colorTable[CT_LTRED1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 			}
 
@@ -2903,7 +2897,6 @@ static void CG_Draw2D( void )
 
 				tempX = x_pos;
 				tempY = y_pos;
-				CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 				cgi_R_Font_DrawString(tempX - offset, tempY, text,  colorTable[CT_LTRED1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 			}
 

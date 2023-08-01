@@ -458,7 +458,6 @@ void CG_DrawCaptionText( bool inImmersiveCamera )
 			int offset = w / 2;
 			int tempX = SCREEN_WIDTH / 2;
 			int tempY = y;
-			CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 			cgi_R_Font_DrawString(tempX - offset, tempY, cg.captionText[i], textcolor_caption, cgs.media.qhFontSmall, -1, fFontScale * FONT_SCALE);
 			y += fontHeight;
 		}
@@ -655,7 +654,6 @@ void CG_DrawScrollText(void)
 			int offset = giScrollTextPixelWidth / 2;
 			int tempX = SCREEN_WIDTH / 2;
 			int tempY = y;
-			CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 			cgi_R_Font_DrawString(tempX - offset, tempY, cg.printText[i], textcolor_scroll, cgs.media.qhFontSmall, -1, FONT_SCALE);
 			y += fontHeight;
 		}
@@ -785,7 +783,6 @@ void CG_DrawCenterString( void )
 		int offset = w / 2;
 		int tempX = SCREEN_WIDTH / 2;
 		int tempY = y;
-		CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 		cgi_R_Font_DrawString(tempX - offset, tempY,linebuffer, textcolor_center, cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 		y += fontHeight;

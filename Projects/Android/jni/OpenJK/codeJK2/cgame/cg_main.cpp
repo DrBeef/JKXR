@@ -3601,7 +3601,6 @@ void CG_DrawForceSelect( void )
 			int w = cgi_R_Font_StrLenPixels(text, cgs.media.qhFontSmall, 1.0f);
 			int x = ( SCREEN_WIDTH - w ) / 2;
 			int y = (SCREEN_HEIGHT / 2 + 50);
-			CG_AdjustFrom640Int(&x, &y, NULL, NULL);
 			cgi_R_Font_DrawString(x, y, text, colorTable[CT_ICON_BLUE], cgs.media.qhFontSmall, -1, 1.0f);
 	}
 }
