@@ -314,7 +314,12 @@ void UI_Init( int apiVersion, uiimport_t *uiimport, qboolean inGameLoad )
 	ui.Cvar_Create( "cg_crosshairIdentifyTarget", "1", CVAR_ARCHIVE );
 	ui.Cvar_Create( "g_subtitles", "0", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_marks", "1", CVAR_ARCHIVE );
-	ui.Cvar_Create( "cg_shadows", "1", CVAR_ARCHIVE );
+	
+#ifdef _WIN32
+	ui.Cvar_Create("cg_shadows", "2", CVAR_ARCHIVE);
+#else
+	ui.Cvar_Create("cg_shadows", "1", CVAR_ARCHIVE);
+#endif
 
 	ui.Cvar_Create( "cg_runpitch", "0.0", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_runroll", "0.0", CVAR_ARCHIVE );
