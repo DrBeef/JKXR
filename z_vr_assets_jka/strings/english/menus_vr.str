@@ -521,7 +521,7 @@ REFERENCE           TBDC_VANILLA
 LANG_ENGLISH        "Vanilla NPCs and Guns"
 
 REFERENCE           REFRESH_RATE_ITEM
-LANG_ENGLISH        "Refresh Rate:"
+LANG_ENGLISH        "Refresh Rate (Standalone Only):"
 
 REFERENCE           REFRESH_RATE_DESC
 LANG_ENGLISH        "Select display refresh rate (72Hz is recommended for default graphics setup)."

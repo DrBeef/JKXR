@@ -690,7 +690,7 @@ LANG_ENGLISH        "Vanilla NPCs and Guns"
 LANG_SPANISH        "#same"
 
 REFERENCE           REFRESH_RATE_ITEM
-LANG_ENGLISH        "Refresh Rate:"
+LANG_ENGLISH        "Refresh Rate (Standalone Only):"
 LANG_SPANISH        "#same"
 
 REFERENCE           REFRESH_RATE_DESC

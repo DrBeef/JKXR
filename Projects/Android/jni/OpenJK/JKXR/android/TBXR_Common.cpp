@@ -67,7 +67,7 @@ PFNEGLGETSYNCATTRIBKHRPROC		eglGetSyncAttribKHR;
 int NUM_MULTI_SAMPLES	= 2;
 float SS_MULTIPLIER    = 0.0f;
 
-const float ZOOM_FOV_ADJUST = 1.1f;
+const float ZOOM_FOV_ADJUST = 1.05f;
 
 GLboolean stageSupported = GL_FALSE;
 

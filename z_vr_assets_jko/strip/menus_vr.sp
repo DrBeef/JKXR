@@ -812,7 +812,7 @@ INDEX 160
 INDEX 161
 {
    REFERENCE REFRESH_RATE_ITEM
-   TEXT_LANGUAGE1 "Refresh Rate:"
+   TEXT_LANGUAGE1 "Refresh Rate (Standalone Only):"
 }
 INDEX 162
 {
