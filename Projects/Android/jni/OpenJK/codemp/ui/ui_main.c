@@ -4895,7 +4895,8 @@ void UI_UpdateVideoSetup ( void )
 	trap->Cvar_Set ( "cg_shadows", UI_Cvar_VariableString ( "ui_cg_shadows" ) );
 	trap->Cvar_Set ( "ui_r_modified", "0" );
 
-	trap->Cmd_ExecuteText( EXEC_APPEND, "vid_restart;" );
+	//Don't do this - expect user to restart themselves
+	//trap->Cmd_ExecuteText( EXEC_APPEND, "vid_restart;" );
 }
 
 /*

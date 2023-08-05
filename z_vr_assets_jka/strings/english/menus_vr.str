@@ -526,4 +526,7 @@ LANG_ENGLISH        "Refresh Rate (Standalone Only):"
 REFERENCE           REFRESH_RATE_DESC
 LANG_ENGLISH        "Select display refresh rate (72Hz is recommended for default graphics setup)."
 
+REFERENCE           RESTART_JKXR_TO_APPLY
+LANG_ENGLISH        "You will need to manually restart JKXR."
+
 ENDMARKER

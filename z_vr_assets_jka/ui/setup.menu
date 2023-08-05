@@ -1346,8 +1346,7 @@
 		{
 			name				vidrestart_text1
 			group				vidrestart
-			text				@MENUS_THIS_WILL_APPLY_VIDEO
-			text2				@MENUS_AND_RETURN_TO_THE_MAIN
+			text				@MENUS_VR_RESTART_JKXR_TO_APPLY
 			rect				305 230 290 20
 			textalign			ITEM_ALIGN_CENTER
 			text2aligny			18

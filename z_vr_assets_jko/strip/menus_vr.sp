@@ -3,7 +3,7 @@ CONFIG W:\bin\striped.cfg
 ID 100
 REFERENCE MENUS_VR
 DESCRIPTION "VR Menu Localizations"
-COUNT 163
+COUNT 164
 INDEX 0
 {
    REFERENCE COMMON_CONTROLS_ITEM
@@ -818,4 +818,9 @@ INDEX 162
 {
    REFERENCE REFRESH_RATE_DESC
    TEXT_LANGUAGE1 "Select display refresh rate (72Hz is recommended for default graphics setup)."
+}
+INDEX 163
+{
+   REFERENCE RESTART_JKXR_TO_APPLY
+   TEXT_LANGUAGE1 "You will need to manually restart JKXR."
 }
