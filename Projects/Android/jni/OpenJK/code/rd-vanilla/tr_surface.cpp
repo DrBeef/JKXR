@@ -1612,7 +1612,8 @@ static void RB_SurfaceLathe()
 	VectorSet2( l_oldpt, e->axis[0][0], e->axis[0][1] );
 
 	// do scalability stuff...r_lodbias 0-3
-	int lod = r_lodbias->integer + 1;
+	int lod = r_alwaysmaxlod->integer ? 1 : 
+		r_lodbias->integer + 1;
 	if ( lod > 4 )
 	{
 		lod = 4;

@@ -722,7 +722,7 @@ Ghoul2 Insert End
 			// if we have a valid model and are biased
 			// so that we won't see any higher detail ones,
 			// stop loading them
-			if ( lod <= r_lodbias->integer ) {
+			if ( r_alwaysmaxlod->integer || lod <= r_lodbias->integer ) {
 				break;
 			}
 		}
