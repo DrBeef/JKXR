@@ -56,7 +56,7 @@ if(BuildSPEngine OR BuildJK2SPEngine)
 
 	#    Dependencies
 	# OpenAL (is optionally included for Windows)
-	if(MSVC AND NOT WIN64)
+	if(MSVC)
 		if(UseInternalOpenAL)
 			# There's a libs/OpenAL32.lib
 			# (mrw) TODO Is this actually required on windows? It is loaded at runtime, should not be linked?
@@ -65,6 +65,7 @@ if(BuildSPEngine OR BuildJK2SPEngine)
 				message(FATAL_ERROR "UseInternalOpenAL enabled, but lib/OpenAL32.lib not found!")
 			endif(NOT OpenALLibrary)
 			set(SPEngineLibraries ${SPEngineLibraries} ${OpenALLibrary})
+			set(SPEngineIncludeDirectories ${SPEngineIncludeDirectories} ${OpenALIncludeDirectory})
 		else(UseInternalOpenAL)
 			find_package(OpenAL REQUIRED)
 			set(SPEngineIncludeDirectories ${SPEngineIncludeDirectories} ${OPENAL_INCLUDE_DIR})
