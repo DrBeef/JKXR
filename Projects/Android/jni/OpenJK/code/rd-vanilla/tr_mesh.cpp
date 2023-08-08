@@ -197,11 +197,6 @@ static int R_ComputeLOD( trRefEntity_t *ent ) {
 		return(0);
 	}
 
-	if (r_alwaysmaxlod->integer)
-	{
-		return(0);
-	}
-
 	// multiple LODs exist, so compute projected bounding sphere
 	// and use that as a criteria for selecting LOD
 //	if ( tr.currentModel->md3[0] )

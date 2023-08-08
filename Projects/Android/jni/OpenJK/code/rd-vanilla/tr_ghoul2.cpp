@@ -842,11 +842,6 @@ static int G2_ComputeLOD( trRefEntity_t *ent, const model_t *currentModel, int l
 		return(0);
 	}
 
-	if (r_alwaysmaxlod->integer)
-	{	
-		return(0);
-	}
-
 	if (r_lodbias->integer > lodBias)
 	{
 		lodBias = r_lodbias->integer;

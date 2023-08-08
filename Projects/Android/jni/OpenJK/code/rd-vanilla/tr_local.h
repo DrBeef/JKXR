@@ -1103,7 +1103,6 @@ extern cvar_t	*r_texturebitslm;		// number of desired lightmap texture bits
 extern cvar_t	*r_measureOverdraw;		// enables stencil buffer overdraw measurement
 
 extern cvar_t	*r_lodbias;				// push/pull LOD transitions
-extern cvar_t	* r_alwaysmaxlod;		// force best LOD
 extern cvar_t	*r_lodscale;
 
 extern cvar_t	*r_primitives;			// "0" = based on compiled vertex array existance
