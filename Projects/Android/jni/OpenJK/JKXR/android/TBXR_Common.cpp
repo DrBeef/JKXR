@@ -1982,6 +1982,7 @@ void TBXR_submitFrame()
 	} 
 	else
 	{
+#ifdef _WIN32
 		//Empty black projection for now
 		memset(&projection_layer, 0, sizeof(XrCompositionLayerProjection));
 		projection_layer.type = XR_TYPE_COMPOSITION_LAYER_PROJECTION;
@@ -2003,7 +2004,7 @@ void TBXR_submitFrame()
 
 		// Compose the layers for this frame.
 		layers[layerCount++] = (const XrCompositionLayerBaseHeader*)&projection_layer;
-
+#endif
 		memset(&quad_layer, 0, sizeof(XrCompositionLayerQuad));
 
 		// Build the quad layers
