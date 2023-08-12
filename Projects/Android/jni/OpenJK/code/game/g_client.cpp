@@ -903,7 +903,7 @@ qboolean G_StandardHumanoid( gentity_t *self )
 		return qfalse;
 	}
 	const char	*GLAName = gi.G2API_GetGLAName( &self->ghoul2[self->playerModel] );
-	assert(GLAName);
+	//assert(GLAName);
 	if (GLAName)
 	{
 		if ( !Q_stricmpn( "models/players/_humanoid", GLAName, 24 ) )///_humanoid", GLAName, 36) )

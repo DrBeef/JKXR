@@ -94,6 +94,7 @@ typedef struct {
 typedef struct {
     GLboolean Active;
     XrPosef Pose;
+    XrPosef GripPose;
     XrSpaceVelocity Velocity;
 } ovrTrackedController;
 

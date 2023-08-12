@@ -117,8 +117,16 @@ REFERENCE           WEAPON_PITCH_ITEM
 LANG_ENGLISH        "Weapon Pitch:"
 LANG_FRENCH         "#same"
 
+REFERENCE           SABER_PITCH_ITEM
+LANG_ENGLISH        "Saber Pitch:"
+LANG_FRENCH         "#same"
+
 REFERENCE           WEAPON_PITCH_DESC
 LANG_ENGLISH        "Sets aiming pitch of held weapon."
+LANG_FRENCH         "#same"
+
+REFERENCE           SABER_PITCH_DESC
+LANG_ENGLISH        "Sets pitch of saber."
 LANG_FRENCH         "#same"
 
 REFERENCE           TWO_HANDED_ITEM

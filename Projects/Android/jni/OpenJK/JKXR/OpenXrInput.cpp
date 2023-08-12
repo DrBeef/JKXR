@@ -19,7 +19,7 @@ XrResult CheckXrResult(XrResult res, const char* originator) {
 
 XrActionSet actionSet = nullptr;
 XrAction grabAction;
-XrAction poseAction;
+XrAction gripAction;
 XrAction vibrateAction;
 XrAction quitAction;
 XrAction touchpadAction;
@@ -27,7 +27,7 @@ XrAction AXAction;
 XrAction homeAction;
 XrAction BYAction;
 XrAction backAction;
-XrAction sideAction;
+XrAction squeezeClickAction;
 XrAction triggerAction;
 XrAction joystickAction;
 XrAction batteryAction;
@@ -36,7 +36,7 @@ XrAction BYTouchAction;
 XrAction thumbstickTouchAction;
 XrAction TriggerTouchAction;
 XrAction ThumbrestTouchAction;
-XrAction GripAction;
+XrAction squeezeAction;
 XrAction AAction;
 XrAction BAction;
 XrAction XAction;
@@ -152,7 +152,7 @@ void TBXR_InitActions( void )
         CreateAction(actionSet, XR_ACTION_TYPE_POSE_INPUT, "grab_object", "Grab Object", SIDE_COUNT, handSubactionPath, &grabAction);
 
         // Create an input action getting the left and right hand poses.
-        CreateAction(actionSet, XR_ACTION_TYPE_POSE_INPUT, "hand_pose", "Hand Pose", SIDE_COUNT, handSubactionPath, &poseAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_POSE_INPUT, "grip_pose", "Grip Pose", SIDE_COUNT, handSubactionPath, &gripAction);
         CreateAction(actionSet, XR_ACTION_TYPE_POSE_INPUT, "aim_pose", "Aim Pose", SIDE_COUNT, handSubactionPath, &aimAction);
 
         // Create output actions for vibrating the left and right controller.
@@ -165,7 +165,7 @@ void TBXR_InitActions( void )
         CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "homekey", "Homekey", SIDE_COUNT, handSubactionPath, &homeAction);
         CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "bykey", "BYkey", SIDE_COUNT, handSubactionPath, &BYAction);
         CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "backkey", "Backkey", SIDE_COUNT, handSubactionPath, &backAction);
-        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "sidekey", "Sidekey", SIDE_COUNT, handSubactionPath, &sideAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "sidekey", "Sidekey", SIDE_COUNT, handSubactionPath, &squeezeClickAction);
         CreateAction(actionSet, XR_ACTION_TYPE_FLOAT_INPUT, "trigger", "Trigger", SIDE_COUNT, handSubactionPath, &triggerAction);
         CreateAction(actionSet, XR_ACTION_TYPE_VECTOR2F_INPUT, "joystick", "Joystick", SIDE_COUNT, handSubactionPath, &joystickAction);
         CreateAction(actionSet, XR_ACTION_TYPE_FLOAT_INPUT, "battery", "battery", SIDE_COUNT, handSubactionPath, &batteryAction);
@@ -174,7 +174,7 @@ void TBXR_InitActions( void )
         CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "rockertouch", "Rockertouch", SIDE_COUNT, handSubactionPath, &thumbstickTouchAction);
         CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "triggertouch", "Triggertouch", SIDE_COUNT, handSubactionPath, &TriggerTouchAction);
         CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "thumbresttouch", "Thumbresttouch", SIDE_COUNT, handSubactionPath, &ThumbrestTouchAction);
-        CreateAction(actionSet, XR_ACTION_TYPE_FLOAT_INPUT, "gripvalue", "GripValue", SIDE_COUNT, handSubactionPath, &GripAction);
+        CreateAction(actionSet, XR_ACTION_TYPE_FLOAT_INPUT, "gripvalue", "GripValue", SIDE_COUNT, handSubactionPath, &squeezeAction);
         CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "akey", "Akey", SIDE_COUNT, handSubactionPath, &AAction);
         CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "bkey", "Bkey", SIDE_COUNT, handSubactionPath, &BAction);
         CreateAction(actionSet, XR_ACTION_TYPE_BOOLEAN_INPUT, "xkey", "Xkey", SIDE_COUNT, handSubactionPath, &XAction);
@@ -297,12 +297,12 @@ void TBXR_InitActions( void )
         bindings[currBinding++] = ActionSuggestedBinding(TriggerTouchAction, triggerTouchPath[SIDE_LEFT]);
         bindings[currBinding++] = ActionSuggestedBinding(TriggerTouchAction, triggerTouchPath[SIDE_RIGHT]);
 
-        bindings[currBinding++] = ActionSuggestedBinding(sideAction, squeezeClickPath[SIDE_LEFT]);
-        bindings[currBinding++] = ActionSuggestedBinding(sideAction, squeezeClickPath[SIDE_RIGHT]);
-        bindings[currBinding++] = ActionSuggestedBinding(GripAction, squeezeValuePath[SIDE_LEFT]);
-        bindings[currBinding++] = ActionSuggestedBinding(GripAction, squeezeValuePath[SIDE_RIGHT]);
-        bindings[currBinding++] = ActionSuggestedBinding(poseAction, posePath[SIDE_LEFT]);
-        bindings[currBinding++] = ActionSuggestedBinding(poseAction, posePath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(squeezeClickAction, squeezeClickPath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(squeezeClickAction, squeezeClickPath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(squeezeAction, squeezeValuePath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(squeezeAction, squeezeValuePath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(gripAction, posePath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(gripAction, posePath[SIDE_RIGHT]);
 
         bindings[currBinding++] = ActionSuggestedBinding(homeAction, systemPath[SIDE_LEFT]);
         bindings[currBinding++] = ActionSuggestedBinding(homeAction, systemPath[SIDE_RIGHT]);
@@ -356,10 +356,10 @@ void TBXR_InitActions( void )
         bindings[currBinding++] = ActionSuggestedBinding(TriggerTouchAction, triggerTouchPath[SIDE_LEFT]);
         bindings[currBinding++] = ActionSuggestedBinding(TriggerTouchAction, triggerTouchPath[SIDE_RIGHT]);
 
-        bindings[currBinding++] = ActionSuggestedBinding(GripAction, squeezeValuePath[SIDE_LEFT]);
-        bindings[currBinding++] = ActionSuggestedBinding(GripAction, squeezeValuePath[SIDE_RIGHT]);
-        bindings[currBinding++] = ActionSuggestedBinding(poseAction, posePath[SIDE_LEFT]);
-        bindings[currBinding++] = ActionSuggestedBinding(poseAction, posePath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(squeezeAction, squeezeValuePath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(squeezeAction, squeezeValuePath[SIDE_RIGHT]);
+        bindings[currBinding++] = ActionSuggestedBinding(gripAction, posePath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(gripAction, posePath[SIDE_RIGHT]);
 
         bindings[currBinding++] = ActionSuggestedBinding(backAction, menuClickPath[SIDE_LEFT]);
 
@@ -390,7 +390,7 @@ void TBXR_InitActions( void )
 
     XrActionSpaceCreateInfo actionSpaceInfo = {};
     actionSpaceInfo.type = XR_TYPE_ACTION_SPACE_CREATE_INFO;
-    actionSpaceInfo.action = poseAction;
+    actionSpaceInfo.action = gripAction;
     actionSpaceInfo.poseInActionSpace.orientation.w = 1.f;
     actionSpaceInfo.subactionPath = handSubactionPath[SIDE_LEFT];
     CHECK_XRCMD(xrCreateActionSpace(gAppState.Session, &actionSpaceInfo, &handSpace[SIDE_LEFT]));
@@ -447,6 +447,14 @@ void TBXR_UpdateControllers( )
         gAppState.TrackedController[i].Active = (loc.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0;
         gAppState.TrackedController[i].Pose = loc.pose;
         gAppState.TrackedController[i].Velocity = vel;
+
+        loc.type = XR_TYPE_SPACE_LOCATION;
+        loc.next = NULL;
+        res = xrLocateSpace(handSpace[i], gAppState.StageSpace, gAppState.FrameState.predictedDisplayTime, &loc);
+        if (res != XR_SUCCESS) {
+            Com_Printf("xrLocateSpace error: %d", (int)res);
+        }
+        gAppState.TrackedController[i].GripPose = loc.pose;
     }
 
     leftRemoteTracking_new = gAppState.TrackedController[0];
@@ -461,7 +469,7 @@ void TBXR_UpdateControllers( )
     if (GetActionStateBoolean(XTouchAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Touches |= xrButton_X;
     if (GetActionStateBoolean(YAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Y;
     if (GetActionStateBoolean(YTouchAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Touches |= xrButton_Y;
-    leftTrackedRemoteState_new.GripTrigger = GetActionStateFloat(GripAction, SIDE_LEFT).currentState;
+    leftTrackedRemoteState_new.GripTrigger = GetActionStateFloat(squeezeAction, SIDE_LEFT).currentState;
     if (leftTrackedRemoteState_new.GripTrigger > 0.5f) leftTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
     if (GetActionStateBoolean(touchpadAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_LThumb;
     if (GetActionStateBoolean(touchpadAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Joystick;
@@ -479,7 +487,7 @@ void TBXR_UpdateControllers( )
     if (GetActionStateBoolean(ATouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_A;
     if (GetActionStateBoolean(BAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_B;
     if (GetActionStateBoolean(BTouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_B;
-    rightTrackedRemoteState_new.GripTrigger = GetActionStateFloat(GripAction, SIDE_RIGHT).currentState;
+    rightTrackedRemoteState_new.GripTrigger = GetActionStateFloat(squeezeAction, SIDE_RIGHT).currentState;
     if (rightTrackedRemoteState_new.GripTrigger > 0.5f) rightTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
     if (GetActionStateBoolean(touchpadAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_RThumb;
     if (GetActionStateBoolean(touchpadAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_Joystick;
