@@ -571,6 +571,7 @@ void *Sys_LoadSPGameDll( const char *name, GetGameAPIProc **GetGameAPI )
         char *apppath = Cvar_VariableString( "fs_apppath" );
 #endif
 		const char* binarypath = Sys_BinaryPath();
+		const char* current_dir = Sys_CurrentDirname();
 
 		const char *searchPaths[] = {
 			homepath,
@@ -579,6 +580,7 @@ void *Sys_LoadSPGameDll( const char *name, GetGameAPIProc **GetGameAPI )
 #endif
 			basepath,
 			binarypath,
+			current_dir,
 			cdpath,
 		};
 		size_t numPaths = ARRAY_LEN( searchPaths );

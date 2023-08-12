@@ -99,11 +99,6 @@ const char *Sys_CurrentDirname(  )
 		dir
 	);
 
-	while( length > 0 && dir[ length ] != '\\' )
-		length--;
-
-	dir[ length ] = '\0';
-
 	return dir;
 }
 
