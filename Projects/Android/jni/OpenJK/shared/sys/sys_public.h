@@ -143,6 +143,7 @@ char    *Sys_DefaultAppPath(void);
 char	*Sys_DefaultHomePath(void);
 const char *Sys_Dirname( char *path );
 const char *Sys_Basename( char *path );
+const char * Sys_CurrentDirname();
 
 bool Sys_PathCmp( const char *path1, const char *path2 );
 

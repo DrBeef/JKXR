@@ -646,7 +646,10 @@ void *Sys_LoadGameDll( const char *name, GetModuleAPIProc **moduleAPI )
 				char *apppath = Cvar_VariableString( "fs_apppath" );
 #endif
 
+				const char* current_dir = Sys_CurrentDirname();
+
 				const char *searchPaths[] = {
+					current_dir,
 					homepath,
 #ifdef MACOS_X
 					apppath,

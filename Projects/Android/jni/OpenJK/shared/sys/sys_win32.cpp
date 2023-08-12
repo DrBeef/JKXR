@@ -25,6 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include <io.h>
 #include <shlobj.h>
 #include <windows.h>
+#include <winbase.h>
 
 #define MEM_THRESHOLD (128*1024*1024)
 
@@ -75,6 +76,28 @@ const char *Sys_Dirname( char *path )
 
 	Q_strncpyz( dir, path, sizeof( dir ) );
 	length = strlen( dir ) - 1;
+
+	while( length > 0 && dir[ length ] != '\\' )
+		length--;
+
+	dir[ length ] = '\0';
+
+	return dir;
+}
+
+/*
+==============
+Sys_Dirname
+==============
+*/
+const char *Sys_CurrentDirname(  )
+{
+	static char dir[ MAX_OSPATH ] = { 0 };
+
+	GetCurrentDirectory(
+		MAX_OSPATH,
+		dir
+	);
 
 	while( length > 0 && dir[ length ] != '\\' )
 		length--;
