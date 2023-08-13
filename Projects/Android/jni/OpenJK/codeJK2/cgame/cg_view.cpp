@@ -2109,7 +2109,7 @@ wasForceSpeed=isForceSpeed;
 					VectorScale( handEnt.axis[i], (!vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
 				}
 
-				CG_AddRefEntityWithPowerups(&handEnt, cent->currentState.powerups, cent);
+				CG_AddRefEntityWithPowerups(&handEnt, cent->currentState.powerups, cent, true);
 			}
 		}
 	}
