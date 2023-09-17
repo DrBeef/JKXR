@@ -212,35 +212,21 @@ void ovrFramebuffer_SetNone() {
     GL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
-PFNGLBLITNAMEDFRAMEBUFFERPROC glBlitNamedFramebuffer = NULL;
 extern cvar_t* r_mode;
 qboolean R_GetModeInfo(int* width, int* height, int mode);
 
 void ovrFramebuffer_Resolve(ovrFramebuffer* frameBuffer) {
-
-	if (glBlitNamedFramebuffer == NULL)
-	{
-		glBlitNamedFramebuffer = (PFNGLBLITNAMEDFRAMEBUFFERPROC)SDL_GL_GetProcAddress("glBlitNamedFramebuffer");
-
-	}
 
 	const GLuint colorTexture = frameBuffer->ColorSwapChainImage[frameBuffer->TextureSwapChainIndex].image;
 
 	int width, height;
 	R_GetModeInfo(&width, &height, r_mode->integer);
 
-	glBlitNamedFramebuffer((GLuint)colorTexture,             // readFramebuffer
-		(GLuint)0,                       // backbuffer     // drawFramebuffer
-		(GLint)0,                        // srcX0
-		(GLint)0,                        // srcY0
-		(GLint)gAppState.Width,                        // srcX1
-		(GLint)gAppState.Height,                        // srcY1
-		(GLint)0,                        // dstX0
-		(GLint)0,                        // dstY0
-		(GLint)width,                    // dstX1
-		(GLint)height,                    // dstY1
-		(GLbitfield)GL_COLOR_BUFFER_BIT, // mask
-		(GLenum)GL_LINEAR);              // filter
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, colorTexture);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(0, 0, gAppState.Width, gAppState.Height,
+		0, 0, width, height,
+		GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 void ovrFramebuffer_Acquire(ovrFramebuffer* frameBuffer) {
@@ -906,7 +892,10 @@ void TBXR_InitialiseOpenXR()
 
 	OXR(initResult = xrGetSystem(gAppState.Instance, &systemGetInfo, &gAppState.SystemId));
 	if (initResult != XR_SUCCESS) {
-		ALOGE("Failed to get system.");
+		if (initResult != XR_SUCCESS) {
+			Sys_Dialog(DT_ERROR, "Unable to create OpenXR System - Please ensure you headset is connected and powered on.", "No VR Headset Detected");
+			exit(1);
+		}
 		exit(1);
 	}
 

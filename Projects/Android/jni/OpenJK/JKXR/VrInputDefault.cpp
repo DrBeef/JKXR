@@ -628,7 +628,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 cl.frame.ps.stats[STAT_HEALTH] > 0)
             {
                 if (vr.weapon_stabilised &&
-                    VectorLength(vr.weaponoffset) < 0.24f &&
+                    VectorLength(vr.weaponoffset) < vr_scope_engage_distance->value &&
                     vr.cgzoommode == 0) {
                     sendButtonAction("enterscope", true);
                 } else if ((VectorLength(vr.weaponoffset) > 0.26f || !vr.weapon_stabilised) &&

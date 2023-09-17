@@ -251,6 +251,7 @@ void VR_Init()
 	vr_immersive_cinematics = Cvar_Get("vr_immersive_cinematics", "1", CVAR_ARCHIVE);
 	vr_screen_dist = Cvar_Get( "vr_screen_dist", "3.5", CVAR_ARCHIVE);
 	vr_weapon_velocity_trigger = Cvar_Get( "vr_weapon_velocity_trigger", "2.0", CVAR_ARCHIVE);
+	vr_scope_engage_distance = Cvar_Get( "vr_scope_engage_distance", "0.25", CVAR_ARCHIVE);
 	vr_force_velocity_trigger = Cvar_Get( "vr_force_velocity_trigger", "2.09", CVAR_ARCHIVE);
 	vr_force_distance_trigger = Cvar_Get( "vr_force_distance_trigger", "0.15", CVAR_ARCHIVE);
     vr_two_handed_weapons = Cvar_Get ("vr_two_handed_weapons", "1", CVAR_ARCHIVE);

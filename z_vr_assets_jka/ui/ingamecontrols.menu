@@ -1208,6 +1208,37 @@
 			}
 		}
 
+		itemDef 
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_YESNO
+			text				"Motion Ignite Saber:"
+			cvar				"vr_motion_enable_saber"
+			rect				260 380 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174 
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 0.0
+			visible				0 
+			descText			"Turn disabled saber back on when motion triggered"
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight10
+			}
+			mouseexit 
+			{ 
+				hide			highlight10
+			}
+		}
+
 //----------------------------------------------------------------------------------------------
 //
 //	WEAPON MENU
