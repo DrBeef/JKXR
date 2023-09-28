@@ -2775,12 +2775,15 @@ void CG_ItemSelectorSelect_f( void )
 		cg.forcepowerSelectTime = cg.time;
 		cg.forcepowerSelect = cg.itemSelectorSelection;
 	}
-	else if (cg.itemSelectorType == ST_QUICK_SAVE) {
+	else if (cg.itemSelectorType == ST_QUICK_MENU) {
 		if (cg.itemSelectorSelection == 0) {
 			cgi_SendConsoleCommand("save quik*\n");
 			CG_CenterPrint("Quick Saved", 240);
-		} else {
+		} else if (cg.itemSelectorSelection == 1) {
 			cgi_SendConsoleCommand("load quik\n");
+		}
+		else {
+			vr->move_speed = (++vr->move_speed) % 3;
 		}
 	}
 
@@ -2792,7 +2795,7 @@ void CG_ItemSelectorNext_f( void )
 {
 	if (cg.itemSelectorType >= ST_FORCE_POWER)
 	{
-		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_SAVE : ST_FORCE_POWER;
+		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_MENU : ST_FORCE_POWER;
 		return;
 	}
 
@@ -2809,7 +2812,7 @@ void CG_ItemSelectorPrev_f( void )
 {
 	if (cg.itemSelectorType >= ST_FORCE_POWER)
 	{
-		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_SAVE : ST_FORCE_POWER;
+		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_MENU : ST_FORCE_POWER;
 		return;
 	}
 
@@ -2938,8 +2941,8 @@ void CG_DrawItemSelector( void )
 			sRGB[1] = 0.0f;
 			sRGB[2] = 1.0f;
 			break;
-		case ST_QUICK_SAVE:
-			count = 2;
+		case ST_QUICK_MENU:
+			count = 3;
 			sRGB[0] = 1.0f;
 			sRGB[1] = 1.0f;
 			sRGB[2] = 1.0f;
@@ -3068,7 +3071,7 @@ void CG_DrawItemSelector( void )
 				case ST_FORCE_POWER: // force powers
 					selectable = ForcePower_Valid(itemId);
 					break;
-				case ST_QUICK_SAVE:
+				case ST_QUICK_MENU:
 					selectable = true;
 					break;
 			}
@@ -3155,8 +3158,19 @@ void CG_DrawItemSelector( void )
 						case ST_FORCE_POWER: // force powers
 							sprite.customShader = force_icons[showPowers[itemId]];
 							break;
-						case ST_QUICK_SAVE:
-							sprite.customShader = itemId == 0 ? cgs.media.iconSave : cgs.media.iconLoad;
+						case ST_QUICK_MENU:
+							switch (itemId)
+							{
+							case 0:
+								sprite.customShader = cgs.media.iconSave;
+								break;
+							case 1:
+								sprite.customShader = cgs.media.iconLoad;
+								break;
+							case 2:
+								sprite.customShader = cgs.media.iconMoveSpeed[(vr->move_speed + 1) % 3];
+								break;
+							}
 							break;
 					}
 
