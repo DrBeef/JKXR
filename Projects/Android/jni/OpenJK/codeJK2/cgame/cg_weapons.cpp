@@ -2777,13 +2777,12 @@ void CG_ItemSelectorSelect_f( void )
 	}
 	else if (cg.itemSelectorType == ST_QUICK_MENU) {
 		if (cg.itemSelectorSelection == 0) {
+			cgi_SendConsoleCommand("togglemenu\n");
+		} else if (cg.itemSelectorSelection == 1) {
 			cgi_SendConsoleCommand("save quik*\n");
 			CG_CenterPrint("Quick Saved", 240);
-		} else if (cg.itemSelectorSelection == 1) {
+		} else {
 			cgi_SendConsoleCommand("load quik\n");
-		}
-		else {
-			vr->move_speed = (++vr->move_speed) % 3;
 		}
 	}
 
@@ -3162,13 +3161,13 @@ void CG_DrawItemSelector( void )
 							switch (itemId)
 							{
 							case 0:
-								sprite.customShader = cgs.media.iconSave;
+								sprite.customShader = cgs.media.iconExit;
 								break;
 							case 1:
-								sprite.customShader = cgs.media.iconLoad;
+								sprite.customShader = cgs.media.iconSave;
 								break;
 							case 2:
-								sprite.customShader = cgs.media.iconMoveSpeed[(vr->move_speed + 1) % 3];
+								sprite.customShader = cgs.media.iconLoad;
 								break;
 							}
 							break;

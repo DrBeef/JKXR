@@ -1336,6 +1336,7 @@ static void CG_RegisterGraphics( void ) {
 
 	cgs.media.iconSave = cgi_R_RegisterShaderNoMip( "gfx/icon_save" );
 	cgs.media.iconLoad = cgi_R_RegisterShaderNoMip( "gfx/icon_load" );
+	cgs.media.iconExit = cgi_R_RegisterShaderNoMip( "gfx/icon_exit" );
 
 
 	// FIXME: do these conditionally

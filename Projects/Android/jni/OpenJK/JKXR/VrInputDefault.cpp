@@ -859,11 +859,11 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                     v[1] * (vr.move_speed == 0 ? 0.75f : (vr.move_speed == 1 ? 1.0f : 0.5f));
             
 
-            //X button invokes menu now
-            if ((secondaryButtonsNew & secondaryButton1) &&
-                !(secondaryButtonsOld & secondaryButton1))
-            {
-                Sys_QueEvent(0, SE_KEY, A_ESCAPE, true, 0, NULL);
+            if (((secondaryButtonsNew & secondaryButton1) !=
+                (secondaryButtonsOld & secondaryButton1)) &&
+                    (secondaryButtonsNew & secondaryButton1)) {
+                //Toggle walk/run somehow?!
+                vr.move_speed = (++vr.move_speed) % 3;
             }
 
             //Open the datapad
