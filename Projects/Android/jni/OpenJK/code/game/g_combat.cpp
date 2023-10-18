@@ -34,6 +34,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "Q3_Interface.h"
 #include "g_navigator.h"
 
+extern cvar_t	*g_TeamBeefDirectorsCut;
+
 #define TURN_OFF			0x00000100
 
 extern qboolean Rosh_TwinPresent( gentity_t *self );
@@ -1217,7 +1219,8 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 #endif //_DEBUG
 
 	if ( g_saberRealisticCombat->integer > 1
-		|| debug_subdivision->integer )
+		|| debug_subdivision->integer
+        || g_TeamBeefDirectorsCut->integer) // always dismember for TBDC
 	{
 		dismember = qtrue;
 	}
@@ -2237,7 +2240,11 @@ static qboolean G_Dismemberable( gentity_t *self, int hitLoc )
 	{//cannot dismember me right now
 		return qfalse;
 	}
-	if ( !debug_subdivision->integer && g_saberRealisticCombat->integer < 2 )
+    if (g_TeamBeefDirectorsCut->integer)
+    {
+        return qtrue;
+    }
+	if ( !debug_subdivision->integer && g_saberRealisticCombat->integer < 2)
 	{
 		if ( g_dismemberProbabilities->value > 0.0f )
 		{//use the ent-specific dismemberProbabilities
@@ -2289,6 +2296,10 @@ static qboolean G_Dismemberable2( gentity_t *self, int hitLoc )
 	{//cannot dismember me right now
 		return qfalse;
 	}
+    if (g_TeamBeefDirectorsCut->integer)
+    {
+        return qtrue;
+    }
 	if ( !debug_subdivision->integer && g_saberRealisticCombat->integer < 2 )
 	{
 		if ( g_dismemberProbabilities->value <= 0.0f )
@@ -6055,7 +6066,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, const
 		}
 	}
 	// figure momentum add, even if the damage won't be taken
-	if ( knockback && !(dflags&DAMAGE_DEATH_KNOCKBACK) ) //&& targ->client
+	if ( knockback && (!(dflags&DAMAGE_DEATH_KNOCKBACK) || (g_TeamBeefDirectorsCut->integer == 1 && targ->s.number != 0))) //&& targ->client //GB not the player
 	{
 		G_ApplyKnockback( targ, newDir, knockback );
 		G_CheckKnockdown( targ, attacker, newDir, dflags, mod );
@@ -6717,6 +6728,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, const
 				if ( mod == MOD_FLECHETTE )
 				{//special case because this is shotgun-ish damage, we need to multiply the knockback
 					knockback *= 12;//*6 for 6 flechette shots
+				}
+				else if(g_TeamBeefDirectorsCut->integer == 1)
+				{
+					knockback *= 2;
 				}
 				G_ApplyKnockback( targ, newDir, knockback );
 			}

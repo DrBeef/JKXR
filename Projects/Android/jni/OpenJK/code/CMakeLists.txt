@@ -37,17 +37,26 @@ if(BuildSPEngine OR BuildJK2SPEngine)
 	endif(WIN32)
 	# Defines
 	set(SPEngineDefines ${SharedDefines} "_JK2EXE") # it's called JK2EXE but it really just means Singleplayer Exe
+	
+	# OpenXR defines used by 
+	set(SPEngineDefines ${SPEngineDefines} "JKXR_CLIENT") 
+	set(SPEngineDefines ${SPEngineDefines} "XR_USE_PLATFORM_WIN32") 
+	set(SPEngineDefines ${SPEngineDefines} "XR_USE_GRAPHICS_API_OPENGL") 
 
 	set(SPEngineIncludeDirectories
 		${SPEngineIncludeDirectories}
 		${SharedDir}
 		${CMAKE_BINARY_DIR}/shared
 		${SPDir}
-		"${GSLIncludeDirectory}")
+		"${GSLIncludeDirectory}"
+		"${JKXRDir}"
+		"${OpenXRLibDir}"
+		"${OpenGLExternalIncludeDir}"
+		)
 
 	#    Dependencies
 	# OpenAL (is optionally included for Windows)
-	if(MSVC AND NOT WIN64)
+	if(MSVC)
 		if(UseInternalOpenAL)
 			# There's a libs/OpenAL32.lib
 			# (mrw) TODO Is this actually required on windows? It is loaded at runtime, should not be linked?
@@ -56,6 +65,7 @@ if(BuildSPEngine OR BuildJK2SPEngine)
 				message(FATAL_ERROR "UseInternalOpenAL enabled, but lib/OpenAL32.lib not found!")
 			endif(NOT OpenALLibrary)
 			set(SPEngineLibraries ${SPEngineLibraries} ${OpenALLibrary})
+			set(SPEngineIncludeDirectories ${SPEngineIncludeDirectories} ${OpenALIncludeDirectory})
 		else(UseInternalOpenAL)
 			find_package(OpenAL REQUIRED)
 			set(SPEngineIncludeDirectories ${SPEngineIncludeDirectories} ${OPENAL_INCLUDE_DIR})
@@ -99,6 +109,19 @@ if(BuildSPEngine OR BuildJK2SPEngine)
 		set(SPEngineIncludeDirectories ${SPEngineIncludeDirectories} ${SDL2_INCLUDE_DIRS})
 		set(SPEngineLibraries ${SPEngineLibraries} ${SDL2_LIBRARIES})
 	endif()
+	
+	# OpenGL needed in the SP engine now for JKXR
+	find_package(OpenGL REQUIRED)
+	set(SPEngineIncludeDirectories ${SPEngineIncludeDirectories} ${OPENGL_INCLUDE_DIR})
+	set(SPEngineLibraries ${SPEngineLibraries} ${OPENGL_LIBRARIES})
+
+
+	# OpenXR library - switch between debug/release
+	set(SPEngineLibraries
+		${SPEngineLibraries}
+		${OpenJKLibDir}/openxr/lib/x64/openxr_loader$<$<CONFIG:Debug>:d>.lib
+	)
+
 
 	#    Source Files
 
@@ -307,7 +330,6 @@ if(BuildSPEngine OR BuildJK2SPEngine)
 	source_group("ui" FILES ${SPEngineUIFiles})
 	set(SPEngineFiles ${SPEngineFiles} ${SPEngineUIFiles})
 
-
 	# Ghoul2 files
 	set(SPEngineGhoul2Files
 		"${SPDir}/ghoul2/G2.h"
@@ -316,6 +338,25 @@ if(BuildSPEngine OR BuildJK2SPEngine)
 	source_group("ghoul2" FILES ${SPEngineGhoul2Files})
 	set(SPEngineFiles ${SPEngineFiles} ${SPEngineGhoul2Files})
 
+
+	# JKXR files
+	set(SPEngineJKXRFiles
+		"${CMAKE_SOURCE_DIR}/JKXR/windows/JKXR_SurfaceView.cpp"
+		"${CMAKE_SOURCE_DIR}/JKXR/windows/TBXR_Common.cpp"
+		"${CMAKE_SOURCE_DIR}/JKXR/windows/TBXR_Common.h"
+		"${CMAKE_SOURCE_DIR}/JKXR/OpenXrInput.cpp"
+		"${CMAKE_SOURCE_DIR}/JKXR/VrClientInfo.h"
+		"${CMAKE_SOURCE_DIR}/JKXR/VrCommon.h"
+		"${CMAKE_SOURCE_DIR}/JKXR/VrInputCommon.cpp"
+		"${CMAKE_SOURCE_DIR}/JKXR/VrInputDefault.cpp"
+		"${CMAKE_SOURCE_DIR}/JKXR/VrInputWeaponAlign.cpp"
+		"${CMAKE_SOURCE_DIR}/JKXR/VrCvars.h"
+		"${CMAKE_SOURCE_DIR}/JKXR/VrInput.h"
+		"${CMAKE_SOURCE_DIR}/JKXR/VrTBDC.h"
+		)
+	source_group("JKXR" FILES ${SPEngineJKXRFiles})
+	set(SPEngineFiles ${SPEngineFiles} ${SPEngineJKXRFiles})
+	
 
 	# Server files
 	set(SPEngineCGameFiles

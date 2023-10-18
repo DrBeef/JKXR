@@ -39,17 +39,27 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 	float		dist, shotDist, shotRange = 8192;
 	qboolean	hitDodged = qfalse;
 
+	vec3_t	angs, forward;
+	if ( BG_UseVRPosition(ent))
+	{
+		BG_CalculateVRWeaponPosition(muzzle, angs);
+		AngleVectors(angs, forward, NULL, NULL);
+	}
+	else {
+		VectorCopy(forwardVec, forward);
+	}
+
 	if (ent->s.number >= MAX_CLIENTS)
 	{
 		vec3_t angles;
-		vectoangles(forwardVec, angles);
+		vectoangles(forward, angles);
 		angles[PITCH] += ( Q_flrand(-1.0f, 1.0f) * (CONC_NPC_SPREAD+(6-ent->NPC->currentAim)*0.25f));//was 0.5f
 		angles[YAW]	  += ( Q_flrand(-1.0f, 1.0f) * (CONC_NPC_SPREAD+(6-ent->NPC->currentAim)*0.25f));//was 0.5f
-		AngleVectors(angles, forwardVec, vrightVec, up);
+		AngleVectors(angles, forward, vrightVec, up);
 	}
 
 	//Shove us backwards for half a second
-	VectorMA( ent->client->ps.velocity, -200, forwardVec, ent->client->ps.velocity );
+	VectorMA( ent->client->ps.velocity, -200, forward, ent->client->ps.velocity );
 	ent->client->ps.groundEntityNum = ENTITYNUM_NONE;
 	if ( (ent->client->ps.pm_flags&PMF_DUCKED) )
 	{//hunkered down
@@ -100,7 +110,7 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 
 	for ( int i = 0; i < traces; i++ )
 	{
-		VectorMA( start, shotRange, forwardVec, end );
+		VectorMA( start, shotRange, forward, end );
 
 		//NOTE: if you want to be able to hit guys in emplaced guns, use "G2_COLLIDE, 10" instead of "G2_RETURNONHIT, 0"
 		//alternately, if you end up hitting an emplaced_gun that has a sitter, just redo this one trace with the "G2_COLLIDE, 10" to see if we it the sitter
@@ -166,16 +176,16 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 					qboolean noKnockBack = (qboolean)((traceEnt->flags&FL_NO_KNOCKBACK) != 0);//will be set if they die, I want to know if it was on *before* they died
 					if ( traceEnt && traceEnt->client && traceEnt->client->NPC_class == CLASS_GALAKMECH )
 					{//hehe
-						G_Damage( traceEnt, ent, ent, forwardVec, tr.endpos, 10, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, MOD_CONC_ALT, hitLoc );
+						G_Damage( traceEnt, ent, ent, forward, tr.endpos, 10, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, MOD_CONC_ALT, hitLoc );
 						break;
 					}
-					G_Damage( traceEnt, ent, ent, forwardVec, tr.endpos, damage, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, MOD_CONC_ALT, hitLoc );
+					G_Damage( traceEnt, ent, ent, forward, tr.endpos, damage, DAMAGE_NO_KNOCKBACK|DAMAGE_NO_HIT_LOC, MOD_CONC_ALT, hitLoc );
 
 					//do knockback and knockdown manually
 					if ( traceEnt->client )
 					{//only if we hit a client
 						vec3_t pushDir;
-						VectorCopy( forwardVec, pushDir );
+						VectorCopy( forward, pushDir );
 						if ( pushDir[2] < 0.2f )
 						{
 							pushDir[2] = 0.2f;
@@ -242,7 +252,7 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 		VectorMA( muzzle, dist, dir, spot );
 		AddSightEvent( ent, spot, 256, AEL_DISCOVERED, 50 );
 		//FIXME: creates *way* too many effects, make it one effect somehow?
-		G_PlayEffect( G_EffectIndex( "concussion/alt_ring" ), spot, forwardVec );
+		G_PlayEffect( G_EffectIndex( "concussion/alt_ring" ), spot, forward );
 	}
 	//FIXME: spawn a temp ent that continuously spawns sight alerts here?  And 1 sound alert to draw their attention?
 	VectorMA( start, shotDist-4, forwardVec, spot );

@@ -274,7 +274,7 @@ void UI_Init( int apiVersion, uiimport_t *uiimport, qboolean inGameLoad )
 	ui.Cvar_Create( "cg_drawCrosshairForce", "9", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_marks", "1", CVAR_ARCHIVE );
 	ui.Cvar_Create ("s_language",			"english",	CVAR_ARCHIVE | CVAR_NORESTART);
-	ui.Cvar_Create( "g_dismemberment", "3", CVAR_ARCHIVE );//0 = none, 1 = arms and hands, 2 = legs, 3 = waist and head
+	ui.Cvar_Create( "g_dismemberment", "4", CVAR_ARCHIVE );//0 = none, 1 = arms and hands, 2 = legs, 3 = waist and head
 	ui.Cvar_Create( "g_dismemberProbabilities", "100", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_usableObjectsHint", "1", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_autoUseBacta", "0", CVAR_ARCHIVE );
@@ -314,7 +314,12 @@ void UI_Init( int apiVersion, uiimport_t *uiimport, qboolean inGameLoad )
 	ui.Cvar_Create( "cg_crosshairIdentifyTarget", "1", CVAR_ARCHIVE );
 	ui.Cvar_Create( "g_subtitles", "0", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_marks", "1", CVAR_ARCHIVE );
-	ui.Cvar_Create( "cg_shadows", "1", CVAR_ARCHIVE );
+	
+#ifdef _WIN32
+	ui.Cvar_Create("cg_shadows", "2", CVAR_ARCHIVE);
+#else
+	ui.Cvar_Create("cg_shadows", "1", CVAR_ARCHIVE);
+#endif
 
 	ui.Cvar_Create( "cg_runpitch", "0.0", CVAR_ARCHIVE );
 	ui.Cvar_Create( "cg_runroll", "0.0", CVAR_ARCHIVE );
@@ -324,7 +329,11 @@ void UI_Init( int apiVersion, uiimport_t *uiimport, qboolean inGameLoad )
 
 	ui.Cvar_Create( "ui_disableWeaponSway", "0", CVAR_ARCHIVE );
 
-	ui.Cvar_Create( "g_saberMoreRealistic", "3", CVAR_ARCHIVE );
+	//This is the original setting we had, but it makes the sabers too powerful
+	//ui.Cvar_Create( "g_saberMoreRealistic", "3", CVAR_ARCHIVE );
+
+	//This is the new setting, using the original JKO cvar name, so that any existing players get this new var and the sabers work like JKO
+	ui.Cvar_Create( "g_saberRealisticCombat", "1", CVAR_ARCHIVE );
 #endif
 
 

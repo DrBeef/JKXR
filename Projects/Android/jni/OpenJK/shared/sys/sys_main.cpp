@@ -100,7 +100,21 @@ Sys_GetClipboardData
 ==================
 */
 char *Sys_GetClipboardData( void ) {
+#ifndef _WIN32
 	return NULL;
+#else
+	if ( !SDL_HasClipboardText() )
+		return NULL;
+
+	char *cbText = SDL_GetClipboardText();
+	size_t len = strlen( cbText ) + 1;
+
+	char *buf = (char *)Z_Malloc( len, TAG_CLIPBOARD );
+	Q_strncpyz( buf, cbText, len );
+
+	SDL_free( cbText );
+	return buf;
+#endif
 }
 
 /*
@@ -154,8 +168,8 @@ void Sys_Init( void ) {
 
 static void NORETURN Sys_Exit( int ex ) {
 	IN_Shutdown();
-#ifndef DEDICATED
-	//SDL_Quit();
+#ifdef _WIN32
+	SDL_Quit();
 #endif
 
 	NET_Shutdown();
@@ -192,10 +206,12 @@ static void Sys_ErrorDialog( const char *error )
 		fclose( fp );
 
 		const char *errorMessage = va( "%s\n\nThe crash log was written to %s", error, crashLogPath );
-/*		if ( SDL_ShowSimpleMessageBox( SDL_MESSAGEBOX_ERROR, "Error", errorMessage, NULL ) < 0 )
+#ifdef _win32		
+		if ( SDL_ShowSimpleMessageBox( SDL_MESSAGEBOX_ERROR, "Error", errorMessage, NULL ) < 0 )
 		{
 			fprintf( stderr, "%s", errorMessage );
-		}*/
+		}
+#endif
 	}
 	else
 	{
@@ -205,11 +221,13 @@ static void Sys_ErrorDialog( const char *error )
 
 		const char *errorMessage = va( "%s\nCould not write the crash log file, but we printed it to stderr.\n"
 										"Try running the game using a command line interface.", error );
-/*		if ( SDL_ShowSimpleMessageBox( SDL_MESSAGEBOX_ERROR, "Error", errorMessage, NULL ) < 0 )
+#ifdef _win32		
+		if ( SDL_ShowSimpleMessageBox( SDL_MESSAGEBOX_ERROR, "Error", errorMessage, NULL ) < 0 )
 		{
 			// We really have hit rock bottom here :(
 			fprintf( stderr, "%s", errorMessage );
-		}*/
+		}
+#endif		
 	}
 }
 #endif
@@ -272,7 +290,66 @@ void Sys_UnloadDll( void *dllHandle )
 	Sys_UnloadLibrary(dllHandle);
 }
 
+#ifdef _WIN32
+/*
+=================
+Sys_LoadDll
 
+First try to load library name from system library path,
+from executable path, then fs_basepath.
+=================
+*/
+void *Sys_LoadDll( const char *name, qboolean useSystemLib )
+{
+	void *dllhandle = NULL;
+
+	// Don't load any DLLs that end with the pk3 extension
+	if ( COM_CompareExtension( name, ".pk3" ) )
+	{
+		Com_Printf( S_COLOR_YELLOW "WARNING: Rejecting DLL named \"%s\"", name );
+		return NULL;
+	}
+
+	if ( useSystemLib )
+	{
+		Com_Printf( "Trying to load \"%s\"...\n", name );
+
+		dllhandle = Sys_LoadLibrary( name );
+		if ( dllhandle )
+			return dllhandle;
+
+		Com_Printf( "%s(%s) failed: \"%s\"\n", __FUNCTION__, name, Sys_LibraryError() );
+	}
+
+	const char *binarypath = Sys_BinaryPath();
+	const char *basepath = Cvar_VariableString( "fs_basepath" );
+
+	if ( !*binarypath )
+		binarypath = ".";
+
+	const char *searchPaths[] = {
+		binarypath,
+		basepath,
+	};
+	const size_t numPaths = ARRAY_LEN( searchPaths );
+
+	for ( size_t i = 0; i < numPaths; i++ )
+	{
+		const char *libDir = searchPaths[i];
+		if ( !libDir[0] )
+			continue;
+
+		Com_Printf( "Trying to load \"%s\" from \"%s\"...\n", name, libDir );
+		char *fn = va( "%s%c%s", libDir, PATH_SEP, name );
+		dllhandle = Sys_LoadLibrary( fn );
+		if ( dllhandle )
+			return dllhandle;
+
+		Com_Printf( "%s(%s) failed: \"%s\"\n", __FUNCTION__, fn, Sys_LibraryError() );
+	}
+	return NULL;
+}
+#endif
 
 #if defined(MACOS_X) && !defined(_JK2EXE)
 void *Sys_LoadMachOBundle( const char *name )
@@ -493,6 +570,8 @@ void *Sys_LoadSPGameDll( const char *name, GetGameAPIProc **GetGameAPI )
 #ifdef MACOS_X
         char *apppath = Cvar_VariableString( "fs_apppath" );
 #endif
+		const char* binarypath = Sys_BinaryPath();
+		const char* current_dir = Sys_CurrentDirname();
 
 		const char *searchPaths[] = {
 			homepath,
@@ -500,6 +579,8 @@ void *Sys_LoadSPGameDll( const char *name, GetGameAPIProc **GetGameAPI )
 			apppath,
 #endif
 			basepath,
+			binarypath,
+			current_dir,
 			cdpath,
 		};
 		size_t numPaths = ARRAY_LEN( searchPaths );
@@ -567,7 +648,10 @@ void *Sys_LoadGameDll( const char *name, GetModuleAPIProc **moduleAPI )
 				char *apppath = Cvar_VariableString( "fs_apppath" );
 #endif
 
+				const char* current_dir = Sys_CurrentDirname();
+
 				const char *searchPaths[] = {
+					current_dir,
 					homepath,
 #ifdef MACOS_X
 					apppath,
@@ -699,8 +783,7 @@ int main ( int argc, char* argv[] )
 
 	Com_Init (commandLine);
 
-#ifndef DEDICATED
-	/*
+#ifdef _WIN32
 	SDL_version compiled;
 	SDL_version linked;
 
@@ -709,7 +792,6 @@ int main ( int argc, char* argv[] )
 
 	Com_Printf( "SDL Version Compiled: %d.%d.%d\n", compiled.major, compiled.minor, compiled.patch );
 	Com_Printf( "SDL Version Linked: %d.%d.%d\n", linked.major, linked.minor, linked.patch );
-	 */
 #endif
 
 	NET_Init();

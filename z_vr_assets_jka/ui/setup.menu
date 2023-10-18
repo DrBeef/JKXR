@@ -1346,8 +1346,7 @@
 		{
 			name				vidrestart_text1
 			group				vidrestart
-			text				@MENUS_THIS_WILL_APPLY_VIDEO
-			text2				@MENUS_AND_RETURN_TO_THE_MAIN
+			text				@MENUS_VR_RESTART_JKXR_TO_APPLY
 			rect				305 230 290 20
 			textalign			ITEM_ALIGN_CENTER
 			text2aligny			18
@@ -2604,7 +2603,6 @@
 			cvar				"g_TeamBeefDirectorsCut"
       cvarFloatList
       {
-        @MENUS_VR_TBDC_BUMMSER 0
         @MENUS_VR_TBDC_BAGGYG 1
         @MENUS_VR_TBDC_VANILLA 2
       }
@@ -2667,7 +2665,7 @@
 			group				difficulty
       type				ITEM_TYPE_MULTI
 			text				@MENUS_VR_SABER_REALISM_ITEM
-			cvar				"g_saberMoreRealistic"
+			cvar				"g_saberRealisticCombat"
 			cvarFloatList		
 			{ 
 				@MENUS_VR_SABER_REALISM_DEFAULT 0 

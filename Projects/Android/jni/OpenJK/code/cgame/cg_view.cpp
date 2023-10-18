@@ -32,7 +32,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../game/wp_saber.h"
 #include "../game/g_vehicles.h"
 #include "bg_local.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 #define MASK_CAMERACLIP (MASK_SOLID)
 #define CAMERA_SIZE	4
@@ -1318,7 +1318,6 @@ qboolean CG_CalcFOVFromX( float fov_x )
 	}
 
 	// set it
-	cg.refdef.override_fov = true;
 	cg.refdef.fov_x = fov_x;
 	cg.refdef.fov_y = fov_y;
 
@@ -2047,8 +2046,12 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 
 	CG_BuildSolidList();
 
-	// set up cg.snap and possibly cg.nextSnap
-	CG_ProcessSnapshots();
+	if ( stereoView == STEREO_LEFT )
+	{
+		// set up cg.snap and possibly cg.nextSnap
+		CG_ProcessSnapshots();
+	}
+
 	// if we haven't received any snapshots yet, all
 	// we can draw is the information screen
 	if ( !cg.snap ) {
@@ -2153,7 +2156,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		CGCam_UpdateFade();
 		// build cg.refdef
 		inwater = CG_CalcViewValues();
-		cg.refdef.override_fov = inwater;
+		cg.refdef.override_fov |= inwater;
 	}
 
 	if (cg.zoomMode)
@@ -2173,9 +2176,22 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 
 	//Calculate all angles upfront
 	{
-		//Only vehicle in JK2 is the AT-ST
 		vr->in_vehicle = (g_entities[0].client &&
-						  g_entities[0].client->NPC_class == CLASS_ATST);
+			(g_entities[0].client->NPC_class == CLASS_VEHICLE || g_entities[0].client->NPC_class == CLASS_ATST ||
+			g_entities[0].s.m_iVehicleNum != 0 ));
+		vr->vehicle_type = VH_NONE;
+		if (vr->in_vehicle)
+		{
+			if (g_entities[0].client->NPC_class == CLASS_ATST)
+			{
+				vr->vehicle_type = VH_WALKER;
+			}
+			else if (g_entities[0].s.m_iVehicleNum != 0 && g_entities[g_entities[0].s.m_iVehicleNum].m_pVehicle)
+			{
+				vr->vehicle_type = (int) g_entities[g_entities[0].s.m_iVehicleNum].m_pVehicle->m_pVehicleInfo->type;
+			}
+		}
+
 		vr->remote_npc = !Q_stricmp( "NPC", g_entities[cg.snap->ps.viewEntity].classname );
 		vr->remote_droid = false;
 		vr->remote_turret = false;
@@ -2216,6 +2232,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 			!in_misccamera &&
 			!vr->remote_droid &&
 			!vr->remote_npc &&
+			!vr->in_vehicle &&
 			!usingScope &&
 			!cg.renderingThirdPerson)
 		{
@@ -2242,7 +2259,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		//Sniper/E11 scope
 		if (usingScope)
 		{
-			cg.refdef.viewangles[ROLL] = vr->clientviewangles[ROLL];
+			cg.refdef.viewangles[ROLL] = vr->hmdorientation[ROLL];
 			cg.refdef.viewangles[PITCH] = vr->weaponangles[ANGLES_ADJUSTED][PITCH];
 			cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW]
 										+ vr->weaponangles[ANGLES_ADJUSTED][YAW] + SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
@@ -2252,7 +2269,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		//Normal 3rd person view angles
 		if (!in_camera &&
 			!in_misccamera &&
-			cg.renderingThirdPerson)
+				(vr->in_vehicle || cg.renderingThirdPerson))
 		{
 			VectorCopy(vr->hmdorientation, cg.refdef.viewangles);
 			cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] +
@@ -2348,20 +2365,21 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 		}
 
 		//Render hand models when appropriate
-		if (!in_camera
+		if (cg.snap->ps.clientNum == 0
+			&& !in_camera
 			&& !cg.renderingThirdPerson
 			&& cg.predicted_player_state.stats[STAT_HEALTH] > 0
 			&& cg.snap->ps.viewEntity < ENTITYNUM_WORLD
 			&& g_entities[cg.snap->ps.viewEntity].client
-			&& !(g_entities[cg.snap->ps.viewEntity].client->ps.dualSabers && cg.snap->ps.weapon == WP_SABER)
-			&& cg.snap->ps.weapon != WP_MELEE
 			&& !vr->weapon_stabilised
 			&& !vr->in_vehicle
 			&& !cg_pano.integer
+			&& cg.zoomMode == 0
 			&& (cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD))
 		{
 			vec3_t end, forward;
 			refEntity_t handEnt;
+			centity_t *cent = &cg_entities[0];
 			memset( &handEnt, 0, sizeof(refEntity_t) );
 			BG_CalculateVRDefaultPosition(1, handEnt.origin, handEnt.angles);
 
@@ -2372,38 +2390,54 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 
 			handEnt.renderfx = RF_DEPTHHACK | RF_VRVIEWMODEL;
 
-			if (cg.snap->ps.powerups[PW_FORCE_PUSH] > cg.time ||
-				(cg.snap->ps.forcePowersActive & (1<<FP_GRIP)) ||
-				(cg.snap->ps.forcePowersActive & (1<<FP_LIGHTNING)) ||
-				(cg.snap->ps.forcePowersActive & (1<<FP_ABSORB)) ||
-				(cg.snap->ps.forcePowersActive & (1<<FP_DRAIN)))
+			if (!g_entities[cg.snap->ps.viewEntity].client->ps.dualSabers ||
+				cg.snap->ps.weapon != WP_SABER)
 			{
-				handEnt.hModel = cgs.media.handModel_force;
-			}
-			else
-			{
-				handEnt.hModel = cgs.media.handModel_relaxed;
-			}
-			VectorCopy(handEnt.origin, handEnt.oldorigin);
+				if (cg.snap->ps.powerups[PW_FORCE_PUSH] > cg.time ||
+					(cg.snap->ps.forcePowersActive & (1<<FP_GRIP)) ||
+					(cg.snap->ps.forcePowersActive & (1<<FP_LIGHTNING)) ||
+					(cg.snap->ps.forcePowersActive & (1<<FP_ABSORB)) ||
+					(cg.snap->ps.forcePowersActive & (1<<FP_DRAIN)) ||
+					(cg.snap->ps.forcePowersActive & (1<<FP_RAGE)))
+				{
+					handEnt.hModel = cgs.media.handModel_force;
+				}
+				else if (cg.snap->ps.weapon == WP_MELEE)
+				{
+					handEnt.hModel = cgs.media.handModel_fist;
+				}
+				else
+				{
+					handEnt.hModel = cgs.media.handModel_relaxed;
+				}
+				VectorCopy(handEnt.origin, handEnt.oldorigin);
 
-			AnglesToAxis(handEnt.angles, handEnt.axis);
-			for ( int i = 0; i < 3; i++ ) {
-				VectorScale( handEnt.axis[i], (vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
-			}
+				AnglesToAxis(handEnt.angles, handEnt.axis);
+				for ( int i = 0; i < 3; i++ ) {
+					VectorScale( handEnt.axis[i], (vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
+				}
 
-			centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
-			if (!cent)
-			{
-				cgi_R_AddRefEntityToScene(&handEnt);
-			}
-			else
-			{
 				CG_AddRefEntityWithPowerups(&handEnt, cent->currentState.powerups, cent, true);
 			}
 
-			if (cg.snap->ps.weapon == WP_NONE)
+			if (cg.snap->ps.weapon == WP_NONE ||
+				cg.snap->ps.weapon == WP_MELEE ||
+				(cg.snap->ps.weapon == WP_SABER && cg.snap->ps.saberInFlight))
 			{
 				BG_CalculateVRDefaultPosition(0, handEnt.origin, handEnt.angles);
+
+				if (cg.snap->ps.weapon == WP_SABER && cg.snap->ps.saberInFlight)
+				{
+					handEnt.hModel = cgs.media.handModel_force;
+				}
+				else if (cg.snap->ps.weapon == WP_MELEE)
+				{
+					handEnt.hModel = cgs.media.handModel_fist;
+				}
+				else
+				{
+					handEnt.hModel = cgs.media.handModel_relaxed;
+				}
 
 				//Move it back a bit?
 				AngleVectors(handEnt.angles, forward, NULL, NULL);

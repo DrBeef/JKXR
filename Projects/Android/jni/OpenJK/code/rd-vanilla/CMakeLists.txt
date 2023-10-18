@@ -28,6 +28,7 @@ if(BuildSPRdVanilla OR BuildJK2SPRdVanilla)
 		${SharedDir}
 		${SPRDVanillaRendererIncludeDirectories}
 		"${SPDir}/rd-vanilla"
+		"${JKXRDir}"
 		"${GSLIncludeDirectory}"
 		)
 

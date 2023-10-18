@@ -91,8 +91,14 @@ LANG_ENGLISH        "Enables left-handed mode."
 REFERENCE           WEAPON_PITCH_ITEM
 LANG_ENGLISH        "Weapon Pitch:"
 
+REFERENCE           SABER_PITCH_ITEM
+LANG_ENGLISH        "Saber Pitch:"
+
 REFERENCE           WEAPON_PITCH_DESC
 LANG_ENGLISH        "Sets aiming pitch of held weapon."
+
+REFERENCE           SABER_PITCH_DESC
+LANG_ENGLISH        "Sets pitch of saber."
 
 REFERENCE           TWO_HANDED_ITEM
 LANG_ENGLISH        "Two-Handed Mode:"
@@ -188,10 +194,10 @@ REFERENCE           SABER_REALISM_DESC
 LANG_ENGLISH        "Choose effectivity of lightsaber. Affects lightsaber duels difficulty mostly."
 
 REFERENCE           SABER_REALISM_DEFAULT
-LANG_ENGLISH        "Default"
+LANG_ENGLISH        "Weak"
 
 REFERENCE           SABER_REALISM_INCREASED
-LANG_ENGLISH        "Increased Damage"
+LANG_ENGLISH        "Team Beef Recommended"
 
 REFERENCE           SABER_REALISM_CRITICAL
 LANG_ENGLISH        "Fatal Critical Hit"
@@ -279,6 +285,12 @@ LANG_ENGLISH        "Staff"
 
 REFERENCE           CHEATS_SABER_STYLE_STAFF_DESC
 LANG_ENGLISH        "Use double-bladed lightsaber."
+
+REFERENCE           CHEATS_SABER_STYLE_SITH_ITEM
+LANG_ENGLISH        "Sith Sword"
+
+REFERENCE           CHEATS_SABER_STYLE_SITH_DESC
+LANG_ENGLISH        "Use Sith Sword."
 
 REFERENCE           CHEATS_SABER_COLOR_TITLE
 LANG_ENGLISH        "Lightsaber Color:"
@@ -506,18 +518,21 @@ REFERENCE           MODS_WARNING_CONFIRM
 LANG_ENGLISH        "Continue"
 
 REFERENCE           TBDC_BUMMSER
-LANG_ENGLISH        "Slower NPCs (Easy)-Vanilla Player Guns"
+LANG_ENGLISH        "Slower NPCs and Vanilla Player Guns - Not in JKA"
 
 REFERENCE           TBDC_BAGGYG
-LANG_ENGLISH        "Vanilla NPCs (Hard)-Stronger Player Guns"
+LANG_ENGLISH        "Vanilla NPCs and Stronger Player Guns"
 
 REFERENCE           TBDC_VANILLA
 LANG_ENGLISH        "Vanilla NPCs and Guns"
 
 REFERENCE           REFRESH_RATE_ITEM
-LANG_ENGLISH        "Refresh Rate:"
+LANG_ENGLISH        "Refresh Rate (Standalone Only):"
 
 REFERENCE           REFRESH_RATE_DESC
 LANG_ENGLISH        "Select display refresh rate (72Hz is recommended for default graphics setup)."
+
+REFERENCE           RESTART_JKXR_TO_APPLY
+LANG_ENGLISH        "You will need to manually restart JKXR."
 
 ENDMARKER

@@ -400,6 +400,7 @@ typedef struct {
 
 	// centerprinting
 	int			centerPrintTime;
+	int			centerPrintDelayOverride;
 	int			centerPrintY;
 	char		centerPrint[1024];
 	int			centerPrintLines;
@@ -594,6 +595,7 @@ extern	vmCvar_t		cg_bobpitch;
 extern	vmCvar_t		cg_bobroll;
 extern	vmCvar_t		cg_shadows;
 extern	vmCvar_t		cg_renderToTextureFX;
+extern	vmCvar_t		cg_forceBlurRenderToTextureFX;
 extern	vmCvar_t		cg_shadowCullDistance;
 extern	vmCvar_t		cg_paused;
 extern	vmCvar_t		cg_drawTimer;
@@ -810,7 +812,7 @@ void CG_AdjustFrom640Int( int *x, int *y, int *w, int *h );
 //
 // cg_draw.c
 //
-void CG_CenterPrint( const char *str, int y );
+void CG_CenterPrint( const char *str, int y, int delayOverride = -1 );
 void CG_DrawActive( stereoFrame_t stereoView );
 void CG_ScrollText( const char *str, int iPixelWidth );
 void CG_CaptionText( const char *str, int sound );

@@ -33,7 +33,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "qcommon/stringed_ingame.h"
 #include "sys/sys_loadlib.h"
 
-#include <JKXR/VrCommon.h>
+#include <VrCommon.h>
 
 vm_t	cgvm;
 /*

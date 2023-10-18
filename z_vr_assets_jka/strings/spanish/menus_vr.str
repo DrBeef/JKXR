@@ -115,11 +115,19 @@ LANG_SPANISH        "#same"
 
 REFERENCE           WEAPON_PITCH_ITEM
 LANG_ENGLISH        "Weapon Pitch:"
-LANG_SPANISH        "#same"
+LANG_SPANISH         "#same"
+
+REFERENCE           SABER_PITCH_ITEM
+LANG_ENGLISH        "Saber Pitch:"
+LANG_SPANISH         "#same"
 
 REFERENCE           WEAPON_PITCH_DESC
 LANG_ENGLISH        "Sets aiming pitch of held weapon."
-LANG_SPANISH        "#same"
+LANG_SPANISH         "#same"
+
+REFERENCE           SABER_PITCH_DESC
+LANG_ENGLISH        "Sets pitch of saber."
+LANG_SPANISH         "#same"
 
 REFERENCE           TWO_HANDED_ITEM
 LANG_ENGLISH        "Two-Handed Mode:"
@@ -246,11 +254,11 @@ LANG_ENGLISH        "Choose effectivity of lightsaber. Affects lightsaber duels 
 LANG_SPANISH        "#same"
 
 REFERENCE           SABER_REALISM_DEFAULT
-LANG_ENGLISH        "Default"
+LANG_ENGLISH        "Weak"
 LANG_SPANISH        "#same"
 
 REFERENCE           SABER_REALISM_INCREASED
-LANG_ENGLISH        "Increased Damage"
+LANG_ENGLISH        "Team Beef Recommended"
 LANG_SPANISH        "#same"
 
 REFERENCE           SABER_REALISM_CRITICAL
@@ -367,6 +375,14 @@ LANG_SPANISH         "#same"
 
 REFERENCE           CHEATS_SABER_STYLE_STAFF_DESC
 LANG_ENGLISH        "Use double-bladed lightsaber."
+LANG_SPANISH         "#same"
+
+REFERENCE           CHEATS_SABER_STYLE_SITH_ITEM
+LANG_ENGLISH        "Sith Sword"
+LANG_SPANISH         "#same"
+
+REFERENCE           CHEATS_SABER_STYLE_SITH_DESC
+LANG_ENGLISH        "Use Sith Sword."
 LANG_SPANISH         "#same"
 
 REFERENCE           CHEATS_SABER_COLOR_TITLE
@@ -674,7 +690,7 @@ LANG_ENGLISH        "Slower NPCs (Easy)-Vanilla Player Guns"
 LANG_SPANISH        "#same"
 
 REFERENCE           TBDC_BAGGYG
-LANG_ENGLISH        "Vanilla NPCs (Hard)-Stronger Player Guns"
+LANG_ENGLISH        "Vanilla NPCs and Stronger Player Guns"
 LANG_SPANISH        "#same"
 
 REFERENCE           TBDC_VANILLA
@@ -682,11 +698,15 @@ LANG_ENGLISH        "Vanilla NPCs and Guns"
 LANG_SPANISH        "#same"
 
 REFERENCE           REFRESH_RATE_ITEM
-LANG_ENGLISH        "Refresh Rate:"
+LANG_ENGLISH        "Refresh Rate (Standalone Only):"
 LANG_SPANISH        "#same"
 
 REFERENCE           REFRESH_RATE_DESC
 LANG_ENGLISH        "Select display refresh rate (72Hz is recommended for default graphics setup)."
+LANG_SPANISH        "#same"
+
+REFERENCE           RESTART_JKXR_TO_APPLY
+LANG_ENGLISH        "You will need to manually restart JKXR."
 LANG_SPANISH        "#same"
 
 ENDMARKER

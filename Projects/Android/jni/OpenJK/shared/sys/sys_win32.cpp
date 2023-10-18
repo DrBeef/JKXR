@@ -25,6 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include <io.h>
 #include <shlobj.h>
 #include <windows.h>
+#include <winbase.h>
 
 #define MEM_THRESHOLD (128*1024*1024)
 
@@ -32,6 +33,40 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 static char homePath[ MAX_OSPATH ] = { 0 };
 
 static UINT timerResolution = 0;
+
+
+
+
+/*
+==============
+Sys_Dialog
+
+Display a win32 dialog box
+==============
+*/
+dialogResult_t Sys_Dialog(dialogType_t type, const char* message, const char* title)
+{
+	UINT uType;
+
+	switch (type)
+	{
+	default:
+	case DT_INFO:      uType = MB_ICONINFORMATION | MB_OK; break;
+	case DT_WARNING:   uType = MB_ICONWARNING | MB_OK; break;
+	case DT_ERROR:     uType = MB_ICONERROR | MB_OK; break;
+	case DT_YES_NO:    uType = MB_ICONQUESTION | MB_YESNO; break;
+	case DT_OK_CANCEL: uType = MB_ICONWARNING | MB_OKCANCEL; break;
+	}
+
+	switch (MessageBox(NULL, message, title, uType))
+	{
+	default:
+	case IDOK:      return DR_OK;
+	case IDCANCEL:  return DR_CANCEL;
+	case IDYES:     return DR_YES;
+	case IDNO:      return DR_NO;
+	}
+}
 
 /*
 ==============
@@ -80,6 +115,23 @@ const char *Sys_Dirname( char *path )
 		length--;
 
 	dir[ length ] = '\0';
+
+	return dir;
+}
+
+/*
+==============
+Sys_Dirname
+==============
+*/
+const char *Sys_CurrentDirname(  )
+{
+	static char dir[ MAX_OSPATH ] = { 0 };
+
+	GetCurrentDirectory(
+		MAX_OSPATH,
+		dir
+	);
 
 	return dir;
 }

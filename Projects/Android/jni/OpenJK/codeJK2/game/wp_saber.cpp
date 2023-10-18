@@ -30,7 +30,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "../../code/qcommon/tri_coll_test.h"
 #include "../cgame/FxScheduler.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 #define MAX_SABER_VICTIMS 16
 static int		victimEntityNum[MAX_SABER_VICTIMS];

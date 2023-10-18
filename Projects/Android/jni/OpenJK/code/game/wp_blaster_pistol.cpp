@@ -26,6 +26,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "w_local.h"
 
 #include "bg_local.h"
+#include <VrTBDC.h>
+extern cvar_t	*g_TeamBeefDirectorsCut;
 
 
 //---------------
@@ -43,7 +45,6 @@ void WP_FireBryarPistol( gentity_t *ent, qboolean alt_fire )
 	if ( BG_UseVRPosition(ent))
 	{
 		BG_CalculateVRWeaponPosition(muzzle, angs);
-		AngleVectors(angs, forward, NULL, NULL);
 	}
 	else {
 		vectoangles(forwardVec, angs);
@@ -68,14 +69,19 @@ void WP_FireBryarPistol( gentity_t *ent, qboolean alt_fire )
 				angs[PITCH] += ( Q_flrand(-1.0f, 1.0f) * ((5-ent->NPC->currentAim)*0.25f) );
 				angs[YAW]	+= ( Q_flrand(-1.0f, 1.0f) * ((5-ent->NPC->currentAim)*0.25f) );
 			}
-
-			AngleVectors( angs, forward, NULL, NULL );
 		}
 	}
 
+	AngleVectors( angs, forward, NULL, NULL );
+
 	WP_MissileTargetHint(ent, start, forward);
 
-	gentity_t	*missile = CreateMissile( start, forward, BRYAR_PISTOL_VEL, 10000, ent, alt_fire );
+	float velocity = BRYAR_PISTOL_VEL;
+	if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->integer == 1)
+	{
+		velocity = TBDC_BRYAR_PISTOL_VEL;
+	}
+	gentity_t	*missile = CreateMissile( start, forward, velocity, 10000, ent, alt_fire );
 
 	missile->classname = "bryar_proj";
 	if ( ent->s.weapon == WP_BLASTER_PISTOL

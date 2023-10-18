@@ -3,7 +3,7 @@ CONFIG W:\bin\striped.cfg
 ID 100
 REFERENCE MENUS_VR
 DESCRIPTION "VR Menu Localizations"
-COUNT 163
+COUNT 166
 INDEX 0
 {
    REFERENCE COMMON_CONTROLS_ITEM
@@ -297,12 +297,12 @@ INDEX 57
 INDEX 58
 {
    REFERENCE SABER_REALISM_DEFAULT
-   TEXT_LANGUAGE1 "Default"
+   TEXT_LANGUAGE1 "Weak"
 }
 INDEX 59
 {
    REFERENCE SABER_REALISM_INCREASED
-   TEXT_LANGUAGE1 "Increased Damage"
+   TEXT_LANGUAGE1 "Team Beef Recommended"
 }
 INDEX 60
 {
@@ -802,7 +802,7 @@ INDEX 158
 INDEX 159
 {
    REFERENCE TBDC_BAGGYG
-   TEXT_LANGUAGE1 "Vanilla NPCs (Hard)-Stronger Player Guns"
+   TEXT_LANGUAGE1 "Vanilla NPCs and Stronger Player Guns"
 }
 INDEX 160
 {
@@ -812,10 +812,25 @@ INDEX 160
 INDEX 161
 {
    REFERENCE REFRESH_RATE_ITEM
-   TEXT_LANGUAGE1 "Refresh Rate:"
+   TEXT_LANGUAGE1 "Refresh Rate (Standalone Only):"
 }
 INDEX 162
 {
    REFERENCE REFRESH_RATE_DESC
    TEXT_LANGUAGE1 "Select display refresh rate (72Hz is recommended for default graphics setup)."
+}
+INDEX 163
+{
+   REFERENCE RESTART_JKXR_TO_APPLY
+   TEXT_LANGUAGE1 "You will need to manually restart JKXR."
+}
+INDEX 164
+{
+   REFERENCE SABER_PITCH_ITEM
+   TEXT_LANGUAGE1 "Saber Pitch:"
+}
+INDEX 165
+{
+   REFERENCE SABER_PITCH_DESC
+   TEXT_LANGUAGE1 "Sets pitch of Saber."
 }

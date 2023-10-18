@@ -1631,8 +1631,7 @@
 		{
 			name				vidrestart_text1
 			group				vidrestart
-			text				@MENUS0_THIS_WILL_APPLY_VIDEO
-			text2				@MENUS0_AND_RETURN_TO_THE_MAIN
+			text				@MENUS_VR_RESTART_JKXR_TO_APPLY
 			rect				305 230 290 20
 			textalign			ITEM_ALIGN_CENTER
 			text2aligny			18
@@ -1847,7 +1846,7 @@
 			{  
 				@MENUS3_NONE		0 
 				@MENUS0_LOW		1 
-				@MENUS0_HIGH	3
+				@MENUS0_HIGH	2
 			}
 			rect				305 271 300 20
 	   		textalign			ITEM_ALIGN_RIGHT
@@ -3165,8 +3164,7 @@
 		{
 			name				options
 			group				defaults
-			text				@MENUS2_THIS_WILL_SET_ALL_GAME
-			text2				@MENUS2_TO_THEIR_FACTORY_SETTINGS
+			text				@MENUS_VR_RESTART_JKXR_TO_APPLY
 			rect				305 231 300 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			150

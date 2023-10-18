@@ -644,6 +644,31 @@ static void Svcmd_SetForceAll_f(void)
 	}
 }
 
+void Svcmd_SaberSetLevel_f( void )
+{
+	if ( !&g_entities[0] || !g_entities[0].client )
+	{
+		return;
+	}
+
+	gentity_t *self = G_GetSelfForPlayerCmd();
+	if ( self->s.weapon != WP_SABER )
+	{
+		return;
+	}
+
+	const char *newVal = gi.argv(1);
+	int saberAnimLevel = atoi(newVal);
+	if ( !self->s.number )
+	{
+		cg.saberAnimLevelPending = saberAnimLevel;
+	}
+	else
+	{
+		self->client->ps.saberAnimLevel = saberAnimLevel;
+	}
+}
+
 static void Svcmd_SetSaberAll_f(void)
 {
 	Svcmd_ForceSetLevel_f( FP_SABERTHROW );
@@ -926,6 +951,7 @@ static svcmd_t svcmds[] = {
 	{ "setForceSight",				Svcmd_ForceSetLevel_f<FP_SEE>,				CMD_CHEAT },
 	{ "setForceAll",				Svcmd_SetForceAll_f,						CMD_CHEAT },
 	{ "setSaberAll",				Svcmd_SetSaberAll_f,						CMD_CHEAT },
+	{ "setSaberLevel",				Svcmd_SaberSetLevel_f,					CMD_NONE },
 	
 	{ "saberAttackCycle",			Svcmd_SaberAttackCycle_f,					CMD_NONE },
 	

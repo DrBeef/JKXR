@@ -37,6 +37,12 @@ char *Sys_Cwd( void ) {
 	return cwd;
 }
 
+//No support for this on Android atm
+dialogResult_t Sys_Dialog(dialogType_t type, const char* message, const char* title)
+{
+	return DR_OK;
+}
+
 /*
 =================
 Sys_ConsoleInput

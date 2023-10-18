@@ -29,7 +29,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "../../code/qcommon/sstring.h"
 #include "../code/qcommon/ojk_saved_game_helper.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 //NOTENOTE: Be sure to change the mirrored code in g_shared.h
 typedef std::map< sstring_t, unsigned char, std::less<sstring_t> >	namePrecache_m;
@@ -385,8 +385,11 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_stereoSeparation, "cg_stereoSeparation", "0.065", CVAR_ARCHIVE  },
 	{ &cg_worldScale, "cg_worldScale", "33.5", CVAR_ARCHIVE  },
 	{ &cg_heightAdjust, "cg_heightAdjust", "0.0", CVAR_ARCHIVE  },
-	{ &cg_shadows, "cg_shadows", "3", CVAR_ARCHIVE  },
-
+#ifdef _WIN32
+	{ &cg_shadows, "cg_shadows", "2", CVAR_ARCHIVE  },
+#else
+	{ &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE  },
+#endif
 	{ &cg_hudScale, "cg_hudScale", "2.5", CVAR_ARCHIVE  },
 	{ &cg_hudStereo, "cg_hudStereo", "20", CVAR_ARCHIVE  },
 	{ &cg_hudYOffset, "cg_hudYOffset", "0.0", CVAR_ARCHIVE  },
@@ -1317,6 +1320,7 @@ static void CG_RegisterGraphics( void ) {
 
 	//VR Hand models
 	cgs.media.handModel_relaxed		= cgi_R_RegisterModel( "models/players/kyle/lhand_r.md3" );
+	cgs.media.handModel_fist		= cgi_R_RegisterModel( "models/players/kyle/lhand_force_fisting.md3" );
 	cgs.media.handModel_force		= cgi_R_RegisterModel( "models/players/kyle/lhand_f.md3" );
 	cgs.media.saberHilt = cgi_R_RegisterModel( "models/weapons2/saber/saber_w.md3" );
 
@@ -3600,7 +3604,6 @@ void CG_DrawForceSelect( void )
 			int w = cgi_R_Font_StrLenPixels(text, cgs.media.qhFontSmall, 1.0f);
 			int x = ( SCREEN_WIDTH - w ) / 2;
 			int y = (SCREEN_HEIGHT / 2 + 50);
-			CG_AdjustFrom640Int(&x, &y, NULL, NULL);
 			cgi_R_Font_DrawString(x, y, text, colorTable[CT_ICON_BLUE], cgs.media.qhFontSmall, -1, 1.0f);
 	}
 }

@@ -31,7 +31,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../game/anims.h"
 #include "../game/g_functions.h"
 #include "bg_local.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 #define MASK_CAMERACLIP (MASK_SOLID)
 #define CAMERA_SIZE	4
@@ -2033,13 +2033,14 @@ wasForceSpeed=isForceSpeed;
 		}
 
 		//Render hand models when appropriate
-		if (!in_camera
+		if (cg.snap->ps.clientNum == 0
+			&& !in_camera
 			&& !cg.renderingThirdPerson
 			&& cg.predicted_player_state.stats[STAT_HEALTH] > 0
-			&& cg.snap->ps.weapon != WP_MELEE
 			&& !vr->weapon_stabilised
 			&& !vr->in_vehicle
 			&& !cg_pano.integer
+			&& cg.zoomMode == 0
 			&& (cg.snap->ps.viewEntity == 0 || cg.snap->ps.viewEntity >= ENTITYNUM_WORLD))
 		{
 			vec3_t end, forward;
@@ -2060,6 +2061,10 @@ wasForceSpeed=isForceSpeed;
 			{
 				handEnt.hModel = cgs.media.handModel_force;
 			}
+			else if (cg.snap->ps.weapon == WP_MELEE)
+			{
+				handEnt.hModel = cgs.media.handModel_fist;
+			}
 			else
 			{
 				handEnt.hModel = cgs.media.handModel_relaxed;
@@ -2071,11 +2076,27 @@ wasForceSpeed=isForceSpeed;
 				VectorScale( handEnt.axis[i], (vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
 			}
 
-			cgi_R_AddRefEntityToScene(&handEnt);
+			centity_t *cent = &cg_entities[0];
+			CG_AddRefEntityWithPowerups(&handEnt, cent->currentState.powerups, cent, true);
 
-			if (cg.snap->ps.weapon == WP_NONE)
+			if (cg.snap->ps.weapon == WP_NONE ||
+				cg.snap->ps.weapon == WP_MELEE ||
+				(cg.snap->ps.weapon == WP_SABER && cg.snap->ps.saberInFlight))
 			{
 				BG_CalculateVRDefaultPosition(0, handEnt.origin, handEnt.angles);
+
+				if (cg.snap->ps.weapon == WP_SABER && cg.snap->ps.saberInFlight)
+				{
+					handEnt.hModel = cgs.media.handModel_force;
+				}
+				else if (cg.snap->ps.weapon == WP_MELEE)
+				{
+					handEnt.hModel = cgs.media.handModel_fist;
+				}
+				else
+				{
+					handEnt.hModel = cgs.media.handModel_relaxed;
+				}
 
 				//Move it back a bit?
 				AngleVectors(handEnt.angles, forward, NULL, NULL);
@@ -2088,7 +2109,7 @@ wasForceSpeed=isForceSpeed;
 					VectorScale( handEnt.axis[i], (!vr->right_handed || i != 1) ? 1.0f : -1.0f, handEnt.axis[i] );
 				}
 
-				cgi_R_AddRefEntityToScene(&handEnt);
+				CG_AddRefEntityWithPowerups(&handEnt, cent->currentState.powerups, cent, true);
 			}
 		}
 	}

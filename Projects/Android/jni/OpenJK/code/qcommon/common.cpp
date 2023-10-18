@@ -159,7 +159,9 @@ void QDECL Com_Printf( const char *fmt, ... ) {
 
 
 #ifdef OUTPUT_TO_BUILD_WINDOW
-	OutputDebugString(msg);
+	char cmsg[MAXPRINTMSG] = { 0 };
+	snprintf(cmsg, sizeof(cmsg), "%s\n", msg);
+	OutputDebugString(cmsg);
 #endif
 
 	// logfile
@@ -1132,7 +1134,11 @@ void Com_Init( char *commandLine ) {
 			Cmd_AddCommand ("freeze", Com_Freeze_f);
 		}
 
+#ifdef _WIN32
+		s = va("%s %s %s", Q3_VERSION, PLATFORM_STRING, SOURCE_DATE );
+#else
 		s = va("%s   %s", Q3_VERSION, SOURCE_DATE );
+#endif		
 		com_version = Cvar_Get ("version", s, CVAR_ROM | CVAR_SERVERINFO );
 
 #ifdef JK2_MODE

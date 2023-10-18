@@ -31,7 +31,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "bg_public.h"
 #include "g_items.h"
 #include "g_vehicles.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 
 extern weaponData_t weaponData[WP_NUM_WEAPONS];
@@ -716,9 +716,15 @@ void rotateAboutOrigin(float x, float y, float rotation, vec2_t out)
 
 float getHMDYawForCalc()
 {
-	if (!vr->third_person && vr->cgzoommode != 2 && vr->cgzoommode != 4 ) {
+	if (vr->in_vehicle || vr->third_person)
+	{
+		return vr->hmdorientation_first[YAW];
+	}
+
+	if (vr->cgzoommode != 2 && vr->cgzoommode != 4) {
 		return vr->hmdorientation[YAW];
 	}
+
 	return 0.0f;
 }
 
@@ -788,6 +794,11 @@ void BG_CalculateVRSaberPosition( int saberNum, vec3_t origin, vec3_t angles )
 	else
 	{
 		BG_CalculateVRPositionInWorld(vr->offhandposition[0], vr->offhandoffset, vr->offhandangles[ANGLES_SABER], origin, angles);
+	}
+
+	if (vr->in_vehicle)
+	{
+		BG_ConvertFromVR(vr->hmdposition_offset, origin, origin);
 	}
 
 	//Move position down a bit

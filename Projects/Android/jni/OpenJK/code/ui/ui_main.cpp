@@ -4333,7 +4333,8 @@ void UI_UpdateVideoSetup ( void )
 //	Cvar_Set ( "cg_shadows", Cvar_VariableString ( "ui_cg_shadows" ) );
 	Cvar_Set ( "ui_r_modified", "0" );
 
-	Cbuf_ExecuteText( EXEC_APPEND, "vid_restart;" );
+	//Don't do this - expect user to restart themselves
+	//Cbuf_ExecuteText( EXEC_APPEND, "vid_restart;" );
 }
 
 /*

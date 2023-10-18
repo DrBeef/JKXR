@@ -74,6 +74,7 @@ typedef struct {
 // as well as the locally generated scene information
 typedef struct {
 	int			x, y, width, height;
+	bool 		override_fov;
 	float		fov_x, fov_y;
 	vec3_t		vieworg;
 	vec3_t		viewaxis[3];		// transformation matrix
@@ -1309,7 +1310,7 @@ void	RE_GetScreenShot(byte *data, int w, int h);
 byte*	RE_TempRawImage_ReadFromFile(const char *psLocalFilename, int *piWidth, int *piHeight, byte *pbReSampleBuffer, qboolean qbVertFlip);
 void	RE_TempRawImage_CleanUp();
 
-void		RE_BeginRegistration( glconfig_t *glconfig );
+void		RE_BeginRegistration( glconfig_t *glconfig, intptr_t pVrClientInfo );
 void		RE_LoadWorldMap( const char *mapname );
 void		RE_SetWorldVisData( const byte *vis );
 qhandle_t	RE_RegisterModel( const char *name );
@@ -1778,6 +1779,7 @@ typedef enum {
 	RC_DRAW_BUFFER,
 	RC_SWAP_BUFFERS,
 	RC_WORLD_EFFECTS,
+	RC_FLUSH
 } renderCommand_t;
 
 
@@ -1818,6 +1820,7 @@ void RE_LAGoggles( void );
 void RE_Scissor ( float x, float y, float w, float h);
 void RE_BeginFrame( stereoFrame_t stereoFrame );
 void RE_EndFrame( int *frontEndMsec, int *backEndMsec );
+void RE_SubmitStereoFrame(  );
 qboolean	RE_ProcessDissolve(void);
 qboolean	RE_InitDissolve(qboolean bForceCircularExtroWipe);
 

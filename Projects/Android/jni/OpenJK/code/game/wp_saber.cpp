@@ -29,7 +29,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_vehicles.h"
 #include "../qcommon/tri_coll_test.h"
 #include "../cgame/cg_local.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 #define JK2_RAGDOLL_GRIPNOHEALTH
 
@@ -1448,9 +1448,15 @@ qboolean WP_SaberApplyDamage( gentity_t *ent, float baseDamage, int baseDFlags,
 						qboolean vicWasDismembered = qtrue;
 						qboolean vicWasAlive = (qboolean)(victim->health>0);
 
-						if ( baseDamage <= 0.1f )
-						{//just get their attention?
-							dFlags |= DAMAGE_NO_DAMAGE;
+
+						//This will prevent damage being inflicted if no base damage happened at all
+						//this is different to JKO so don't do this in TBDC mode
+						if (!g_TeamBeefDirectorsCut->integer)
+						{
+							if (baseDamage <= 0.1f)
+							{//just get their attention?
+								dFlags |= DAMAGE_NO_DAMAGE;
+							}
 						}
 
 						if( victim->client )
@@ -2318,6 +2324,14 @@ qboolean WP_SaberDamageEffects( trace_t *tr, const vec3_t start, float length, f
 					if ( !hitEnt->client || (hitEnt->client->ps.weapon!=WP_SABER&&hitEnt->client->NPC_class!=CLASS_GALAKMECH&&hitEnt->client->playerTeam==enemyTeam) )
 					{//did *not* hit a jedi and did *not* hit the player
 						//make sure the base damage is high against non-jedi, feels better
+						doDmg = 10;
+					}
+
+					// Let the saber cut through sand people and Noghri like butter...
+					if ( hitEnt->client && (
+                            hitEnt->client->NPC_class==CLASS_TUSKEN ||
+                            hitEnt->client->NPC_class==CLASS_NOGHRI))
+					{
 						doDmg = 10;
 					}
 				}
@@ -4656,26 +4670,37 @@ void WP_SaberDamageTrace( gentity_t *ent, int saberNum, int bladeNum )
 			{//don't kill with this hit
 				baseDFlags = DAMAGE_NO_KILL;
 			}
-			if (  (!WP_SaberBladeUseSecondBladeStyle( &ent->client->ps.saber[saberNum], bladeNum )
-						&& (ent->client->ps.saber[saberNum].saberFlags2&SFL2_NO_IDLE_EFFECT) )
-				|| ( WP_SaberBladeUseSecondBladeStyle( &ent->client->ps.saber[saberNum], bladeNum )
-						&& (ent->client->ps.saber[saberNum].saberFlags2&SFL2_NO_IDLE_EFFECT2) )
-				)
-			{//do nothing at all when idle
-				return;
+
+			//This bit isn't in JKO, so only enable it if not in TBDC
+			if ( !g_TeamBeefDirectorsCut->integer)
+			{
+				if ((!WP_SaberBladeUseSecondBladeStyle(&ent->client->ps.saber[saberNum], bladeNum)
+					 && (ent->client->ps.saber[saberNum].saberFlags2 & SFL2_NO_IDLE_EFFECT))
+					|| (WP_SaberBladeUseSecondBladeStyle(&ent->client->ps.saber[saberNum], bladeNum)
+						&& (ent->client->ps.saber[saberNum].saberFlags2 & SFL2_NO_IDLE_EFFECT2))
+						)
+				{//do nothing at all when idle
+					return;
+				}
 			}
+
 			baseDamage = 0;
 		}
 		else if ( ent->client->ps.saberLockTime > level.time )
 		{//just do effects
-			if (  (!WP_SaberBladeUseSecondBladeStyle( &ent->client->ps.saber[saberNum], bladeNum )
-						&& (ent->client->ps.saber[saberNum].saberFlags2&SFL2_NO_IDLE_EFFECT) )
-				|| ( WP_SaberBladeUseSecondBladeStyle( &ent->client->ps.saber[saberNum], bladeNum )
-						&& (ent->client->ps.saber[saberNum].saberFlags2&SFL2_NO_IDLE_EFFECT2) )
-				)
-			{//do nothing at all when idle
-				return;
+			//This bit isn't in JKO, so only enable it if not in TBDC
+			if ( !g_TeamBeefDirectorsCut->integer)
+			{
+				if ((!WP_SaberBladeUseSecondBladeStyle(&ent->client->ps.saber[saberNum], bladeNum)
+					 && (ent->client->ps.saber[saberNum].saberFlags2 & SFL2_NO_IDLE_EFFECT))
+					|| (WP_SaberBladeUseSecondBladeStyle(&ent->client->ps.saber[saberNum], bladeNum)
+						&& (ent->client->ps.saber[saberNum].saberFlags2 & SFL2_NO_IDLE_EFFECT2))
+						)
+				{//do nothing at all when idle
+					return;
+				}
 			}
+
 			baseDamage = 0;
 		}
 		else if ( !WP_SaberBladeUseSecondBladeStyle( &ent->client->ps.saber[saberNum], bladeNum )
@@ -6345,6 +6370,75 @@ gentity_t *WP_SaberFindEnemy( gentity_t *self, gentity_t *saber )
 		maxs[i] = center[i] + radius;
 	}
 
+	if ( WP_SaberValidateEnemy( self, self->enemy ) )
+	{
+		bestEnt = self->enemy;
+		bestRating = WP_SaberRateEnemy( bestEnt, center, forward, radius );
+	}
+
+	numListedEntities = gi.EntitiesInBox( mins, maxs, entityList, MAX_GENTITIES );
+
+	if ( !numListedEntities )
+	{//should we clear the enemy?
+		return bestEnt;
+	}
+
+	for ( e = 0 ; e < numListedEntities ; e++ )
+	{
+		ent = entityList[ e ];
+
+		if ( ent == self || ent == saber || ent == bestEnt )
+		{
+			continue;
+		}
+		if ( !WP_SaberValidateEnemy( self, ent ) )
+		{//doesn't meet criteria of valid look enemy (don't check current since we would have done that before this func's call
+			continue;
+		}
+		if ( !gi.inPVS( self->currentOrigin, ent->currentOrigin ) )
+		{//not even potentially visible
+			continue;
+		}
+		if ( !G_ClearLOS( self, self->client->renderInfo.eyePoint, ent ) )
+		{//can't see him
+			continue;
+		}
+		//rate him based on how close & how in front he is
+		rating = WP_SaberRateEnemy( ent, center, forward, radius );
+		if ( rating > bestRating )
+		{
+			bestEnt = ent;
+			bestRating = rating;
+		}
+	}
+	return bestEnt;
+}
+
+/*
+gentity_t *WP_SaberFindEnemy( gentity_t *self, gentity_t *saber )
+{
+//FIXME: should be a more intelligent way of doing this, like auto aim?
+//closest, most in front... did damage to... took damage from?  How do we know who the player is focusing on?
+	gentity_t	*ent, *bestEnt = NULL;
+	gentity_t	*entityList[MAX_GENTITIES];
+	int			numListedEntities;
+	vec3_t		center, mins, maxs, fwdangles, forward;
+	int			i, e;
+	float		radius = 400;
+	float		rating, bestRating = 0.0f;
+
+	//FIXME: no need to do this in 1st person?
+	fwdangles[1] = self->client->ps.viewangles[1];
+	AngleVectors( fwdangles, forward, NULL, NULL );
+
+	VectorCopy( saber->currentOrigin, center );
+
+	for ( i = 0 ; i < 3 ; i++ )
+	{
+		mins[i] = center[i] - radius;
+		maxs[i] = center[i] + radius;
+	}
+
 	//if the saber has an enemy from the last time it looked, init to that one
 	if ( WP_SaberValidateEnemy( self, saber->enemy ) )
 	{
@@ -6412,6 +6506,7 @@ gentity_t *WP_SaberFindEnemy( gentity_t *self, gentity_t *saber )
 	}
 	return bestEnt;
 }
+*/
 
 void WP_RunSaber( gentity_t *self, gentity_t *saber )
 {
@@ -6501,6 +6596,24 @@ void WP_RunSaber( gentity_t *self, gentity_t *saber )
 			VectorCopy( self->client->renderInfo.handRPoint, saberHome );
 			VectorMA( saberHome, self->client->ps.saberEntityDist, forward, saberDest );
 
+			/*
+			 * This is JKO's saber level 3 enemy seek code, just seems to work better, especially in VR
+			 * so have re-instated this
+			 */
+			if ( self->client->ps.forcePowerLevel[FP_SABERTHROW] > FORCE_LEVEL_2 && self->client->ps.saberEntityState == SES_LEAVING )
+			{//max level
+				//pick an enemy
+				enemy = WP_SaberFindEnemy( self, saber );
+				if ( enemy )
+				{//home in on enemy
+					float enemyDist = Distance( self->client->renderInfo.handRPoint, enemy->currentOrigin );
+					VectorCopy( enemy->currentOrigin, saberDest );
+					saberDest[2] += enemy->maxs[2]/2.0f;//FIXME: when in a knockdown anim, the saber float above them... do we care?
+					self->client->ps.saberEntityDist = enemyDist;
+				}
+			}
+
+			/*
 			if ( self->client->ps.forcePowerLevel[FP_SABERTHROW] > FORCE_LEVEL_2
 				&& self->client->ps.saberEntityState == SES_LEAVING )
 			{//max level
@@ -6524,6 +6637,7 @@ void WP_RunSaber( gentity_t *self, gentity_t *saber )
 					}
 				}
 			}
+			 */
 
 
 			//Make the saber head there
@@ -12944,7 +13058,7 @@ void WP_ForcePowerStart( gentity_t *self, forcePowers_t forcePower, int override
 	}
 }
 
-void CG_CenterPrint( const char *str, int y );
+void CG_CenterPrint( const char *str, int y, int delayOverride);
 qboolean WP_ForcePowerAvailable( gentity_t *self, forcePowers_t forcePower, int overrideAmt )
 {
 	if ( forcePower == FP_LEVITATION )

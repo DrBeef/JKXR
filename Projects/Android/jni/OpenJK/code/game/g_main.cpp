@@ -633,7 +633,7 @@ void G_InitCvars( void ) {
 	g_sex = gi.cvar ("sex", "f", CVAR_USERINFO | CVAR_ARCHIVE|CVAR_SAVEGAME|CVAR_NORESTART );
 	g_spskill = gi.cvar ("g_spskill", "0", CVAR_ARCHIVE | CVAR_SAVEGAME|CVAR_NORESTART);
 	g_knockback = gi.cvar( "g_knockback", "1000", CVAR_CHEAT );
-	g_dismemberment = gi.cvar ( "g_dismemberment", "3", CVAR_ARCHIVE );//0 = none, 1 = arms and hands, 2 = legs, 3 = waist and head
+	g_dismemberment = gi.cvar ( "g_dismemberment", "4", CVAR_ARCHIVE );//0 = none, 1 = arms and hands, 2 = legs, 3 = waist and head
 	// for now I'm making default 10 seconds
 	g_corpseRemovalTime = gi.cvar ( "g_corpseRemovalTime", "10", CVAR_ARCHIVE );//number of seconds bodies stick around for, at least... 0 = never go away
 	g_synchSplitAnims = gi.cvar ( "g_synchSplitAnims", "1", 0 );
@@ -666,7 +666,13 @@ void G_InitCvars( void ) {
 
 	g_saberAutoDeflect1stPerson = gi.cvar( "g_saberAutoDeflect1stPerson", "0", CVAR_ARCHIVE );//Whether the saber will auto deflect missiles in first person
 	g_saberAutoBlocking = gi.cvar( "g_saberAutoBlocking", "1", CVAR_ARCHIVE|CVAR_CHEAT );//must press +block button to do any blocking
-	g_saberRealisticCombat = gi.cvar( "g_saberMoreRealistic", "3", CVAR_ARCHIVE );//makes collision more precise, increases damage
+
+	//This is the original setting we had, but it makes the sabers too powerful
+//	g_saberRealisticCombat = gi.cvar( "g_saberMoreRealistic", "3", CVAR_ARCHIVE );//makes collision more precise, increases damage
+
+	//This is the new setting, using the original JKO cvar name, so that any existing players get this new var and the sabers work like JKO
+	g_saberRealisticCombat = gi.cvar( "g_saberRealisticCombat", "1", CVAR_ARCHIVE );//makes collision more precise, increases damage
+
 	debug_subdivision = gi.cvar( "debug_subdivision", "0", CVAR_ARCHIVE );//debug for dismemberment
 	g_dismemberProbabilities = gi.cvar ( "g_dismemberProbabilities", "100", CVAR_ARCHIVE );//0 = ignore probabilities, 1 = use probabilities
 	g_saberDamageCapping = gi.cvar( "g_saberDamageCapping", "1", CVAR_CHEAT );//caps damage of sabers vs players and NPC who use sabers

@@ -278,7 +278,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				230 155 50 20
+			rect				210 155 50 20
 			text				@MENUS_VR_CHEATS_SABER_STYLE_SINGLE_ITEM
 			descText		@MENUS_VR_CHEATS_SABER_STYLE_SINGLE_DESC
 			font				2
@@ -292,7 +292,7 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
-				exec			"saber single; vstr set_saber_color"
+				exec			"saber single_1; vstr set_saber_color"
 			}
 		}
 
@@ -302,7 +302,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				288 155 50 20
+			rect				268 155 50 20
 			text				@MENUS_VR_CHEATS_SABER_STYLE_DUAL_ITEM
 			descText		@MENUS_VR_CHEATS_SABER_STYLE_DUAL_DESC
 			font				2
@@ -316,7 +316,7 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
-				exec			"saber single single; vstr set_saber_color"
+				exec			"saber single_1 single_1; vstr set_saber_color"
 			}
 		}
 
@@ -326,9 +326,9 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				350 155 50 20
+			rect				330 155 50 20
 			text				@MENUS_VR_CHEATS_SABER_STYLE_STAFF_ITEM
-			descText		@MENUS_VR_CHEATS_SABER_STYLE_STAFF_DESC
+			descText			@MENUS_VR_CHEATS_SABER_STYLE_STAFF_DESC
 			font				2
 			textscale			1
 			textalignx			25
@@ -341,6 +341,30 @@
 			{ 
 				play			"sound/interface/button1.wav" ;
 				exec			"saber dual_1; vstr set_saber_color"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				410 155 50 20
+			text				@MENUS_VR_CHEATS_SABER_STYLE_SITH_ITEM
+			descText			@MENUS_VR_CHEATS_SABER_STYLE_SITH_DESC
+			font				2
+			textscale			1
+			textalignx			25
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"saber sith_sword"
 			}
 		}
 

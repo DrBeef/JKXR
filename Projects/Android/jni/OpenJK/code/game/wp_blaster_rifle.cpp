@@ -27,7 +27,9 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "w_local.h"
 
 #include "bg_local.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
+#include <VrTBDC.h>
+extern cvar_t	*g_TeamBeefDirectorsCut;
 
 
 //---------------
@@ -59,6 +61,11 @@ void WP_FireBlasterMissile( gentity_t *ent, vec3_t start, vec3_t dir, qboolean a
 			{
 				velocity *= BLASTER_NPC_HARD_VEL_CUT;
 			}
+		}
+
+		if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->integer == 1)
+		{
+			velocity = TBDC_BLASTER_VELOCITY;
 		}
 	}
 

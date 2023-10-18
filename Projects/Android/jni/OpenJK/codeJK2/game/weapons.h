@@ -84,7 +84,7 @@ typedef enum //# weapon_e
 } weapon_t;
 
 #define FIRST_WEAPON		WP_SABER		// this is the first weapon for next and prev weapon switching
-#define MAX_PLAYER_WEAPONS	WP_STUN_BATON	// this is the max you can switch to and get with the give all.
+#define MAX_PLAYER_WEAPONS	WP_MELEE	// this is the max you can switch to and get with the give all.
 
 // AMMO_NONE must be first and AMMO_MAX must be last, cause weapon load validates based off of these vals
 typedef enum //# ammo_e

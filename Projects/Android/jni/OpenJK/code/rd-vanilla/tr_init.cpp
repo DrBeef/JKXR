@@ -729,7 +729,7 @@ static void InitOpenGL( void )
 
 		// set default state
 		GL_SetDefaultState();
-		R_Splash();	//get something on screen asap
+		//R_Splash();	//get something on screen asap
 	}
 	else
 	{
@@ -1554,7 +1554,7 @@ void R_Register( void )
 	// archived variables that can change at any time
 	//
 	r_lodCurveError = ri.Cvar_Get( "r_lodCurveError", "250", CVAR_ARCHIVE_ND );
-	r_lodbias = ri.Cvar_Get( "r_lodbias", "0", CVAR_ARCHIVE_ND );
+	r_lodbias = ri.Cvar_Get( "r_lodbias", "-2", CVAR_ARCHIVE_ND );
 	r_flares = ri.Cvar_Get ("r_flares", "1", CVAR_ARCHIVE_ND );
 	r_lodscale = ri.Cvar_Get( "r_lodscale", "10", CVAR_ARCHIVE_ND );
 
@@ -1636,6 +1636,11 @@ void R_Register( void )
 	r_lockpvs = ri.Cvar_Get ("r_lockpvs", "0", CVAR_CHEAT);
 	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_CHEAT);
 	r_shadows = ri.Cvar_Get( "cg_shadows", "1", 0 );
+#ifdef _WIN32
+	r_shadows = ri.Cvar_Get("cg_shadows", "2", 0);
+#else
+	r_shadows = ri.Cvar_Get("cg_shadows", "1", 0);
+#endif
 	r_shadowRange = ri.Cvar_Get( "r_shadowRange", "1000", CVAR_ARCHIVE_ND );
 
 /*
@@ -2038,6 +2043,7 @@ extern "C" Q_EXPORT refexport_t* QDECL GetRefAPI ( int apiVersion, refimport_t *
 
 	REX(BeginFrame);
 	REX(EndFrame);
+	REX(SubmitStereoFrame);
 
 	REX(ProcessDissolve);
 	REX(InitDissolve);

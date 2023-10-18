@@ -27,7 +27,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "b_local.h"
 #include "b_public.h"
 #include "anims.h"
-#include <JKXR/VrTBDC.h>
+#include <VrTBDC.h>
 extern cvar_t	*g_TeamBeefDirectorsCut;
 
 extern qboolean NPCsPrecached;

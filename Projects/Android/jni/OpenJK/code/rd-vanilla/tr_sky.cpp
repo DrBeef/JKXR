@@ -805,6 +805,11 @@ void RB_StageIteratorSky( void ) {
 		return;
 	}
 
+	//Don't need to use the following in JK3
+#ifdef JK2_MODE
+	hasskybox = 1;
+#endif
+
 	// go through all the polygons and project them onto
 	// the sky box to see which blocks on each side need
 	// to be drawn

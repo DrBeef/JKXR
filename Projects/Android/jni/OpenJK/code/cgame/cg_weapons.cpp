@@ -30,7 +30,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "../game/anims.h"
 #include <bg_local.h>
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 extern void CG_LightningBolt( centity_t *cent, vec3_t origin );
 
@@ -2208,7 +2208,6 @@ void CG_DrawWeaponSelect( void )
 			int w = cgi_R_Font_StrLenPixels(text, cgs.media.qhFontSmall, 1.0f);
 			int x = ( SCREEN_WIDTH - w ) / 2;
 			int y = (SCREEN_HEIGHT - 24);
-			CG_AdjustFrom640Int(&x, &y, NULL, NULL);
 			cgi_R_Font_DrawString(x, y, text, textColor, cgs.media.qhFontSmall, -1, FONT_SCALE);
 		}
 	}
@@ -2854,14 +2853,32 @@ void CG_EnterScope_f( )
 
 void CG_ToggleSaber_f( )
 {
-	if (player->client->ps.saber->Active())
+    bool deactivated = false;
+    if (player->client->ps.saber[0].numBlades > 1)
+    {
+        if (player->client->ps.saber[0].blade[0].active && player->client->ps.saber[0].blade[1].active)
+        {
+            player->client->ps.SaberBladeActivate( 0, 1, qfalse );
+            deactivated = true;
+        }
+        else if (player->client->ps.saber[0].blade[0].active)
+        {
+            player->client->ps.SaberBladeActivate( 0, 0, qfalse );
+            deactivated = true;
+        }
+        else
+        {
+            player->client->ps.saber[0].Activate();
+        }
+    }
+    else if (player->client->ps.saber->Active())
 	{
 		player->client->ps.saber[0].Deactivate();
 		if (player->client->ps.dualSabers)
 		{
 			player->client->ps.saber[1].Deactivate();
 		}
-		G_SoundOnEnt( player, CHAN_WEAPON, "sound/weapons/saber/saberoffquick.wav" );
+        deactivated = true;
 	}
 	else
 	{
@@ -2871,6 +2888,11 @@ void CG_ToggleSaber_f( )
 			player->client->ps.saber[1].Activate();
 		}
 	}
+
+    if (deactivated)
+    {
+        G_SoundOnEnt( player, CHAN_WEAPON, "sound/weapons/saber/saberoffquick.wav" );
+    }
 }
 
 //Selects the currently selected thing (if one _is_ selected)
@@ -2886,13 +2908,24 @@ void CG_ItemSelectorSelect_f( void )
 
 	if (cg.itemSelectorType == ST_WEAPON) // weapons
 	{
-		if (cg.weaponSelect == cg.itemSelectorSelection)
+		centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
+		if (vr->in_vehicle
+			&& vr->vehicle_type != VH_WALKER
+			&& cent->currentState.weapon == WP_SABER)
 		{
-			return;
+			//If holding saber, put it away
+			CG_NextWeapon_f();
 		}
+		else
+		{
+			if (cg.weaponSelect == cg.itemSelectorSelection)
+			{
+				return;
+			}
 
-		cg.weaponSelectTime = cg.time;
-		cg.weaponSelect = cg.itemSelectorSelection;
+			cg.weaponSelectTime = cg.time;
+			cg.weaponSelect = cg.itemSelectorSelection;
+		}
 	}
 	else if (cg.itemSelectorType == ST_GADGET) // gadgets
 	{
@@ -2919,12 +2952,15 @@ void CG_ItemSelectorSelect_f( void )
 		cg.forcepowerSelectTime = cg.time;
 		cg.forcepowerSelect = cg.itemSelectorSelection;
 	}
-	else if (cg.itemSelectorType == ST_QUICK_SAVE) {
+	else if (cg.itemSelectorType == ST_QUICK_MENU) {
 		if (cg.itemSelectorSelection == 0) {
 			cgi_SendConsoleCommand("save quick\n");
 			CG_CenterPrint("Quick Saved", 240);
-		} else {
+		} else if (cg.itemSelectorSelection == 1) {
 			cgi_SendConsoleCommand("load quick\n");
+		}
+		else {
+			vr->move_speed = (++vr->move_speed) % 3;
 		}
 	}
 
@@ -2936,14 +2972,14 @@ void CG_ItemSelectorNext_f( void )
 {
 	if (cg.itemSelectorType >= ST_FORCE_POWER)
 	{
-		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_SAVE : ST_FORCE_POWER;
+		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_MENU : ST_FORCE_POWER;
 		return;
 	}
 
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
 
-    //Only show the stance selection if using saber and in third person
-	int selectors = ((cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) &&
+	//Only show the stance selection if using saber and in third person and not using dual/staff saber
+	int selectors = (cent->gent->client->ps.saberStylesKnown != SS_NONE &&
 					 cent->currentState.weapon == WP_SABER && cg_thirdPerson.integer) ? 3 : 2;
 	cg.itemSelectorType = (cg.itemSelectorType+1) % selectors;
 	cg.itemSelectorTime = cg.time;
@@ -2953,15 +2989,15 @@ void CG_ItemSelectorPrev_f( void )
 {
 	if (cg.itemSelectorType >= ST_FORCE_POWER)
 	{
-		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_SAVE : ST_FORCE_POWER;
+		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_MENU : ST_FORCE_POWER;
 		return;
 	}
 
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
 
-    //Only show the stance selection if using saber and in third person
-	int selectors = ((cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) &&
-							 cent->currentState.weapon == WP_SABER && cg_thirdPerson.integer) ? 3 : 2;
+    //Only show the stance selection if using saber and in third person and not using dual/staff saber
+	int selectors = (cent->gent->client->ps.saberStylesKnown != SS_NONE &&
+			cent->currentState.weapon == WP_SABER && cg_thirdPerson.integer) ? 3 : 2;
 	if (--cg.itemSelectorType < 0)
 		cg.itemSelectorType = selectors-1;
 	cg.itemSelectorTime = cg.time;
@@ -3019,6 +3055,11 @@ void CG_DrawItemSelector( void )
 		VectorSubtract(vr->weaponposition, cg.itemSelectorOrigin, controllerOffset);
 	}
 
+	if (vr->in_vehicle)
+	{
+		BG_ConvertFromVR(vr->hmdposition_offset, controllerOrigin, controllerOrigin);
+	}
+
 	vec3_t wheelAngles, wheelOrigin, beamOrigin, wheelForward, wheelRight, wheelUp;
 	vec3_t angles;
 	VectorClear(angles);
@@ -3051,59 +3092,56 @@ void CG_DrawItemSelector( void )
 
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
 
-	refEntity_t beam;
-	beam.shaderRGBA[3] = 0xff;
+	vec3_t sRGB;
 	int count;
 	switch (cg.itemSelectorType)
 	{
-		case ST_WEAPON: //weapons
-			if (vr->in_vehicle)
-				count = 2;
-			else
-				count = WP_MELEE;
-			beam.shaderRGBA[0] = 0xff;
-			beam.shaderRGBA[1] = 0xae;
-			beam.shaderRGBA[2] = 0x40;
-			break;
-		case ST_GADGET: //gadgets
-			count = INV_GOODIE_KEY;
-			beam.shaderRGBA[0] = 0x00;
-			beam.shaderRGBA[1] = 0xff;
-			beam.shaderRGBA[2] = 0x00;
-			break;
-		case ST_FIGHTING_STYLE: //fighting style
-			count = 3;
-			beam.shaderRGBA[0] = 0xff;
-			beam.shaderRGBA[1] = 0xff;
-			beam.shaderRGBA[2] = 0xff;
-			break;
-		case ST_FORCE_POWER: // force powers
-			count = MAX_SHOWPOWERS;
-			beam.shaderRGBA[0] = 0x00;
-			beam.shaderRGBA[1] = 0x00;
-			beam.shaderRGBA[2] = 0xff;
-			break;
-		case ST_QUICK_SAVE:
+	case ST_WEAPON: //weapons
+		if (vr->in_vehicle)
 			count = 2;
-			beam.shaderRGBA[0] = 0xff;
-			beam.shaderRGBA[1] = 0xff;
-			beam.shaderRGBA[2] = 0xff;
-			break;
+		else
+			count = WP_MELEE;
+		sRGB[0] = 1.0f;
+		sRGB[1] = 0.8f;
+		sRGB[2] = 0.2f;
+		break;
+	case ST_GADGET: //gadgets
+		count = INV_GOODIE_KEY;
+		sRGB[0] = 0.0f;
+		sRGB[1] = 1.0f;
+		sRGB[2] = 0.0f;
+		break;
+	case ST_FIGHTING_STYLE: //fighting style
+		count = 3;
+		sRGB[0] = 0.0f;
+		sRGB[1] = 1.0f;
+		sRGB[2] = 1.0f;
+		break;
+	case ST_FORCE_POWER: // force powers
+		count = MAX_SHOWPOWERS;
+		sRGB[0] = 0.0f;
+		sRGB[1] = 0.0f;
+		sRGB[2] = 1.0f;
+		break;
+	case ST_QUICK_MENU:
+		count = 3;
+		sRGB[0] = 1.0f;
+		sRGB[1] = 1.0f;
+		sRGB[2] = 1.0f;
+		break;
 	}
 
-	VectorCopy(beamOrigin, beam.oldorigin);
-	VectorCopy(selectorOrigin, beam.origin );
-	beam.customShader = cgi_R_RegisterShader( "gfx/misc/whiteline2" );
-	beam.reType = RT_LINE;
-	beam.radius = 0.3f;
-
-	cgi_R_AddRefEntityToScene( &beam );
+	//cgi_R_AddRefEntityToScene( &beam );
+	FX_AddLine(beamOrigin, selectorOrigin, 1.0f, 0.1f, 0.0f,
+		0.5f, 0.5f,
+		sRGB, sRGB,
+		10, cgi_R_RegisterShader("gfx/misc/whiteline2"),
+		FX_SIZE_LINEAR | FX_ALPHA_LINEAR);
 
 
 	if (cg.itemSelectorType == ST_WEAPON) // weapons
 	{
-		if (cg.weaponSelect != WP_NONE &&
-				cg.weaponSelect != WP_MELEE) {
+		if (cg.weaponSelect != WP_NONE) {
 			refEntity_t sprite;
 			memset(&sprite, 0, sizeof(sprite));
 			VectorCopy(wheelOrigin, sprite.origin);
@@ -3114,25 +3152,25 @@ void CG_DrawItemSelector( void )
 			cgi_R_AddRefEntityToScene(&sprite);
 		}
 	}
-/*	else if (cg.itemSelectorType == 2) // fighting style
+	else if (cg.itemSelectorType == 2) // fighting style
 	{
 		//For the fighting style show the active one in the middle
-		int level = cent->gent->client->ps.saberAnimLevel;
-		if (cent->gent->client->ps.forcePowersKnown & (1 << FP_SABER_OFFENSE) &&
-			level > FORCE_LEVEL_0) {
+		if (cent->gent->client->ps.saberStylesKnown != SS_NONE) {
 			refEntity_t sprite;
 			memset(&sprite, 0, sizeof(sprite));
 			VectorCopy(wheelOrigin, sprite.origin);
 			sprite.reType = RT_SPRITE;
-			switch (level) {
-				case FORCE_LEVEL_1:
-					sprite.customShader = cgs.media.HUDSaberStyleFast;
+			switch (cent->gent->client->ps.saberAnimLevel) {
+				case SS_FAST:
+					sprite.customShader = otherHUDBits[OHB_SABERSTYLE_FAST].background;
 					break;
-				case FORCE_LEVEL_2:
-					sprite.customShader = cgs.media.HUDSaberStyleMed;
+				case SS_MEDIUM:
+				case SS_DUAL:
+				case SS_STAFF:
+					sprite.customShader = otherHUDBits[OHB_SABERSTYLE_MEDIUM].background;
 					break;
-				case FORCE_LEVEL_3:
-					sprite.customShader = cgs.media.HUDSaberStyleStrong;
+				default:
+					sprite.customShader = otherHUDBits[OHB_SABERSTYLE_STRONG].background;
 					break;
 			}
 
@@ -3140,7 +3178,7 @@ void CG_DrawItemSelector( void )
 			memset(sprite.shaderRGBA, 0xff, 4);
 			cgi_R_AddRefEntityToScene(&sprite);
 		}
-	}*/
+	}
 	else if (cg.itemSelectorType == ST_FORCE_POWER) // force powers
 	{
 		if (cent->gent->client->ps.forcePowersKnown != 0) {
@@ -3178,14 +3216,21 @@ void CG_DrawItemSelector( void )
 		if (cg.itemSelectorType == ST_WEAPON) {
 			if (vr->in_vehicle)
 			{
-				itemId = WP_ATST_MAIN + index;
+				if (vr->vehicle_type == VH_WALKER)
+				{
+					itemId = WP_ATST_MAIN + index;
+				}
+				else
+				{
+					//Only choice on a speeder/animal is the saber
+					itemId = WP_SABER;
+				}
 			}
 			else
 			{
-				itemId = index + 1; // We need to ignore WP_NONE for weapons
-				if (itemId == count)
+				if (itemId == 0)
 				{
-					break;
+					itemId = WP_MELEE;
 				}
 
 				CG_RegisterWeapon(itemId);
@@ -3197,25 +3242,20 @@ void CG_DrawItemSelector( void )
 			switch (cg.itemSelectorType)
 			{
 				case ST_WEAPON: //weapons
-					selectable = vr->in_vehicle || // both ATST weapons are always selectable
+					selectable = vr->in_vehicle ||
 							(CG_WeaponSelectable(itemId, cg.weaponSelect, qfalse) && cg.snap->ps.ammo[weaponData[itemId].ammoIndex]);
 					break;
 				case ST_GADGET: //gadgets
 					selectable = CG_InventorySelectable(itemId) && inv_icons[itemId];
 					break;
 				case ST_FIGHTING_STYLE: //fighting style
-					{
-						if (cent->gent->client->ps.forcePowersKnown & ( 1 << FP_SABER_OFFENSE )) {
-							selectable = itemId < cent->gent->client->ps.forcePowerLevel[FP_SABER_OFFENSE];
-						} else {
-							selectable = false;
-						}
-					}
+					selectable = cent->gent->client->ps.saberAnimLevel <= SS_STRONG &&
+                                 cent->gent->client->ps.saberStylesKnown & (1<<(itemId+1));
 					break;
 				case ST_FORCE_POWER: // force powers
 					selectable = ForcePower_Valid(itemId);
 					break;
-				case ST_QUICK_SAVE:
+				case ST_QUICK_MENU:
 					selectable = true;
 					break;
 			}
@@ -3226,8 +3266,7 @@ void CG_DrawItemSelector( void )
 				VectorClear(angles);
 				angles[YAW] = wheelAngles[YAW];
 				angles[PITCH] = wheelAngles[PITCH];
-				angles[ROLL] =
-                        (float)(360 / (count - ((cg.itemSelectorType == ST_WEAPON && !vr->in_vehicle) ? 1 : 0))) * index;
+				angles[ROLL] = (float)(360 / count) * index;
 				vec3_t forward, up;
 				AngleVectors(angles, forward, NULL, up);
 
@@ -3286,25 +3325,36 @@ void CG_DrawItemSelector( void )
 						case ST_GADGET: //gadgets
 							sprite.customShader = inv_icons[itemId];
 							break;
-/*						case 2: //fighting style
-							switch ( itemId )
+						case ST_FIGHTING_STYLE: //fighting style
+							switch ( itemId+1 )
 							{
-								case 0://FORCE_LEVEL_1:
-									sprite.customShader = cgs.media.HUDSaberStyleFast;
+								case SS_FAST:
+									sprite.customShader = otherHUDBits[OHB_SABERSTYLE_FAST].background;
 									break;
-								case 1://FORCE_LEVEL_2:
-									sprite.customShader = cgs.media.HUDSaberStyleMed;
+								case SS_MEDIUM:
+									sprite.customShader = otherHUDBits[OHB_SABERSTYLE_MEDIUM].background;
 									break;
-								case 2://FORCE_LEVEL_3:
-									sprite.customShader = cgs.media.HUDSaberStyleStrong;
+								case SS_STRONG:
+									sprite.customShader = otherHUDBits[OHB_SABERSTYLE_STRONG].background;
 									break;
 							}
 							break;
-*/						case ST_FORCE_POWER: // force powers
+						case ST_FORCE_POWER: // force powers
 							sprite.customShader = force_icons[showPowers[itemId]];
 							break;
-						case ST_QUICK_SAVE:
-							sprite.customShader = itemId == 0 ? cgs.media.iconSave : cgs.media.iconLoad;
+						case ST_QUICK_MENU:
+							switch (itemId)
+							{
+							case 0:
+								sprite.customShader = cgs.media.iconSave;
+								break;
+							case 1:
+								sprite.customShader = cgs.media.iconLoad;
+								break;
+							case 2:
+								sprite.customShader = cgs.media.iconMoveSpeed[(vr->move_speed+1)%3];
+								break;
+							}
 							break;
 					}
 
@@ -3468,7 +3518,9 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire )
             //Haptics
             switch (ent->weapon) {
                 case WP_SABER:
-                    if (cent->gent->client->ps.dualSabers)
+                case WP_MELEE:
+                    if (cent->gent->client->ps.dualSabers ||
+							ent->weapon == WP_MELEE)
                     {
                         if (vr->primaryVelocityTriggeredAttack && vr->secondaryVelocityTriggeredAttack)
                         {
@@ -3487,7 +3539,8 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire )
 							position = -1;
 						}
                     }
-                    cgi_HapticEvent("chainsaw_fire", position, 0, 40, 0, 0);
+
+					cgi_HapticEvent( "chainsaw_fire", position, 0, 40, 0, 0);
                     break;
                 case WP_BRYAR_PISTOL:
                 case WP_BOWCASTER:

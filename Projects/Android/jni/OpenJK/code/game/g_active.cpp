@@ -29,7 +29,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_vehicles.h"
 #include "b_local.h"
 #include "g_navigator.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 #ifdef _DEBUG
 	#include <float.h>
@@ -1403,7 +1403,9 @@ void	G_TouchTriggersWithHand( bool offHand, gentity_t *ent, vec3_t src, vec3_t v
 
 		touched[i] = qtrue;
 		memset( &trace, 0, sizeof(trace) );
-		if ( hit->e_TouchFunc != touchF_NULL ) {
+		if ( hit->e_TouchFunc != touchF_NULL &&
+			hit->e_TouchFunc != touchF_hurt_touch) //We don't want the use gesture to trigger a hurt function!
+		{
 			int channel = vr->right_handed != offHand ? 1 : 2;
 			if (level.time > vr->useHapticFeedbackTime[channel - 1]) {
 				cgi_HapticEvent("use_button", 0, channel, 60, 0, 0);
@@ -5362,9 +5364,10 @@ extern cvar_t	*g_skippingcin;
 		{
 			// Vehicle Camera Overrides
 			//--------------------------
- 			cg.overrides.active					|= ( CG_OVERRIDE_3RD_PERSON_RNG | CG_OVERRIDE_FOV | CG_OVERRIDE_3RD_PERSON_VOF | CG_OVERRIDE_3RD_PERSON_POF );
+			// in VR - Vehicles mustn't affect FOV
+ 			cg.overrides.active					|= ( CG_OVERRIDE_3RD_PERSON_RNG | /*CG_OVERRIDE_FOV |*/ CG_OVERRIDE_3RD_PERSON_VOF | CG_OVERRIDE_3RD_PERSON_POF );
  			cg.overrides.thirdPersonRange		 = pPlayerVeh->m_pVehicleInfo->cameraRange;
-			cg.overrides.fov					 = pPlayerVeh->m_pVehicleInfo->cameraFOV;
+			//cg.overrides.fov					 = pPlayerVeh->m_pVehicleInfo->cameraFOV;
 			cg.overrides.thirdPersonVertOffset	 = pPlayerVeh->m_pVehicleInfo->cameraVertOffset;
 			cg.overrides.thirdPersonPitchOffset  = pPlayerVeh->m_pVehicleInfo->cameraPitchOffset;
 

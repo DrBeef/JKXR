@@ -55,17 +55,19 @@ static void WP_FlechetteMainFire( gentity_t *ent )
 //		damage *= 2;
 //	}
 
+	vec3_t	a;
+	if ( BG_UseVRPosition(ent))
+	{
+		BG_CalculateVRWeaponPosition(muzzle, a);
+	}
+	else {
+		vectoangles(forwardVec, a);
+	}
+
 	for ( int i = 0; i < FLECHETTE_SHOTS; i++ )
 	{
 		vec3_t	angs;
-		if ( BG_UseVRPosition(ent))
-		{
-			BG_CalculateVRWeaponPosition(muzzle, angs);
-		}
-		else {
-			vectoangles(forwardVec, angs);
-		}
-
+		VectorCopy(a, angs);
 		if ( i == 0 && ent->s.number == 0 )
 		{
 			// do nothing on the first shot for the player, this one will hit the crosshairs
@@ -263,8 +265,14 @@ static void WP_FlechetteAltFire( gentity_t *self )
 {
 	vec3_t 	dir, fwd, start, angs;
 
-	vectoangles( forwardVec, angs );
-	VectorCopy( muzzle, start );
+	if ( BG_UseVRPosition(self))
+	{
+		BG_CalculateVRWeaponPosition(start, angs);
+	}
+	else {
+		vectoangles( forwardVec, angs );
+		VectorCopy( muzzle, start );
+	}
 
 	WP_TraceSetStart( self, start, vec3_origin, vec3_origin );//make sure our start point isn't on the other side of a wall
 

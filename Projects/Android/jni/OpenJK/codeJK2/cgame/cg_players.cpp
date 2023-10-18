@@ -31,8 +31,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../game/anims.h"
 #include "../game/wp_saber.h"
 #include "bg_local.h"
-#include <JKXR/VrClientInfo.h>
-#include <JKXR/VrTBDC.h>
+#include <VrClientInfo.h>
+#include <VrTBDC.h>
 
 #define	LOOK_SWING_SCALE	0.5
 
@@ -3400,7 +3400,7 @@ CG_AddRefEntityWithPowerups
 Adds a piece with modifications or duplications for powerups
 ===============
 */
-void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cent )
+void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cent, bool forceShownInFirstPerson )
 {
 	if ( !cent )
 	{
@@ -3431,7 +3431,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 //		cgi_S_AddLoopingSound( 0, cent->lerpOrigin, vec3_origin, cgs.media.overchargeLoopSound );
 //	}
 
-	if (player1stPersonSaber) {
+	if (player1stPersonSaber && !forceShownInFirstPerson) {
 		ent->renderfx = RF_THIRD_PERSON;
 	}
 
@@ -4588,6 +4588,12 @@ Ghoul2 Insert End
 			{
 				if ( (trace.contents&CONTENTS_WATER) || (trace.contents&CONTENTS_SLIME) )
 				{
+					if (!cent->gent->client->ps.saberInFlight)
+					{
+						int position = (vr->right_handed ? 2 : 1);
+						cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+					}
+
 					/*
 					if ( !(cent->gent->client->ps.saberEventFlags&SEF_INWATER) )
 					{
@@ -4607,6 +4613,12 @@ Ghoul2 Insert End
 				}
 				else
 				{
+					if (!cent->gent->client->ps.saberInFlight)
+					{
+						int position = (vr->right_handed ? 2 : 1);
+						cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+					}
+
 					theFxScheduler.PlayEffect( "spark", trace.endpos, trace.plane.normal );
 					// All I need is a bool to mark whether I have a previous point to work with.
 					//....come up with something better..
@@ -4785,8 +4797,6 @@ Ghoul2 Insert End
     		cent->gent->client->ps.saberBounceMove != LS_NONE &&
 			vr->saberBlockDebounce < cg.time)
     {
-		//cvar_t *vr_saber_block_debounce_time = gi.cvar("vr_saber_block_debounce_time", "1000", CVAR_ARCHIVE); // defined in VrCvars.h
-		//vr->saberBlockDebounce = cg.time + vr_saber_block_debounce_time->integer;
 		vr->saberBlockDebounce = cg.time + TBDC_SABER_BOUNCETIME;
 		vr->saberBounceMove = cent->gent->client->ps.saberBounceMove;
 		cgi_HapticEvent("shotgun_fire", 0, 0, 100, 0, 0);
@@ -4897,6 +4907,9 @@ void CG_Player(centity_t *cent ) {
 	if (cent->gent->client->ps.clientNum == 0) {
 		vr->velocitytriggered = (!cg.renderingThirdPerson &&
 								 (cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE || cg.snap->ps.weapon == WP_STUN_BATON));
+		cvar_t *vr_motion_enable_saber = gi.cvar("vr_motion_enable_saber", "0", CVAR_ARCHIVE);
+		vr->velocitytriggeractive = ((cg.snap->ps.weapon == WP_SABER && (cent->gent->client->ps.saberActive || vr_motion_enable_saber->integer)) ||
+									 cg.snap->ps.weapon == WP_MELEE || cg.snap->ps.weapon == WP_STUN_BATON);
 	}
 
 	//Get the player's light level for stealth calculations
@@ -5076,7 +5089,7 @@ Ghoul2 Insert Start
 			{//no viewentity
 				if ( cent->currentState.number == cg.snap->ps.clientNum )
 				{//I am the player
-					if ( cg.snap->ps.weapon != WP_SABER && cg.snap->ps.weapon != WP_MELEE )
+					if ( cg.snap->ps.weapon != WP_SABER )
 					{//not using saber or fists
 						ent.renderfx = RF_THIRD_PERSON;			// only draw in mirrors
 					}
@@ -5084,7 +5097,7 @@ Ghoul2 Insert Start
 			}
 			else if ( cent->currentState.number == cg.snap->ps.viewEntity )
 			{//I am the view entity
-				if ( cg.snap->ps.weapon != WP_SABER && cg.snap->ps.weapon != WP_MELEE )
+				if ( cg.snap->ps.weapon != WP_SABER )
 				{//not using first person saber test or, if so, not using saber
 					ent.renderfx = RF_THIRD_PERSON;			// only draw in mirrors
 				}
@@ -5749,7 +5762,7 @@ Ghoul2 Insert End
 		{//no viewentity
 			if ( cent->currentState.number == cg.snap->ps.clientNum )
 			{//I am the player
-				if ( cg.snap->ps.weapon != WP_SABER && cg.snap->ps.weapon != WP_MELEE )
+				if ( cg.snap->ps.weapon != WP_SABER )
 				{//not using saber or fists
 					renderfx = RF_THIRD_PERSON;			// only draw in mirrors
 				}
@@ -5757,7 +5770,7 @@ Ghoul2 Insert End
 		}
 		else if ( cent->currentState.number == cg.snap->ps.viewEntity )
 		{//I am the view entity
-			if ( cg.snap->ps.weapon != WP_SABER && cg.snap->ps.weapon != WP_MELEE )
+			if ( cg.snap->ps.weapon != WP_SABER )
 			{//not using saber or fists
 				renderfx = RF_THIRD_PERSON;			// only draw in mirrors
 			}

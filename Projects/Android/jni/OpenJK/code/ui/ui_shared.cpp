@@ -41,7 +41,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "qcommon/stringed_ingame.h"
 
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 extern vr_client_info_t vr;
 

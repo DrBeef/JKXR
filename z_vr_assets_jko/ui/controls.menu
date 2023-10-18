@@ -1515,6 +1515,38 @@
 			}
 		}
 
+		itemDef
+		{
+			name				none
+			group				commoncontrols
+			type				ITEM_TYPE_YESNO
+			text				"Motion Ignite Saber:"
+			cvar				"vr_motion_enable_saber"
+			rect				305 371 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		3
+			descText			"Turn disabled saber back on when motion triggered"
+			action
+			{
+				play			sound/interface/button1
+			}
+
+			mouseenter
+			{
+				show			highlight11
+			}
+			mouseexit
+			{
+				hide			highlight11
+			}
+		}
+
 
 
 		//----------------------------------------------------------------------------------------------
@@ -1568,7 +1600,7 @@
 			group				weaponcontrols
 			type				ITEM_TYPE_SLIDER
 			text				@MENUS_VR_WEAPON_PITCH_ITEM
-			cvarfloat			"vr_weapon_pitchadjust" 0 -25 5
+			cvarfloat			"vr_weapon_pitchadjust" 20 -45 5
 			rect				305 211 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
@@ -1600,9 +1632,9 @@
 		{
 			name				none
 			group				weaponcontrols
-			type				ITEM_TYPE_YESNO
-			text				@MENUS_VR_TWO_HANDED_ITEM
-			cvar			"vr_two_handed_weapons"
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_SABER_PITCH_ITEM
+			cvarfloat			"vr_saber_pitchadjust" 20 -45 5
 			rect				305 231 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
@@ -1612,19 +1644,19 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		2
-			descText			@MENUS_VR_TWO_HANDED_DESC
+			descText			@MENUS_VR_SABER_PITCH_DESC
 			action
-			{ 
+			{
 				play			sound/interface/button1
 			}
 
 			mouseenter
-			{ 
+			{
 				show			highlight4
 			}
 
 			mouseexit
-			{ 
+			{
 				hide			highlight4
 			}
 
@@ -1635,8 +1667,8 @@
 			name				none
 			group				weaponcontrols
 			type				ITEM_TYPE_YESNO
-			text				@MENUS_VR_GUN_STOCK_ITEM
-			cvar			"vr_virtual_stock"
+			text				@MENUS_VR_TWO_HANDED_ITEM
+			cvar			"vr_two_handed_weapons"
 			rect				305 251 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
@@ -1646,7 +1678,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		2
-			descText			@MENUS_VR_GUN_STOCK_DESC
+			descText			@MENUS_VR_TWO_HANDED_DESC
 			action
 			{ 
 				play			sound/interface/button1
@@ -1668,9 +1700,9 @@
 		{
 			name				none
 			group				weaponcontrols
-			type				ITEM_TYPE_SLIDER
-			text				@MENUS_VR_WEAPON_VELOCITY_TRIGGER_ITEM
-			cvarfloat			"vr_weapon_velocity_trigger" 0 1.5 2.5
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_GUN_STOCK_ITEM
+			cvar			"vr_virtual_stock"
 			rect				305 271 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
@@ -1680,7 +1712,7 @@
 			forecolor			1 1 1 1
 			visible			0
 			// appearance_slot		2
-			descText			@MENUS_VR_WEAPON_VELOCITY_TRIGGER_DESC
+			descText			@MENUS_VR_GUN_STOCK_DESC
 			action
 			{ 
 				play			sound/interface/button1
@@ -1702,6 +1734,40 @@
 		{
 			name				none
 			group				weaponcontrols
+			type				ITEM_TYPE_SLIDER
+			text				@MENUS_VR_WEAPON_VELOCITY_TRIGGER_ITEM
+			cvarfloat			"vr_weapon_velocity_trigger" 0 1.5 2.5
+			rect				305 291 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			151
+			textaligny			-2
+			font				2
+			textscale			0.8
+			forecolor			1 1 1 1
+			visible			0
+			// appearance_slot		2
+			descText			@MENUS_VR_WEAPON_VELOCITY_TRIGGER_DESC
+			action
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter
+			{ 
+				show			highlight7
+			}
+
+			mouseexit
+			{ 
+				hide			highlight7
+			}
+
+		}
+
+		itemDef
+		{
+			name				none
+			group				weaponcontrols
 			type				ITEM_TYPE_MULTI
 			text				@MENUS_VR_SABER_3RD_PERSON_ITEM
 			cvar				"vr_saber_3rdperson_mode"
@@ -1711,7 +1777,7 @@
 				@MENUS_VR_SABER_3RD_PERSON_MANUAL 1
 				@MENUS_VR_SABER_3RD_PERSON_AUTO 2
 			}
-			rect				305 291 300 20
+			rect				305 311 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			151
 			textaligny			-2
@@ -1728,12 +1794,12 @@
 
 			mouseenter
 			{
-				show			highlight7
+				show			highlight8
 			}
 
 			mouseexit
 			{
-				hide			highlight7
+				hide			highlight8
 			}
 
 		}

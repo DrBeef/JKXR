@@ -28,7 +28,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../game/g_local.h"
 #include "../game/anims.h"
 #include <bg_local.h>
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 extern void CG_LightningBolt( centity_t *cent, vec3_t origin );
 
@@ -114,6 +114,12 @@ void CG_RegisterWeapon( int weaponNum ) {
 	cgi_R_ModelBounds( weaponInfo->weaponModel, mins, maxs );
 	for ( i = 0 ; i < 3 ; i++ ) {
 		weaponInfo->weaponMidpoint[i] = mins[i] + 0.5 * ( maxs[i] - mins[i] );
+	}
+
+	//Bit of a hack - default weapons.dat on JK2 is missing the melee icon!
+	if (weaponNum == WP_MELEE)
+	{
+		strcpy((char *)weaponData[weaponNum].weaponIcon, "gfx/hud/w_icon_melee");
 	}
 
 	// setup the shader we will use for the icon
@@ -2175,7 +2181,6 @@ void CG_DrawWeaponSelect( void )
 			int w = cgi_R_Font_StrLenPixels(text, cgs.media.qhFontSmall, 1.0f);
 			int x = ( SCREEN_WIDTH - w ) / 2;
 			int y = (SCREEN_HEIGHT - 24);
-			CG_AdjustFrom640Int(&x, &y, NULL, NULL);
 			cgi_R_Font_DrawString(x, y, text, textColor, cgs.media.qhFontSmall, -1, FONT_SCALE);
 		}
 	}
@@ -2770,12 +2775,15 @@ void CG_ItemSelectorSelect_f( void )
 		cg.forcepowerSelectTime = cg.time;
 		cg.forcepowerSelect = cg.itemSelectorSelection;
 	}
-	else if (cg.itemSelectorType == ST_QUICK_SAVE) {
+	else if (cg.itemSelectorType == ST_QUICK_MENU) {
 		if (cg.itemSelectorSelection == 0) {
 			cgi_SendConsoleCommand("save quik*\n");
 			CG_CenterPrint("Quick Saved", 240);
-		} else {
+		} else if (cg.itemSelectorSelection == 1) {
 			cgi_SendConsoleCommand("load quik\n");
+		}
+		else {
+			vr->move_speed = (++vr->move_speed) % 3;
 		}
 	}
 
@@ -2787,7 +2795,7 @@ void CG_ItemSelectorNext_f( void )
 {
 	if (cg.itemSelectorType >= ST_FORCE_POWER)
 	{
-		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_SAVE : ST_FORCE_POWER;
+		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_MENU : ST_FORCE_POWER;
 		return;
 	}
 
@@ -2804,7 +2812,7 @@ void CG_ItemSelectorPrev_f( void )
 {
 	if (cg.itemSelectorType >= ST_FORCE_POWER)
 	{
-		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_SAVE : ST_FORCE_POWER;
+		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_MENU : ST_FORCE_POWER;
 		return;
 	}
 
@@ -2902,8 +2910,7 @@ void CG_DrawItemSelector( void )
 
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
 
-	refEntity_t beam;
-	beam.shaderRGBA[3] = 0xff;
+	vec3_t sRGB;
 	int count;
 	switch (cg.itemSelectorType)
 	{
@@ -2912,49 +2919,47 @@ void CG_DrawItemSelector( void )
 				count = 2;
 			else
 				count = WP_MELEE;
-			beam.shaderRGBA[0] = 0xff;
-			beam.shaderRGBA[1] = 0xae;
-			beam.shaderRGBA[2] = 0x40;
+			sRGB[0] = 1.0f;
+			sRGB[1] = 0.8f;
+			sRGB[2] = 0.2f;
 			break;
 		case ST_GADGET: //gadgets
 			count = INV_GOODIE_KEY;
-			beam.shaderRGBA[0] = 0x00;
-			beam.shaderRGBA[1] = 0xff;
-			beam.shaderRGBA[2] = 0x00;
+			sRGB[0] = 0.0f;
+			sRGB[1] = 1.0f;
+			sRGB[2] = 0.0f;
 			break;
 		case ST_FIGHTING_STYLE: //fighting style
 			count = 3;
-			beam.shaderRGBA[0] = 0xff;
-			beam.shaderRGBA[1] = 0xff;
-			beam.shaderRGBA[2] = 0xff;
+			sRGB[0] = 0.0f;
+			sRGB[1] = 1.0f;
+			sRGB[2] = 1.0f;
 			break;
 		case ST_FORCE_POWER: // force powers
 			count = MAX_SHOWPOWERS;
-			beam.shaderRGBA[0] = 0x00;
-			beam.shaderRGBA[1] = 0x00;
-			beam.shaderRGBA[2] = 0xff;
+			sRGB[0] = 0.0f;
+			sRGB[1] = 0.0f;
+			sRGB[2] = 1.0f;
 			break;
-		case ST_QUICK_SAVE:
-			count = 2;
-			beam.shaderRGBA[0] = 0xff;
-			beam.shaderRGBA[1] = 0xff;
-			beam.shaderRGBA[2] = 0xff;
+		case ST_QUICK_MENU:
+			count = 3;
+			sRGB[0] = 1.0f;
+			sRGB[1] = 1.0f;
+			sRGB[2] = 1.0f;
 			break;
 	}
 
-	VectorCopy(beamOrigin, beam.oldorigin);
-	VectorCopy(selectorOrigin, beam.origin );
-	beam.customShader = cgi_R_RegisterShader( "gfx/misc/whiteline2" );
-	beam.reType = RT_LINE;
-	beam.radius = 0.3f;
-
-	cgi_R_AddRefEntityToScene( &beam );
+	//cgi_R_AddRefEntityToScene( &beam );
+	FX_AddLine(beamOrigin, selectorOrigin, 0.1f, 0.1f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		sRGB, sRGB, 1.0f,
+		10, cgi_R_RegisterShader("gfx/misc/whiteline2"),
+		FX_SIZE_LINEAR | FX_ALPHA_LINEAR);
 
 
 	if (cg.itemSelectorType == ST_WEAPON) // weapons
 	{
-		if (cg.weaponSelect != WP_NONE &&
-				cg.weaponSelect != WP_MELEE) {
+		if (cg.weaponSelect != WP_NONE) {
 			refEntity_t sprite;
 			memset(&sprite, 0, sizeof(sprite));
 			VectorCopy(wheelOrigin, sprite.origin);
@@ -3036,10 +3041,9 @@ void CG_DrawItemSelector( void )
 			}
 			else
 			{
-				itemId = index + 1; // We need to ignore WP_NONE for weapons
-				if (itemId == count)
+				if (itemId == WP_NONE)
 				{
-					break;
+					itemId = WP_MELEE;
 				}
 			}
 		}
@@ -3067,7 +3071,7 @@ void CG_DrawItemSelector( void )
 				case ST_FORCE_POWER: // force powers
 					selectable = ForcePower_Valid(itemId);
 					break;
-				case ST_QUICK_SAVE:
+				case ST_QUICK_MENU:
 					selectable = true;
 					break;
 			}
@@ -3078,8 +3082,7 @@ void CG_DrawItemSelector( void )
 				VectorClear(angles);
 				angles[YAW] = wheelAngles[YAW];
 				angles[PITCH] = wheelAngles[PITCH];
-				angles[ROLL] =
-                        (float)(360 / (count - ((cg.itemSelectorType == ST_WEAPON && !vr->in_vehicle) ? 1 : 0))) * index;
+				angles[ROLL] = (float)(360 / count) * index;
 				vec3_t forward, up;
 				AngleVectors(angles, forward, NULL, up);
 
@@ -3155,8 +3158,19 @@ void CG_DrawItemSelector( void )
 						case ST_FORCE_POWER: // force powers
 							sprite.customShader = force_icons[showPowers[itemId]];
 							break;
-						case ST_QUICK_SAVE:
-							sprite.customShader = itemId == 0 ? cgs.media.iconSave : cgs.media.iconLoad;
+						case ST_QUICK_MENU:
+							switch (itemId)
+							{
+							case 0:
+								sprite.customShader = cgs.media.iconSave;
+								break;
+							case 1:
+								sprite.customShader = cgs.media.iconLoad;
+								break;
+							case 2:
+								sprite.customShader = cgs.media.iconMoveSpeed[(vr->move_speed + 1) % 3];
+								break;
+							}
 							break;
 					}
 
@@ -3310,6 +3324,28 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire )
 		switch (ent->weapon) {
 			case WP_SABER:
 				cgi_HapticEvent("chainsaw_fire", position, 0, 40, 0, 0);
+				break;
+			case WP_MELEE:
+				{
+					if (vr->primaryVelocityTriggeredAttack && vr->secondaryVelocityTriggeredAttack)
+					{
+						position = 4;
+					}
+					else if (vr->primaryVelocityTriggeredAttack)
+					{
+						position = (vr->right_handed ? 2 : 1);
+					}
+					else if (vr->secondaryVelocityTriggeredAttack) // secondary triggered
+					{
+						position = (vr->right_handed ? 1 : 2);
+					}
+					else
+					{
+						position = -1;
+					}
+
+					cgi_HapticEvent( "chainsaw_fire", position, 0, 50, 0, 0);
+				}
 				break;
 			case WP_BRYAR_PISTOL:
 			case WP_BOWCASTER:

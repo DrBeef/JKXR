@@ -223,7 +223,7 @@ qboolean G2_Stop_Bone_Index( boneInfo_v &blist, int index, int flags)
 		return G2_Remove_Bone_Index(blist, index);
 	}
 
-	assert(0);
+	//assert(0);
 	return qfalse;
 }
 
@@ -503,7 +503,7 @@ qboolean G2_Set_Bone_Angles_Matrix_Index(boneInfo_v &blist, const int index,
 	if (index<0||(index >= (int)blist.size()) || (blist[index].boneNumber == -1))
 	{
 		// we are attempting to set a bone override that doesn't exist
-		assert(0);
+		//assert(0);
 		return qfalse;
 	}
 	// yes, so set the angles and flags correctly
@@ -960,7 +960,7 @@ qboolean G2_Pause_Bone_Anim_Index( boneInfo_v &blist, const int boneIndex, const
 
 		return qtrue;
 	}
-	assert(0);
+	//assert(0);
 	return qfalse;
 }
 qboolean G2_Pause_Bone_Anim(CGhoul2Info *ghlInfo, boneInfo_v &blist, const char *boneName, const int currentTime)
@@ -1014,7 +1014,7 @@ qboolean G2_Stop_Bone_Anim(CGhoul2Info *ghlInfo, boneInfo_v &blist, const char *
 		blist[index].flags &= ~(BONE_ANIM_TOTAL);
 		return G2_Remove_Bone_Index(blist, index);
 	}
-	assert(0);
+	//assert(0);
 	return qfalse;
 }
 
@@ -1025,7 +1025,7 @@ qboolean G2_Stop_Bone_Angles_Index(boneInfo_v &blist, const int index)
 	if ((index >= (int)blist.size()) || (blist[index].boneNumber == -1))
 	{
 		// we are attempting to set a bone override that doesn't exist
-		assert(0);
+		//assert(0);
 		return qfalse;
 	}
 	blist[index].flags &= ~(BONE_ANGLES_TOTAL);
@@ -1042,7 +1042,7 @@ qboolean G2_Stop_Bone_Angles(CGhoul2Info *ghlInfo, boneInfo_v &blist, const char
 		blist[index].flags &= ~(BONE_ANGLES_TOTAL);
 		return G2_Remove_Bone_Index(blist, index);
 	}
-	assert(0);
+	//assert(0);
 	return qfalse;
 }
 
@@ -1471,7 +1471,7 @@ qboolean G2_Set_Bone_Anim_No_BS(CGhoul2Info &ghoul2, const mdxaHeader_t *mod,bon
 		return qtrue;
 	}
 
-	assert(0);
+	//assert(0);
 	return qfalse;
 }
 
@@ -1695,7 +1695,7 @@ void G2_SetRagDoll(CGhoul2Info_v &ghoul2V,CRagDollParams *parms)
 		return;
 		break;
 	default:
-		assert(0);
+		//assert(0);
 		return;
 		break;
 	}
@@ -2070,7 +2070,7 @@ void G2_SetRagDollBullet(CGhoul2Info &ghoul2,const vec3_t rayStart,const vec3_t 
 						{ //A bad thing happened! Just use the hardcoded numbers even though they could be wrong.
 							startFrame = 3573;
 							endFrame = 3583;
-							assert(0);
+							//assert(0);
 						}
 						G2_Set_Bone_Anim_No_BS(mod_a,blist,"upper_lumbar",startFrame,endFrame-1,
 							BONE_ANIM_OVERRIDE_FREEZE|BONE_ANIM_BLEND,
@@ -2087,7 +2087,7 @@ void G2_SetRagDollBullet(CGhoul2Info &ghoul2,const vec3_t rayStart,const vec3_t 
 						{ //A bad thing happened! Just use the hardcoded numbers even though they could be wrong.
 							startFrame = 3581;
 							endFrame = 3592;
-							assert(0);
+							//assert(0);
 						}
 						G2_Set_Bone_Anim_No_BS(mod_a,blist,"upper_lumbar",endFrame,startFrame+1,
 							BONE_ANIM_OVERRIDE_FREEZE,
@@ -2400,7 +2400,7 @@ static void G2_RagDoll(CGhoul2Info_v &ghoul2V,int g2Index,CRagDollUpdateParams *
 
 	if (!params)
 	{
-		assert(0);
+		//assert(0);
 		return;
 	}
 
@@ -4337,7 +4337,7 @@ static void G2_DoIK(CGhoul2Info_v &ghoul2V,int g2Index,CRagDollUpdateParams *par
 
 	if (!params)
 	{
-		assert(0);
+		//assert(0);
 		return;
 	}
 
@@ -4629,7 +4629,7 @@ qboolean G2_SetBoneIKState(CGhoul2Info_v &ghoul2, int time, const char *boneName
 	//need params if we're not resetting.
 	if (!params)
 	{
-		assert(0);
+		//assert(0);
 		return qfalse;
 	}
 
@@ -4720,7 +4720,7 @@ qboolean G2_IKMove(CGhoul2Info_v &ghoul2, int time, sharedIKMoveParams_t *params
 
 	if (!params)
 	{
-		assert(0);
+		//assert(0);
 		return qfalse;
 	}
 

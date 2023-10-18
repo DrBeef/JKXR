@@ -27,7 +27,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "cg_media.h"
 
 #include "../game/g_roff.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 bool		in_camera = false;
 bool		in_misccamera = false; // if we are viewing a misc_camera

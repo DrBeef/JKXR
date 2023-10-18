@@ -26,6 +26,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "w_local.h"
 #include "bg_local.h"
+#include <VrTBDC.h>
+extern cvar_t	*g_TeamBeefDirectorsCut;
 
 //-----------------------
 //	Rocket Launcher
@@ -54,7 +56,12 @@ void rocketThink( gentity_t *ent )
 	}
 	if ( ent->enemy && ent->enemy->inuse )
 	{
-		float vel = (ent->spawnflags&1)?ent->speed:ROCKET_VELOCITY;
+		float baseVelocity = ROCKET_VELOCITY;
+		if(ent->client && ent->client->ps.clientNum == 0 && g_TeamBeefDirectorsCut->integer == 1)
+		{
+			baseVelocity = TBDC_ROCKET_VELOCITY;
+		}
+		float vel = (ent->spawnflags&1)?ent->speed:baseVelocity;
 		float newDirMult = ent->angle?ent->angle*2.0f:1.0f;
 		float oldDirMult = ent->angle?(1.0f-ent->angle)*2.0f:1.0f;
 

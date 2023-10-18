@@ -27,6 +27,7 @@ set(SPGameIncludeDirectories
 	${SPDir}
 	"${SPDir}/game"
 	"${GSLIncludeDirectory}"
+	"${JKXRDir}"
 	"${CMAKE_BINARY_DIR}/shared"
 	)
 

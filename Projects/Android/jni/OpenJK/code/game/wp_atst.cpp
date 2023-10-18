@@ -24,6 +24,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "b_local.h"
 #include "wp_saber.h"
 #include "w_local.h"
+#include "bg_local.h"
 
 // ATST Main
 //---------------------------------------------------------
@@ -37,6 +38,19 @@ void WP_ATSTMainFire( gentity_t *ent )
 //		vel = 4500.0f;
 //	}
 
+	vec3_t	dir, angs, start;
+
+	if ( BG_UseVRPosition(ent) )
+	{
+		BG_CalculateVRWeaponPosition(start, angs);
+		AngleVectors( angs, dir, NULL, NULL );
+	}
+	else {
+		VectorCopy(muzzle, start);
+		VectorCopy(forwardVec, dir);
+		vectoangles(forwardVec, angs);
+	}
+
 	if ( !ent->s.number )
 	{
 		// player shoots faster
@@ -45,7 +59,7 @@ void WP_ATSTMainFire( gentity_t *ent )
 
 	WP_MissileTargetHint(ent, muzzle, forwardVec);
 
-	gentity_t	*missile = CreateMissile( muzzle, forwardVec, vel, 10000, ent );
+	gentity_t	*missile = CreateMissile( start, dir, vel, 10000, ent );
 
 	missile->classname = "atst_main_proj";
 	missile->s.weapon = WP_ATST_MAIN;
@@ -75,7 +89,20 @@ void WP_ATSTSideAltFire( gentity_t *ent )
 		vel = ATST_SIDE_ALT_VELOCITY;
 	}
 
-	gentity_t *missile = CreateMissile( muzzle, forwardVec, vel, 10000, ent, qtrue );
+	vec3_t	dir, angs, start;
+
+	if ( BG_UseVRPosition(ent) )
+	{
+		BG_CalculateVRWeaponPosition(start, angs);
+		AngleVectors( angs, dir, NULL, NULL );
+	}
+	else {
+		VectorCopy(muzzle, start);
+		VectorCopy(forwardVec, dir);
+		vectoangles(forwardVec, angs);
+	}
+
+	gentity_t *missile = CreateMissile( start, dir, vel, 10000, ent, qtrue );
 
 	missile->classname = "atst_rocket";
 	missile->s.weapon = WP_ATST_SIDE;
@@ -99,7 +126,7 @@ void WP_ATSTSideAltFire( gentity_t *ent )
 		}
 	}
 
-	VectorCopy( forwardVec, missile->movedir );
+	VectorCopy( dir, missile->movedir );
 
 	// Make it easier to hit things
 	VectorSet( missile->maxs, ATST_SIDE_ALT_ROCKET_SIZE, ATST_SIDE_ALT_ROCKET_SIZE, ATST_SIDE_ALT_ROCKET_SIZE );
@@ -126,7 +153,20 @@ void WP_ATSTSideFire( gentity_t *ent )
 {
 	int	damage	= weaponData[WP_ATST_SIDE].damage;
 
-	gentity_t *missile = CreateMissile( muzzle, forwardVec, ATST_SIDE_MAIN_VELOCITY, 10000, ent, qfalse );
+	vec3_t	dir, angs, start;
+
+	if ( BG_UseVRPosition(ent) )
+	{
+		BG_CalculateVRWeaponPosition(start, angs);
+		AngleVectors( angs, dir, NULL, NULL );
+	}
+	else {
+		VectorCopy(muzzle, start);
+		VectorCopy(forwardVec, dir);
+		vectoangles(forwardVec, angs);
+	}
+
+	gentity_t *missile = CreateMissile( start, dir, ATST_SIDE_MAIN_VELOCITY, 10000, ent, qfalse );
 
 	missile->classname = "atst_side_proj";
 	missile->s.weapon = WP_ATST_SIDE;

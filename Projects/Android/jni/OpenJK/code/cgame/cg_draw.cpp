@@ -29,7 +29,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "cg_media.h"
 #include "../game/objectives.h"
 #include "../game/g_vehicles.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 #include "bg_local.h"
 
 extern vmCvar_t	cg_debugHealthBars;
@@ -2984,7 +2984,13 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 		return;
 	}
 
-	if ( in_camera ) {
+	if ( in_camera) {
+		return;
+	}
+
+	if (vr->in_vehicle &&
+		(type == 0 || vr->vehicle_type != VH_WALKER))
+	{
 		return;
 	}
 
@@ -3002,6 +3008,7 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 
 	if ( type == 1 && (cg.snap->ps.weapon == WP_NONE ||
 					   cg.snap->ps.weapon == WP_SABER ||
+					   cg.snap->ps.weapon == WP_MELEE ||
 					   cg.snap->ps.weapon == WP_THERMAL ))
 	{
 		return;
@@ -3056,9 +3063,24 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 
 		ent.radius = w / 640 * xmax * trace.fraction * 2048 / 64.0f;
 		ent.customShader = hShader;
-		ent.shaderRGBA[0] = (type == 0 && !cg_forceCrosshair) ? 0 : 255;
-		ent.shaderRGBA[1] = (type == 0) ? 0 : 255;
-		ent.shaderRGBA[2] = 255;
+		if(type == 0 && !cg_forceCrosshair) //Not Active Force Crosshair
+		{
+			ent.shaderRGBA[0] = 255;
+			ent.shaderRGBA[1] = 180;
+			ent.shaderRGBA[2] = 180;
+		}
+		else if(type == 0) //Active Force Crosshair
+		{
+			ent.shaderRGBA[0] = 255;
+			ent.shaderRGBA[1] = 90;
+			ent.shaderRGBA[2] = 90;
+		}
+		else //Regular Crosshair
+		{
+			ent.shaderRGBA[0] = 255;
+			ent.shaderRGBA[1] = 255;
+			ent.shaderRGBA[2] = 255;
+		}
 		ent.shaderRGBA[3] = 255;
 
 		cgi_R_AddRefEntityToScene(&ent);
@@ -3259,7 +3281,10 @@ static void CG_ScanForCrosshairEntity( qboolean scanAll )
 	}
 */
 	//draw crosshair at endpoint
-	//CG_DrawCrosshair( trace.endpos );
+	if (vr->remote_turret)
+	{
+		CG_DrawCrosshair(trace.endpos);
+	}
 
 	g_crosshairEntNum = trace.entityNum;
 	g_crosshairEntDist = 4096*trace.fraction;
@@ -3553,7 +3578,6 @@ static float CG_DrawSnapshot( float y ) {
 
 	int tempX = 635 - w;
 	int tempY = y+2;
-	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX, tempY, s, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 	return y + BIGCHAR_HEIGHT + 10;
@@ -3601,7 +3625,6 @@ static float CG_DrawFPS( float y ) {
 
 	int tempX = 635-xOffset - w;
 	int tempY = y+2;
-	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX, tempY, s, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 	return y + BIGCHAR_HEIGHT + 10;
@@ -3629,7 +3652,6 @@ static float CG_DrawTimer( float y ) {
 
 	int tempX = 635 - w;
 	int tempY = y+2;
-	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX, tempY, s, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 	return y + BIGCHAR_HEIGHT + 10;
@@ -3669,7 +3691,6 @@ static void CG_DrawAmmoWarning( void ) {
 	int offset = w / 2;
 	int tempX = SCREEN_WIDTH / 2;
 	int tempY = 64;
-	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX - offset, tempY, text, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 }
 
@@ -4208,6 +4229,21 @@ static void CG_Draw2D( void )
 		CGCam_DrawWideScreen();
 	}
 
+	static bool was_in_vehicle = false;
+	if (!was_in_vehicle && vr->in_vehicle)
+	{
+		if (vr->vehicle_type == VH_WALKER)
+		{
+			CG_CenterPrint("Tilt controllers to steer. Thumbstick to move.", 240, 5000);
+		}
+		else
+		{
+			CG_CenterPrint("Tilt controllers to steer/move", 240, 5000);
+		}
+	}
+	was_in_vehicle = vr->in_vehicle;
+
+	cg.drawingHUD = CG_HUD_ZOOM;
     if (cg.zoomMode == 4)
     {
         CG_DrawWeapReticle();
@@ -4376,7 +4412,6 @@ static void CG_Draw2D( void )
 
 			int tempX = x_pos;
 			int tempY = y_pos;
-			CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 			cgi_R_Font_DrawString(tempX - offset, tempY, text,  colorTable[CT_LTRED1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 		}
 	}
@@ -4394,7 +4429,6 @@ static void CG_Draw2D( void )
 
 		int tempX = x_pos;
 		int tempY = y_pos;
-		CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 		cgi_R_Font_DrawString(tempX - offset, tempY, text,  colorTable[CT_WHITE], cgs.media.qhFontSmall, -1, FONT_SCALE);
 	}
 
@@ -4571,7 +4605,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	}
 
 	//Immersive cinematic sequence 6DoF
-	if ((in_camera && vr->immersive_cinematics) || vr->emplaced_gun || cg.renderingThirdPerson)
+	if ((in_camera && vr->immersive_cinematics) || vr->emplaced_gun || cg.renderingThirdPerson || vr->in_vehicle)
 	{
 		BG_ConvertFromVR(vr->hmdposition_offset, cg.refdef.vieworg, cg.refdef.vieworg);
 	}

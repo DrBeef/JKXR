@@ -458,7 +458,6 @@ void CG_DrawCaptionText( bool inImmersiveCamera )
 			int offset = w / 2;
 			int tempX = SCREEN_WIDTH / 2;
 			int tempY = y;
-			CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 			cgi_R_Font_DrawString(tempX - offset, tempY, cg.captionText[i], textcolor_caption, cgs.media.qhFontSmall, -1, fFontScale * FONT_SCALE);
 			y += fontHeight;
 		}
@@ -655,7 +654,6 @@ void CG_DrawScrollText(void)
 			int offset = giScrollTextPixelWidth / 2;
 			int tempX = SCREEN_WIDTH / 2;
 			int tempY = y;
-			CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 			cgi_R_Font_DrawString(tempX - offset, tempY, cg.printText[i], textcolor_scroll, cgs.media.qhFontSmall, -1, FONT_SCALE);
 			y += fontHeight;
 		}
@@ -682,7 +680,7 @@ Called for important messages that should stay in the center of the screen
 for a few moments
 ==============
 */
-void CG_CenterPrint( const char *str, int y) {
+void CG_CenterPrint( const char *str, int y, int delayOverride) {
 	char	*s;
 
 	// Find text to match the str given
@@ -704,6 +702,7 @@ void CG_CenterPrint( const char *str, int y) {
 	}
 
 	cg.centerPrintTime = cg.time;
+	cg.centerPrintDelayOverride = delayOverride;
 	cg.centerPrintY = y;
 
 	// count the number of lines for centering
@@ -734,7 +733,10 @@ void CG_DrawCenterString( void )
 		return;
 	}
 
-	color = CG_FadeColor( cg.centerPrintTime, 1000 * 2 );
+	//Default time is 2 seconds
+	int printTime = cg.centerPrintDelayOverride == -1 ? 2000 : cg.centerPrintDelayOverride;
+
+	color = CG_FadeColor( cg.centerPrintTime, printTime );
 	if ( !color ) {
 		return;
 	}
@@ -781,7 +783,6 @@ void CG_DrawCenterString( void )
 		int offset = w / 2;
 		int tempX = SCREEN_WIDTH / 2;
 		int tempY = y;
-		CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 		cgi_R_Font_DrawString(tempX - offset, tempY,linebuffer, textcolor_center, cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 		y += fontHeight;

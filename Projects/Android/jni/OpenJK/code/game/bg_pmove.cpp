@@ -25,7 +25,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "../rd-common/tr_public.h"
 
-
 // bg_pmove.c -- both games player movement code
 // takes a playerstate and a usercmd as input and returns a modifed playerstate
 
@@ -45,7 +44,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "wp_saber.h"
 #include "g_vehicles.h"
 #include <float.h>
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
+#include <VrTBDC.h>
 
 extern qboolean G_DoDismemberment( gentity_t *self, vec3_t point, int mod, int damage, int hitLoc, qboolean force = qfalse );
 extern qboolean G_EntIsUnlockedDoor( int entityNum );
@@ -8964,7 +8964,7 @@ static void PM_BeginWeaponChange( int weapon ) {
 		return;
 	}
 
-	if ( !( pm->ps->stats[STAT_WEAPONS] & ( 1 << weapon ) ) ) {
+	if ( weapon != WP_NONE && !( pm->ps->stats[STAT_WEAPONS] & ( 1 << weapon ) ) ) {
 		return;
 	}
 
@@ -14085,7 +14085,19 @@ static void PM_Weapon( void )
 			return;
 		}
 		PM_AddEvent( EV_FIRE_WEAPON );
-		addTime = weaponData[pm->ps->weapon].fireTime;
+
+		if(pm->ps->weapon == WP_BRYAR_PISTOL && g_TeamBeefDirectorsCut->integer == 1)
+		{
+			addTime = TBDC_BRYAR_PISTOL_FIRERATE;
+		}
+		else if(pm->ps->weapon == WP_BLASTER && g_TeamBeefDirectorsCut->integer == 1)
+		{
+			addTime = TBDC_BLASTER_FIRERATE;
+		}
+		else
+		{
+			addTime = weaponData[pm->ps->weapon].fireTime;
+		}
 
 		switch( pm->ps->weapon)
 		{

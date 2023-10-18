@@ -29,7 +29,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "cg_media.h"
 #include "../game/objectives.h"
 #include "bg_local.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
 
 #include "FxUtil.h"
 
@@ -1894,6 +1894,7 @@ static void CG_DrawCrosshair3D(int type) // 0 - force, 1 - weapons
 	}
 
 	if ( type == 1 && (cg.snap->ps.weapon == WP_NONE ||
+		 cg.snap->ps.weapon == WP_MELEE ||
 		 cg.snap->ps.weapon == WP_SABER ||
 		 cg.snap->ps.weapon == WP_STUN_BATON ||
 		 cg.snap->ps.weapon == WP_THERMAL ))
@@ -2407,7 +2408,6 @@ static float CG_DrawSnapshot( float y ) {
 
 	int tempX = 635 - w;
 	int tempY = y+2;
-	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX, tempY, s, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 	return y + BIGCHAR_HEIGHT + 10;
@@ -2454,7 +2454,6 @@ static float CG_DrawFPS( float y ) {
 
 	int tempX = 635 - w;
 	int tempY = y+2;
-	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX, tempY, s, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 	return y + BIGCHAR_HEIGHT + 10;
@@ -2482,7 +2481,6 @@ static float CG_DrawTimer( float y ) {
 
 	int tempX = 635 - w;
 	int tempY = y+2;
-	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX, tempY, s, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 	return y + BIGCHAR_HEIGHT + 10;
 }
@@ -2521,7 +2519,6 @@ static void CG_DrawAmmoWarning( void ) {
 	int offset = w / 2;
 	int tempX = SCREEN_WIDTH / 2;
 	int tempY = 64;
-	CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 	cgi_R_Font_DrawString(tempX - offset, tempY, text, colorTable[CT_LTGOLD1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 }
 
@@ -2722,7 +2719,8 @@ static void CG_Draw2D( void )
 		CGCam_DrawWideScreen();
 	}
 
-    if (cg.zoomMode == 4)
+	cg.drawingHUD = CG_HUD_ZOOM;
+	if (cg.zoomMode == 4)
     {
         CG_DrawWeapReticle();
     }
@@ -2868,7 +2866,6 @@ static void CG_Draw2D( void )
 
 			int tempX = x_pos;
 			int tempY = y_pos;
-			CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 			cgi_R_Font_DrawString(tempX - offset, tempY, text,  colorTable[CT_LTRED1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 
 			if (cg_updatedDataPadForcePower1.integer) 
@@ -2884,7 +2881,6 @@ static void CG_Draw2D( void )
 
 				tempX = x_pos;
 				tempY = y_pos;
-				CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 				cgi_R_Font_DrawString(tempX - offset, tempY, text,  colorTable[CT_LTRED1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 			}
 
@@ -2901,7 +2897,6 @@ static void CG_Draw2D( void )
 
 				tempX = x_pos;
 				tempY = y_pos;
-				CG_AdjustFrom640Int( &tempX, &tempY, NULL, NULL );
 				cgi_R_Font_DrawString(tempX - offset, tempY, text,  colorTable[CT_LTRED1], cgs.media.qhFontSmall, -1, FONT_SCALE);
 			}
 
@@ -3035,7 +3030,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	//Sniper/E11 scope
 	if (usingScope)
 	{
-		cg.refdef.viewangles[ROLL] = vr->clientviewangles[ROLL];
+		cg.refdef.viewangles[ROLL] = vr->hmdorientation[ROLL];
 		cg.refdef.viewangles[PITCH] = vr->weaponangles[ANGLES_ADJUSTED][PITCH];
 		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW]
 				+ vr->weaponangles[ANGLES_ADJUSTED][YAW] + SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);

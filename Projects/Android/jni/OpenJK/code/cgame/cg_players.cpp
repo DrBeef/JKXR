@@ -32,7 +32,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "../game/g_vehicles.h"
 #include "../Rufl/hstring.h"
 #include "bg_local.h"
-#include <JKXR/VrClientInfo.h>
+#include <VrClientInfo.h>
+#include <VrTBDC.h>
 
 #define	LOOK_SWING_SCALE	0.5f
 #define	CG_SWINGSPEED		0.3f
@@ -4055,7 +4056,9 @@ static void CG_ForcePushRefraction( vec3_t org, centity_t *cent )
 	int tDif;
 
 	//Use classic force push blur - refraction effect not working in GLES
-	//if (!cg_renderToTextureFX.integer)
+#ifdef _WIN32	
+	if (!cg_forceBlurRenderToTextureFX.integer)
+#endif
 	{
 		CG_ForcePushBlur(org);
 		return;
@@ -4652,6 +4655,13 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		!gent->client->ps.powerups[PW_UNCLOAKING] &&
 		!gent->client->ps.powerups[PW_DISRUPTION] )
 	{
+		// HACK HACK HACK
+		// If this entity is a vehicle being piloted by the player, then increase the radius so it doesn't get culled
+		if (gent->m_pVehicle && gent->m_pVehicle->m_pPilot && gent->m_pVehicle->m_pPilot->s.number == 0 )
+		{
+			ent->radius = 80;
+		}
+
 		cgi_R_AddRefEntityToScene( ent );
 	}
 
@@ -4747,9 +4757,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 		}
 		else
 		{
-			//Causes screen to go black - just don't use this at all
-			/*
-			if (cg_renderToTextureFX.integer && cg_shadows.integer != 2 && cgs.glconfig.stencilBits >= 4)
+/*			if (cg_renderToTextureFX.integer && cg_shadows.integer != 2 && cgs.glconfig.stencilBits >= 4)
 			{
 				cgi_R_SetRefractProp(1.0f, 0.0f, qfalse, qfalse); //don't need to do this every frame.. but..
 				ent->customShader = 2; //crazy "refractive" shader
@@ -4757,7 +4765,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, centity_t *cen
 				ent->customShader = 0;
 			}
 			else
-			 */
+*/
 			{ //stencil buffer's in use, sorry
 				ent->renderfx = 0;//&= ~(RF_RGB_TINT|RF_ALPHA_FADE);
 				ent->shaderRGBA[0] = ent->shaderRGBA[1] = ent->shaderRGBA[2] = ent->shaderRGBA[3] = 255;
@@ -5860,7 +5868,7 @@ static void CG_DoSaber( vec3_t origin, vec3_t dir, float length, float lengthMax
 #define	MAX_MARK_POINTS		768
 extern markPoly_t *CG_AllocMark();
 
-static void CG_CreateSaberMarks( vec3_t start, vec3_t end, vec3_t normal )
+static void CG_CreateSaberMarks( centity_t *cent, vec3_t start, vec3_t end, vec3_t normal )
 {
 //	byte			colors[4];
 	int				i, j, numFragments;
@@ -5947,17 +5955,20 @@ static void CG_CreateSaberMarks( vec3_t start, vec3_t end, vec3_t normal )
 		mark->color[0] = mark->color[1] = mark->color[2] = mark->color[3] = 255;
 		memcpy( mark->verts, verts, mf->numPoints * sizeof( verts[0] ) );
 
-		// And now do a glow pass
-		mark = CG_AllocMark();
-		mark->time = cg.time - 8500 + glowExtraTime;
-		mark->fadeTime = glowFadeTime;
-		mark->alphaFade = qfalse;
-		mark->markShader = cgi_R_RegisterShader("gfx/effects/saberDamageGlow" );
-		mark->poly.numVerts = mf->numPoints;
-		mark->color[0] = 215 + Q_flrand(0.0f, 1.0f) * 40.0f;
-		mark->color[1] = 96 + Q_flrand(0.0f, 1.0f) * 32.0f;
-		mark->color[2] = mark->color[3] = Q_flrand(0.0f, 1.0f)*15.0f;
-		memcpy( mark->verts, verts, mf->numPoints * sizeof( verts[0] ) );
+		if ( cent->gent->client->ps.saber[0].type != SABER_SITH_SWORD )
+		{
+			// And now do a glow pass
+			mark = CG_AllocMark();
+			mark->time = cg.time - 8500 + glowExtraTime;
+			mark->fadeTime = glowFadeTime;
+			mark->alphaFade = qfalse;
+			mark->markShader = cgi_R_RegisterShader("gfx/effects/saberDamageGlow");
+			mark->poly.numVerts = mf->numPoints;
+			mark->color[0] = 215 + Q_flrand(0.0f, 1.0f) * 40.0f;
+			mark->color[1] = 96 + Q_flrand(0.0f, 1.0f) * 32.0f;
+			mark->color[2] = mark->color[3] = Q_flrand(0.0f, 1.0f) * 15.0f;
+			memcpy(mark->verts, verts, mf->numPoints * sizeof(verts[0]));
+		}
 	}
 }
 
@@ -6496,10 +6507,13 @@ Ghoul2 Insert End
 				{
 					if ( !noMarks )
 					{
-                        int position = (vr->right_handed ?
-                                        ((saberNum == 0) ? 2 : 1) :
-                                        ((saberNum == 0) ? 1 : 2));
-                        cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+						if (saberNum == 1 || !cent->gent->client->ps.saberInFlight)
+						{
+							int position = (vr->right_handed ?
+											((saberNum == 0) ? 2 : 1) :
+											((saberNum == 0) ? 1 : 2));
+							cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+						}
 
 						/*
 						if ( !(cent->gent->client->ps.saberEventFlags&SEF_INWATER) )
@@ -6526,10 +6540,13 @@ Ghoul2 Insert End
 				{
 					if ( !noMarks )
 					{
-                        int position = (vr->right_handed ?
-                                        ((saberNum == 0) ? 2 : 1) :
-                                        ((saberNum == 0) ? 1 : 2));
-                        cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+						if (saberNum == 1 || !cent->gent->client->ps.saberInFlight)
+						{
+							int position = (vr->right_handed ?
+											((saberNum == 0) ? 2 : 1) :
+											((saberNum == 0) ? 1 : 2));
+							cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+						}
 
 						if ( ( !WP_SaberBladeUseSecondBladeStyle( &client->ps.saber[saberNum], bladeNum ) && !(client->ps.saber[saberNum].saberFlags2&SFL2_NO_WALL_MARKS) )
 							|| ( WP_SaberBladeUseSecondBladeStyle( &client->ps.saber[saberNum], bladeNum ) && !(client->ps.saber[saberNum].saberFlags2&SFL2_NO_WALL_MARKS2) ) )
@@ -6552,7 +6569,7 @@ Ghoul2 Insert End
 									|| (WP_SaberBladeUseSecondBladeStyle( &client->ps.saber[saberNum], bladeNum ) && !(client->ps.saber[saberNum].saberFlags2&SFL2_NO_WALL_MARKS2)) )
 								{
 									// Let's do some cool burn/glowing mark bits!!!
-									CG_CreateSaberMarks( client->ps.saber[saberNum].blade[bladeNum].trail.oldPos[i], trace.endpos, trace.plane.normal );
+									CG_CreateSaberMarks( cent, client->ps.saber[saberNum].blade[bladeNum].trail.oldPos[i], trace.endpos, trace.plane.normal );
 
 									if ( Q_irand( 1, client->ps.saber[saberNum].numBlades ) == 1 )
 									{
@@ -6802,13 +6819,13 @@ Ghoul2 Insert End
 		renderfx, (qboolean)!noDlight );
 		
     if (CG_getPlayer1stPersonSaber(cent) &&
-        cent->gent->client->ps.saberEventFlags & (SEF_BLOCKED|SEF_PARRIED) &&
-			vr->saberBlockDebounce < cg.time &&
+            cent->gent->client->ps.saberEventFlags & (SEF_BLOCKED|SEF_PARRIED) &&
+            cent->gent->client->ps.saberBounceMove != LS_NONE &&
+            vr->saberBlockDebounce < cg.time &&
 			bladeNum == 0) // Only need to do this for the first blade
     {
-		cvar_t *vr_saber_block_debounce_time = gi.cvar("vr_saber_block_debounce_time", "200", CVAR_ARCHIVE); // defined in VrCvars.h
-		vr->saberBlockDebounce = cg.time + vr_saber_block_debounce_time->integer;
-
+		vr->saberBlockDebounce = cg.time + TBDC_SABER_BOUNCETIME;
+		vr->saberBounceMove = cent->gent->client->ps.saberBounceMove;
 		cgi_HapticEvent("shotgun_fire", 0, vr->right_handed ? (2 - saberNum) : (1 + saberNum), 100, 0, 0);
 	}
 
@@ -6931,7 +6948,7 @@ extern qboolean G_GetRootSurfNameWithVariant( gentity_t *ent, const char *rootSu
 extern qboolean G_ControlledByPlayer( gentity_t *self );
 extern qboolean G_RagDoll(gentity_t *ent, vec3_t forcedAngles);
 int	cg_saberOnSoundTime[MAX_GENTITIES] = {0};
-
+extern void CG_ChangeWeapon( int num );
 void CG_Player( centity_t *cent ) {
 	clientInfo_t	*ci;
 	qboolean		shadow, staticScale = qfalse;
@@ -6985,8 +7002,10 @@ void CG_Player( centity_t *cent ) {
 	if (cent->gent->client->ps.clientNum == 0) {
 		vr->velocitytriggered = (!cg.renderingThirdPerson &&
 								 (cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE || cg.snap->ps.weapon == WP_STUN_BATON));
+		cvar_t *vr_motion_enable_saber = gi.cvar("vr_motion_enable_saber", "0", CVAR_ARCHIVE);
+		vr->velocitytriggeractive = (cg.snap->ps.weapon == WP_SABER && (g_entities[0].client->ps.SaberActive() || vr_motion_enable_saber->integer)) ||
+				cg.snap->ps.weapon == WP_MELEE || cg.snap->ps.weapon == WP_STUN_BATON;
 	}
-
 
 	G_RagDoll(cent->gent, cent->lerpAngles);
 
@@ -6994,6 +7013,15 @@ void CG_Player( centity_t *cent ) {
 	{
 		wData = &weaponData[cent->currentState.weapon];
 	}
+
+	//If viewing a remote turret, ensure we have switched to no weapons
+	if (vr->remote_turret &&
+		cg.weaponSelect != WP_NONE)
+	{
+		cg.weaponSelect = WP_NONE;
+		SetWeaponSelectTime();
+	}
+
 /*
 Ghoul2 Insert Start
 */
@@ -7030,7 +7058,7 @@ Ghoul2 Insert Start
 			{//no viewentity
 				if ( cent->currentState.number == cg.snap->ps.clientNum )
 				{//I am the player
-					if ( cg.snap->ps.weapon != WP_SABER && cg.snap->ps.weapon != WP_MELEE )
+					if ( cg.snap->ps.weapon != WP_SABER )
 					{//not using saber or fists
 						ent.renderfx = RF_THIRD_PERSON;			// only draw in mirrors
 					}
@@ -7038,7 +7066,7 @@ Ghoul2 Insert Start
 			}
 			else if ( cent->currentState.number == cg.snap->ps.viewEntity )
 			{//I am the view entity
-				if ( cg.snap->ps.weapon != WP_SABER && cg.snap->ps.weapon != WP_MELEE )
+				if ( cg.snap->ps.weapon != WP_SABER )
 				{//not using first person saber test or, if so, not using saber
 					ent.renderfx = RF_THIRD_PERSON;			// only draw in mirrors
 				}
@@ -8149,7 +8177,7 @@ Ghoul2 Insert End
 		{//no viewentity
 			if ( cent->currentState.number == cg.snap->ps.clientNum )
 			{//I am the player
-				if ( cg.snap->ps.weapon != WP_SABER && cg.snap->ps.weapon != WP_MELEE )
+				if ( cg.snap->ps.weapon != WP_SABER )
 				{//not using saber or fists
 					renderfx = RF_THIRD_PERSON;			// only draw in mirrors
 				}
@@ -8157,7 +8185,7 @@ Ghoul2 Insert End
 		}
 		else if ( cent->currentState.number == cg.snap->ps.viewEntity )
 		{//I am the view entity
-			if ( cg.snap->ps.weapon != WP_SABER && cg.snap->ps.weapon != WP_MELEE )
+			if ( cg.snap->ps.weapon != WP_SABER )
 			{//not using saber or fists
 				renderfx = RF_THIRD_PERSON;			// only draw in mirrors
 			}
@@ -8528,19 +8556,30 @@ Ghoul2 Insert End
 				continue;
 			}
 
+			char saberModel[256];
+			if (cent->gent->client->ps.saber[saberNum].model == nullptr)
+			{
+				//Bit of a fiddle, but if we have no saber model for some reason, just use a default one
+				strcpy(saberModel, "models/weapons2/saber_1/saber_1.glm");
+			}
+			else
+			{
+				strcpy(saberModel, cent->gent->client->ps.saber[saberNum].model);
+			}
+
 			refEntity_t hiltEnt;
 			memset( &hiltEnt, 0, sizeof(refEntity_t) );
 
 			BG_CalculateVRSaberPosition(saberNum, hiltEnt.origin, hiltEnt.angles);
 
-			int saberModelIndex = G_ModelIndex( cent->gent->client->ps.saber[saberNum].model );
+			int saberModelIndex = G_ModelIndex( saberModel );
 			if (saberModelIndex != cg.saberModelIndex[saberNum])
 			{
 				if (cg.saber_ghoul2[saberNum].size() != 0)
 				{
 					gi.G2API_RemoveGhoul2Model(cg.saber_ghoul2[saberNum], cg.saberG2Num[saberNum]);
 				}
-				cg.saberG2Num[saberNum] = gi.G2API_InitGhoul2Model( cg.saber_ghoul2[saberNum], cent->gent->client->ps.saber[saberNum].model, saberModelIndex , NULL_HANDLE, NULL_HANDLE, 0, 0 );
+				cg.saberG2Num[saberNum] = gi.G2API_InitGhoul2Model( cg.saber_ghoul2[saberNum], saberModel, saberModelIndex , NULL_HANDLE, NULL_HANDLE, 0, 0 );
 				cg.saberModelIndex[saberNum] = saberModelIndex;
 			}
 			hiltEnt.ghoul2 = &cg.saber_ghoul2[saberNum];
