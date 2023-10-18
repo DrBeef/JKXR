@@ -14586,10 +14586,7 @@ void PM_AdjustAttackStates( pmove_t *pm )
 			}
 			else if ( cg.zoomMode == 2 )
 			{
-				G_SoundOnEnt( pm->gent, CHAN_AUTO, "sound/weapons/disruptor/zoomend.wav" );
-				// already zooming, so must be wanting to turn it off
-				cg.zoomMode = 0;
-				cg.zoomTime = cg.time;
+				G_SoundOnEnt( pm->gent, CHAN_AUTO, "sound/weapons/disruptor/zoomstart.wav" );
 				cg.zoomLocked = qfalse;
 			}
 		}
