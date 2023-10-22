@@ -698,7 +698,7 @@ LANG_ENGLISH        "Vanilla NPCs and Guns"
 LANG_GERMAN         "#same"
 
 REFERENCE           REFRESH_RATE_ITEM
-LANG_ENGLISH        "Refresh Rate (Standalone Only):"
+LANG_ENGLISH        "Refresh Rate:"
 LANG_GERMAN         "#same"
 
 REFERENCE           REFRESH_RATE_DESC
