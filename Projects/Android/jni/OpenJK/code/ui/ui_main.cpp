@@ -4770,6 +4770,27 @@ static void UI_ForcePowerWeaponsButton(qboolean activeFlag)
 	if(trap_Cvar_VariableValue("helpUsObi") != 0)
 		activeFlag = qtrue;
 
+	if (!activeFlag) {
+		// If all force powers are maxed, let us pass
+		client_t* cl = &svs.clients[0];
+		playerState_t* pState = NULL;
+		int forcelevel;
+		qboolean allforcesmaxed = qtrue;
+		for (int i = 0; i < MAX_POWER_ENUMS; i++) {
+			if (cl) {
+				pState = cl->gentity->client;
+				forcelevel = pState->forcePowerLevel[powerEnums[i].powerEnum];
+			} else {
+				forcelevel = uiInfo.forcePowerLevel[powerEnums[i].powerEnum];
+			}
+			if (forcelevel < 3) {
+				allforcesmaxed = qfalse;
+				break;
+			}
+		}
+		activeFlag = allforcesmaxed;
+	}
+
 	// Find weaponsbutton
 	itemDef_t	*item;
 	item = (itemDef_s *) Menu_FindItemByName(menu, "weaponbutton");
