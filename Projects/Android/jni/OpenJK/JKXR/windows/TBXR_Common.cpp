@@ -222,7 +222,7 @@ void ovrFramebuffer_Resolve(ovrFramebuffer* frameBuffer) {
 	int width, height;
 	R_GetModeInfo(&width, &height, r_mode->integer);
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, colorTexture);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBuffer->FrameBuffers[frameBuffer->TextureSwapChainIndex]);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBlitFramebuffer(0, 0, gAppState.Width, gAppState.Height,
 		0, 0, width, height,
