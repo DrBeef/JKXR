@@ -471,6 +471,21 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
         }
 
+        //Switch movement speed
+        {
+            static bool switched = false;
+            if (between(-0.2f, primaryJoystickX, 0.2f) &&
+                between(0.8f, pPrimaryJoystick->y, 1.0f)) {
+                if (!switched) {
+                    vr.move_speed = (++vr.move_speed) % 3;
+                    switched = true;
+                }
+            }
+            else {
+                switched = false;
+            }
+        }
+
         /*
         //Parameter Changer
          static bool changed = false;
