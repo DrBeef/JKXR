@@ -2952,7 +2952,7 @@ void CG_ItemSelectorSelect_f( void )
 		cg.forcepowerSelectTime = cg.time;
 		cg.forcepowerSelect = cg.itemSelectorSelection;
 	}
-	else if (cg.itemSelectorType == ST_QUICK_SAVE) {
+	else if (cg.itemSelectorType == ST_QUICK_MENU) {
 		if (cg.itemSelectorSelection == 0) {
 			cgi_SendConsoleCommand("save quick\n");
 			CG_CenterPrint("Quick Saved", 240);
@@ -2969,7 +2969,7 @@ void CG_ItemSelectorNext_f( void )
 {
 	if (cg.itemSelectorType >= ST_FORCE_POWER)
 	{
-		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_SAVE : ST_FORCE_POWER;
+		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_MENU : ST_FORCE_POWER;
 		return;
 	}
 
@@ -2986,7 +2986,7 @@ void CG_ItemSelectorPrev_f( void )
 {
 	if (cg.itemSelectorType >= ST_FORCE_POWER)
 	{
-		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_SAVE : ST_FORCE_POWER;
+		cg.itemSelectorType = (cg.itemSelectorType == ST_FORCE_POWER) ? ST_QUICK_MENU : ST_FORCE_POWER;
 		return;
 	}
 
@@ -3120,7 +3120,7 @@ void CG_DrawItemSelector( void )
 		sRGB[1] = 0.0f;
 		sRGB[2] = 1.0f;
 		break;
-	case ST_QUICK_SAVE:
+	case ST_QUICK_MENU:
 		count = 2;
 		sRGB[0] = 1.0f;
 		sRGB[1] = 1.0f;
@@ -3252,7 +3252,7 @@ void CG_DrawItemSelector( void )
 				case ST_FORCE_POWER: // force powers
 					selectable = ForcePower_Valid(itemId);
 					break;
-				case ST_QUICK_SAVE:
+				case ST_QUICK_MENU:
 					selectable = true;
 					break;
 			}
@@ -3339,7 +3339,7 @@ void CG_DrawItemSelector( void )
 						case ST_FORCE_POWER: // force powers
 							sprite.customShader = force_icons[showPowers[itemId]];
 							break;
-						case ST_QUICK_SAVE:
+						case ST_QUICK_MENU:
 							sprite.customShader = itemId == 0 ? cgs.media.iconSave : cgs.media.iconLoad;
 							break;
 					}

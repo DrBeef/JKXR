@@ -769,7 +769,7 @@ typedef enum
 	ST_GADGET,
 	ST_FIGHTING_STYLE,
 	ST_FORCE_POWER,
-	ST_QUICK_SAVE
+	ST_QUICK_MENU
 } selectorType_t;
 
 typedef enum
