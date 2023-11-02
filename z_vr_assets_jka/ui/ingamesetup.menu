@@ -1534,10 +1534,9 @@
 			cvar				"cg_shadows"
 			cvarFloatList		
 			{  
-				@MENUS_NONE				0 
-				@MENUS_SHADOWS_SIMPLE		1 
-				@MENUS_SHADOWS_VOLUMETRIC	2
-//				"Projected"		3
+				@MENUS_NONE	0
+				@MENUS_LOW	1
+				@MENUS_HIGH	3
 			}
 			rect				260 287 340 14
 	   		textalign			ITEM_ALIGN_RIGHT
