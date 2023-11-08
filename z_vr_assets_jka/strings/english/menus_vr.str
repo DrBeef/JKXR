@@ -259,11 +259,11 @@ LANG_ENGLISH        "Give All Weapons"
 REFERENCE           CHEATS_GIVE_WEAPONS_DESC
 LANG_ENGLISH        "Gives all weapons."
 
-REFERENCE           CHEATS_GIVE_POWERS_ITEM
-LANG_ENGLISH        "Unlock All Powers"
+REFERENCE           CHEATS_UNLIMITED_POWER_ITEM
+LANG_ENGLISH        "Unlimited Force Power"
 
-REFERENCE           CHEATS_GIVE_POWERS_DESC
-LANG_ENGLISH        "Unlocks all force powers."
+REFERENCE           CHEATS_UNLIMITED_POWER_DESC
+LANG_ENGLISH        "Enables unlimited force power."
 
 REFERENCE           CHEATS_SABER_STYLE_TITLE
 LANG_ENGLISH        "Lightsaber Style:"
@@ -333,6 +333,18 @@ LANG_ENGLISH        "Lightsaber Burn Marks Cool Down:"
 
 REFERENCE           CHEATS_SABER_MARK_COOL_DOWN_DESC
 LANG_ENGLISH        "Set how long it takes for burn marks to cool down."
+
+REFERENCE           SENSE_FORCE
+LANG_ENGLISH        "Sense force"
+
+REFERENCE           SABER_DEFEND
+LANG_ENGLISH        "Saber defend"
+
+REFERENCE           SABER_ATTACK
+LANG_ENGLISH        "Saber attack"
+
+REFERENCE           SABER_THROW
+LANG_ENGLISH        "Saber throw"
 
 REFERENCE           WEAPON_CROSSHAIR_ITEM
 LANG_ENGLISH        "Weapon Crosshair:"

@@ -341,12 +341,12 @@ REFERENCE           CHEATS_GIVE_WEAPONS_DESC
 LANG_ENGLISH        "Gives all weapons."
 LANG_SPANISH         "#same"
 
-REFERENCE           CHEATS_GIVE_POWERS_ITEM
-LANG_ENGLISH        "Unlock All Powers"
+REFERENCE           CHEATS_UNLIMITED_POWER_ITEM
+LANG_ENGLISH        "Unlimited Force Power"
 LANG_SPANISH        "#same"
 
-REFERENCE           CHEATS_GIVE_POWERS_DESC
-LANG_ENGLISH        "Unlocks all force powers."
+REFERENCE           CHEATS_UNLIMITED_POWER_DESC
+LANG_ENGLISH        "Enables unlimited force power."
 LANG_SPANISH         "#same"
 
 REFERENCE           CHEATS_SABER_STYLE_TITLE
@@ -439,6 +439,22 @@ LANG_SPANISH        "#same"
 
 REFERENCE           CHEATS_SABER_MARK_COOL_DOWN_DESC
 LANG_ENGLISH        "Set how long it takes for burn marks to cool down."
+LANG_SPANISH        "#same"
+
+REFERENCE           SENSE_FORCE
+LANG_ENGLISH        "Sense force"
+LANG_SPANISH        "#same"
+
+REFERENCE           SABER_DEFEND
+LANG_ENGLISH        "Saber defend"
+LANG_SPANISH        "#same"
+
+REFERENCE           SABER_ATTACK
+LANG_ENGLISH        "Saber attack"
+LANG_SPANISH        "#same"
+
+REFERENCE           SABER_THROW
+LANG_ENGLISH        "Saber throw"
 LANG_SPANISH        "#same"
 
 REFERENCE           WEAPON_CROSSHAIR_ITEM

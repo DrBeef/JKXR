@@ -12904,6 +12904,9 @@ void WP_ForcePowerDrain( gentity_t *self, forcePowers_t forcePower, int override
 	{//For now, NPCs have infinite force power
 		return;
 	}
+	if ( self->flags & FL_UNLIMITEDPOWERMODE) {
+		return;
+	}
 	//take away the power
 	int	drain = overrideAmt;
 	if ( !drain )

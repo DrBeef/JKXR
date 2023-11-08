@@ -41,13 +41,6 @@
 			decoration
 		}
 
-
-//----------------------------------------------------------------------------------------------
-//
-//	CHEAT MENU ITEMS
-//
-//----------------------------------------------------------------------------------------------
-
 		itemDef
 		{
 			name				screen_title
@@ -62,6 +55,12 @@
 			visible			1
 			decoration
 		}
+
+//----------------------------------------------------------------------------------------------
+//
+//	CHEAT MENU ITEMS
+//
+//----------------------------------------------------------------------------------------------
 
 		itemDef 
 		{
@@ -238,8 +237,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				340 100 200 20
-			text				@MENUS_VR_CHEATS_GIVE_POWERS_ITEM
-			descText		@MENUS_VR_CHEATS_GIVE_POWERS_DESC
+			text				@MENUS_VR_CHEATS_UNLIMITED_POWER_ITEM
+			descText		@MENUS_VR_CHEATS_UNLIMITED_POWER_DESC
 			font				2
 			textscale			1
 			textalignx			100
@@ -251,7 +250,7 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
-				exec			"setforceall 3"
+				exec			"unlimitedpower"
 			}
 		}
 
@@ -278,7 +277,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				210 155 50 20
+			rect				190 155 50 20
 			text				@MENUS_VR_CHEATS_SABER_STYLE_SINGLE_ITEM
 			descText		@MENUS_VR_CHEATS_SABER_STYLE_SINGLE_DESC
 			font				2
@@ -302,7 +301,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				268 155 50 20
+			rect				248 155 50 20
 			text				@MENUS_VR_CHEATS_SABER_STYLE_DUAL_ITEM
 			descText		@MENUS_VR_CHEATS_SABER_STYLE_DUAL_DESC
 			font				2
@@ -326,7 +325,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				330 155 50 20
+			rect				310 155 50 20
 			text				@MENUS_VR_CHEATS_SABER_STYLE_STAFF_ITEM
 			descText			@MENUS_VR_CHEATS_SABER_STYLE_STAFF_DESC
 			font				2
@@ -350,7 +349,7 @@
 			group				none
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
-			rect				410 155 50 20
+			rect				390 155 50 20
 			text				@MENUS_VR_CHEATS_SABER_STYLE_SITH_ITEM
 			descText			@MENUS_VR_CHEATS_SABER_STYLE_SITH_DESC
 			font				2
@@ -542,6 +541,131 @@
 			forecolor			1 1 1 1
 			visible			1
 			descText			@MENUS_VR_CHEATS_SABER_MARK_COOL_DOWN_DESC
+		}
+
+//----------------------------------------------------------------------------------------------
+//	CHANGE PAGE BUTTONS
+//----------------------------------------------------------------------------------------------
+		itemDef
+		{
+			name				prevpage_on
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				225 357 32 26
+			background			"gfx/menus/dp_arrow_lon"
+			forecolor			1 1 1 1
+			decoration
+			visible			0
+		}
+		itemDef
+		{
+			name				prevpage_off
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				225 357 32 26
+			background			"gfx/menus/dp_arrow_l"
+			forecolor			1 1 1 1
+			decoration
+			visible			1
+		}
+		itemDef
+		{
+			name				prevpage
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				225 357 32 26
+			font				2
+			textscale			1
+			textalignx			48
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			1 .682 0 1
+			visible				1
+			action
+			{
+				play			"sound/interface/button1.wav" ;
+				close			all
+				open			datapadCheats2Menu
+			}
+			mouseEnter
+			{
+				hide		prevpage_off
+				show		prevpage_on
+			}
+			mouseExit
+			{
+				show		prevpage_off
+				hide		prevpage_on
+			}
+		}
+
+		itemDef 
+		{
+			name				cheats
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			rect				260 357 120 25
+			text				"CHEATS (1/2)"
+			font				2
+			textscale			1
+			textalignx			60
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			1 .682 0 1
+			visible				1
+			decoration
+		}
+
+		itemDef
+		{
+			name				nextpage_on
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				384 357 32 26
+			background			"gfx/menus/dp_arrow_ron"
+			forecolor			1 1 1 1
+			decoration
+			visible			0
+		}
+		itemDef
+		{
+			name				nextpage_off
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				384 357 32 26
+			background			"gfx/menus/dp_arrow_r"
+			forecolor			1 1 1 1
+			decoration
+			visible			1
+		}
+		itemDef
+		{
+			name				nextpage
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				384 357 32 26
+			font				2
+			textscale			1
+			textalignx			48
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			1 .682 0 1
+			visible			1
+			action
+			{
+				play			"sound/interface/button1.wav" ;
+				close			all
+				open			datapadCheats2Menu
+			}
+			mouseEnter
+			{
+				hide			nextpage_off
+				show			nextpage_on
+			}
+			mouseExit
+			{
+				show			nextpage_off
+				hide			nextpage_on
+			}
 		}
 
 //----------------------------------------------------------------------------------------------
@@ -738,12 +862,3 @@
 		}
 	}
 }
-
-
-
-
-
-
-
-
-

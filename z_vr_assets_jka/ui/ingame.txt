@@ -20,6 +20,7 @@
 	loadMenu { "ui/datapadweapons.menu"					}
 	loadMenu { "ui/datapadmoves.menu"					}
 	loadMenu { "ui/datapadcheats.menu"					}
+	loadMenu { "ui/datapadcheats2.menu"					}
 
 	loadMenu { "ui/error.menu" }
 	loadMenu { "ui/ingamevid_warning.menu"					}
