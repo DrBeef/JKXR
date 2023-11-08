@@ -1,0 +1,1174 @@
+//----------------------------------------------------------------------------------------------
+// Data Pad : Cheat Menu
+// 
+//----------------------------------------------------------------------------------------------
+{
+	menuDef 
+	{
+		name					"datapadCheats2Menu"
+		fullScreen				1							// MENU_TRUE				
+		rect					0 0 640 480						// Size and position of the menu
+		visible					1							// Visible on open
+		focusColor				1 1 1 1						// Focus color for text and items
+		descX					320
+		descY					444
+		descScale				1
+		descColor				1 .682 0 .8
+		descAlignment				ITEM_ALIGN_CENTER		
+		onESC 
+		{ 
+				play			"sound/interface/esc.wav" 					
+				uiScript		closedatapad					// Close menu				
+		}
+		onOpen
+		{ 
+				exec				"helpUsObi 1"
+				setfocus		none
+
+			// Light powers
+			uiScript  			"initallocforcepower" "absorb"
+			uiScript  			"initallocforcepower" "heal"
+			uiScript  			"initallocforcepower" "mindtrick"
+			uiScript  			"initallocforcepower" "protect"
+
+			// Core powers
+			uiScript  			"initallocforcepower" "jump"
+			uiScript  			"initallocforcepower" "pull"
+			uiScript  			"initallocforcepower" "push"
+			uiScript  			"initallocforcepower" "sense"
+			uiScript  			"initallocforcepower" "speed"
+			uiScript  			"initallocforcepower" "sabdef"
+			uiScript  			"initallocforcepower" "saboff"
+			uiScript  			"initallocforcepower" "sabthrow"
+
+			// Dark powers
+			uiScript  			"initallocforcepower" "drain"
+			uiScript  			"initallocforcepower" "grip"
+			uiScript  			"initallocforcepower" "lightning"
+			uiScript  			"initallocforcepower" "rage"
+		}
+
+//----------------------------------------------------------------------------------------------
+//	MENU BACKGROUND
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				background
+			group				none
+			rect				0 0 640 480
+			style				WINDOW_STYLE_SHADER
+			background			"gfx/menus/datapad"	
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+
+		itemDef
+		{
+			name				screen_title
+			type				ITEM_TYPE_TEXT
+			rect				170 3 300 26
+			text				@MENUS_VR_CHEATS_TITLE
+			font				3
+			forecolor			.549 .854 1 1
+			textscale			1.2
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			150
+			visible			1
+			decoration
+		}
+
+//----------------------------------------------------------------------------------------------
+//
+//	CHEAT MENU ITEMS
+//
+//----------------------------------------------------------------------------------------------
+
+		itemDef
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			rect				220 40 200 20
+			text				@MENUS_FORCE_POWER_CONFIGURATION
+			font				2
+			textscale			1
+			textalignx			100
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				absorb_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				76 81 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				absorb_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				33 70 64 64
+			background			"gfx/mp/NEW_f_icon_lt_absorb"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				absorb_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				33 81 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_ABSORB_FORCE
+			mouseEnter
+			{
+				setitemcolor		absorb_iconpic  forecolor 1 1 1 1
+				setitemcolor		absorb_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{
+				setitemcolor		absorb_iconpic  forecolor .65 .65 .65 1
+				setitemcolor		absorb_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "absorb"
+			}
+		}
+
+		itemDef
+		{
+			name				heal_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				76 135 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				heal_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				33 125 64 64
+			background			"gfx/mp/NEW_f_icon_lt_heal"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				heal_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				33 135 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_HEAL_FORCE
+			mouseEnter
+			{
+				setitemcolor		heal_iconpic  forecolor 1 1 1 1
+				setitemcolor		heal_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{
+				setitemcolor		heal_iconpic  forecolor .65 .65 .65 1
+				setitemcolor		heal_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "heal"
+			}
+		}
+
+		itemDef
+		{
+			name				mindtrick_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				76 189 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				mindtrick_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				33 181 64 64
+			background			"gfx/mp/NEW_f_icon_lt_mind_trick"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				mindtrick_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				33 189 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_MIND_TRICK_FORCE
+			mouseEnter
+			{
+				setitemcolor		mindtrick_iconpic  forecolor 1 1 1 1
+				setitemcolor		mindtrick_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{
+				setitemcolor		mindtrick_iconpic  forecolor .65 .65 .65 1
+				setitemcolor		mindtrick_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "mindtrick"
+			}
+		}
+
+		itemDef
+		{
+			name				protect_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				76 245 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				protect_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				33 236 64 64
+			background			"gfx/mp/NEW_f_icon_lt_protect"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				protect_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				33 245 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_PROTECT_FORCE
+			mouseEnter
+			{
+				setitemcolor		protect_iconpic  forecolor 1 1 1 1
+				setitemcolor		protect_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{
+				setitemcolor		protect_iconpic  forecolor .65 .65 .65 1
+				setitemcolor		protect_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "protect"
+			}
+		}
+
+		itemDef
+		{
+			name				jump_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				225 81 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				jump_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				184 70 64 64
+			background			"gfx/mp/NEW_f_icon_jump"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				jump_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				184 81 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_JUMP_FORCE
+			mouseEnter
+			{
+				setitemcolor		jump_iconpic  forecolor 1 1 1 1
+				setitemcolor		jump_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{ 
+				setitemcolor		jump_iconpic  forecolor .65 .65 .65 1
+				setitemcolor		jump_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "jump"
+			}
+		}
+
+		itemDef
+		{
+			name				pull_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				225 135 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				pull_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				184 125 64 64
+			background			"gfx/mp/NEW_f_icon_pull"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				pull_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				184 135 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_PULL_FORCE
+			mouseEnter
+			{
+				setitemcolor		pull_iconpic  forecolor 1 1 1 1
+				setitemcolor		pull_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{
+				setitemcolor		pull_iconpic  forecolor .65 .65 .65 1
+				setitemcolor		pull_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "pull"
+			}
+		}
+
+		itemDef
+		{
+			name				push_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				225 189 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				push_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				184 181 64 64
+			background			"gfx/mp/NEW_f_icon_push"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				push_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				184 189 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_PUSH_FORCE
+			mouseEnter
+			{
+				setitemcolor		push_iconpic  forecolor 1 1 1 1
+				setitemcolor		push_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{
+				setitemcolor		push_iconpic  forecolor .65 .65 .65 1
+				setitemcolor		push_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "push"
+			}
+		}
+
+		itemDef
+		{
+			name				sense_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				225 245 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				sense_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				184 236 64 64
+			background			"gfx/mp/NEW_f_icon_sight"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				sense_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				184 245 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_VR_SENSE_FORCE
+			mouseEnter
+			{
+				setitemcolor		sense_iconpic  forecolor 1 1 1 1
+				setitemcolor		sense_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{ 
+				setitemcolor		sense_iconpic  forecolor .65 .65 .65 1
+				setitemcolor		sense_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "sense"
+			}
+		}
+
+		itemDef
+		{
+			name				speed_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				380 81 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				speed_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				336 70 64 64
+			background			"gfx/mp/NEW_f_icon_speed"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				speed_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				336 81 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_SPEED_FORCE
+			mouseEnter 
+			{
+				setitemcolor		speed_iconpic  forecolor 1 1 1 1
+				setitemcolor		speed_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{ 
+				setitemcolor		speed_iconpic  forecolor .65 .65 .65 1
+				setitemcolor		speed_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "speed"
+			}
+		}
+
+		itemDef
+		{
+			name				sabdef_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				380 135 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				sabdef_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				336 125 64 64
+			background			"gfx/mp/NEW_f_icon_saber_defend"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				sabdef_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				336 135 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_VR_SABER_DEFEND
+			mouseEnter
+			{
+				setitemcolor		sabdef_iconpic  forecolor 1 1 1 1
+				setitemcolor		sabdef_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{
+				setitemcolor		sabdef_iconpic  forecolor .65 .65 .65 1
+				setitemcolor		sabdef_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "sabdef"
+			}
+		}
+
+		itemDef
+		{
+			name				saboff_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				380 189 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				saboff_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				336 181 64 64
+			background			"gfx/mp/NEW_f_icon_saber_attack"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				saboff_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				336 189 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_VR_SABER_ATTACK
+			mouseEnter
+			{
+				setitemcolor		saboff_iconpic  forecolor 1 1 1 1
+				setitemcolor		saboff_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{
+				setitemcolor		saboff_iconpic  forecolor .65 .65 .65 1
+				setitemcolor		saboff_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "saboff"
+			}
+		}
+
+		itemDef
+		{
+			name				sabthrow_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				380 245 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.5 .5 .5 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				sabthrow_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				336 236 64 64
+			background			"gfx/mp/NEW_f_icon_saber_throw"
+			forecolor			.5 .5 .5 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				sabthrow_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				336 245 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_VR_SABER_THROW
+			mouseEnter
+			{
+				setitemcolor		sabthrow_iconpic  forecolor 1 1 1 1
+				setitemcolor		sabthrow_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{
+				setitemcolor		sabthrow_iconpic  forecolor .5 .5 .5 1
+				setitemcolor		sabthrow_hexpic  forecolor  .5 .5 .5 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "sabthrow"
+			}
+		}
+
+		itemDef
+		{
+			name				drain_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				527 81 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.5 .5 .5 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				drain_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				484 70 64 64
+			background			"gfx/mp/NEW_f_icon_dk_drain"
+			forecolor			.5 .5 .5 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				drain_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				484 81 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_DRAIN_FORCE
+			mouseEnter
+			{
+				setitemcolor		drain_iconpic  forecolor 1 1 1 1
+				setitemcolor		drain_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{
+				setitemcolor		drain_iconpic  forecolor .5 .5 .5 1
+				setitemcolor		drain_hexpic  forecolor  .5 .5 .5 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "drain"
+			}
+		}
+
+		itemDef
+		{
+			name				grip_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				527 135 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				grip_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				484 125 64 64
+			background			"gfx/mp/NEW_f_icon_dk_grip"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				grip_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				484 135 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_GRIP_FORCE
+			mouseEnter
+			{
+				setitemcolor		grip_iconpic  forecolor 1 1 1 1
+				setitemcolor		grip_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{
+				setitemcolor		grip_iconpic  forecolor .65 .65 .65 1
+				setitemcolor		grip_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "grip"
+			}
+		}
+
+		itemDef
+		{
+			name				lightning_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				527 189 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				lightning_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				484 181 64 64
+			background			"gfx/mp/NEW_f_icon_dk_l1"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				lightning_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				484 189 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_LIGHTNING_FORCE
+			mouseEnter 
+			{
+				setitemcolor		lightning_iconpic  forecolor 1 1 1 1
+				setitemcolor		lightning_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{
+				setitemcolor		lightning_iconpic forecolor .65 .65 .65 1
+				setitemcolor		lightning_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "lightning"
+			}
+		}
+
+		itemDef
+		{
+			name				rage_hexpic
+			group				hexpic
+			style				WINDOW_STYLE_SHADER
+			rect				527 245 70 49
+			background			"gfx/menus/hex_pattern_0"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				rage_iconpic
+			group				iconpic
+			style				WINDOW_STYLE_SHADER
+			rect				484 236 64 64
+			background			"gfx/mp/NEW_f_icon_dk_rage"
+			forecolor			.65 .65 .65 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				rage_button
+			group				force_button
+			type				ITEM_TYPE_BUTTON
+			rect				484 245 115 46
+			forecolor			1 1 1 1
+			visible				1
+			desctext			@MENUS_RAGE_FORCE
+			mouseEnter
+			{
+				setitemcolor		rage_iconpic  forecolor 1 1 1 1
+				setitemcolor		rage_hexpic  forecolor  1 1 1 1
+			}
+			mouseExit
+			{ 
+				setitemcolor		rage_iconpic forecolor .65 .65 .65 1
+				setitemcolor		rage_hexpic  forecolor  .65 .65 .65 1
+			}
+			action
+			{
+				uiScript		"rotateforcepowerlevel" "rage"
+			}
+		}
+
+//----------------------------------------------------------------------------------------------
+//	CHANGE PAGE BUTTONS
+//----------------------------------------------------------------------------------------------
+		itemDef
+		{
+			name				prevpage_on
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				225 357 32 26
+			background			"gfx/menus/dp_arrow_lon"
+			forecolor			1 1 1 1
+			decoration
+			visible			0
+		}
+		itemDef
+		{
+			name				prevpage_off
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				225 357 32 26
+			background			"gfx/menus/dp_arrow_l"
+			forecolor			1 1 1 1
+			decoration
+			visible			1
+		}
+		itemDef
+		{
+			name				prevpage
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				225 357 32 26
+			font				2
+			textscale			1
+			textalignx			48
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			1 .682 0 1
+			visible				1
+			action
+			{
+				play			"sound/interface/button1.wav" ;
+				close			all
+				open			datapadCheatsMenu
+			}
+			mouseEnter
+			{
+				hide		prevpage_off
+				show		prevpage_on
+			}
+			mouseExit
+			{
+				show		prevpage_off
+				hide		prevpage_on
+			}
+		}
+
+		itemDef 
+		{
+			name				cheats
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			rect				260 357 120 25
+			text				"CHEATS (2/2)"
+			font				2
+			textscale			1
+			textalignx			60
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			1 .682 0 1
+			visible				1
+			decoration
+		}
+
+		itemDef
+		{
+			name				nextpage_on
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				384 357 32 26
+			background			"gfx/menus/dp_arrow_ron"
+			forecolor			1 1 1 1
+			decoration
+			visible			0
+		}
+		itemDef
+		{
+			name				nextpage_off
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				384 357 32 26
+			background			"gfx/menus/dp_arrow_r"
+			forecolor			1 1 1 1
+			decoration
+			visible			1
+		}
+		itemDef
+		{
+			name				nextpage
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				384 357 32 26
+			font				2
+			textscale			1
+			textalignx			48
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			1 .682 0 1
+			visible			1
+			action
+			{
+				play			"sound/interface/button1.wav" ;
+				close			all
+				open			datapadCheatsMenu
+			}
+			mouseEnter
+			{
+				hide			nextpage_off
+				show			nextpage_on
+			}
+			mouseExit
+			{
+				show			nextpage_off
+				hide			nextpage_on
+			}
+		}
+
+//----------------------------------------------------------------------------------------------
+//	LOWER BUTTONS
+//----------------------------------------------------------------------------------------------
+		itemDef 
+		{
+			name				mission
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				20 420 120 25
+			text				@MENUS_DP_MISSION
+			descText			@MENUS_AN_OVERVIEW_OF_MISSION
+			font				2
+			textscale			1
+			textalignx			60
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			1 .682 0 1
+			visible				1
+
+			mouseEnter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	10 419 150 30
+			}
+			mouseExit 
+			{ 
+				hide			button_glow 
+			}
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			datapadMissionMenu 
+			}
+		}
+
+		itemDef 
+		{
+			name				weapons
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				140 420 120 25
+			text				@MENUS_WEAPONS
+			descText			@MENUS_VIEW_CURRENTLY_OWNED
+			font				2
+			textscale			1
+			textalignx			60
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			1 .682 0 1
+			visible				1
+			mouseEnter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	130 419 150 30
+			}
+			mouseExit 
+			{ 
+				hide			button_glow 
+			}  	  
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			datapadWeaponsMenu 
+			}
+		}
+
+		itemDef 
+		{
+			name				force
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				260 420 120 25
+			text				@MENUS_DP_FORCE
+			descText			@MENUS_VIEW_CURRENT_FORCE_POWERS
+			font				2
+			textscale			1
+			textalignx			60
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			1 .682 0 1
+			visible			1
+			
+			mouseEnter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	250 419 150 30
+			}
+			mouseExit 
+			{ 
+				hide			button_glow 
+			}	  	  
+			
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			datapadForcePowersMenu 
+			}
+		}
+
+		itemDef 
+		{
+			name				moves
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				380 420 120 25
+			text				@MENUS_MOVES
+			descText			@MENUS_MOVES_DESC
+			font				2
+			textscale			1
+			textalignx			60
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			1 .682 0 1
+			visible				1
+			
+			mouseEnter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	370 419 150 30
+			}
+			mouseExit 
+			{ 
+				hide			button_glow 
+			}	  	  
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				close			all ; 
+				open			datapadMovesMenu 
+			}
+		}
+		
+		itemDef 
+		{
+			name				exit
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				500 420 120 25 
+			text				@MENUS_RESUME
+			descText			@MENUS_RETURN_TO_GAME
+			font				2
+			textscale			1
+			textalignx			60
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			1 .682 0 1
+			visible			1
+
+			mouseEnter 
+			{ 
+				show			button_glow
+				setitemrect		button_glow	490 419 150 30
+			}
+			mouseExit 
+			{ 
+				hide			button_glow 
+			}	  	  
+			
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ; 
+				uiScript		closedatapad			// Close menu				
+			}
+		}
+		
+		itemDef 
+		{
+			name				button_glow
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 0 0
+			background			"gfx/menus/menu_buttonback"
+			forecolor			1 1 1 1
+			visible				0
+			decoration
+		}
+
+		itemDef 
+		{
+			name				scan
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 640 640
+			background			"gfx/menus/scanlines"
+			forecolor			1 1 1 1
+			visible			1
+			decoration
+		}
+	}
+}

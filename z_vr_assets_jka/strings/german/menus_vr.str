@@ -234,7 +234,7 @@ LANG_ENGLISH        "Laser Auto Deflecting:"
 LANG_GERMAN         "#same"
 
 REFERENCE           LASER_AUTODEFLECTING_DESC
-LANG_ENGLISH        "Enables or disables st person auto deflecting of lasers with lightsabers."
+LANG_ENGLISH        "Enables or disables 1st person auto deflecting of lasers with lightsabers."
 LANG_GERMAN         "#same"
 
 REFERENCE           SABER_AUTOBLOCKING_ITEM

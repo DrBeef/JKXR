@@ -2682,7 +2682,7 @@
 			textscale 			1
 			forecolor			.615 .615 .956 1
 			visible				0
-			descText			@MENUS_VR_LASER_AUTODEFLECTING_DESC
+			descText			@MENUS_VR_SABER_REALISM_DESC
 			action
 			{
 				play			"sound/interface/button1.wav"
