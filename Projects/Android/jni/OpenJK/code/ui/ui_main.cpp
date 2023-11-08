@@ -4771,24 +4771,35 @@ static void UI_ForcePowerWeaponsButton(qboolean activeFlag)
 		activeFlag = qtrue;
 
 	if (!activeFlag) {
-		// If all force powers are maxed, let us pass
+		// If updatable force powers are maxed, let us pass
+		int *forcePowerLevel;
+		short forcePowerIndex = 0;
 		client_t* cl = &svs.clients[0];
-		playerState_t* pState = NULL;
-		int forcelevel;
-		qboolean allforcesmaxed = qtrue;
-		for (int i = 0; i < MAX_POWER_ENUMS; i++) {
-			if (cl) {
-				pState = cl->gentity->client;
-				forcelevel = pState->forcePowerLevel[powerEnums[i].powerEnum];
-			} else {
-				forcelevel = uiInfo.forcePowerLevel[powerEnums[i].powerEnum];
-			}
-			if (forcelevel < 3) {
-				allforcesmaxed = qfalse;
-				break;
-			}
+		if (cl) {
+			playerState_t* pState = cl->gentity->client;
+			forcePowerLevel = pState->forcePowerLevel;
+		} else {
+			forcePowerLevel = uiInfo.forcePowerLevel;
 		}
-		activeFlag = allforcesmaxed;
+		qboolean allForcesMaxed = qtrue;
+		if (UI_GetForcePowerIndex ( "absorb", &forcePowerIndex ) && forcePowerLevel[powerEnums[forcePowerIndex].powerEnum] < 3 ) {
+			allForcesMaxed = qfalse;
+		} else if (UI_GetForcePowerIndex ( "heal", &forcePowerIndex ) && forcePowerLevel[powerEnums[forcePowerIndex].powerEnum] < 3 ) {
+			allForcesMaxed = qfalse;
+		} else if (UI_GetForcePowerIndex ( "mindtrick", &forcePowerIndex ) && forcePowerLevel[powerEnums[forcePowerIndex].powerEnum] < 3 ) {
+			allForcesMaxed = qfalse;
+		} else if (UI_GetForcePowerIndex ( "protect", &forcePowerIndex ) && forcePowerLevel[powerEnums[forcePowerIndex].powerEnum] < 3 ) {
+			allForcesMaxed = qfalse;
+		} else if (UI_GetForcePowerIndex ( "drain", &forcePowerIndex ) && forcePowerLevel[powerEnums[forcePowerIndex].powerEnum] < 3 ) {
+			allForcesMaxed = qfalse;
+		} else if (UI_GetForcePowerIndex ( "grip", &forcePowerIndex ) && forcePowerLevel[powerEnums[forcePowerIndex].powerEnum] < 3 ) {
+			allForcesMaxed = qfalse;
+		} else if (UI_GetForcePowerIndex ( "lightning", &forcePowerIndex ) && forcePowerLevel[powerEnums[forcePowerIndex].powerEnum] < 3 ) {
+			allForcesMaxed = qfalse;
+		} else if (UI_GetForcePowerIndex ( "rage", &forcePowerIndex ) && forcePowerLevel[powerEnums[forcePowerIndex].powerEnum] < 3 ) {
+			allForcesMaxed = qfalse;
+		}
+		activeFlag = allForcesMaxed;
 	}
 
 	// Find weaponsbutton
