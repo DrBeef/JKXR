@@ -73,6 +73,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define FL_DISINTEGRATED		0x00020000	// marks that the corpse has already been disintegrated
 #define FL_FORCE_PULLABLE_ONLY	0x00040000	// cannot be force pushed
 #define FL_NO_IMPACT_DMG		0x00080000	// Will not take impact damage
+#define	FL_UNLIMITEDPOWERMODE	0x10000000	// Unlimited power mode
 
 //Pointer safety utilities
 #define VALID( a )		( a != NULL )

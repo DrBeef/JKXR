@@ -114,6 +114,7 @@ static void		UI_GetSaberCvars ( void );
 static void		UI_ResetSaberCvars ( void );
 static void		UI_InitAllocForcePowers ( const char *forceName );
 static void		UI_AffectForcePowerLevel ( const char *forceName );
+static void		UI_RotateForcePowerLevel ( const char *forceName );
 static void		UI_ShowForceLevelDesc ( const char *forceName );
 static void		UI_ResetForceLevels ( void );
 static void		UI_ClearWeapons ( void );
@@ -1288,6 +1289,13 @@ static qboolean UI_RunMenuScript ( const char **args )
 			String_Parse(args, &forceName);
 
 			UI_AffectForcePowerLevel(forceName);
+		}
+		else if (Q_stricmp(name, "rotateforcepowerlevel") == 0)
+		{
+			const char *forceName;
+			String_Parse(args, &forceName);
+
+			UI_RotateForcePowerLevel(forceName);
 		}
 		else if (Q_stricmp(name, "decrementcurrentforcepower") == 0)
 		{
@@ -5329,6 +5337,64 @@ static void UI_AffectForcePowerLevel ( const char *forceName )
 		}
 	}
 
+}
+
+static void UI_RotateForcePowerLevel ( const char *forceName )
+{
+	short forcePowerI=0,i;
+	menuDef_t	*menu;
+	itemDef_t	*item;
+
+	menu = Menu_GetFocused();	// Get current menu
+
+	if (!menu)
+	{
+		return;
+	}
+
+	if (!UI_GetForcePowerIndex ( forceName, &forcePowerI ))
+	{
+		return;
+	}
+
+	// Get player state
+	client_t* cl = &svs.clients[0];	// 0 because only ever us as a player
+	playerState_t*		pState = NULL;
+	int	forcelevel;
+	if( cl )
+	{
+		pState = cl->gentity->client;
+		forcelevel = pState->forcePowerLevel[powerEnums[forcePowerI].powerEnum];
+	}
+	else
+	{
+		forcelevel = uiInfo.forcePowerLevel[powerEnums[forcePowerI].powerEnum];
+	}
+
+	if (forcelevel < 3)	{
+		forcelevel++;
+	} else {
+		forcelevel = 0;
+	}
+
+	// Increment power level.
+	DC->startLocalSound(uiInfo.uiDC.Assets.forceChosenSound, CHAN_AUTO );
+
+	uiInfo.forcePowerUpdated = forcePowerI;	// Remember which power was updated
+
+	if( pState )
+	{
+		pState->forcePowerLevel[powerEnums[forcePowerI].powerEnum] = forcelevel;
+		pState->forcePowersKnown |= ( 1 << powerEnums[forcePowerI].powerEnum );
+		forcelevel = pState->forcePowerLevel[powerEnums[forcePowerI].powerEnum];
+	}
+	else
+	{
+		uiInfo.forcePowerLevel[powerEnums[forcePowerI].powerEnum] = forcelevel;
+		forcelevel = uiInfo.forcePowerLevel[powerEnums[forcePowerI].powerEnum];
+	}
+
+	UI_SetHexPicLevel( menu, uiInfo.forcePowerUpdated,forcelevel, qfalse );
 }
 
 static void UI_DecrementForcePowerLevel( void )

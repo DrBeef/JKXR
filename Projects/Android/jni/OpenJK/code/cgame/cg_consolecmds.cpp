@@ -335,7 +335,8 @@ static const char *gcmds[] = {
 	"use_lightamp_goggles",
 	"use_seeker",
 	"use_sentry",
-	"viewobjective"
+	"viewobjective",
+	"unlimitedpower"
 };
 static const size_t numgcmds = ARRAY_LEN( gcmds );
 

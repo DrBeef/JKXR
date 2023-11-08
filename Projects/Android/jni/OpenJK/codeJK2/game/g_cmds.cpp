@@ -512,6 +512,32 @@ void Cmd_Undying_f (gentity_t *ent)
 
 /*
 ==================
+Cmd_UnlimitedPower_f
+
+Grants unlimited power to client
+
+argv(0) unlimitedpower
+==================
+*/
+void Cmd_UnlimitedPower_f (gentity_t *ent)
+{
+	const char	*msg;
+
+	if ( !CheatsOk( ent ) ) {
+		return;
+	}
+
+	ent->flags ^= FL_UNLIMITEDPOWERMODE;
+	if (!(ent->flags & FL_UNLIMITEDPOWERMODE) )
+		msg = "unlimited power mode OFF\n";
+	else
+		msg = "unlimited power mode ON\n";
+
+	gi.SendServerCommand( ent-g_entities, "print \"%s\"", msg);
+}
+
+/*
+==================
 Cmd_Notarget_f
 
 Sets client to notarget
@@ -1031,6 +1057,8 @@ void ClientCommand( int clientNum ) {
 		Cmd_God_f (ent);
 	else if (Q_stricmp (cmd, "undying") == 0)
 		Cmd_Undying_f (ent);
+	else if (Q_stricmp (cmd, "unlimitedpower") == 0)
+		Cmd_UnlimitedPower_f (ent);
 	else if (Q_stricmp (cmd, "notarget") == 0)
 		Cmd_Notarget_f (ent);
 	else if (Q_stricmp (cmd, "noclip") == 0)

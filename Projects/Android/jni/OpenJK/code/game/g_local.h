@@ -75,7 +75,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define FL_OVERCHARGED_HEALTH	0x00100000	// Reduce health back to max
 #define FL_NO_ANGLES			0x00200000	// No bone angle overrides, no pitch or roll in full angles
 #define FL_RED_CROSSHAIR		0x00400000	// Crosshair red on me
-
+#define	FL_UNLIMITEDPOWERMODE	0x10000000	// Unlimited power mode
 
 //Pointer safety utilities
 #define VALID( a )		( a != NULL )
