@@ -21,6 +21,7 @@
 	loadMenu { "ui/datapadmission.menu"					}
 	loadMenu { "ui/datapadweapons.menu"					}
 	loadMenu { "ui/datapadcheats.menu"					}
+	loadMenu { "ui/datapadcheats2.menu"					}
 
 	loadMenu { "ui/error.menu" }
 	loadMenu { "ui/vid_warning.menu"					}

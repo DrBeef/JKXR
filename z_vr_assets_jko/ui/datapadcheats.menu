@@ -78,12 +78,6 @@
 			background		"gfx/hud/datapad2"
 		}
 
-		//----------------------------------------------------------------------------------------------
-		//
-		//	CHEAT MENU ITEMS
-		//
-		//----------------------------------------------------------------------------------------------
-
 		itemDef 
 		{
 			name				cheats_title
@@ -100,6 +94,12 @@
 			visible				1
 			decoration
 		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	CHEAT MENU ITEMS
+		//
+		//----------------------------------------------------------------------------------------------
 
 		itemDef 
 		{
@@ -276,8 +276,8 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				340 135 200 20
-			text				@MENUS_VR_CHEATS_GIVE_POWERS_ITEM
-			descText		@MENUS_VR_CHEATS_GIVE_POWERS_DESC
+			text				@MENUS_VR_CHEATS_UNLIMITED_POWER_ITEM
+			descText		@MENUS_VR_CHEATS_UNLIMITED_POWER_DESC
 			font				2
 			textscale			1
 			textalignx			100
@@ -289,7 +289,7 @@
 			action 
 			{ 
 				play			"sound/interface/button1.wav" ;
-				exec			"setforceall 3"
+				exec			"unlimitedpower"
 			}
 		}
 
@@ -462,6 +462,136 @@
 			forecolor			1 1 1 1
 			visible			1
 			descText			@MENUS_VR_CHEATS_SABER_MARK_COOL_DOWN_DESC
+		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		//	CHANGE PAGE BUTTONS
+		//
+		//----------------------------------------------------------------------------------------------
+
+		itemDef
+		{
+			name			prevpage_on
+			group			none
+			style			WINDOW_STYLE_SHADER
+			rect			265 314 32 26 
+			background		"gfx/menus/dp_arrow_lon"
+			forecolor		1 1 1 1
+			decoration
+			visible		0
+		}
+		itemDef
+		{
+			name			prevpage_off
+			group			none
+			style			WINDOW_STYLE_SHADER
+			rect			265 314 32 26 
+			background		"gfx/menus/dp_arrow_l"
+			forecolor		1 1 1 1
+			decoration
+			visible		1
+		}
+		itemDef
+		{
+			name				prevpage
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				265 314 32 26
+			font				2
+			textscale			1
+			textalignx			48
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1
+			visible				1
+			action
+			{
+				play			"sound/interface/button1.wav" ; 
+				close			all
+				open			datapadCheats2Menu
+			}
+			mouseEnter
+			{
+				hide		prevpage_off
+				show		prevpage_on
+			}
+			mouseExit
+			{
+				show		prevpage_off
+				hide		prevpage_on
+			}
+		}
+
+		itemDef 
+		{
+			name				cheats
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			rect				260 314 120 25
+			text				"1/2"
+			font				2
+			textscale			1
+			textalignx			60
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			1 .682 0 1
+			visible				1
+			decoration
+		}
+
+		itemDef
+		{
+			name			nextpage_on
+			group			none
+			style			WINDOW_STYLE_SHADER
+			rect			344 314 32 26
+			background		"gfx/menus/dp_arrow_ron"
+			forecolor		1 1 1 1
+			decoration
+			visible		0
+		}
+		itemDef
+		{
+			name			nextpage_off
+			group			none
+			style			WINDOW_STYLE_SHADER
+			rect			344 314 32 26
+			background		"gfx/menus/dp_arrow_r"
+			forecolor		1 1 1 1
+			decoration
+			visible		1
+		}
+		itemDef
+		{
+			name				nextpage
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				344 314 32 26 
+			font				2
+			textscale			1
+			textalignx			48
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1
+			visible				1
+			action
+			{ 
+				play			"sound/interface/button1.wav" ;
+				close			all
+				open			datapadCheats2Menu
+			}
+			mouseEnter
+			{ 
+				hide		nextpage_off
+				show		nextpage_on
+			}
+			mouseExit
+			{ 
+				show		nextpage_off
+				hide		nextpage_on
+			}
 		}
 
 		//----------------------------------------------------------------------------------------------
