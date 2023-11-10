@@ -281,6 +281,13 @@ void VR_Init()
 		Cvar_Set( "expanded_menu_enabled", "0" );
 	}
 
+	cvar_t *mod_npcsp_enabled = Cvar_Get ("mod_npcsp_enabled", "0", CVAR_ARCHIVE);
+	if (FS_FileExists("NpcSP_v1.1.pk3") || FS_BaseFileExists("NpcSP_v1.1.pk3")) {
+		Cvar_Set( "mod_npcsp_enabled", "1" );
+	} else {
+		Cvar_Set( "mod_npcsp_enabled", "0" );
+	}
+
     vr.menu_right_handed = vr_control_scheme->integer == 0;
 }
 
