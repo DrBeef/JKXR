@@ -547,4 +547,22 @@ LANG_ENGLISH        "Select display refresh rate (72Hz is recommended for defaul
 REFERENCE           RESTART_JKXR_TO_APPLY
 LANG_ENGLISH        "You will need to manually restart JKXR."
 
+REFERENCE           NPC_SETUP_ITEM
+LANG_ENGLISH        "NPC SETUP"
+
+REFERENCE           NPC_SETUP_DESC
+LANG_ENGLISH        "Opens NpcSP menu mod to spawn and setup NPCs."
+
+REFERENCE           MP_MAP_ITEM
+LANG_ENGLISH        "MP MAP"
+
+REFERENCE           MP_MAP_DESC
+LANG_ENGLISH        "Select multiplayer map."
+
+REFERENCE           MP_MAP_TITLE
+LANG_ENGLISH        "MULTIPLAYER MAP SELECTION"
+
+REFERENCE           MP_MAP_START_DESC
+LANG_ENGLISH        "Start multiplayer map."
+
 ENDMARKER

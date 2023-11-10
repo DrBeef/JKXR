@@ -725,4 +725,28 @@ REFERENCE           RESTART_JKXR_TO_APPLY
 LANG_ENGLISH        "You will need to manually restart JKXR."
 LANG_SPANISH        "#same"
 
+REFERENCE           NPC_SETUP_ITEM
+LANG_ENGLISH        "NPC SETUP"
+LANG_SPANISH        "#same"
+
+REFERENCE           NPC_SETUP_DESC
+LANG_ENGLISH        "Opens NpcSP menu mod to spawn and setup NPCs."
+LANG_SPANISH        "#same"
+
+REFERENCE           MP_MAP_ITEM
+LANG_ENGLISH        "MP MAP"
+LANG_SPANISH        "#same"
+
+REFERENCE           MP_MAP_DESC
+LANG_ENGLISH        "Select multiplayer map."
+LANG_SPANISH        "#same"
+
+REFERENCE           MP_MAP_TITLE
+LANG_ENGLISH        "MULTIPLAYER MAP SELECTION"
+LANG_SPANISH        "#same"
+
+REFERENCE           MP_MAP_START_DESC
+LANG_ENGLISH        "Start multiplayer map."
+LANG_SPANISH        "#same"
+
 ENDMARKER
