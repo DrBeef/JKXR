@@ -496,7 +496,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         }
 
         //Switch movement speed
-        if (!vr.cgzoommode)
+        if (!vr.cgzoommode && !vr_always_run->integer)
         {
             static bool switched = false;
             if (between(-0.2f, primaryJoystickX, 0.2f) &&
@@ -892,11 +892,27 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             vec2_t v;
             rotateAboutOrigin(x, y, controllerYawHeading, v);
 
-            //Move a lot slower if scope is engaged
-            remote_movementSideways =
-                    v[0] * (vr.move_speed == 0 ? 0.75f : (vr.move_speed == 1 ? 1.0f : 0.5f));
-            remote_movementForward =
-                    v[1] * (vr.move_speed == 0 ? 0.75f : (vr.move_speed == 1 ? 1.0f : 0.5f));
+            float move_speed_multiplier = 1.0f;
+            switch (vr.move_speed)
+            {
+            case 0:
+                move_speed_multiplier = 0.75f;
+                break;
+            case 1:
+                move_speed_multiplier = 1.0f;
+                break;
+            case 2:
+                move_speed_multiplier = 0.5f;
+                break;
+            }
+
+            if (vr_always_run->integer)
+            {
+                move_speed_multiplier = 1.0f;
+            }
+
+            remote_movementSideways = move_speed_multiplier * v[0];
+            remote_movementForward = move_speed_multiplier * v[1];
             
 
             //X button invokes menu now

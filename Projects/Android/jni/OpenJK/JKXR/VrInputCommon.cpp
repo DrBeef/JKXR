@@ -31,6 +31,7 @@ cvar_t	*vr_force_motion_controlled;
 cvar_t	*vr_force_motion_push;
 cvar_t	*vr_force_motion_pull;
 cvar_t	*vr_motion_enable_saber;
+cvar_t	* vr_always_run;
 cvar_t	*vr_crouch_toggle;
 cvar_t  *vr_irl_crouch_enabled;
 cvar_t  *vr_irl_crouch_to_stand_ratio;
