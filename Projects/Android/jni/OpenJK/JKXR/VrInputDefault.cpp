@@ -121,6 +121,14 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         Cvar_Set("vr_control_scheme", "99");
     }
 
+    static int cinCameraTimestamp = -1;
+    if (vr.cin_camera && cinCameraTimestamp == -1) {
+        cinCameraTimestamp = Sys_Milliseconds();
+    }
+    else if (!vr.cin_camera) {
+        cinCameraTimestamp = -1;
+    }
+
     //Set controller angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
     {
         vec3_t rotation = {0};
@@ -212,6 +220,28 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     static float menuYaw = 0;
     if (VR_UseScreenLayer() && !vr.misc_camera)
     {
+        if (vr.cin_camera && cinCameraTimestamp + 1000 < Sys_Milliseconds())
+        {
+            // To skip cinematic use any thumb or trigger (but wait a while
+            // to prevent skipping when cinematic is started during action)
+            if ((primaryButtonsNew & primaryThumb) != (primaryButtonsOld & primaryThumb)) {
+                sendButtonAction("+use", (primaryButtonsNew & primaryThumb));
+            }
+            if ((secondaryButtonsNew & secondaryThumb) != (secondaryButtonsOld & secondaryThumb)) {
+                sendButtonAction("+use", (secondaryButtonsNew & secondaryThumb));
+            }
+            if ((pDominantTrackedRemoteNew->Buttons & xrButton_Trigger) != (pDominantTrackedRemoteOld->Buttons & xrButton_Trigger)) {
+                sendButtonAction("+use", (pDominantTrackedRemoteNew->Buttons & xrButton_Trigger));
+                // mark button as already pressed to prevent firing after entering the game
+                pDominantTrackedRemoteOld->Buttons |= xrButton_Trigger;
+            }
+            if ((pOffTrackedRemoteNew->Buttons & xrButton_Trigger) != (pOffTrackedRemoteOld->Buttons & xrButton_Trigger)) {
+                sendButtonAction("+use", (pOffTrackedRemoteNew->Buttons & xrButton_Trigger));
+                // mark button as already pressed to prevent firing after entering the game
+                pOffTrackedRemoteOld->Buttons |= xrButton_Trigger;
+            }
+        }
+
         bool controlsLeftHanded = vr_control_scheme->integer >= 10;
         if (controlsLeftHanded == vr.menu_right_handed) {
             interactWithTouchScreen(menuYaw, vr.offhandangles[ANGLES_DEFAULT]);
@@ -377,12 +407,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
         }
 
-        static int cinCameraTimestamp = -1;
-        if (vr.cin_camera && cinCameraTimestamp == -1) {
-            cinCameraTimestamp = Sys_Milliseconds();
-        } else if (!vr.cin_camera) {
-            cinCameraTimestamp = -1;
-        }
         if (vr.cin_camera && cinCameraTimestamp + 1000 < Sys_Milliseconds())
         {
             // To skip cinematic use any thumb or trigger (but wait a while
@@ -472,6 +496,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         }
 
         //Switch movement speed
+        if (!vr.cgzoommode)
         {
             static bool switched = false;
             if (between(-0.2f, primaryJoystickX, 0.2f) &&

@@ -2841,7 +2841,10 @@ static void CG_Draw2D( void )
 
 		CG_UseIcon();
 	}
+
+	cg.drawingHUD = CG_HUD_NORMAL;
 	CG_SaberClashFlare();
+	cg.drawingHUD = CG_HUD_SCALED;
 
 	float y = 0;
 	if (cg_drawSnapshot.integer) {
