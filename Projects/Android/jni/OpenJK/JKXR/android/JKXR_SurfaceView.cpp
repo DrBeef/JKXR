@@ -234,10 +234,10 @@ void VR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side
 	}
 	else if (vr.cgzoommode == 2 || vr.cgzoommode == 4)
 	{
-		*forward = 0.0f;
+		*forward = remote_movementForward / 3.0f;
 		*pos_forward = 0.0f;
 		*up = 0.0f;
-		*side = 0.0f;
+		*side = remote_movementSideways / 3.0f;
 		*pos_side = 0.0f;
 		*yaw = vr.snapTurn;
 		*pitch = vr.weaponangles[ANGLES_ADJUSTED][PITCH];
