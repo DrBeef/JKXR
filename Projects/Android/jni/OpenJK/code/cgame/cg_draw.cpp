@@ -4262,45 +4262,6 @@ static void CG_Draw2D( void )
 		CG_DrawZoomBorders();
 	}
 
-	if (cg.zoomMode)
-	{
-		cg.drawingHUD = CG_HUD_NORMAL;
-		const auto xOffset = (-vr->off_center_fov_x * 640);
-		const auto yOffset = (vr->off_center_fov_y * 480);
-
-		vec4_t color = { 0, 0, 0, 1 };
-		if (cg.stereoView == STEREO_LEFT)
-		{
-			//Left Gap
-			CG_FillRect(0, 0, xOffset, 480, color);
-			if (yOffset < 0)
-			{
-				//Bottom Gap
-				CG_FillRect(0, 0, 640, yOffset, color);
-			}
-			else
-			{
-				//Top Gap
-				CG_FillRect(0, 480 - yOffset, 640, yOffset, color);
-			}
-		}
-		else
-		{
-			//Right Gap
-			CG_FillRect(640 - xOffset, 0, xOffset, 480, color);
-			if (yOffset < 0)
-			{
-				//Bottom Gap
-				CG_FillRect(0, 0, 640, yOffset, color);
-			}
-			else
-			{
-				//Top Gap
-				CG_FillRect(0, 480 - yOffset, 640, yOffset, color);
-			}
-		}
-	}
-
 	cg.drawingHUD = CG_HUD_SCALED;
 
 	CG_DrawBatteryCharge();
@@ -4343,7 +4304,7 @@ static void CG_Draw2D( void )
 	if ( (cg.snap->ps.forcePowersActive&(1<<FP_SEE)) )
 	{//force sight is on
 		//indicate this with sight cone thingy
-		cg.drawingHUD = CG_HUD_NORMAL;
+		cg.drawingHUD = CG_HUD_OTHER;
 		CG_DrawVignette(true);
 		CG_DrawPic( 50, 40, 540, 400, cgi_R_RegisterShader( "gfx/2d/jsense" ));
 		cg.drawingHUD = CG_HUD_SCALED;
@@ -4354,6 +4315,46 @@ static void CG_Draw2D( void )
 		CG_DrawHealthBars();
 	}
 
+
+
+	if (cg.zoomMode || (cg.snap->ps.forcePowersActive & (1 << FP_SEE)))
+	{
+		cg.drawingHUD = CG_HUD_NORMAL;
+		const auto xOffset = (-vr->off_center_fov_x * 640);
+		const auto yOffset = (vr->off_center_fov_y * 480);
+
+		vec4_t color = { 0, 0, 0, 1 };
+		if (cg.stereoView == STEREO_LEFT)
+		{
+			//Left Gap
+			CG_FillRect(0, 0, -xOffset, 480, color);
+			if (yOffset < 0)
+			{
+				//Bottom Gap
+				CG_FillRect(0, 0, 640, yOffset, color);
+			}
+			else
+			{
+				//Top Gap
+				CG_FillRect(0, 480 - yOffset, 640, yOffset, color);
+			}
+		}
+		else
+		{
+			//Right Gap
+			CG_FillRect(640 - xOffset, 0, xOffset, 480, color);
+			if (yOffset < 0)
+			{
+				//Bottom Gap
+				CG_FillRect(0, 0, 640, yOffset, color);
+			}
+			else
+			{
+				//Top Gap
+				CG_FillRect(0, 480 - yOffset, 640, yOffset, color);
+			}
+		}
+	}
 
 	// don't draw any status if dead
 	if ( cg.snap->ps.stats[STAT_HEALTH] > 0 )

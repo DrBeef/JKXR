@@ -297,6 +297,7 @@ typedef struct {
 #define CG_HUD_NORMAL				0x00
 #define CG_HUD_SCALED				0x01
 #define CG_HUD_ZOOM					0x02
+#define CG_HUD_OTHER				0x03
 
 typedef struct {
 	//NOTE: these probably get cleared in save/load!!!
