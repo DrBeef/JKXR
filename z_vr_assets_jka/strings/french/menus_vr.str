@@ -325,20 +325,20 @@ REFERENCE           CHEATS_GIVE_AMMO_DESC
 LANG_ENGLISH        "Replenishes ammunition."
 LANG_FRENCH         "#same"
 
-REFERENCE           CHEATS_UNLOCK_SABER_SKILLS_ITEM
-LANG_ENGLISH        "Unlock Lightsaber Skills"
-LANG_FRENCH         "#same"
-
-REFERENCE           CHEATS_UNLOCK_SABER_SKILLS_DESC
-LANG_ENGLISH        "Unlocks all lightsaber skills."
-LANG_FRENCH         "#same"
-
 REFERENCE           CHEATS_GIVE_WEAPONS_ITEM
 LANG_ENGLISH        "Give All Weapons"
 LANG_FRENCH         "#same"
 
 REFERENCE           CHEATS_GIVE_WEAPONS_DESC
 LANG_ENGLISH        "Gives all weapons."
+LANG_FRENCH         "#same"
+
+REFERENCE           CHEATS_GIVE_MAX_HEALTH_ITEM
+LANG_ENGLISH        "Give Maxed-Out Health"
+LANG_FRENCH         "#same"
+
+REFERENCE           CHEATS_GIVE_MAX_HEALTH_DESC
+LANG_ENGLISH        "Sets health to 999."
 LANG_FRENCH         "#same"
 
 REFERENCE           CHEATS_UNLIMITED_POWER_ITEM
