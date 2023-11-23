@@ -138,10 +138,10 @@ void VR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side
 	}
 	else if (vr.cgzoommode == 2 || vr.cgzoommode == 4)
 	{
-		*forward = 0.0f;
+		*forward = remote_movementForward / 3.0f;
 		*pos_forward = 0.0f;
 		*up = 0.0f;
-		*side = 0.0f;
+		*side = remote_movementSideways / 3.0f;
 		*pos_side = 0.0f;
 		*yaw = vr.snapTurn;
 		*pitch = vr.weaponangles[ANGLES_ADJUSTED][PITCH];
@@ -259,6 +259,7 @@ void VR_Init()
 	vr_force_motion_push = Cvar_Get ("vr_force_motion_push", "3", CVAR_ARCHIVE);
 	vr_force_motion_pull = Cvar_Get ("vr_force_motion_pull", "4", CVAR_ARCHIVE);
 	vr_motion_enable_saber = Cvar_Get ("vr_motion_enable_saber", "0", CVAR_ARCHIVE);
+	vr_always_run = Cvar_Get ("vr_always_run", "0", CVAR_ARCHIVE);
 	vr_crouch_toggle = Cvar_Get ("vr_crouch_toggle", "0", CVAR_ARCHIVE);
 	vr_irl_crouch_enabled = Cvar_Get ("vr_irl_crouch_enabled", "0", CVAR_ARCHIVE);
 	vr_irl_crouch_to_stand_ratio = Cvar_Get ("vr_irl_crouch_to_stand_ratio", "0.65", CVAR_ARCHIVE);

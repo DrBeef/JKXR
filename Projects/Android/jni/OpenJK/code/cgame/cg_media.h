@@ -150,7 +150,6 @@ typedef struct {
 
 	qhandle_t 	iconSave;
 	qhandle_t 	iconLoad;
-	qhandle_t 	iconExit;
 
 //Chunks
 	qhandle_t	chunkModels[NUM_CHUNK_TYPES][4];

@@ -107,7 +107,6 @@ typedef struct {
 
 	qhandle_t 	iconSave;
 	qhandle_t 	iconLoad;
-	qhandle_t 	iconExit;
 
 	int			currentDataPadIconBackground;
 

@@ -4117,15 +4117,24 @@ CG_DrawVignette
 float currentComfortVignetteValue = 0.0f;
 float filteredViewYawDelta = 0.0f;
 
-static void CG_DrawVignette( void )
+static void CG_DrawVignette( bool force )
 {
 	playerState_t	*ps;
 	ps = &cg.snap->ps;
 
+	float vignetteValue;
 	cvar_t *vr_comfort_vignette = gi.cvar("vr_comfort_vignette", "0.0", CVAR_ARCHIVE); // defined in VrCvars.h
-	if (vr_comfort_vignette->value <= 0.0f || vr_comfort_vignette->value > 1.0f || !cg.zoomMode == 0)
+	if (!force)
 	{
-		return;
+		if (vr_comfort_vignette->value <= 0.0f || vr_comfort_vignette->value > 1.0f || !cg.zoomMode == 0)
+		{
+			return;
+		}
+		vignetteValue = vr_comfort_vignette->value;
+	}
+	else
+	{
+		vignetteValue = 0.3f;
 	}
 
 	bool isMoving = VectorLength(cg.predicted_player_state.velocity) > 30.0;
@@ -4144,17 +4153,17 @@ static void CG_DrawVignette( void )
 		isTurning = filteredViewYawDelta > 1;
 	}
 
-	if (isMoving || isInAir || isTurning)
+	if (isMoving || isInAir || isTurning || force)
 	{
-		if (currentComfortVignetteValue <  vr_comfort_vignette->value)
+		if (currentComfortVignetteValue < vignetteValue)
 		{
-			currentComfortVignetteValue += vr_comfort_vignette->value * 0.05;
+			currentComfortVignetteValue += vignetteValue * 0.05;
 			if (currentComfortVignetteValue > 1.0f)
 				currentComfortVignetteValue = 1.0f;
 		}
 	} else{
 		if (currentComfortVignetteValue >  0.0f)
-			currentComfortVignetteValue -= vr_comfort_vignette->value * 0.05;
+			currentComfortVignetteValue -= vignetteValue * 0.05;
 	}
 
 	if (currentComfortVignetteValue > 0.0f && currentComfortVignetteValue <= 1.0f)
@@ -4295,8 +4304,9 @@ static void CG_Draw2D( void )
 	if ( (cg.snap->ps.forcePowersActive&(1<<FP_SEE)) )
 	{//force sight is on
 		//indicate this with sight cone thingy
-		cg.drawingHUD = CG_HUD_NORMAL;
-		CG_DrawPic( 35, 50, 570, 400, cgi_R_RegisterShader( "gfx/2d/jsense" ));
+		cg.drawingHUD = CG_HUD_OTHER;
+		CG_DrawVignette(true);
+		CG_DrawPic( 50, 40, 540, 400, cgi_R_RegisterShader( "gfx/2d/jsense" ));
 		cg.drawingHUD = CG_HUD_SCALED;
 		CG_DrawHealthBars();
 	}
@@ -4306,10 +4316,50 @@ static void CG_Draw2D( void )
 	}
 
 
+
+	if (cg.zoomMode || (cg.snap->ps.forcePowersActive & (1 << FP_SEE)))
+	{
+		cg.drawingHUD = CG_HUD_NORMAL;
+		const auto xOffset = (-vr->off_center_fov_x * 640);
+		const auto yOffset = (vr->off_center_fov_y * 480);
+
+		vec4_t color = { 0, 0, 0, 1 };
+		if (cg.stereoView == STEREO_LEFT)
+		{
+			//Left Gap
+			CG_FillRect(0, 0, -xOffset, 480, color);
+			if (yOffset < 0)
+			{
+				//Bottom Gap
+				CG_FillRect(0, 0, 640, yOffset, color);
+			}
+			else
+			{
+				//Top Gap
+				CG_FillRect(0, 480 - yOffset, 640, yOffset, color);
+			}
+		}
+		else
+		{
+			//Right Gap
+			CG_FillRect(640 - xOffset, 0, xOffset, 480, color);
+			if (yOffset < 0)
+			{
+				//Bottom Gap
+				CG_FillRect(0, 0, 640, yOffset, color);
+			}
+			else
+			{
+				//Top Gap
+				CG_FillRect(0, 480 - yOffset, 640, yOffset, color);
+			}
+		}
+	}
+
 	// don't draw any status if dead
 	if ( cg.snap->ps.stats[STAT_HEALTH] > 0 )
 	{
-		CG_DrawVignette();
+		CG_DrawVignette(false);
 
 		if ( !(cent->gent && cent->gent->s.eFlags & (EF_LOCKED_TO_WEAPON )))//|EF_IN_ATST
 		{
@@ -4345,7 +4395,10 @@ static void CG_Draw2D( void )
 
 		CG_UseIcon();
 	}
+
+	cg.drawingHUD = CG_HUD_NORMAL;
 	CG_SaberClashFlare();
+	cg.drawingHUD = CG_HUD_SCALED;
 
 	float y = 0;
 	if (cg_drawSnapshot.integer) {

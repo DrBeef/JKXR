@@ -222,7 +222,7 @@ void ovrFramebuffer_Resolve(ovrFramebuffer* frameBuffer) {
 	int width, height;
 	R_GetModeInfo(&width, &height, r_mode->integer);
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, colorTexture);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBuffer->FrameBuffers[frameBuffer->TextureSwapChainIndex]);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBlitFramebuffer(0, 0, gAppState.Width, gAppState.Height,
 		0, 0, width, height,
@@ -1151,8 +1151,8 @@ void TBXR_submitFrame()
 	TBXR_updateProjections();
 
 	//Calculate the maximum extent fov for use in culling in the engine (we won't want to cull inside this fov)
-	vr.fov_x = (fabs(gAppState.Views[0].fov.angleLeft) + fabs(gAppState.Views[1].fov.angleLeft)) * 180.0f / M_PI;
-	vr.fov_y = (fabs(gAppState.Views[0].fov.angleUp) + fabs(gAppState.Views[0].fov.angleUp)) * 180.0f / M_PI;
+	vr.fov_x = (fabs(gAppState.Views[0].fov.angleLeft) + fabs(gAppState.Views[1].fov.angleRight)) * 180.0f / M_PI;
+	vr.fov_y = (fabs(gAppState.Views[0].fov.angleUp) + fabs(gAppState.Views[0].fov.angleDown)) * 180.0f / M_PI;
 
 
 	XrFrameEndInfo endFrameInfo = {};

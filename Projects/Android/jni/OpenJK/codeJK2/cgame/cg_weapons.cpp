@@ -2777,8 +2777,6 @@ void CG_ItemSelectorSelect_f( void )
 	}
 	else if (cg.itemSelectorType == ST_QUICK_MENU) {
 		if (cg.itemSelectorSelection == 0) {
-			cgi_SendConsoleCommand("togglemenu\n");
-		} else if (cg.itemSelectorSelection == 1) {
 			cgi_SendConsoleCommand("save quik*\n");
 			CG_CenterPrint("Quick Saved", 240);
 		} else {
@@ -2941,7 +2939,7 @@ void CG_DrawItemSelector( void )
 			sRGB[2] = 1.0f;
 			break;
 		case ST_QUICK_MENU:
-			count = 3;
+			count = 2;
 			sRGB[0] = 1.0f;
 			sRGB[1] = 1.0f;
 			sRGB[2] = 1.0f;
@@ -3158,18 +3156,7 @@ void CG_DrawItemSelector( void )
 							sprite.customShader = force_icons[showPowers[itemId]];
 							break;
 						case ST_QUICK_MENU:
-							switch (itemId)
-							{
-							case 0:
-								sprite.customShader = cgs.media.iconExit;
-								break;
-							case 1:
-								sprite.customShader = cgs.media.iconSave;
-								break;
-							case 2:
-								sprite.customShader = cgs.media.iconLoad;
-								break;
-							}
+							sprite.customShader = itemId == 0 ? cgs.media.iconSave : cgs.media.iconLoad;
 							break;
 					}
 

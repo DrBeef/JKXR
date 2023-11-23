@@ -804,8 +804,10 @@ void BG_CalculateVRSaberPosition( int saberNum, vec3_t origin, vec3_t angles )
 	//Move position down a bit
 	vec3_t axis[3];
 	AnglesToAxis(angles, axis);
-	//The "forward" axis will be adjusted
+	//Small adjustments to make saber align better
 	VectorMA(origin, -3.0f, axis[0], origin);
+	VectorMA(origin, -0.5f, axis[1], origin);
+	VectorMA(origin, 1.2f, axis[2], origin);
 }
 
 bool BG_UseVRPosition( gentity_t *ent )

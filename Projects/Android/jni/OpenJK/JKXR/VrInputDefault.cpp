@@ -121,6 +121,14 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         Cvar_Set("vr_control_scheme", "99");
     }
 
+    static int cinCameraTimestamp = -1;
+    if (vr.cin_camera && cinCameraTimestamp == -1) {
+        cinCameraTimestamp = Sys_Milliseconds();
+    }
+    else if (!vr.cin_camera) {
+        cinCameraTimestamp = -1;
+    }
+
     //Set controller angles - We need to calculate all those we might need (including adjustments) for the client to then take its pick
     {
         vec3_t rotation = {0};
@@ -212,6 +220,28 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
     static float menuYaw = 0;
     if (VR_UseScreenLayer() && !vr.misc_camera)
     {
+        if (vr.cin_camera && cinCameraTimestamp + 1000 < Sys_Milliseconds())
+        {
+            // To skip cinematic use any thumb or trigger (but wait a while
+            // to prevent skipping when cinematic is started during action)
+            if ((primaryButtonsNew & primaryThumb) != (primaryButtonsOld & primaryThumb)) {
+                sendButtonAction("+use", (primaryButtonsNew & primaryThumb));
+            }
+            if ((secondaryButtonsNew & secondaryThumb) != (secondaryButtonsOld & secondaryThumb)) {
+                sendButtonAction("+use", (secondaryButtonsNew & secondaryThumb));
+            }
+            if ((pDominantTrackedRemoteNew->Buttons & xrButton_Trigger) != (pDominantTrackedRemoteOld->Buttons & xrButton_Trigger)) {
+                sendButtonAction("+use", (pDominantTrackedRemoteNew->Buttons & xrButton_Trigger));
+                // mark button as already pressed to prevent firing after entering the game
+                pDominantTrackedRemoteOld->Buttons |= xrButton_Trigger;
+            }
+            if ((pOffTrackedRemoteNew->Buttons & xrButton_Trigger) != (pOffTrackedRemoteOld->Buttons & xrButton_Trigger)) {
+                sendButtonAction("+use", (pOffTrackedRemoteNew->Buttons & xrButton_Trigger));
+                // mark button as already pressed to prevent firing after entering the game
+                pOffTrackedRemoteOld->Buttons |= xrButton_Trigger;
+            }
+        }
+
         bool controlsLeftHanded = vr_control_scheme->integer >= 10;
         if (controlsLeftHanded == vr.menu_right_handed) {
             interactWithTouchScreen(menuYaw, vr.offhandangles[ANGLES_DEFAULT]);
@@ -377,12 +407,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
         }
 
-        static int cinCameraTimestamp = -1;
-        if (vr.cin_camera && cinCameraTimestamp == -1) {
-            cinCameraTimestamp = Sys_Milliseconds();
-        } else if (!vr.cin_camera) {
-            cinCameraTimestamp = -1;
-        }
         if (vr.cin_camera && cinCameraTimestamp + 1000 < Sys_Milliseconds())
         {
             // To skip cinematic use any thumb or trigger (but wait a while
@@ -468,6 +492,22 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             if (mode != 0)
             {
                 sendButtonActionSimple("cg_thirdPerson 0");
+            }
+        }
+
+        //Switch movement speed
+        if (!vr.cgzoommode && !vr_always_run->integer)
+        {
+            static bool switched = false;
+            if (between(-0.2f, primaryJoystickX, 0.2f) &&
+                between(0.8f, pPrimaryJoystick->y, 1.0f)) {
+                if (!switched) {
+                    vr.move_speed = (++vr.move_speed) % 3;
+                    switched = true;
+                }
+            }
+            else {
+                switched = false;
             }
         }
 
@@ -852,18 +892,34 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             vec2_t v;
             rotateAboutOrigin(x, y, controllerYawHeading, v);
 
-            //Move a lot slower if scope is engaged
-            remote_movementSideways =
-                    v[0] * (vr.move_speed == 0 ? 0.75f : (vr.move_speed == 1 ? 1.0f : 0.5f));
-            remote_movementForward =
-                    v[1] * (vr.move_speed == 0 ? 0.75f : (vr.move_speed == 1 ? 1.0f : 0.5f));
+            float move_speed_multiplier = 1.0f;
+            switch (vr.move_speed)
+            {
+            case 0:
+                move_speed_multiplier = 0.75f;
+                break;
+            case 1:
+                move_speed_multiplier = 1.0f;
+                break;
+            case 2:
+                move_speed_multiplier = 0.5f;
+                break;
+            }
+
+            if (vr_always_run->integer)
+            {
+                move_speed_multiplier = 1.0f;
+            }
+
+            remote_movementSideways = move_speed_multiplier * v[0];
+            remote_movementForward = move_speed_multiplier * v[1];
             
 
-            if (((secondaryButtonsNew & secondaryButton1) !=
-                (secondaryButtonsOld & secondaryButton1)) &&
-                    (secondaryButtonsNew & secondaryButton1)) {
-                //Toggle walk/run somehow?!
-                vr.move_speed = (++vr.move_speed) % 3;
+            //X button invokes menu now
+            if ((secondaryButtonsNew & secondaryButton1) &&
+                !(secondaryButtonsOld & secondaryButton1))
+            {
+                Sys_QueEvent(0, SE_KEY, A_ESCAPE, true, 0, NULL);
             }
 
             //Open the datapad
