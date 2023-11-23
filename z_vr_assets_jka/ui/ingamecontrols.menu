@@ -1213,8 +1213,8 @@
 			name				none
 			group				commoncontrols
 			type				ITEM_TYPE_YESNO
-			text				"Motion Ignite Saber:"
-			cvar				"vr_motion_enable_saber"
+			text				@MENUS_VR_ALWAYS_RUN_ITEM
+			cvar				"vr_always_run"
 			rect				260 380 340 14
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			174 
@@ -1223,7 +1223,7 @@
 			textscale			1
 			forecolor			 .615 .615 .956 0.0
 			visible				0 
-			descText			"Turn disabled saber back on when motion triggered"
+			descText			@MENUS_VR_ALWAYS_RUN_DESC
 			action 
 			{ 
 				play			sound/interface/button1
@@ -1470,6 +1470,37 @@
 			mouseexit 
 			{ 
 				hide			highlight7
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				weaponcontrols
+			type				ITEM_TYPE_YESNO
+			text				@MENUS_VR_MOTION_IGNITE_SABER_ITEM
+			cvar				"vr_motion_enable_saber"
+			rect				260 340 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174 
+			textaligny			0
+			font				4
+			textscale			1
+			forecolor			 .615 .615 .956 1.0
+			visible			0 
+			descText			@MENUS_VR_MOTION_IGNITE_SABER_DESC
+			action 
+			{ 
+				play			sound/interface/button1
+			}
+
+			mouseenter 
+			{
+				show			highlight8
+			}
+			mouseexit 
+			{ 
+				hide			highlight8
 			}
 		}
 
