@@ -174,7 +174,7 @@ void G_Give( gentity_t *ent, const char *name, const char *args, int argc )
 	if ( give_all || !Q_stricmp( name, "health") )
 	{
 		if ( argc == 3 )
-			ent->health = Com_Clampi( 1, ent->client->ps.stats[STAT_MAX_HEALTH], atoi( args ) );
+			ent->health = Com_Clampi( 1, 999, atoi( args ) );
 		else
 			ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
 		if ( !give_all )

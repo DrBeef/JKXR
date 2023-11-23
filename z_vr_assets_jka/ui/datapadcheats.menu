@@ -165,30 +165,6 @@
 			style				WINDOW_STYLE_EMPTY
 			type				ITEM_TYPE_BUTTON
 			rect				340 50 200 20
-			text				@MENUS_VR_CHEATS_UNLOCK_SABER_SKILLS_ITEM
-			descText		@MENUS_VR_CHEATS_UNLOCK_SABER_SKILLS_DESC
-			font				2
-			textscale			1
-			textalignx			100
-			textalign			ITEM_ALIGN_CENTER
-			forecolor			.509 .609 .847 1
-			appearance_slot		1		
-			visible				1
-
-			action 
-			{ 
-				play			"sound/interface/button1.wav" ;
-				exec			"setSaberThrow 2; setSaberDefense 3; setSaberOffense 3;"
-			}
-		}
-
-		itemDef 
-		{
-			name				none
-			group				none
-			style				WINDOW_STYLE_EMPTY
-			type				ITEM_TYPE_BUTTON
-			rect				340 75 200 20
 			text				@MENUS_VR_CHEATS_GIVE_WEAPONS_ITEM
 			descText		@MENUS_VR_CHEATS_GIVE_WEAPONS_DESC
 			font				2
@@ -203,6 +179,30 @@
 			{ 
 				play			"sound/interface/button1.wav" ;
 				exec			"give weapons;"
+			}
+		}
+
+		itemDef 
+		{
+			name				none
+			group				none
+			style				WINDOW_STYLE_EMPTY
+			type				ITEM_TYPE_BUTTON
+			rect				340 75 200 20
+			text				@MENUS_VR_CHEATS_GIVE_MAX_HEALTH_ITEM
+			descText		@MENUS_VR_CHEATS_GIVE_MAX_HEALTH_DESC
+			font				2
+			textscale			1
+			textalignx			100
+			textalign			ITEM_ALIGN_CENTER
+			forecolor			.509 .609 .847 1
+			appearance_slot		1		
+			visible				1
+
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"give health 999;"
 			}
 		}
 

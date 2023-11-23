@@ -247,17 +247,17 @@ LANG_ENGLISH        "Replenish Ammo"
 REFERENCE           CHEATS_GIVE_AMMO_DESC
 LANG_ENGLISH        "Replenishes ammunition."
 
-REFERENCE           CHEATS_UNLOCK_SABER_SKILLS_ITEM
-LANG_ENGLISH        "Unlock Lightsaber Skills"
-
-REFERENCE           CHEATS_UNLOCK_SABER_SKILLS_DESC
-LANG_ENGLISH        "Unlocks all lightsaber skills."
-
 REFERENCE           CHEATS_GIVE_WEAPONS_ITEM
 LANG_ENGLISH        "Give All Weapons"
 
 REFERENCE           CHEATS_GIVE_WEAPONS_DESC
 LANG_ENGLISH        "Gives all weapons."
+
+REFERENCE           CHEATS_GIVE_MAX_HEALTH_ITEM
+LANG_ENGLISH        "Give Maxed-Out Health"
+
+REFERENCE           CHEATS_GIVE_MAX_HEALTH_DESC
+LANG_ENGLISH        "Sets health to 999."
 
 REFERENCE           CHEATS_UNLIMITED_POWER_ITEM
 LANG_ENGLISH        "Unlimited Force Power"
