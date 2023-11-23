@@ -565,4 +565,16 @@ LANG_ENGLISH        "MULTIPLAYER MAP SELECTION"
 REFERENCE           MP_MAP_START_DESC
 LANG_ENGLISH        "Start multiplayer map."
 
+REFERENCE           MOTION_IGNITE_SABER_ITEM
+LANG_ENGLISH        "Motion Ignite Saber:"
+
+REFERENCE           MOTION_IGNITE_SABER_DESC
+LANG_ENGLISH        "Turn disabled saber back on when motion triggered."
+
+REFERENCE           ALWAYS_RUN_ITEM
+LANG_ENGLISH        "Always Run:"
+
+REFERENCE           ALWAYS_RUN_DESC
+LANG_ENGLISH        "Always use maximum movement speed."
+
 ENDMARKER
