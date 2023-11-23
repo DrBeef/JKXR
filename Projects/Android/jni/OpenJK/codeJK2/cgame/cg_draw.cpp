@@ -3074,8 +3074,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	{
 		cg.refdef.viewangles[ROLL] = vr->hmdorientation[ROLL];
 		cg.refdef.viewangles[PITCH] = vr->weaponangles[ANGLES_ADJUSTED][PITCH];
-		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW]
-				+ vr->weaponangles[ANGLES_ADJUSTED][YAW] + SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
+		cg.refdef.viewangles[YAW] = vr->clientviewangles[YAW] + SHORT2ANGLE(cg.snap->ps.delta_angles[YAW]);
 		AnglesToAxis(cg.refdef.viewangles, cg.refdef.viewaxis);
 	}
 

@@ -2248,12 +2248,13 @@ extern cvar_t	*g_skippingcin;
 //			ucmd->angles[PITCH] = 0;
 //		}
 
-		if ( cg.zoomMode == 2 )
+		//Allow movement when zoomed
+/*		if ( cg.zoomMode == 2 )
 		{
 			// Any kind of movement when the player is NOT ducked when the disruptor gun is zoomed will cause us to auto-magically un-zoom
 			if ( ( (ucmd->forwardmove||ucmd->rightmove) 
 				   && ucmd->upmove >= 0 //crouching-moving is ok
-				   && !(ucmd->buttons&BUTTON_USE)/*leaning is ok*/ 
+				   && !(ucmd->buttons&BUTTON_USE)//leaning is ok
 				 ) 
 				 || ucmd->upmove > 0 //jumping not allowed
 			   )
@@ -2265,7 +2266,7 @@ extern cvar_t	*g_skippingcin;
 				cg.zoomLocked = qfalse;
 			}
 		}
-
+*/
 		if ( (player_locked || (ent->client->ps.eFlags&EF_FORCE_GRIPPED)) && ent->client->ps.pm_type < PM_DEAD ) // unless dead
 		{//lock out player control
 			if ( !player_locked )

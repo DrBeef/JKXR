@@ -725,7 +725,7 @@ float getHMDYawForCalc()
 		return vr->hmdorientation[YAW];
 	}
 
-	return 0.0f;
+	return vr->weaponangles[ANGLES_ADJUSTED][YAW];
 }
 
 void BG_ConvertFromVR(vec3_t in, vec3_t offset, vec3_t out)

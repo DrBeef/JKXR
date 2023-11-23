@@ -4588,10 +4588,13 @@ Ghoul2 Insert End
 			{
 				if ( (trace.contents&CONTENTS_WATER) || (trace.contents&CONTENTS_SLIME) )
 				{
-					if (!cent->gent->client->ps.saberInFlight)
+					if (cent->gent->client->ps.clientNum == 0)
 					{
-						int position = (vr->right_handed ? 2 : 1);
-						cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+						if (!cent->gent->client->ps.saberInFlight)
+						{
+							int position = (vr->right_handed ? 2 : 1);
+							cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+						}
 					}
 
 					/*
@@ -4613,10 +4616,13 @@ Ghoul2 Insert End
 				}
 				else
 				{
-					if (!cent->gent->client->ps.saberInFlight)
+					if (cent->gent->client->ps.clientNum == 0)
 					{
-						int position = (vr->right_handed ? 2 : 1);
-						cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+						if (!cent->gent->client->ps.saberInFlight)
+						{
+							int position = (vr->right_handed ? 2 : 1);
+							cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+						}
 					}
 
 					theFxScheduler.PlayEffect( "spark", trace.endpos, trace.plane.normal );
