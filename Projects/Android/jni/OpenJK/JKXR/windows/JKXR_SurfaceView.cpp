@@ -56,7 +56,7 @@ void VR_SetHMDOrientation(float pitch, float yaw, float roll)
 	//Keep this for our records
 	VectorCopy(vr.hmdorientation, vr.hmdorientation_last);
 
-	if (!vr.third_person && !vr.remote_npc && !vr.remote_turret
+	if (!vr.third_person && !vr.remote_npc && !vr.remote_turret && !vr.cgzoommode
 #ifndef JK2_MODE
 		&& !vr.in_vehicle
 #endif
@@ -65,7 +65,7 @@ void VR_SetHMDOrientation(float pitch, float yaw, float roll)
 		VectorCopy(vr.hmdorientation, vr.hmdorientation_first);
 	}
 
-	if (!vr.remote_turret)
+	if (!vr.remote_turret && !vr.cgzoommode)
 	{
 		VectorCopy(vr.weaponangles[ANGLES_ADJUSTED], vr.weaponangles_first[ANGLES_ADJUSTED]);
 	}
@@ -143,7 +143,8 @@ void VR_GetMove(float *forward, float *side, float *pos_forward, float *pos_side
 		*up = 0.0f;
 		*side = remote_movementSideways / 3.0f;
 		*pos_side = 0.0f;
-		*yaw = vr.snapTurn;
+		*yaw = vr.snapTurn + vr.hmdorientation_first[YAW] +
+			vr.weaponangles[ANGLES_ADJUSTED][YAW] - vr.weaponangles_first[ANGLES_ADJUSTED][YAW];
 		*pitch = vr.weaponangles[ANGLES_ADJUSTED][PITCH];
 		*roll = 0.0f;//vr.hmdorientation[ROLL];
 	}
@@ -241,7 +242,7 @@ void VR_Init()
 	vr_positional_factor = Cvar_Get( "vr_positional_factor", "12", CVAR_ARCHIVE);
     vr_walkdirection = Cvar_Get( "vr_walkdirection", "1", CVAR_ARCHIVE);
 	vr_weapon_pitchadjust = Cvar_Get( "vr_weapon_pitchadjust", "-20.0", CVAR_ARCHIVE);
-	vr_saber_pitchadjust = Cvar_Get( "vr_saber_pitchadjust", "-20.0", CVAR_ARCHIVE);
+	vr_saber_pitchadjust = Cvar_Get( "vr_saber_pitchadjust", "-13.36", CVAR_ARCHIVE);
     vr_virtual_stock = Cvar_Get( "vr_virtual_stock", "0", CVAR_ARCHIVE);
 
     //Defaults

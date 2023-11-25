@@ -368,6 +368,7 @@ static void CG_RegisterCustomSounds(clientInfo_t *ci, int iSoundEntryBase,
 //SB: Never render any player model if 1st person and using the saber
 bool CG_getPlayer1stPersonSaber(const centity_t *cent) {
 	return (!cent->gent->NPC && !cg.renderingThirdPerson &&
+			cent->gent->client->ps.clientNum == 0 &&
 			cent->gent->client->ps.weapon == WP_SABER);
 }
 
@@ -6507,12 +6508,15 @@ Ghoul2 Insert End
 				{
 					if ( !noMarks )
 					{
-						if (saberNum == 1 || !cent->gent->client->ps.saberInFlight)
+						if (CG_getPlayer1stPersonSaber(cent))
 						{
-							int position = (vr->right_handed ?
-											((saberNum == 0) ? 2 : 1) :
-											((saberNum == 0) ? 1 : 2));
-							cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+							if (saberNum == 1 || !cent->gent->client->ps.saberInFlight)
+							{
+								int position = (vr->right_handed ?
+									((saberNum == 0) ? 2 : 1) :
+									((saberNum == 0) ? 1 : 2));
+								cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+							}
 						}
 
 						/*
@@ -6540,12 +6544,15 @@ Ghoul2 Insert End
 				{
 					if ( !noMarks )
 					{
-						if (saberNum == 1 || !cent->gent->client->ps.saberInFlight)
+						if (CG_getPlayer1stPersonSaber(cent))
 						{
-							int position = (vr->right_handed ?
-											((saberNum == 0) ? 2 : 1) :
-											((saberNum == 0) ? 1 : 2));
-							cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+							if (saberNum == 1 || !cent->gent->client->ps.saberInFlight)
+							{
+								int position = (vr->right_handed ?
+									((saberNum == 0) ? 2 : 1) :
+									((saberNum == 0) ? 1 : 2));
+								cgi_HapticEvent("chainsaw_fire", position, 0, 25, 0, 0);
+							}
 						}
 
 						if ( ( !WP_SaberBladeUseSecondBladeStyle( &client->ps.saber[saberNum], bladeNum ) && !(client->ps.saber[saberNum].saberFlags2&SFL2_NO_WALL_MARKS) )
