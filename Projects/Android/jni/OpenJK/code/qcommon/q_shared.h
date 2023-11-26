@@ -68,7 +68,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #if JK2_MODE
 #define PRODUCT_NAME			"openjo_sp"
 
-#define CLIENT_WINDOW_TITLE "OpenJO (SP)"
+#define CLIENT_WINDOW_TITLE "JKXR Jedi Outcast"
 #define CLIENT_CONSOLE_TITLE "OpenJO Console (SP)"
 #define HOMEPATH_NAME_UNIX "openjo"
 #define HOMEPATH_NAME_WIN "OpenJO"
@@ -76,7 +76,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #else
 #define PRODUCT_NAME			"openjk_sp"
 
-#define CLIENT_WINDOW_TITLE "OpenJK (SP)"
+#define CLIENT_WINDOW_TITLE "JKXR Jedi Academy"
 #define CLIENT_CONSOLE_TITLE "OpenJK Console (SP)"
 #define HOMEPATH_NAME_UNIX "openjk"
 #define HOMEPATH_NAME_WIN "OpenJK"
