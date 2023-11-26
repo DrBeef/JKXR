@@ -260,3 +260,7 @@ pip-log.txt
 ## CLion
 #############
 .idea
+JKXR-PCVR-Installer/JKXR_JKO.exe
+JKXR-PCVR-Installer/JKXR_JKA.exe
+JKXR-PCVR-Installer/JKXR_JKA_Setup.exe
+JKXR-PCVR-Installer/JKXR_JKO_Setup.exe
