@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "JKXR - Jedi Academy"
-#define MyAppVersion "1.0.20"
+#define MyAppVersion "1.0.21"
 #define MyAppPublisher "Team Beef VR"
 #define MyAppURL "https://www.patreon.com/teambeef"
 #define MyAppExeName "openjk_sp.x86_64.exe"
@@ -28,7 +28,8 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 AlwaysShowDirOnReadyPage=yes
-AppendDefaultDirName=no
+AppendDefaultDirName=no   
+DisableWelcomePage=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -41,8 +42,10 @@ Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKA\{#MyAppExeName}"; DestDir: "{
 Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKA\jagamex86_64.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKA\OpenAL32.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKA\rdsp-vanilla_x86_64.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\packaged_mods_credits.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKA\SDL2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKA\base\*"; DestDir: "{app}\base"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKA\base\*"; DestDir: "{app}\base"; Flags: ignoreversion recursesubdirs createallsubdirs     
+Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\vr_splash.bmp"; Flags: dontcopy
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -52,3 +55,36 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
+[Code]
+var
+  Page: TWizardPage;
+
+procedure InitializeWizard();
+var
+  BitmapImage: TBitmapImage;
+  BitmapFileName: String;
+
+begin
+  Page := CreateCustomPage(wpWelcome, 'JKXR - Jedi Academy Installer', 'Join our Patreon at:   patreon.com/teambeef');
+  BitmapFileName := ExpandConstant('{tmp}\vr_splash.bmp');
+  ExtractTemporaryFile(ExtractFileName(BitmapFileName));
+  BitmapImage := TBitmapImage.Create(Page);    
+  BitmapImage.Bitmap.LoadFromFile(BitmapFileName); 
+  BitmapImage.Center := True;
+  BitmapImage.Stretch := True;
+  BitmapImage.Parent := Page.Surface;
+  with BitmapImage do begin
+    Width := Page.SurfaceHeight + 10;
+    Height := Page.SurfaceHeight + 10;
+    Parent := Page.Surface;
+  end;
+end;
+
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  { Validate certain pages before allowing the user to proceed }
+  if CurPageID = Page.ID then begin
+    SuppressibleMsgBox('If installing into the same location as an existing Jedi Academy install, please ensure you choose the directory that contains the single player executable and the "base" folder (probably called Jedi Academy\GameData)', mbConfirmation, MB_OK, IDOK);
+  end;
+  Result := True;
+end;

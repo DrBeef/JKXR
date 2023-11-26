@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "JKXR - Jedi Outcast"
-#define MyAppVersion "1.0.20"
+#define MyAppVersion "1.0.21"
 #define MyAppPublisher "Team Beef VR"
 #define MyAppURL "https://www.patreon.com/teambeef"
 #define MyAppExeName "openjo_sp.x86_64.exe"
@@ -29,6 +29,7 @@ SolidCompression=yes
 WizardStyle=modern
 AlwaysShowDirOnReadyPage=yes
 AppendDefaultDirName=no
+DisableWelcomePage=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -42,7 +43,9 @@ Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKO\jospgamex86_64.dll"; DestDir:
 Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKO\OpenAL32.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKO\rdjosp-vanilla_x86_64.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKO\SDL2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\packaged_mods_credits.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKO\base\*"; DestDir: "{app}\base"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\vr_splash.bmp"; Flags: dontcopy
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -52,3 +55,36 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
+[Code]
+var
+  Page: TWizardPage;
+
+procedure InitializeWizard();
+var
+  BitmapImage: TBitmapImage;
+  BitmapFileName: String;
+
+begin
+  Page := CreateCustomPage(wpWelcome, 'JKXR - Jedi Outcast Installer', 'Join our Patreon at:   patreon.com/teambeef');
+  BitmapFileName := ExpandConstant('{tmp}\vr_splash.bmp');
+  ExtractTemporaryFile(ExtractFileName(BitmapFileName));
+  BitmapImage := TBitmapImage.Create(Page);    
+  BitmapImage.Bitmap.LoadFromFile(BitmapFileName); 
+  BitmapImage.Center := True;
+  BitmapImage.Stretch := True;
+  BitmapImage.Parent := Page.Surface;
+  with BitmapImage do begin
+    Width := Page.SurfaceHeight + 10;
+    Height := Page.SurfaceHeight + 10;
+    Parent := Page.Surface;
+  end;
+end;
+
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  { Validate certain pages before allowing the user to proceed }
+  if CurPageID = Page.ID then begin
+    SuppressibleMsgBox('If installing into the same location as an existing Jedi Outcast install, please ensure you choose the directory that contains the single player executable and the "base" folder (probably called Jedi Outcast\GameData)', mbConfirmation, MB_OK, IDOK);
+  end;
+  Result := True;
+end;
