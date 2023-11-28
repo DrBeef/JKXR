@@ -1450,6 +1450,27 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.handModel_fist		= cgi_R_RegisterModel( "models/players/kyle/lhand_force_fisting.md3" );
 	cgs.media.handModel_force		= cgi_R_RegisterModel( "models/players/kyle/lhand_f.md3" );
 
+	cgs.media.handModel_hm_a_relaxed	= cgi_R_RegisterModel( "models/players/jedi_hm/lhand_r_skin_a.md3" );
+	cgs.media.handModel_hm_a_fist		= cgi_R_RegisterModel( "models/players/jedi_hm/lhand_force_fisting_skin_a.md3" );
+	cgs.media.handModel_hm_a_force		= cgi_R_RegisterModel( "models/players/jedi_hm/lhand_f_skin_a.md3" );
+	cgs.media.handModel_hm_b_relaxed	= cgi_R_RegisterModel( "models/players/jedi_hm/lhand_r_skin_b.md3" );
+	cgs.media.handModel_hm_b_fist		= cgi_R_RegisterModel( "models/players/jedi_hm/lhand_force_fisting_skin_b.md3" );
+	cgs.media.handModel_hm_b_force		= cgi_R_RegisterModel( "models/players/jedi_hm/lhand_f_skin_f.md3" );
+	cgs.media.handModel_kdm_relaxed		= cgi_R_RegisterModel( "models/players/jedi_kdm/lhand_r.md3" );
+	cgs.media.handModel_kdm_fist		= cgi_R_RegisterModel( "models/players/jedi_kdm/lhand_force_fisting.md3" );
+	cgs.media.handModel_kdm_force		= cgi_R_RegisterModel( "models/players/jedi_kdm/lhand_f.md3" );
+	cgs.media.handModel_rm_relaxed		= cgi_R_RegisterModel( "models/players/jedi_rm/lhand_r.md3" );
+	cgs.media.handModel_rm_fist			= cgi_R_RegisterModel( "models/players/jedi_rm/lhand_force_fisting.md3" );
+	cgs.media.handModel_rm_force		= cgi_R_RegisterModel( "models/players/jedi_rm/lhand_f.md3" );
+	cgs.media.handModel_hf_relaxed		= cgi_R_RegisterModel( "models/players/jedi_hf/lhand_r.md3" );
+	cgs.media.handModel_hf_fist			= cgi_R_RegisterModel( "models/players/jedi_hf/lhand_force_fisting.md3" );
+	cgs.media.handModel_hf_force		= cgi_R_RegisterModel( "models/players/jedi_hf/lhand_f.md3" );
+	cgs.media.handModel_tf_relaxed		= cgi_R_RegisterModel( "models/players/jedi_tf/lhand_r.md3" );
+	cgs.media.handModel_tf_fist			= cgi_R_RegisterModel( "models/players/jedi_tf/lhand_force_fisting.md3" );
+	cgs.media.handModel_tf_force		= cgi_R_RegisterModel( "models/players/jedi_tf/lhand_f.md3" );
+	cgs.media.handModel_zf_relaxed		= cgi_R_RegisterModel( "models/players/jedi_zf/lhand_r.md3" );
+	cgs.media.handModel_zf_fist			= cgi_R_RegisterModel( "models/players/jedi_zf/lhand_force_fisting.md3" );
+	cgs.media.handModel_zf_force		= cgi_R_RegisterModel( "models/players/jedi_zf/lhand_f.md3" );
 
 	cgs.media.boltShader				= cgi_R_RegisterShader( "gfx/misc/blueLine" );
 

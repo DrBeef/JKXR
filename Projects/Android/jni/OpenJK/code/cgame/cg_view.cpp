@@ -2389,6 +2389,40 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView ) {
 
 			handEnt.renderfx = RF_DEPTHHACK | RF_VRVIEWMODEL;
 
+			char *char_model = cgi_Cvar_Get("g_char_model");
+			if ( strstr( "jedi_kdm", char_model ) != NULL ) {
+				cgs.media.handModel_relaxed = cgs.media.handModel_kdm_relaxed; 
+				cgs.media.handModel_fist = cgs.media.handModel_kdm_fist;
+				cgs.media.handModel_force = cgs.media.handModel_kdm_force;
+			} else if ( strstr( "jedi_rm", char_model ) != NULL ) {
+				cgs.media.handModel_relaxed = cgs.media.handModel_rm_relaxed; 
+				cgs.media.handModel_fist = cgs.media.handModel_rm_fist;
+				cgs.media.handModel_force = cgs.media.handModel_rm_force;
+			} else if ( strstr( "jedi_hf", char_model ) != NULL ) {
+				cgs.media.handModel_relaxed = cgs.media.handModel_hf_relaxed; 
+				cgs.media.handModel_fist = cgs.media.handModel_hf_fist;
+				cgs.media.handModel_force = cgs.media.handModel_hf_force;
+			} else if ( strstr( "jedi_tf", char_model ) != NULL ) {
+				cgs.media.handModel_relaxed = cgs.media.handModel_tf_relaxed; 
+				cgs.media.handModel_fist = cgs.media.handModel_tf_fist;
+				cgs.media.handModel_force = cgs.media.handModel_tf_force;
+			} else if ( strstr( "jedi_zf", char_model ) != NULL ) {
+				cgs.media.handModel_relaxed = cgs.media.handModel_zf_relaxed; 
+				cgs.media.handModel_fist = cgs.media.handModel_zf_fist;
+				cgs.media.handModel_force = cgs.media.handModel_zf_force;
+			} else {
+				char *char_skin_head = cgi_Cvar_Get("g_char_skin_head");
+				if ( strstr( "head_a1", char_skin_head ) != NULL ) {
+					cgs.media.handModel_relaxed = cgs.media.handModel_hm_b_relaxed;
+					cgs.media.handModel_fist = cgs.media.handModel_hm_b_fist;
+					cgs.media.handModel_force = cgs.media.handModel_hm_b_force;
+                } else {
+					cgs.media.handModel_relaxed = cgs.media.handModel_hm_a_relaxed;
+					cgs.media.handModel_fist = cgs.media.handModel_hm_a_fist;
+					cgs.media.handModel_force = cgs.media.handModel_hm_a_force;
+				}
+			}
+
 			if (!g_entities[cg.snap->ps.viewEntity].client->ps.dualSabers ||
 				cg.snap->ps.weapon != WP_SABER)
 			{

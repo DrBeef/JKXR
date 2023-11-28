@@ -189,6 +189,28 @@ typedef struct {
 	qhandle_t	handModel_fist;
 	qhandle_t	handModel_force;
 
+	qhandle_t	handModel_hm_a_relaxed;
+	qhandle_t	handModel_hm_a_fist;
+	qhandle_t	handModel_hm_a_force;
+	qhandle_t	handModel_hm_b_relaxed;
+	qhandle_t	handModel_hm_b_fist;
+	qhandle_t	handModel_hm_b_force;
+	qhandle_t	handModel_kdm_relaxed;
+	qhandle_t	handModel_kdm_fist;
+	qhandle_t	handModel_kdm_force;
+	qhandle_t	handModel_rm_relaxed;
+	qhandle_t	handModel_rm_fist;
+	qhandle_t	handModel_rm_force;
+	qhandle_t	handModel_hf_relaxed;
+	qhandle_t	handModel_hf_fist;
+	qhandle_t	handModel_hf_force;
+	qhandle_t	handModel_tf_relaxed;
+	qhandle_t	handModel_tf_fist;
+	qhandle_t	handModel_tf_force;
+	qhandle_t	handModel_zf_relaxed;
+	qhandle_t	handModel_zf_fist;
+	qhandle_t	handModel_zf_force;
+
 	qhandle_t	halfShieldModel;
 
 	qhandle_t	solidWhiteShader;
