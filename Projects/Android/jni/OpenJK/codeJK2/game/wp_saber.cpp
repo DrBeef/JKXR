@@ -8677,14 +8677,14 @@ void WP_InitForcePowers( gentity_t *ent )
 		ent->client->ps.forcePowersKnown = ( 1 << FP_HEAL )|( 1 << FP_LEVITATION )|( 1 << FP_SPEED )|( 1 << FP_PUSH )|( 1 << FP_PULL )|( 1 << FP_TELEPATHY )|( 1 << FP_GRIP )|( 1 << FP_LIGHTNING)|( 1 << FP_SABERTHROW)|( 1 << FP_SABER_DEFENSE )|( 1 << FP_SABER_OFFENSE );
 		ent->client->ps.forcePower = ent->client->ps.forcePowerMax = FORCE_POWER_MAX;
 		ent->client->ps.forcePowerRegenDebounceTime = 0;
-		ent->client->ps.forcePowerLevel[FP_HEAL] = FORCE_LEVEL_2;
-		ent->client->ps.forcePowerLevel[FP_LEVITATION] = FORCE_LEVEL_2;
-		ent->client->ps.forcePowerLevel[FP_PUSH] = FORCE_LEVEL_1;
-		ent->client->ps.forcePowerLevel[FP_PULL] = FORCE_LEVEL_1;
+		ent->client->ps.forcePowerLevel[FP_HEAL] = FORCE_LEVEL_3;
+		ent->client->ps.forcePowerLevel[FP_LEVITATION] = FORCE_LEVEL_3;
+		ent->client->ps.forcePowerLevel[FP_PUSH] = FORCE_LEVEL_3;
+		ent->client->ps.forcePowerLevel[FP_PULL] = FORCE_LEVEL_3;
 		ent->client->ps.forcePowerLevel[FP_SABERTHROW] = FORCE_LEVEL_2;
-		ent->client->ps.forcePowerLevel[FP_SPEED] = FORCE_LEVEL_2;
-		ent->client->ps.forcePowerLevel[FP_LIGHTNING] = FORCE_LEVEL_1;
-		ent->client->ps.forcePowerLevel[FP_TELEPATHY] = FORCE_LEVEL_2;
+		ent->client->ps.forcePowerLevel[FP_SPEED] = FORCE_LEVEL_3;
+		ent->client->ps.forcePowerLevel[FP_LIGHTNING] = FORCE_LEVEL_3;
+		ent->client->ps.forcePowerLevel[FP_TELEPATHY] = FORCE_LEVEL_3;
 		ent->client->ps.forcePowerLevel[FP_SABER_DEFENSE] = FORCE_LEVEL_3;
 		ent->client->ps.forcePowerLevel[FP_SABER_OFFENSE] = FORCE_LEVEL_3;
 		if ( ent->NPC )
@@ -8693,7 +8693,7 @@ void WP_InitForcePowers( gentity_t *ent )
 		}
 		else
 		{
-			ent->client->ps.forcePowerLevel[FP_GRIP] = FORCE_LEVEL_2;
+			ent->client->ps.forcePowerLevel[FP_GRIP] = FORCE_LEVEL_3;
 		}
 		ent->client->ps.forceGripEntityNum = ENTITYNUM_NONE;
 		ent->client->ps.forceGripEntityInitialDist = ENTITYNUM_NONE;
