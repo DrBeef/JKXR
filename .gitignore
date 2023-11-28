@@ -260,3 +260,21 @@ pip-log.txt
 ## CLion
 #############
 .idea
+JKXR-PCVR-Installer/JKXR_JKO.exe
+JKXR-PCVR-Installer/JKXR_JKA.exe
+JKXR-PCVR-Installer/JKXR_JKA_Setup.exe
+JKXR-PCVR-Installer/JKXR_JKO_Setup.exe
+JKXR-PCVR-Installer/JKO/rdjosp-vanilla_x86_64.dll
+JKXR-PCVR-Installer/JKO/openjo_sp.x86_64.exe
+JKXR-PCVR-Installer/JKO/jospgamex86_64.dll
+JKXR-PCVR-Installer/JKO/base/Haps_Stormtrooper.pk3
+JKXR-PCVR-Installer/JKO/base/GGDynamicWeapons.pk3
+JKXR-PCVR-Installer/JKO/base/Episode3blades.pk3
+JKXR-PCVR-Installer/JKO/base/assets6_vr_weapons_shaders.pk3
+JKXR-PCVR-Installer/JKA/rdsp-vanilla_x86_64.dll
+JKXR-PCVR-Installer/JKA/openjk_sp.x86_64.exe
+JKXR-PCVR-Installer/JKA/jagamex86_64.dll
+JKXR-PCVR-Installer/JKA/base/GGDynamicWeapons.pk3
+JKXR-PCVR-Installer/JKA/base/Episode3blades.pk3
+JKXR-PCVR-Installer/JKA/base/DT_Stormtrooper_ROTJ_SP.pk3
+JKXR-PCVR-Installer/JKA/base/DT_Stormtrooper_ROTJ.pk3

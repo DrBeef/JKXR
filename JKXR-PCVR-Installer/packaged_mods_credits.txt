@@ -1,0 +1,192 @@
+The following excellent mods were included in the apk:
+
+
+
+=============================================================================================================================
+
+
+TITLE: Vince Crusty and Elin's VR Fully Modeled Weapons Pack
+AUTHORS: Elin and Vince Crusty
+FILE NAME: z_Crusty_and_Elin_vr_weapons.pk3
+FILE SIZE: 1.0 MB
+DATE RELEASED: 21 MAR 2023
+
+DESCRIPTION: This mod replaces all the Jedi Outcast weapons with fully modeled weapons for use in VR
+
+THIS MODIFICATION IS NOT MADE, DISTRIBUTED, OR SUPPORTED BY ACTIVISION, RAVEN, OR LUCASARTS ENTERTAINMENT COMPANY LLC. ELEMENTS TM & © LUCASARTS ENTERTAINMENT COMPANY LLC AND/OR ITS LICENSORS.
+
+
+=============================================================================================================================
+
+
+Author:
+Grab
+
+File name:
+GGDynamicWeapons v1.0
+
+Description:
+Dynamic light for weapons effects
+
+Instalation:
+Take one of these .pk3's and put it into your base folder.
+
+Known issues:
+Probably only Seeker's shots are missing dynamic lightning. Might be fixed in future.
+
+Copyright:
+Grab
+
+
+=============================================================================================================================
+
+
+
+Readme File:
+JEDI KNIGHT: JEDI ACADEMY MODIFICATION
+**************************************
+
+Title : Episode 3: Revenge of the Sith Lightsaber Blades REVISED
+author : PK_Azlon
+email :digitalvapor@mac.com
+File Name :episode3blades.pk3
+
+
+Description: Due to feedback, and the fact that I myself was not satisfied with my previous release of this blade pack, I have completely remade the glows for my Episode 3: Revenge of the Sith Lightsaber Blades.
+Most people were unhappy with the sky blue blade, and after a 5th viewing of the movie, I was too. So I have gone back and made the blue closer to what is seen in the film, and also made the glows about 64 pixels thinner. While this introduces a little bit of grainyness, the overall blade looks much better.
+----------------------------------
+
+Installation: Extract  episode3sabers.pk3 into Jedi Academy's  /gamedata/base directory.
+This pack is made to replace the previous release, so if asked if you want to overwrite the existing copy (if you have it) Choose yes.
+
+
+New textures: YES!
+New Models: No
+
+Special thanks to Raven for making this game, and a VERY SPECIAL Thanks to George Lucas for making Star Wars Episode III: Revenge of the Sith so much better than Epidodes 1, 2, and 6
+
+
+Copyright / Permissions
+THIS MODIFICATION IS NOT MADE, DISTRIBUTED, OR SUPPORTED BY ACTIVISION, RAVEN, OR LUCASARTS ENTERTAINMENT COMPANY LLC. ELEMENTS TM & © LUCASARTS ENTERTAINMENT COMPANY LLC AND/OR ITS LICENSORS.
+
+
+
+
+=============================================================================================================================
+
+
+
+
+
+
+******************************************
+JEDI KNIGHT II : JEDI OUTCAST MODIFICATION
+******************************************
+
+Title			: HapSlash's Improved Stormtrooper - JO
+Author			: HapSlash
+E-Mail			: slash_happy@yahoo.com
+Website			: www.hapslash.com
+
+File Name		: Haps-Stormtrooper.pk3
+File Size		: 1.23MB
+Date Released		: 02-27-04
+
+
+
+
+Description
+----------------------------------------------------------------------
+The first pk3 includes the Improved Stormtrooper model, which features accurate movie stylings, team skins, complete caps, and full LOD support .  This file is set up to replace the default Stormtrooper.
+
+Also included is a second pk3 which will replace the 3rd person 
+Stormtrooper blaster with my own version of the E-11.
+
+
+
+
+Installation
+----------------------------------------------------------------------
+Simply extract both pk3's to the gamedata/base folder of your Jedi Outcast 
+directory.
+
+
+
+
+Comments
+----------------------------------------------------------------------
+
+ First of all I think that thank's are in order to INFINITY BLADE, who 
+took the time to weight the model & convert it almost 5 times before the 
+finished product was released.  Without him this project never would have 
+gotten very far.
+
+I originally started this upgrade due to the number of problems I had 
+with the original. The main changes are primarily in the head, torso, 
+and knees, with texture changes throughout.  Other than the cosmetic 
+changes I also noticed that not all of the body sections had caps on 
+them, with this model I've added them all in.
+
+Well here it is, my first released model. A lot of hard work, blood, 
+sweat, tears, and almost a years worth of procrastination went into this,...  
+
+Enjoy.
+
+
+
+======================================================================
+THIS MODIFICATION IS NOT MADE, DISTRIBUTED, OR SUPPORTED BY ACTIVISION, RAVEN, OR LUCASARTS ENTERTAINMENT COMPANY LLC. ELEMENTS TM & © LUCASARTS ENTERTAINMENT COMPANY LLC AND/OR ITS LICENSORS.
+
+
+
+
+*******************************************
+JEDI KNIGHT III : JEDI ACADEMY MODIFICATION
+*******************************************
+
+Title : DT Stormtrooper ROTJ 2.0
+Author : DT
+Version : 2.0
+File Size : 3.2 MB
+Date Released : September 6, 2013
+
+Model : DT
+Textures : DT
+Weighting : DT
+
+
+
+Description:
+----------------------------------------------------------------------
+Stormtrooper, as seen in Return of the Jedi. Specular & slight gloss added. SP PK3 Included to replace base JKA Stormtrooper.
+
+
+Known Bugs:
+
+- Slight clipping in certain animations, unavoidable thanks to the JKA skeleton.
+
+
+Bot: Yes.
+NPC: Yes.
+LODs: Yes.
+Team Skins: Yes.
+SP Replacement: Yes.
+SP Customise Menu: No.
+
+
+Credits:
+
+----------------------------------------------------------------------
+
+Thanks to Circa for making the SP replacement for me. :)
+
+
+
+Installation:
+----------------------------------------------------------------------
+
+Simply extract the pk3(s) to the gamedata/base folder of your Jedi Academy directory.
+
+======================================================================
+THIS MODIFICATION IS NOT MADE, DISTRIBUTED, OR SUPPORTED BY ACTIVISION, RAVEN, OR LUCASARTS ENTERTAINMENT COMPANY LLC. ELEMENTS TM & © LUCASARTS ENTERTAINMENT COMPANY LLC AND/OR ITS LICENSORS.
+
