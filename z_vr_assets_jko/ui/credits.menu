@@ -1,0 +1,290 @@
+{
+	menuDef
+	{
+		name					"credits"
+		fullScreen				1
+		rect					0 0 640 480
+		visible					1
+		focusColor				1 1 1 1
+		descX					320
+		descY					426
+		descScale				1
+		descColor				1 .682 0 .8
+		descAlignment				ITEM_ALIGN_CENTER
+		onESC
+		{
+			uiScript	Quit ;
+		}
+		onAccept
+		{
+			uiScript	Quit ;
+		}
+
+		itemDef
+		{
+			name				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 640 480
+      background			"gfx/colors/black"
+			forecolor			1 1 1 1
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 10 640 40
+			text				"JKXR by Team Beef"
+			font				2
+			forecolor			1 0 0 1
+			textscale			1.2
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 35 640 40
+			text				"--------------------"
+			font				2
+			forecolor			1 1 1 1
+			textscale			1.2
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 70 640 40
+			text				"Team Beef are DrBeef,  Baggyg,  Bummser"
+			font				2
+			forecolor			0 0 1 1
+			textscale			1.3
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 120 640 40
+			text				"Lead programmer"
+			font				2
+			forecolor			1 0 0 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 140 640 40
+			text				"DrBeef"
+			font				2
+			forecolor			1 1 1 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 170 640 40
+			text				"JKXR Companion App"
+			font				2
+			forecolor			1 0 0 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 190 640 40
+			text				"Baggyg"
+			font				2
+			forecolor			1 1 1 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 220 640 40
+			text				"Additional Development Contributions"
+			font				2
+			forecolor			1 0 0 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 240 640 40
+			text				"MuadDib, BaggyG"
+			font				2
+			forecolor			1 1 1 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 270 640 40
+			text				"VR Compatible Weapon Models"
+			font				2
+			forecolor			1 0 0 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 290 640 40
+			text				"Vince Crusty, Elin, Alejandro Avila,"
+			font				2
+			forecolor			1 1 1 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 310 640 40
+			text				"Corto, Quinn Kuslich"
+			font				2
+			forecolor			1 1 1 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 350 640 40
+			text				"With Special Thanks to:"
+			font				2
+			forecolor			1 0 0 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 380 640 40
+			text				"Team Beef patrons, all Team Beef discord members,"
+			font				2
+			forecolor			1 1 1 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 400 640 40
+			text				"the OpenJK Development Team and Raven Software for"
+			font				2
+			forecolor			1 1 1 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 420 640 40
+			text				"creating and open-sourcing these wonderful games"
+			font				2
+			forecolor			1 1 1 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 455 640 40
+			text				"Join our Patreon:  patreon.com/teambeef"
+			font				2
+			forecolor			1 0 0 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+	}
+}
