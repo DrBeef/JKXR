@@ -127,7 +127,7 @@ void GL_SelectTexture( int unit )
 ** GL_Cull
 */
 void GL_Cull( int cullType ) {
-	if ( glState.faceCulling == cullType ) {
+	if ( glState.faceCulling == cullType && !backEnd.overrideCullFace ) {
 		return;
 	}
 	glState.faceCulling = cullType;
@@ -135,9 +135,10 @@ void GL_Cull( int cullType ) {
 		return;
 	}
 
-	if ( cullType == CT_TWO_SIDED )
+	if ( cullType == CT_TWO_SIDED || backEnd.overrideCullFace )
 	{
 		qglDisable( GL_CULL_FACE );
+		glState.faceCulling = CT_TWO_SIDED;
 	}
 	else
 	{
@@ -654,7 +655,6 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	int				entityNum, oldEntityNum;
 	int				dlighted, oldDlighted;
 	int				depthRange, oldDepthRange;
-	int 			isVRViewModel, oldIsVRViewModel;
 	int				i;
 	drawSurf_t		*drawSurf;
 	unsigned int	oldSort;
@@ -680,14 +680,11 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	oldShader = NULL;
 	oldFogNum = -1;
 	oldDepthRange = qfalse;
-	isVRViewModel = qfalse;
-	oldIsVRViewModel = qfalse;
 	oldDlighted = qfalse;
 	oldSort = (unsigned int) -1;
 	depthRange = qfalse;
 
-	GLint oldFaceCullMode;
-	GLboolean oldFaceCullEnabled;
+	backEnd.overrideCullFace = qfalse;
 
 	backEnd.pc.c_surfaces += numDrawSurfs;
 
@@ -764,6 +761,10 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 			}
 		}
 
+		if (backEnd.currentEntity->e.renderfx & RF_VRVIEWMODEL) {
+			backEnd.overrideCullFace = qtrue;
+		}
+
 		if (shader != oldShader || fogNum != oldFogNum || dlighted != oldDlighted
 			|| ( entityNum != oldEntityNum && !shader->entityMergable ) )
 		{
@@ -780,6 +781,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 			oldShader = shader;
 			oldFogNum = fogNum;
 			oldDlighted = dlighted;
+			backEnd.overrideCullFace = qfalse;
 		}
 
 		//
@@ -787,7 +789,6 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		//
 		if ( entityNum != oldEntityNum ) {
 			depthRange = qfalse;
-			isVRViewModel = qfalse;
 
 			if ( entityNum != REFENTITYNUM_WORLD ) {
 				backEnd.currentEntity = &backEnd.refdef.entities[entityNum];
@@ -808,10 +809,6 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 				else if ( backEnd.currentEntity->e.renderfx & RF_DEPTHHACK ) {
 					// hack the depth range to prevent view model from poking into walls
 					depthRange = qtrue;
-				}
-
-				if (backEnd.currentEntity->e.renderfx & RF_VRVIEWMODEL) {
-					isVRViewModel = qtrue;
 				}
 			} else {
 				backEnd.currentEntity = &tr.worldEntity;
@@ -842,25 +839,6 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 				}
 
 				oldDepthRange = depthRange;
-			}
-
-			if (isVRViewModel != oldIsVRViewModel) {
-				if (isVRViewModel) {
-					qglGetBooleanv(GL_CULL_FACE, &oldFaceCullEnabled);
-					qglGetIntegerv(GL_CULL_FACE_MODE, &oldFaceCullMode);
-
-					//Draw all faces on weapons
-					qglDisable(GL_CULL_FACE);
-				} else{
-					if (!oldFaceCullEnabled)
-					{
-						qglDisable(GL_CULL_FACE);
-					} else{
-						qglEnable(GL_CULL_FACE);
-					}
-					qglCullFace( oldFaceCullMode );
-				}
-				oldIsVRViewModel = isVRViewModel;
 			}
 
 			oldEntityNum = entityNum;
