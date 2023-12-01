@@ -2069,7 +2069,7 @@ void RB_StageIteratorGeneric( void )
 	//
 	// set face culling appropriately
 	//
-	GL_Cull( input->shader->cullType );
+	GL_Cull(input->shader->cullType);
 
 	// set polygon offset if necessary
 	if ( input->shader->polygonOffset )

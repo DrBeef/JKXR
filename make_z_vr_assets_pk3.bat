@@ -1,9 +1,9 @@
 cd assets
-del z_vr_assets_jka.pk3
+del z_vr_assets_jko.pk3
 cd ..
-powershell Compress-Archive z_vr_assets_jka/* z_vr_assets_jka.zip
-rename z_vr_assets_jka.zip z_vr_assets_jka.pk3
-move z_vr_assets_jka.pk3 assets/
+powershell Compress-Archive z_vr_assets_jko/* z_vr_assets_jko.zip
+rename z_vr_assets_jko.zip z_vr_assets_jko.pk3
+move z_vr_assets_jko.pk3 assets/
 
 cd assets
 del z_vr_assets_jka.pk3
