@@ -171,7 +171,7 @@
 			name				none
 			type				ITEM_TYPE_TEXT
 			rect				0 270 640 40
-			text				"VR Compatible Weapon Models"
+			text				"VR Compatible Weapon & Hand Models"
 			font				2
 			forecolor			1 0 0 1
 			textscale			1.0
@@ -186,7 +186,22 @@
 			name				none
 			type				ITEM_TYPE_TEXT
 			rect				0 290 640 40
-			text				"Vince Crusty  and  Elin"
+			text				"Vince Crusty, Elin, LennyGuy20"
+			font				2
+			forecolor			1 1 1 1
+			textscale			1.0
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			320
+			visible			1
+			decoration
+		}
+
+		itemDef
+		{
+			name				none
+			type				ITEM_TYPE_TEXT
+			rect				0 310 640 40
+			text				"Alejandro Avila, Corto, Quinn Kuslich"
 			font				2
 			forecolor			1 1 1 1
 			textscale			1.0
