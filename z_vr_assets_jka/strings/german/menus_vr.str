@@ -765,4 +765,12 @@ REFERENCE           ALWAYS_RUN_DESC
 LANG_ENGLISH        "Always use maximum movement speed."
 LANG_GERMAN         "#same"
 
+REFERENCE           CURVES_DETAIL_ITEM
+LANG_ENGLISH        "Distant Curves Detail:"
+LANG_GERMAN         "#same"
+
+REFERENCE           CURVES_DETAIL_DESC
+LANG_ENGLISH        "Configures how far away are curves approximated by edges."
+LANG_GERMAN         "#same"
+
 ENDMARKER
