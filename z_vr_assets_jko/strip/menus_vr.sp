@@ -3,7 +3,7 @@ CONFIG W:\bin\striped.cfg
 ID 100
 REFERENCE MENUS_VR
 DESCRIPTION "VR Menu Localizations"
-COUNT 173
+COUNT 175
 INDEX 0
 {
    REFERENCE COMMON_CONTROLS_ITEM
@@ -868,4 +868,14 @@ INDEX 172
 {
    REFERENCE ALWAYS_RUN_DESC
    TEXT_LANGUAGE1 "Always use maximum movement speed."
+}
+INDEX 173
+{
+   REFERENCE CURVES_DETAIL_ITEM
+   TEXT_LANGUAGE1 "Distant Curves Detail:"
+}
+INDEX 174
+{
+   REFERENCE CURVES_DETAIL_DESC
+   TEXT_LANGUAGE1 "Configures how far away are curves approximated by edges."
 }

@@ -1423,12 +1423,48 @@
 		}
 
 		itemDef 
+		{
+			name				curves_detail
+			group				video
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_CURVES_DETAIL_ITEM
+			rect				305 291 300 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			165
+			textaligny			-2
+			font				2
+			textscale 			0.8
+			forecolor			1 1 1 1
+			cvarFloatList		{  @MENUS0_LOW 250 @MENUS0_MEDIUM 500 @MENUS0_HIGH 1000 }
+			descText			@MENUS_VR_CURVES_DETAIL_DESC
+			cvar				"r_lodCurveError"
+
+			visible				0
+
+			mouseenter 
+			{ 
+				show			highlight7
+			}
+			mouseexit 
+			{ 
+				hide			highlight7
+			} 
+			action 
+			{
+				play			"sound/interface/button1.wav" ; 
+				uiScript		glCustom ;
+				setcvar			ui_r_modified	1 ;
+				show			applyChanges
+			}
+		}
+
+		itemDef 
 		{	
 			name				compress_textures
 			group				video_obsolete
 			type				ITEM_TYPE_MULTI
 			text				@MENUS0_COMPRESSED_TEXTURES
-			rect				305 291 300 20
+			rect				305 311 300 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			165
 			textaligny			-2
@@ -1443,11 +1479,11 @@
 
 			mouseenter 
 			{ 
-				show			highlight7
+				show			highlight8
 			}
 			mouseexit 
 			{ 
-				hide			highlight7
+				hide			highlight8
 			} 
 			action 
 			{
