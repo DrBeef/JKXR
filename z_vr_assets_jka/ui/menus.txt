@@ -18,4 +18,5 @@
 	loadMenu { "ui/credits.menu" }
 	loadMenu { "ui/help_popup.menu" }
 	loadMenu { "ui/mpmap.menu" }
+	loadMenu { "ui/ngsaber.menu" }
 }
