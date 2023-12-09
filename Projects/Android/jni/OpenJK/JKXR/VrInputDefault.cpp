@@ -669,22 +669,30 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
 
             //Should we trigger the disruptor scope?
-            if ((cl.frame.ps.weapon == WP_DISRUPTOR ||
-                 cl.frame.ps.weapon == WP_BLASTER) &&
-                cl.frame.ps.stats[STAT_HEALTH] > 0)
+            if (!vr.cin_camera)
             {
-                if (vr.weapon_stabilised &&
-                    VectorLength(vr.weaponoffset) < vr_scope_engage_distance->value &&
-                    vr.cgzoommode == 0) {
-                    sendButtonAction("enterscope", true);
-                } else if ((VectorLength(vr.weaponoffset) > 0.26f || !vr.weapon_stabilised) &&
-                           (vr.cgzoommode == 2 || vr.cgzoommode == 4)) {
+                if ((cl.frame.ps.weapon == WP_DISRUPTOR ||
+                     cl.frame.ps.weapon == WP_BLASTER) &&
+                    cl.frame.ps.stats[STAT_HEALTH] > 0)
+                {
+                    if (vr.weapon_stabilised &&
+                        VectorLength(vr.weaponoffset) < vr_scope_engage_distance->value &&
+                        vr.cgzoommode == 0)
+                    {
+                        sendButtonAction("enterscope", true);
+                    }
+                    else if ((VectorLength(vr.weaponoffset) > 0.26f || !vr.weapon_stabilised) &&
+                             (vr.cgzoommode == 2 || vr.cgzoommode == 4))
+                    {
+                        sendButtonActionSimple("exitscope");
+                    }
+                }
+                else if (vr.cgzoommode == 2 || vr.cgzoommode == 4)
+                {
+                    // In case we were using weapon scope and weapon
+                    // was changed due to out of ammo, exit scope
                     sendButtonActionSimple("exitscope");
                 }
-            } else if (vr.cgzoommode == 2 || vr.cgzoommode == 4) {
-                // In case we were using weapon scope and weapon
-                // was changed due to out of ammo, exit scope
-                sendButtonActionSimple("exitscope");
             }
 
             vec3_t offhandPositionAverage;
