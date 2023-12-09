@@ -295,13 +295,34 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         if (offhandGripPushed)
         {
             if (!vr.weapon_stabilised && vr.item_selector == 0 &&
-                !vr.misc_camera && !vr.cgzoommode)
+                !vr.misc_camera && !vr.cgzoommode && vr_two_handed_weapons->integer)
             {
                 if (distance < STABILISATION_DISTANCE &&
-                        vr_two_handed_weapons->integer &&
-                        cl.frame.ps.weapon >= WP_SABER) {
+                    cl.frame.ps.weapon == WP_SABER) {
                     vr.weapon_stabilised = true;
-                } else {
+                }
+                else {
+                    vec3_t dir, weaponposition, offhandposition;
+                    VectorSet(weaponposition, pWeapon->Pose.position.z, pWeapon->Pose.position.x, pWeapon->Pose.position.y);
+                    VectorSet(offhandposition, pOff->Pose.position.z, pOff->Pose.position.x, pOff->Pose.position.y);
+                    VectorSubtract(weaponposition, offhandposition, dir);
+                    VectorNormalize(dir);
+
+                    vec3_t weaponangles, weaponForward, rotation = { 0 };
+                    rotation[PITCH] = vr_weapon_pitchadjust->value;
+                    QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, weaponangles);
+                    AngleVectors(weaponangles, weaponForward, NULL, NULL);
+                    VectorNormalize(weaponForward);
+
+                    if (cl.frame.ps.weapon > WP_SABER &&
+                        DotProduct(weaponForward, dir) > 0.8f)
+                    {
+                        vr.weapon_stabilised = true;
+                    }
+                }
+                
+                if (!vr.weapon_stabilised)
+                {
                     vr.item_selector = 2;
                 }
             }
