@@ -135,7 +135,7 @@ qboolean G_ParseLiteral( const char **data, const char *string )
 //
 // NPC parameters file : scripts/NPCs.cfg
 //
-#define MAX_NPC_DATA_SIZE 0x40000
+#define MAX_NPC_DATA_SIZE 0x200000
 char	NPCParms[MAX_NPC_DATA_SIZE];
 
 team_t TranslateTeamName( const char *name )
@@ -2322,7 +2322,7 @@ void NPC_LoadParms( void )
 				g_TeamBeefDirectorsCut->integer != 0 ? "npcs" : "npcs_og");
 
 	char		*buffer, *holdChar, *marker;
-	char		npcExtensionListBuf[2048];			//	The list of file names read in
+	char		npcExtensionListBuf[4096];			//	The list of file names read in
 
 	//First, load in the npcs.cfg
 	len = gi.FS_ReadFile( npcs_filename, (void **) &buffer );
