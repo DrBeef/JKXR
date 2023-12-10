@@ -9262,11 +9262,13 @@ void ForceThrowEx( gentity_t *self, qboolean pull, qboolean fake, qboolean aimBy
 
 	if ( pull )
 	{
-		cone = forcePullCone[self->client->ps.forcePowerLevel[FP_PULL]];
+		cone = forcePullCone[self->client->ps.forcePowerLevel[FP_PULL]] -
+				((aimByViewAngles != 0) ? 0.05f : 0.0f);
 	}
 	else
 	{
-		cone = forcePushCone[self->client->ps.forcePowerLevel[FP_PUSH]];
+		cone = forcePushCone[self->client->ps.forcePowerLevel[FP_PUSH]] -
+				((aimByViewAngles != 0)  ? 0.05f : 0.0f);
 	}
 
 	//	if ( cone >= 1.0f )

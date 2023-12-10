@@ -7010,8 +7010,37 @@ void CG_Player( centity_t *cent ) {
 		vr->velocitytriggered = (!cg.renderingThirdPerson &&
 								 (cg.snap->ps.weapon == WP_SABER || cg.snap->ps.weapon == WP_MELEE || cg.snap->ps.weapon == WP_STUN_BATON));
 		cvar_t *vr_motion_enable_saber = gi.cvar("vr_motion_enable_saber", "0", CVAR_ARCHIVE);
-		vr->velocitytriggeractive = (cg.snap->ps.weapon == WP_SABER && (g_entities[0].client->ps.SaberActive() || vr_motion_enable_saber->integer)) ||
-				cg.snap->ps.weapon == WP_MELEE || cg.snap->ps.weapon == WP_STUN_BATON;
+
+		switch (cg.snap->ps.weapon)
+		{
+			case WP_SABER:
+			{
+				gentity_t *saberent = &g_entities[cent->gent->client->ps.saberEntityNum];
+
+				if (g_entities[0].client->ps.SaberActive() || vr_motion_enable_saber->integer)
+				{
+					vr->velocitytriggeractive = true;
+				}
+					//Should we allow player to pull saber back with motion?
+				else if (cent->gent->client->ps.saberInFlight &&
+						 saberent->s.pos.trType != TR_LINEAR)
+				{
+					vr->velocitytriggeractive = true;
+				}
+				else
+				{
+					vr->velocitytriggeractive = false;
+				}
+				break;
+			}
+			case WP_MELEE:
+			case WP_STUN_BATON:
+				vr->velocitytriggeractive = true;
+				break;
+			default:
+				vr->velocitytriggeractive = false;
+				break;
+		}
 	}
 
 	G_RagDoll(cent->gent, cent->lerpAngles);

@@ -295,13 +295,34 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         if (offhandGripPushed)
         {
             if (!vr.weapon_stabilised && vr.item_selector == 0 &&
-                !vr.misc_camera && !vr.cgzoommode)
+                !vr.misc_camera && !vr.cgzoommode && vr_two_handed_weapons->integer)
             {
                 if (distance < STABILISATION_DISTANCE &&
-                        vr_two_handed_weapons->integer &&
-                        cl.frame.ps.weapon >= WP_SABER) {
+                    cl.frame.ps.weapon == WP_SABER) {
                     vr.weapon_stabilised = true;
-                } else {
+                }
+                else {
+                    vec3_t dir, weaponposition, offhandposition;
+                    VectorSet(weaponposition, pWeapon->Pose.position.z, pWeapon->Pose.position.x, pWeapon->Pose.position.y);
+                    VectorSet(offhandposition, pOff->Pose.position.z, pOff->Pose.position.x, pOff->Pose.position.y);
+                    VectorSubtract(weaponposition, offhandposition, dir);
+                    VectorNormalize(dir);
+
+                    vec3_t weaponangles, weaponForward, rotation = { 0 };
+                    rotation[PITCH] = vr_weapon_pitchadjust->value;
+                    QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, weaponangles);
+                    AngleVectors(weaponangles, weaponForward, NULL, NULL);
+                    VectorNormalize(weaponForward);
+
+                    if (cl.frame.ps.weapon > WP_SABER &&
+                        DotProduct(weaponForward, dir) > 0.8f)
+                    {
+                        vr.weapon_stabilised = true;
+                    }
+                }
+                
+                if (!vr.weapon_stabilised)
+                {
                     vr.item_selector = 2;
                 }
             }
@@ -648,22 +669,30 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             }
 
             //Should we trigger the disruptor scope?
-            if ((cl.frame.ps.weapon == WP_DISRUPTOR ||
-                 cl.frame.ps.weapon == WP_BLASTER) &&
-                cl.frame.ps.stats[STAT_HEALTH] > 0)
+            if (!vr.cin_camera)
             {
-                if (vr.weapon_stabilised &&
-                    VectorLength(vr.weaponoffset) < vr_scope_engage_distance->value &&
-                    vr.cgzoommode == 0) {
-                    sendButtonAction("enterscope", true);
-                } else if ((VectorLength(vr.weaponoffset) > 0.26f || !vr.weapon_stabilised) &&
-                           (vr.cgzoommode == 2 || vr.cgzoommode == 4)) {
+                if ((cl.frame.ps.weapon == WP_DISRUPTOR ||
+                     cl.frame.ps.weapon == WP_BLASTER) &&
+                    cl.frame.ps.stats[STAT_HEALTH] > 0)
+                {
+                    if (vr.weapon_stabilised &&
+                        VectorLength(vr.weaponoffset) < vr_scope_engage_distance->value &&
+                        vr.cgzoommode == 0)
+                    {
+                        sendButtonAction("enterscope", true);
+                    }
+                    else if ((VectorLength(vr.weaponoffset) > 0.26f || !vr.weapon_stabilised) &&
+                             (vr.cgzoommode == 2 || vr.cgzoommode == 4))
+                    {
+                        sendButtonActionSimple("exitscope");
+                    }
+                }
+                else if (vr.cgzoommode == 2 || vr.cgzoommode == 4)
+                {
+                    // In case we were using weapon scope and weapon
+                    // was changed due to out of ammo, exit scope
                     sendButtonActionSimple("exitscope");
                 }
-            } else if (vr.cgzoommode == 2 || vr.cgzoommode == 4) {
-                // In case we were using weapon scope and weapon
-                // was changed due to out of ammo, exit scope
-                sendButtonActionSimple("exitscope");
             }
 
             vec3_t offhandPositionAverage;

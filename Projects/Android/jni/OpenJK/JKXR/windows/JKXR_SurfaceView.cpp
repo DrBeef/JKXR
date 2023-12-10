@@ -33,6 +33,8 @@ bool VR_UseScreenLayer()
 			(bool)((vr.cin_camera && !vr.immersive_cinematics) ||
 			vr.misc_camera ||
 			(CL_IsRunningInGameCinematic() || CL_InGameCinematicOnStandBy()) ||
+            (cls.state == CA_DISCONNECTED) ||
+            (cls.state == CA_CONNECTING) ||
             (cls.state == CA_CINEMATIC) ||
             (cls.state == CA_LOADING) ||
             ( Key_GetCatcher( ) & KEYCATCH_UI ) ||
@@ -93,12 +95,13 @@ void VR_SetHMDOrientation(float pitch, float yaw, float roll)
 void VR_SetHMDPosition(float x, float y, float z )
 {
 	static bool s_useScreen = qfalse;
+	static int frame = 0;
 
 	VectorSet(vr.hmdposition, x, y, z);
 
 	//Can be set elsewhere
 	vr.take_snap |= s_useScreen != VR_UseScreenLayer();
-	if (vr.take_snap)
+	if (vr.take_snap || (frame++ < 100))
     {
 		s_useScreen = VR_UseScreenLayer();
 
