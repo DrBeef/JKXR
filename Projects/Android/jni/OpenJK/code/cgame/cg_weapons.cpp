@@ -3555,6 +3555,7 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire )
                     break;
                 case WP_DEMP2:
                 case WP_EMPLACED_GUN:
+                case WP_CONCUSSION:
                     cgi_HapticEvent("bfg_fire", position, 0, 100, 0, 0);
                     break;
             }
