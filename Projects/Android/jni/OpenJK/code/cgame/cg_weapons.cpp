@@ -3488,7 +3488,7 @@ void CG_FireWeapon( centity_t *cent, qboolean alt_fire )
 	}
 
 	//Are we the player?
-	if (cent->gent->client->ps.clientNum == 0)
+	if (cent->gent->client && cent->gent->client->ps.clientNum == 0)
 	{
 		/*
 		   These are specific to external haptics vest/arms/face combinations

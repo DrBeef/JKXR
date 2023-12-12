@@ -1452,7 +1452,7 @@ static inline qboolean G_RagWantsHumanoidsOnly( CGhoul2Info *ghlInfo )
 {
 	char	*GLAName;
 	GLAName = gi.G2API_GetGLAName( ghlInfo );
-	assert(GLAName);
+	//assert(GLAName);
 
 	if ( !Q_stricmp( "models/players/_humanoid/_humanoid", GLAName ) )
 	{//only _humanoid skeleton is expected to have these
