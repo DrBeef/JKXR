@@ -924,10 +924,10 @@ void ovrApp_HandleSessionStateChanges(ovrApp* app, XrSessionState state) {
 					"xrPerfSettingsSetPerformanceLevelEXT",
 					(PFN_xrVoidFunction * )(&pfnPerfSettingsSetPerformanceLevelEXT)));
 
-			OXR(pfnPerfSettingsSetPerformanceLevelEXT(
-					app->Session, XR_PERF_SETTINGS_DOMAIN_CPU_EXT, cpuPerfLevel));
-			OXR(pfnPerfSettingsSetPerformanceLevelEXT(
-					app->Session, XR_PERF_SETTINGS_DOMAIN_GPU_EXT, gpuPerfLevel));
+//			OXR(pfnPerfSettingsSetPerformanceLevelEXT(
+//					app->Session, XR_PERF_SETTINGS_DOMAIN_CPU_EXT, cpuPerfLevel));
+//			OXR(pfnPerfSettingsSetPerformanceLevelEXT(
+//					app->Session, XR_PERF_SETTINGS_DOMAIN_GPU_EXT, gpuPerfLevel));
 
 			if (strstr(gAppState.OpenXRHMD, "meta") != NULL)
 			{
