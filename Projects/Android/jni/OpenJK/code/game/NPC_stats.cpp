@@ -217,7 +217,7 @@ qboolean G_ParseLiteral( const char **data, const char *string )
 //
 // NPC parameters file : ext_data/NPCs/*.npc*
 //
-#define MAX_NPC_DATA_SIZE 0x200000
+#define MAX_NPC_DATA_SIZE 0x400000
 char	NPCParms[MAX_NPC_DATA_SIZE];
 
 /*
