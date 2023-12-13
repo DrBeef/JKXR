@@ -37,8 +37,6 @@ extern float SS_MULTIPLIER    ;
 
 /* global arg_xxx structs */
 struct arg_dbl *ss;
-struct arg_int *cpu;
-struct arg_int *gpu;
 struct arg_int *msaa;
 struct arg_end *end;
 
@@ -791,8 +789,6 @@ JNIEXPORT jlong JNICALL Java_com_drbeef_jkxr_GLES3JNILib_onCreate( JNIEnv * env,
 	/* the global arg_xxx structs are initialised within the argtable */
 	void *argtable[] = {
 			ss    = arg_dbl0("s", "supersampling", "<double>", "super sampling value (default: Q1: 1.2, Q2: 1.35)"),
-            cpu   = arg_int0("c", "cpu", "<int>", "CPU perf index 1-4 (default: 2)"),
-            gpu   = arg_int0("g", "gpu", "<int>", "GPU perf index 1-4 (default: 3)"),
             msaa  = arg_int0("m", "msaa", "<int>", "MSAA (default: 1)"),
             end   = arg_end(20)
 	};

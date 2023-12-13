@@ -28,6 +28,11 @@
 		<!-- META QUEST -->
 		<meta-data android:name="com.oculus.supportedDevices" android:value="quest|quest2"/>
 		<meta-data android:name="com.oculus.ossplash" android:value="true"/>
+		<!-- Set Dual Core mode for Quest 2/Pro -->
+		<meta-data android:name="com.oculus.dualcorecpuset" android:value="true" />
+		<!-- Enabling CPU and GPU level trading: -1 = -1 level to gpu, +1 level to cpu -->
+		<!-- CPU needs all the power it can get!! -->
+		<meta-data android:name="com.oculus.trade_cpu_for_gpu_amount" android:value="-1" />
 
 		<!-- PICO XR -->
 		<meta-data android:name="pvr.app.type" android:value="vr" />
