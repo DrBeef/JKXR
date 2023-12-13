@@ -1075,11 +1075,46 @@
 
 		itemDef 
 		{	
+			name				super_sampling
+			group				video
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_SUPER_SAMPLING_ITEM
+			rect				260 216 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font 				4					
+			textscale 			1
+			forecolor			.615 .615 .956 1
+			cvarFloatList { "0.8" 0.8 "0.9" 0.9 "1.0" 1.0 "1.1" 1.1 "1.2" 1.2 "1.3" 1.3 }
+			descText			@MENUS_VR_SUPER_SAMPLING_DESC
+			cvar				"vr_super_sampling"
+			cvarTest		openXRHMD
+			showCvar		{ meta }
+
+			visible				0
+
+			mouseenter 
+			{ 
+				show			highlight3
+			}
+			mouseexit 
+			{ 
+				hide			highlight3
+			} 
+			action 
+			{
+				play			"sound/interface/button1.wav" ; 
+			}
+		}
+
+		itemDef 
+		{	
 			name				geometric_detail
 			group				video
 			type				ITEM_TYPE_MULTI
 			text				@MENUS_GEOMETRIC_DETAIL
-			rect				260 216 340 14
+			rect				260 230 340 14
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -1094,11 +1129,11 @@
 
 			mouseenter 
 			{ 
-				show			highlight3
+				show			highlight4
 			}
 			mouseexit 
 			{ 
-				hide			highlight3
+				hide			highlight4
 			} 
 			action 
 			{
@@ -1116,7 +1151,7 @@
 			group				video
 			type				ITEM_TYPE_MULTI
 			text				@MENUS_TEXTURE_DETAIL
-			rect				260 230 340 14
+			rect				260 244 340 14
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -1126,42 +1161,6 @@
 			cvarFloatList			{  @MENUS_LOW 3 @MENUS_MEDIUM 2 @MENUS_HIGH 1 @MENUS_VERY_HIGH 0 }
 			descText			@MENUS_SELECT_THE_RESOLUTION
 			cvar				"ui_r_picmip"
-
-			visible				0
-
-			mouseenter 
-			{ 
-				show			highlight4
-			}
-			mouseexit 
-			{ 
-				hide			highlight4
-			} 
-			action 
-			{
-				play			"sound/interface/button1.wav" ; 
-				uiScript		glCustom ;
-				setcvar			ui_r_modified	1 ;
-				show			applyChanges
-			}
-		}
-
-		itemDef 
-		{	
-			name				texture_filter
-			group				video
-			type				ITEM_TYPE_MULTI
-			text				@MENUS_TEXTURE_FILTER
-			rect				260 244 340 14
-			textalign			ITEM_ALIGN_RIGHT
-			textalignx			174
-			textaligny			0
-			font 				4					
-			textscale 			1
-			forecolor			.615 .615 .956 1
-			cvarStrList			{  @MENUS_BILINEAR , "GL_LINEAR_MIPMAP_NEAREST" , @MENUS_TRILINEAR , "GL_LINEAR_MIPMAP_LINEAR" }
-			descText			@MENUS_ADJUST_HOW_WELL_THE_TEXTURES
-			cvar				"ui_r_texturemode"
 
 			visible				0
 
@@ -1184,10 +1183,10 @@
 
 		itemDef 
 		{	
-			name				simple_shaders
+			name				texture_filter
 			group				video
 			type				ITEM_TYPE_MULTI
-			text				@MENUS_DETAILED_SHADERS
+			text				@MENUS_TEXTURE_FILTER
 			rect				260 258 340 14
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
@@ -1195,9 +1194,9 @@
 			font 				4					
 			textscale 			1
 			forecolor			.615 .615 .956 1
-			cvarFloatList			{  @MENUS_OFF 0 @MENUS_ON 1 }
-			descText			@MENUS_HIDE_OR_UNHIDE_TEXTURES
-			cvar				"ui_r_detailtextures"
+			cvarStrList			{  @MENUS_BILINEAR , "GL_LINEAR_MIPMAP_NEAREST" , @MENUS_TRILINEAR , "GL_LINEAR_MIPMAP_LINEAR" }
+			descText			@MENUS_ADJUST_HOW_WELL_THE_TEXTURES
+			cvar				"ui_r_texturemode"
 
 			visible				0
 
@@ -1220,10 +1219,10 @@
 
 		itemDef 
 		{	
-			name				curves_detail
+			name				simple_shaders
 			group				video
 			type				ITEM_TYPE_MULTI
-			text				@MENUS_VR_CURVES_DETAIL_ITEM
+			text				@MENUS_DETAILED_SHADERS
 			rect				260 272 340 14
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
@@ -1231,9 +1230,9 @@
 			font 				4					
 			textscale 			1
 			forecolor			.615 .615 .956 1
-			cvarFloatList			{  @MENUS_LOW 250 @MENUS_MEDIUM 500 @MENUS_HIGH 1000 }
-			descText			@MENUS_VR_CURVES_DETAIL_DESC
-			cvar				"r_lodCurveError"
+			cvarFloatList			{  @MENUS_OFF 0 @MENUS_ON 1 }
+			descText			@MENUS_HIDE_OR_UNHIDE_TEXTURES
+			cvar				"ui_r_detailtextures"
 
 			visible				0
 
@@ -1256,11 +1255,47 @@
 
 		itemDef 
 		{	
+			name				curves_detail
+			group				video
+			type				ITEM_TYPE_MULTI
+			text				@MENUS_VR_CURVES_DETAIL_ITEM
+			rect				260 286 340 14
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			174
+			textaligny			0
+			font 				4					
+			textscale 			1
+			forecolor			.615 .615 .956 1
+			cvarFloatList			{  @MENUS_LOW 250 @MENUS_MEDIUM 500 @MENUS_HIGH 1000 }
+			descText			@MENUS_VR_CURVES_DETAIL_DESC
+			cvar				"r_lodCurveError"
+
+			visible				0
+
+			mouseenter 
+			{ 
+				show			highlight8
+			}
+			mouseexit 
+			{ 
+				hide			highlight8
+			} 
+			action 
+			{
+				play			"sound/interface/button1.wav" ; 
+				uiScript		glCustom ;
+				setcvar			ui_r_modified	1 ;
+				show			applyChanges
+			}
+		}
+
+		itemDef 
+		{	
 			name				compress_textures
 			group				video_obsolete
 			type				ITEM_TYPE_MULTI
 			text				@MENUS_COMPRESSED_TEXTURES
-			rect				260 286 340 14
+			rect				260 230 340 14
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			174
 			textaligny			0
@@ -1275,11 +1310,11 @@
 
 			mouseenter 
 			{ 
-				show			highlight8
+				show			highlight9
 			}
 			mouseexit 
 			{ 
-				hide			highlight8
+				hide			highlight9
 			} 
 			action 
 			{

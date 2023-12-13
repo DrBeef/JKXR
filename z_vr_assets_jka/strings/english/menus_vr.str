@@ -583,4 +583,10 @@ LANG_ENGLISH        "Distant Curves Detail:"
 REFERENCE           CURVES_DETAIL_DESC
 LANG_ENGLISH        "Configures how far away are curves approximated by edges."
 
+REFERENCE           SUPER_SAMPLING_ITEM
+LANG_ENGLISH        "Super Sampling:"
+
+REFERENCE           SUPER_SAMPLING_DESC
+LANG_ENGLISH        "Configures super sampling value."
+
 ENDMARKER

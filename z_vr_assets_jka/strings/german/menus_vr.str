@@ -773,4 +773,12 @@ REFERENCE           CURVES_DETAIL_DESC
 LANG_ENGLISH        "Configures how far away are curves approximated by edges."
 LANG_GERMAN         "#same"
 
+REFERENCE           SUPER_SAMPLING_ITEM
+LANG_ENGLISH        "Super Sampling:"
+LANG_GERMAN         "#same"
+
+REFERENCE           SUPER_SAMPLING_DESC
+LANG_ENGLISH        "Configures super sampling value."
+LANG_GERMAN         "#same"
+
 ENDMARKER

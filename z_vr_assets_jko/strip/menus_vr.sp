@@ -3,7 +3,7 @@ CONFIG W:\bin\striped.cfg
 ID 100
 REFERENCE MENUS_VR
 DESCRIPTION "VR Menu Localizations"
-COUNT 175
+COUNT 177
 INDEX 0
 {
    REFERENCE COMMON_CONTROLS_ITEM
@@ -878,4 +878,14 @@ INDEX 174
 {
    REFERENCE CURVES_DETAIL_DESC
    TEXT_LANGUAGE1 "Configures how far away are curves approximated by edges."
+}
+INDEX 175
+{
+   REFERENCE SUPER_SAMPLING_ITEM
+   TEXT_LANGUAGE1 "Super Sampling:"
+}
+INDEX 176
+{
+   REFERENCE SUPER_SAMPLING_DESC
+   TEXT_LANGUAGE1 "Configures super sampling value."
 }

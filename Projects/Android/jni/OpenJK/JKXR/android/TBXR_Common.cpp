@@ -71,6 +71,9 @@ const float ZOOM_FOV_ADJUST = 1.05f;
 
 GLboolean stageSupported = GL_FALSE;
 
+float superSampling = 1.0f;
+qboolean usingScreenLayer = qtrue;
+qboolean resetScreenLayerRenderer = qfalse;
 
 const char* const requiredExtensionNames_meta[] = {
 		XR_KHR_OPENGL_ES_ENABLE_EXTENSION_NAME,
@@ -1218,8 +1221,15 @@ bool destroyed = qfalse;
 
 void TBXR_GetScreenRes(int *width, int *height)
 {
-	*width = gAppState.Width;
-	*height = gAppState.Height;
+	float configuredSuperSampling = Cvar_VariableValue("vr_super_sampling");
+	if (configuredSuperSampling != 0.0f && configuredSuperSampling != superSampling) {
+		superSampling = configuredSuperSampling;
+		resetScreenLayerRenderer = qtrue;
+		Cbuf_AddText( "vid_restart\n" );        
+	}
+
+	*width = gAppState.Width * superSampling;
+	*height = gAppState.Height * superSampling;
 }
 
 XrInstance TBXR_GetXrInstance() {
@@ -1570,17 +1580,27 @@ void TBXR_InitRenderer(  ) {
 		pfnXrGetConfigPICO(gAppState.Session, GET_DISPLAY_RATE, &gAppState.currentDisplayRefreshRate);
 	}
 
+	int eyeW, eyeH;
+	TBXR_GetScreenRes(&eyeW, &eyeH);
+
 	ovrRenderer_Create(
 			gAppState.Session,
 			&gAppState.Renderer,
-			gAppState.ViewConfigurationView[0].recommendedImageRectWidth,
-			gAppState.ViewConfigurationView[0].recommendedImageRectHeight);
+			eyeW,
+			eyeH);
 }
 
 void VR_DestroyRenderer(  )
 {
 	ovrRenderer_Destroy(&gAppState.Renderer);
 	free(gAppState.Views);
+}
+
+void VR_ResetRenderer()
+{
+	VR_DestroyRenderer();
+	TBXR_InitialiseResolution();
+	TBXR_InitRenderer();
 }
 
 void TBXR_InitialiseOpenXR()
@@ -1949,6 +1969,12 @@ void TBXR_submitFrame()
 
 	if (!VR_UseScreenLayer()) 
 	{
+
+		if (usingScreenLayer) {
+			usingScreenLayer = qfalse;
+			VR_ResetRenderer();
+		}
+
 		memset(&projection_layer, 0, sizeof(XrCompositionLayerProjection));
 		projection_layer.type = XR_TYPE_COMPOSITION_LAYER_PROJECTION;
 		projection_layer.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
@@ -1982,6 +2008,13 @@ void TBXR_submitFrame()
 	} 
 	else
 	{
+
+		usingScreenLayer = qtrue;
+		if (resetScreenLayerRenderer) {
+			resetScreenLayerRenderer = qfalse;
+			VR_ResetRenderer();
+		}
+
 #ifdef _WIN32
 		//Empty black projection for now
 		memset(&projection_layer, 0, sizeof(XrCompositionLayerProjection));
