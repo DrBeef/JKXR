@@ -16,14 +16,6 @@ XrResult CheckXrResult(XrResult res, const char* originator) {
 #define SIDE_RIGHT 1
 #define SIDE_COUNT 2
 
-#define VIVE_CONTROLLERS 10
-#define INDEX_CONTROLLERS 11
-#define PICO_CONTROLLERS 12
-#define TOUCH_CONTROLLERS 13
-//Anything else will emulate touch
-
-int controllersPresent;
-
 XrActionSet actionSet = nullptr;
 XrAction grabAction;
 XrAction gripAction;
@@ -698,9 +690,6 @@ void TBXR_InitActions( void )
     CHECK_XRCMD(xrAttachSessionActionSets(gAppState.Session, &attachInfo));
 
     
-    
-
-    
 }
 
 void TBXR_SyncActions( void )
@@ -719,10 +708,57 @@ void TBXR_SyncActions( void )
     }
 }
 
+void TBXR_CheckControllers(void)
+{
+    if (gAppState.controllersPresent == -1)
+    {
+        XrInteractionProfileState profileState = { XR_TYPE_INTERACTION_PROFILE_STATE };
+        XrResult _res = CHECK_XRCMD(xrGetCurrentInteractionProfile(gAppState.Session, handSubactionPath[SIDE_RIGHT], &profileState));
+        if (profileState.interactionProfile != XR_NULL_PATH)
+        {
+            uint32_t bufferLength = 0;
+            XrResult result = xrPathToString(gAppState.Instance, profileState.interactionProfile, 0, &bufferLength, nullptr);
+
+            if (result == XR_SUCCESS) {
+                // Allocate a buffer to store the string
+                char* pathString = new char[bufferLength];
+
+                // Convert XrPath to a string
+                result = xrPathToString(gAppState.Instance, profileState.interactionProfile, bufferLength, &bufferLength, pathString);
+                if (result == XR_SUCCESS) {
+                    
+                    Com_Printf("Controllers Found: %s", pathString);
+                    
+                    if (strcmp(pathString, "/interaction_profiles/valve/index_controller") == 0)
+                    {
+                        gAppState.controllersPresent = INDEX_CONTROLLERS;
+                    }
+                    else if (strcmp(pathString, "/interaction_profiles/htc/vive_controller") == 0)
+                    {
+                        gAppState.controllersPresent = VIVE_CONTROLLERS;
+                    }
+                    else if (strcmp(pathString, "/interaction_profiles/oculus/touch_controller") == 0)
+                    {
+                        gAppState.controllersPresent = TOUCH_CONTROLLERS;
+                    }
+                    else if (strcmp(pathString, "/interaction_profiles/bytedance/pico4_controller") == 0 ||
+                        strcmp(pathString, "/interaction_profiles/bytedance/pico3_controller") == 0)
+                    {
+                        gAppState.controllersPresent = PICO_CONTROLLERS;
+                    }
+                }
+                
+                
+            }
+        }
+    }
+}
+
 void TBXR_UpdateControllers( )
 {
+    TBXR_CheckControllers();
     TBXR_SyncActions();
-
+    
     //get controller poses
     for (int i = 0; i < 2; i++) {
         XrSpaceVelocity vel = {};
@@ -848,7 +884,7 @@ void TBXR_ProcessHaptics() {
             vibration.amplitude = vibration_channel_intensity[i];
             vibration.duration = ToXrTime(vibration_channel_duration[i]);            
             
-            if(controllersPresent == VIVE_CONTROLLERS)
+            if(gAppState.controllersPresent == VIVE_CONTROLLERS)
                 vibration.duration /= 100;
             
             //Lets see what happens when the runtime decides it (as per https://registry.khronos.org/OpenXR/specs/1.0/man/html/XrHapticVibration.html)

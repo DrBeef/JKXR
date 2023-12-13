@@ -136,8 +136,9 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         QuatToYawPitchRoll(pOff->Pose.orientation, rotation, vr.offhandangles[ANGLES_DEFAULT]);
 
         //If we are in a saberBlockDebounce thing then add on an angle
-        //Lerped upon how far from the start of the saber move
-        rotation[PITCH] = vr_saber_pitchadjust->value;
+        //Lerped upon how far from the start of the saber move 
+        //Index default -> vr_saber_pitchadjust->value = -2.42187500
+        rotation[PITCH] = vr_saber_pitchadjust->value + (gAppState.controllersPresent == INDEX_CONTROLLERS ? 10.938125f : 0.0f);
         if (vr.saberBlockDebounce > cl.serverTime) {
             float lerp = 0.0f;
             //Where are we in the lerp
@@ -198,7 +199,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
         QuatToYawPitchRoll(pWeapon->GripPose.orientation, rotation, vr.weaponangles[ANGLES_SABER]);
         QuatToYawPitchRoll(pOff->GripPose.orientation, rotation, vr.offhandangles[ANGLES_SABER]);
-
+        // + (gAppState.controllersPresent == INDEX_CONTROLLERS ? -35
         rotation[PITCH] = vr_weapon_pitchadjust->value;
         QuatToYawPitchRoll(pWeapon->Pose.orientation, rotation, vr.weaponangles[ANGLES_ADJUSTED]);
         QuatToYawPitchRoll(pOff->Pose.orientation, rotation, vr.offhandangles[ANGLES_ADJUSTED]);
