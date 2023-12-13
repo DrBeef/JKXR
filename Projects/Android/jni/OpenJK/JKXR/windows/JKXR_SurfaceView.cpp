@@ -34,9 +34,11 @@ bool VR_UseScreenLayer()
 			vr.misc_camera ||
 			(CL_IsRunningInGameCinematic() || CL_InGameCinematicOnStandBy()) ||
             (cls.state == CA_DISCONNECTED) ||
+            (cls.state == CA_CHALLENGING) ||
             (cls.state == CA_CONNECTING) ||
             (cls.state == CA_CINEMATIC) ||
             (cls.state == CA_LOADING) ||
+            (cls.state == CA_PRIMED) ||
             ( Key_GetCatcher( ) & KEYCATCH_UI ) ||
             ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ));
 
