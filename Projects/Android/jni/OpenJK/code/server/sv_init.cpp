@@ -311,7 +311,8 @@ void SV_SpawnServer( const char *server, ForceReload_e eForceReload, qboolean bA
 	SV_InitGameProgs();
 
 	// run a few frames to allow everything to settle
-	for ( i = 0 ;i < 3 ; i++ ) {
+	cvar_t *frameDelay = Cvar_Get("s_spawnFrameDelay", "4", CVAR_TEMP);
+	for ( i = 0 ;i < frameDelay->integer ; i++ ) {
 		ge->RunFrame( sv.time );
 		sv.time += 100;
 		re.G2API_SetTime(sv.time,G2T_SV_TIME);
