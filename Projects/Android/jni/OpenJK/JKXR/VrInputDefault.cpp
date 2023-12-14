@@ -138,7 +138,18 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
         //If we are in a saberBlockDebounce thing then add on an angle
         //Lerped upon how far from the start of the saber move 
         //Index default -> vr_saber_pitchadjust->value = -2.42187500
-        rotation[PITCH] = vr_saber_pitchadjust->value + (gAppState.controllersPresent == INDEX_CONTROLLERS ? 10.938125f : 0.0f);
+        rotation[PITCH] = vr_saber_pitchadjust->value;
+        
+        //Individual Controller offsets (so that they match quest)
+        if (gAppState.controllersPresent == INDEX_CONTROLLERS)
+        {
+            rotation[PITCH] += 10.938125f;
+        }
+        else if (gAppState.controllersPresent == PICO_CONTROLLERS)
+        {
+            rotation[PITCH] += 12.500625f;        
+        }        
+
         if (vr.saberBlockDebounce > cl.serverTime) {
             float lerp = 0.0f;
             //Where are we in the lerp
