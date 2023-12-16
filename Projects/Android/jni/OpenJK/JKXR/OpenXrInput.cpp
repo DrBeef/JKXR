@@ -360,11 +360,12 @@ void TBXR_InitActions( void )
 
         XrActionSuggestedBinding bindings[128];
         int currBinding = 0;
-        //SQUEEZE
+        //SQUEEZE -> Since this is a button, change click to be the value 
         bindings[currBinding++] = ActionSuggestedBinding(squeezeClickAction, squeezeClickPath[SIDE_LEFT]);
         bindings[currBinding++] = ActionSuggestedBinding(squeezeClickAction, squeezeClickPath[SIDE_RIGHT]);
         //MENU BUTTON
         bindings[currBinding++] = ActionSuggestedBinding(backAction, menuClickPath[SIDE_LEFT]);
+        bindings[currBinding++] = ActionSuggestedBinding(backAction, menuClickPath[SIDE_RIGHT]);
         //TRIGGER CLICK
         bindings[currBinding++] = ActionSuggestedBinding(triggerClickAction, triggerClickPath[SIDE_LEFT]);
         bindings[currBinding++] = ActionSuggestedBinding(triggerClickAction, triggerClickPath[SIDE_RIGHT]);
@@ -541,7 +542,7 @@ void TBXR_InitActions( void )
     //Pico Devices
     {
         XrPath picoMixedRealityInteractionProfilePath;
-        CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/interaction_profiles/bytedance/pico_neo3_controller",
+        CHECK_XRCMD(xrStringToPath(gAppState.Instance, "/interaction_profiles/bytedance/pico_neo3_controller_bd",
                                    &picoMixedRealityInteractionProfilePath));
 
         XrActionSuggestedBinding bindings[128];
@@ -792,16 +793,53 @@ void TBXR_UpdateControllers( )
     leftTrackedRemoteState_new.Buttons = 0;
     leftTrackedRemoteState_new.Touches = 0;
     if (GetActionStateBoolean(backAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Enter;
-    if (GetActionStateBoolean(XAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_X;
-    if (GetActionStateBoolean(XTouchAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Touches |= xrButton_X;
     
-    //FOR VIVE CHANGE THIS TO A TRACKPADCLIC With a Positive Y value
-    if (GetActionStateBoolean(YAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Y;    
-    if (GetActionStateBoolean(YTouchAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Touches |= xrButton_Y;
+    //VIVE Do buttons differently
+    if (gAppState.controllersPresent == VIVE_CONTROLLERS)
+    {
+        //Position
+        XrVector2f trackpadPosition;
+        trackpadPosition = GetActionStateVector2(trackPadAction, SIDE_LEFT).currentState;        
+        if (GetActionStateBoolean(trackPadClickAction, SIDE_LEFT).currentState)
+        {
+            if (trackpadPosition.x >= -0.2 && trackpadPosition.x <= 0.2)
+            {
+                if (trackpadPosition.y >= 0.2)
+                {
+                    leftTrackedRemoteState_new.Buttons |= xrButton_Y;
+                }
+                else if (trackpadPosition.y <= -0.2)
+                {
+                    leftTrackedRemoteState_new.Buttons |= xrButton_X;
+                }
+            }
+        }        
+    }
+    else
+    {
+        if (GetActionStateBoolean(XAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_X;
+        if (GetActionStateBoolean(XTouchAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Touches |= xrButton_X;
+        if (GetActionStateBoolean(YAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Y;
+        if (GetActionStateBoolean(YTouchAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Touches |= xrButton_Y;
+    }
 
-    //TODO INDEX we'll need to add force check so its not boolean
-    leftTrackedRemoteState_new.GripTrigger = GetActionStateFloat(squeezeAction, SIDE_LEFT).currentState;    
-    if (leftTrackedRemoteState_new.GripTrigger > 0.7f) leftTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
+    //INDEX we'll need to add force check so its not boolean    
+    if (gAppState.controllersPresent == VIVE_CONTROLLERS)
+    {
+        leftTrackedRemoteState_new.GripTrigger = GetActionStateBoolean(squeezeClickAction, SIDE_LEFT).currentState;
+    }
+    else if (gAppState.controllersPresent == INDEX_CONTROLLERS)
+    {
+        leftTrackedRemoteState_new.GripTrigger = GetActionStateFloat(squeezeForceAction, SIDE_LEFT).currentState;        
+    }
+    else    
+    {
+        leftTrackedRemoteState_new.GripTrigger = GetActionStateFloat(squeezeAction, SIDE_LEFT).currentState;        
+    }
+    if (leftTrackedRemoteState_new.GripTrigger > 0.7f)
+    {
+        leftTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
+    }
 
     if (GetActionStateBoolean(thumbstickClickAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_LThumb;
     if (GetActionStateBoolean(thumbstickClickAction, SIDE_LEFT).currentState) leftTrackedRemoteState_new.Buttons |= xrButton_Joystick;
@@ -816,13 +854,59 @@ void TBXR_UpdateControllers( )
 
     rightTrackedRemoteState_new.Buttons = 0;
     rightTrackedRemoteState_new.Touches = 0;
-    if (GetActionStateBoolean(backAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_Enter;
-    if (GetActionStateBoolean(AAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_A;
-    if (GetActionStateBoolean(ATouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_A;
-    if (GetActionStateBoolean(BAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_B;
-    if (GetActionStateBoolean(BTouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_B;
-    rightTrackedRemoteState_new.GripTrigger = GetActionStateFloat(squeezeAction, SIDE_RIGHT).currentState;
+    
+    
+    
+    //VIVE Do buttons differently
+    if (gAppState.controllersPresent == VIVE_CONTROLLERS)
+    {
+        //Position
+        XrVector2f trackpadPosition;
+        trackpadPosition = GetActionStateVector2(trackPadAction, SIDE_RIGHT).currentState;
+        if (GetActionStateBoolean(trackPadClickAction, SIDE_RIGHT).currentState)
+        {
+            if (trackpadPosition.x >= -0.2 && trackpadPosition.x <= 0.2)
+            {
+                if (trackpadPosition.y >= 0.2)
+                {
+                    //Menu button on Vive instead
+                    rightTrackedRemoteState_new.Buttons |= xrButton_B;
+                }
+                else if (trackpadPosition.y <= -0.2)
+                {
+                    rightTrackedRemoteState_new.Buttons |= xrButton_A;
+                }
+            }
+        }        
+        if (GetActionStateBoolean(backAction, SIDE_RIGHT).currentState)
+        {
+            rightTrackedRemoteState_new.Joystick.y = -0.9f;
+        }
+    }
+    else
+    {
+        if (GetActionStateBoolean(AAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_A;
+        if (GetActionStateBoolean(ATouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_A;
+        if (GetActionStateBoolean(BAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_B;
+        if (GetActionStateBoolean(BTouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_B;
+        if (GetActionStateBoolean(backAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_Enter;
+    }
+    
+    //INDEX we'll need to add force check so its not boolean    
+    if (gAppState.controllersPresent == VIVE_CONTROLLERS)
+    {
+        rightTrackedRemoteState_new.GripTrigger = GetActionStateBoolean(squeezeClickAction, SIDE_RIGHT).currentState;
+    }
+    else if (gAppState.controllersPresent == INDEX_CONTROLLERS)
+    {
+        rightTrackedRemoteState_new.GripTrigger = GetActionStateFloat(squeezeForceAction, SIDE_RIGHT).currentState;
+    }
+    else
+    {
+        rightTrackedRemoteState_new.GripTrigger = GetActionStateFloat(squeezeAction, SIDE_RIGHT).currentState;
+    }    
     if (rightTrackedRemoteState_new.GripTrigger > 0.7f) rightTrackedRemoteState_new.Buttons |= xrButton_GripTrigger;
+    
     if (GetActionStateBoolean(thumbstickClickAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_RThumb;
     if (GetActionStateBoolean(thumbstickClickAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Buttons |= xrButton_Joystick;
     if (GetActionStateBoolean(thumbstickTouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_RThumb;
@@ -833,14 +917,34 @@ void TBXR_UpdateControllers( )
     if (GetActionStateBoolean(thumbrestTouchAction, SIDE_RIGHT).currentState) rightTrackedRemoteState_new.Touches |= xrButton_ThumbRest;
 
     //thumbstick
-    XrActionStateVector2f moveJoystickState;
-    moveJoystickState = GetActionStateVector2(thumbstickAction, SIDE_LEFT);
-    leftTrackedRemoteState_new.Joystick.x = moveJoystickState.currentState.x;
-    leftTrackedRemoteState_new.Joystick.y = moveJoystickState.currentState.y;
+    if (gAppState.controllersPresent == VIVE_CONTROLLERS)
+    {
+        XrActionStateVector2f trackpadPositionState;
+        trackpadPositionState = GetActionStateVector2(trackPadAction, SIDE_LEFT);
+        leftTrackedRemoteState_new.Joystick.x = trackpadPositionState.currentState.x;
+        leftTrackedRemoteState_new.Joystick.y = trackpadPositionState.currentState.y;
 
-    moveJoystickState = GetActionStateVector2(thumbstickAction, SIDE_RIGHT);
-    rightTrackedRemoteState_new.Joystick.x = moveJoystickState.currentState.x;
-    rightTrackedRemoteState_new.Joystick.y = moveJoystickState.currentState.y;
+        //Only have
+        trackpadPositionState = GetActionStateVector2(trackPadAction, SIDE_RIGHT);
+        rightTrackedRemoteState_new.Joystick.x = trackpadPositionState.currentState.x;
+                
+        //Only use positive vertical to avoid 3rd persion (which is now on the menu button)
+        if(trackpadPositionState.currentState.y > 0.0f)
+            rightTrackedRemoteState_new.Joystick.y = trackpadPositionState.currentState.y;
+        else if(!GetActionStateBoolean(backAction, SIDE_RIGHT).currentState)
+            rightTrackedRemoteState_new.Joystick.y = 0.0f;
+    }
+    else
+    {
+        XrActionStateVector2f moveJoystickState;
+        moveJoystickState = GetActionStateVector2(thumbstickAction, SIDE_LEFT);
+        leftTrackedRemoteState_new.Joystick.x = moveJoystickState.currentState.x;
+        leftTrackedRemoteState_new.Joystick.y = moveJoystickState.currentState.y;
+
+        moveJoystickState = GetActionStateVector2(thumbstickAction, SIDE_RIGHT);
+        rightTrackedRemoteState_new.Joystick.x = moveJoystickState.currentState.x;
+        rightTrackedRemoteState_new.Joystick.y = moveJoystickState.currentState.y;
+    }
 }
 
 
@@ -885,7 +989,7 @@ void TBXR_ProcessHaptics() {
             vibration.duration = ToXrTime(vibration_channel_duration[i]);            
             
             if(gAppState.controllersPresent == VIVE_CONTROLLERS)
-                vibration.duration /= 100;
+                vibration.duration /= 1000;
             
             //Lets see what happens when the runtime decides it (as per https://registry.khronos.org/OpenXR/specs/1.0/man/html/XrHapticVibration.html)
             //GB - If not then we might need to do this by platform or controller
@@ -896,6 +1000,7 @@ void TBXR_ProcessHaptics() {
             hapticActionInfo.next = NULL;
             hapticActionInfo.action = vibrateAction;
             hapticActionInfo.subactionPath = handSubactionPath[i];
+            
             OXR(xrApplyHapticFeedback(gAppState.Session, &hapticActionInfo, (const XrHapticBaseHeader*)&vibration));
 
             if (vibration_channel_duration[i] != -1.0f) {

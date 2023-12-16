@@ -61,6 +61,10 @@ void HandleInput_WeaponAlign( ovrInputStateTrackedRemote *pDominantTrackedRemote
         }
 
         rotation[PITCH] = vr_weapon_pitchadjust->value;
+        if (gAppState.controllersPresent == VIVE_CONTROLLERS)
+        {
+            rotation[PITCH] -= 33.6718750f;
+        }
         QuatToYawPitchRoll(pDominantTracking->Pose.orientation, rotation, vr.weaponangles[ANGLES_ADJUSTED]);
         QuatToYawPitchRoll(pOffTracking->Pose.orientation, rotation, vr.offhandangles[ANGLES_ADJUSTED]);
 
