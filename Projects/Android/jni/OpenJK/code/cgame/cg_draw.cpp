@@ -1634,18 +1634,18 @@ static void CG_DrawWeapReticle( void )
     vec4_t light_color = {0.7, 0.7, 0.7, 1};
     vec4_t black = {0.0, 0.0, 0.0, 1};
 
-    float indent = 0.16;
+    float indent = 0.1;
     float X_WIDTH=640;
     float Y_HEIGHT=480;
 
     float x = (X_WIDTH * indent), y = (Y_HEIGHT * indent), w = (X_WIDTH * (1-(2*indent))) / 2.0f, h = (Y_HEIGHT * (1-(2*indent))) / 2;
 
     // sides
-    CG_FillRect( 0, 0, (X_WIDTH * indent), Y_HEIGHT, black );
-    CG_FillRect( X_WIDTH * (1 - indent), 0, (X_WIDTH * indent), Y_HEIGHT, black );
+    CG_FillRect( 0, 0, (X_WIDTH * indent)+1, Y_HEIGHT, black );
+    CG_FillRect( X_WIDTH * (1 - indent) - 1, 0, (X_WIDTH * indent) + 2, Y_HEIGHT, black );
     // top/bottom
-    CG_FillRect( X_WIDTH * indent, 0, X_WIDTH * (1-indent), Y_HEIGHT * indent, black );
-    CG_FillRect( X_WIDTH * indent, Y_HEIGHT * (1-indent), X_WIDTH * (1-indent), Y_HEIGHT * indent, black );
+    CG_FillRect( X_WIDTH * indent, 0, X_WIDTH * (1-indent), Y_HEIGHT * indent + 1, black );
+    CG_FillRect( X_WIDTH * indent, Y_HEIGHT * (1-indent) - 1, X_WIDTH * (1-indent), Y_HEIGHT * indent + 2, black );
 
     {
         // center
