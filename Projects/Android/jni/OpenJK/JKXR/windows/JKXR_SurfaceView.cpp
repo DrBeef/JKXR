@@ -280,7 +280,6 @@ void VR_Init()
 	vr_use_gesture_boundary = Cvar_Get ("vr_use_gesture_boundary", "0.35", CVAR_ARCHIVE);
 	vr_align_weapons = Cvar_Get ("vr_align_weapons", "0", CVAR_ARCHIVE);
 	vr_refresh = Cvar_Get ("vr_refresh", "72", CVAR_ARCHIVE);
-	vr_super_sampling = Cvar_Get ("vr_super_sampling", "1.0", CVAR_ARCHIVE);
 
 	cvar_t *expanded_menu_enabled = Cvar_Get ("expanded_menu_enabled", "0", CVAR_ARCHIVE);
 	if (FS_FileExists("expanded_menu.pk3") || FS_BaseFileExists("expanded_menu.pk3")) {
