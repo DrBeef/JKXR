@@ -193,8 +193,8 @@ typedef struct
     GLboolean SessionActive;
     XrPosef xfStageFromHead;
     XrView* Views;
-
-
+    
+    int controllersPresent = -1;
     float currentDisplayRefreshRate;
     float* SupportedDisplayRefreshRates;
     uint32_t RequestedDisplayRefreshRateIndex;
@@ -266,5 +266,11 @@ void TBXR_UpdateControllers( );
 void TBXR_prepareEyeBuffer(int eye );
 void TBXR_finishEyeBuffer(int eye );
 void TBXR_submitFrame();
+
+#define VIVE_CONTROLLERS 10
+#define INDEX_CONTROLLERS 11
+#define PICO_CONTROLLERS 12
+#define TOUCH_CONTROLLERS 13
+//Anything else will emulate touch
 
 #endif //vrcommon_h
