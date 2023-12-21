@@ -1634,26 +1634,20 @@ static void CG_DrawWeapReticle( void )
     vec4_t light_color = {0.7, 0.7, 0.7, 1};
     vec4_t black = {0.0, 0.0, 0.0, 1};
 
-    float indent = 0.1;
+    float indent = 0.12;
     float X_WIDTH=640;
     float Y_HEIGHT=480;
+	float STRETCH = 6;
 
     float x = (X_WIDTH * indent), y = (Y_HEIGHT * indent), w = (X_WIDTH * (1-(2*indent))) / 2.0f, h = (Y_HEIGHT * (1-(2*indent))) / 2;
-
-    // sides
-    CG_FillRect( 0, 0, (X_WIDTH * indent)+1, Y_HEIGHT, black );
-    CG_FillRect( X_WIDTH * (1 - indent) - 1, 0, (X_WIDTH * indent) + 2, Y_HEIGHT, black );
-    // top/bottom
-    CG_FillRect( X_WIDTH * indent, 0, X_WIDTH * (1-indent), Y_HEIGHT * indent + 1, black );
-    CG_FillRect( X_WIDTH * indent, Y_HEIGHT * (1-indent) - 1, X_WIDTH * (1-indent), Y_HEIGHT * indent + 2, black );
 
     {
         // center
         if ( cgs.media.reticleShader ) {
-            cgi_R_DrawStretchPic( x, y, w, h, 0, 0, 1, 1, cgs.media.reticleShader );    // tl
-            cgi_R_DrawStretchPic( x + w, y, w, h, 1, 0, 0, 1, cgs.media.reticleShader );  // tr
-            cgi_R_DrawStretchPic( x, y + h, w, h, 0, 1, 1, 0, cgs.media.reticleShader );    // bl
-            cgi_R_DrawStretchPic( x + w, y + h, w, h, 1, 1, 0, 0, cgs.media.reticleShader );  // br
+            cgi_R_DrawStretchPic( x - STRETCH, y - STRETCH, w + STRETCH, h+STRETCH, 0, 0, 1, 1, cgs.media.reticleShader );    // tl
+            cgi_R_DrawStretchPic( x + w, y - STRETCH, w + STRETCH, h + STRETCH, 1, 0, 0, 1, cgs.media.reticleShader );  // tr
+            cgi_R_DrawStretchPic( x - STRETCH, y + h, w + STRETCH, h + STRETCH, 0, 1, 1, 0, cgs.media.reticleShader );    // bl
+            cgi_R_DrawStretchPic( x + w, y + h, w + STRETCH, h + STRETCH, 1, 1, 0, 0, cgs.media.reticleShader );  // br
         }
 
         // hairs
@@ -1662,6 +1656,13 @@ static void CG_DrawWeapReticle( void )
         CG_FillRect( 319, 300, 2, 178, black );  // center bot
         CG_FillRect( 380, 239, 177, 2, black );  // right
     }
+
+	// sides
+	CG_FillRect( 0, 0, (X_WIDTH * indent)+1, Y_HEIGHT, black );
+	CG_FillRect( X_WIDTH * (1 - indent) - 1, 0, (X_WIDTH * indent) + 2, Y_HEIGHT, black );
+	// top/bottom
+	CG_FillRect( X_WIDTH * indent, 0, X_WIDTH * (1-indent), Y_HEIGHT * indent + 1, black );
+	CG_FillRect( X_WIDTH * indent, Y_HEIGHT * (1-indent) - 1, X_WIDTH * (1-indent), Y_HEIGHT * indent + 2, black );
 }
 
 //--------------------------------------
