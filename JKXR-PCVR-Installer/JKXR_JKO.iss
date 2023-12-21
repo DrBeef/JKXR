@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "JKXR - Jedi Outcast"
-#define MyAppVersion "1.0.22"
+#define MyAppVersion "1.1.26"
 #define MyAppPublisher "Team Beef VR"
 #define MyAppURL "https://www.patreon.com/teambeef"
 #define MyAppExeName "openjo_sp.x86_64.exe"
