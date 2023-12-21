@@ -1393,7 +1393,7 @@
 			descText			@MENUS_VR_SUPER_SAMPLING_DESC
 			cvar				"vr_super_sampling"
 			cvarTest		openXRHMD
-			showCvar		{ meta }
+			showCvar		{ meta pico }
 
 			visible				0
 
