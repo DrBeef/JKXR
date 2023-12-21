@@ -347,7 +347,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                         VectorNormalize(weaponForward);
 
                         if (cl.frame.ps.weapon > WP_SABER &&
-                            DotProduct(weaponForward, dir) > 0.8f)
+                            DotProduct(weaponForward, dir) > 0.6f)
                         {
                             vr.weapon_stabilised = true;
                         }
