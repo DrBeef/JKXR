@@ -9,9 +9,6 @@
 
 JK XR is a VR port of the Jedi Knight games using OpenXR (the open standard for virtual and augmented reality devices) and is based on the excellent OpenJK port, originally forked from: https://github.com/JACoders/OpenJK
 
-This is currently built for standalone VR HMDs (see the Building section below) and will currently **not** run on any other device, the list of supported devices is: Meta Quest (1, 2, Pro) and Pico (3 & 4).
-
-Support for PCVR based devices will hopefully come in the future.
 
 The easiest way to install this on your device is using SideQuest. Download SideQuest here:
 https://sidequestvr.com/setup-howto
@@ -68,21 +65,33 @@ The companion app will be installed at the same time when using the SideQuest of
 You can find the latest version, which also includes the Companion App hosted on Sidequest. Use the links at the top of the page (separated by headset). Before installing via SideQuest you must have enabled "Developer Mode" on your headset. You can find the details on how to do that below:
 
 Pico 3/4 Instructions
+---------------------
 https://trello.com/c/Idb627uv/47-pico-4-installation-instructions
 
 Meta Quest Install Instructions
+-------------------------------
 https://trello.com/c/C0YTFpvX/48-quest-quest-2-installation-instructions
 
-## Copying the Full Game files to your Oculus Quest
+PCVR
+----
+Download the PCVR installers from the release page and use them to install to the game location.
+
+
+## Copying the Full Game files to your Meta Quest / Pico
 
 Before you are able to run the full game of Jedi Knight: Jedi Outcast in VR you will need to:
 
 - Install JK XR thought SideQuest (this will also install the companion app)
 - Start JK XR for the first time, it will ask for appropriate permissions (which you must allow), create the necessary folders and then close down
 - You can now run the Companion App. This will check that it has the files for the full game. 
-- (optional) Copy only the assets files (assets0.pk3, assets1.pk3, assets2.pk3, assets5.pk3) from your PC install of JKO (Jedi Outcast\GameData\base) into the following folder on your device:
+- Copy only the assets files (assets0.pk3, assets1.pk3, assets2.pk3, assets5.pk3) from your PC install of JKO (Jedi Outcast\GameData\base) into the following folder on your device:
 
 \JKXR\JK2\base
+
+or 
+
+\JKXR\JK3\base
+
 
 - You must then use the Companion App to download any mods and start the game. It is possible to play the JK Demo without having copied across the full game assets. All other mods require the full game. 
 
@@ -121,6 +130,9 @@ There is no dependency on any specific headset native libraries, as this port us
 
 JKXR\Projects\Android\libs\arm64-v8a
 
+
+PCVR instructions will follow in the future (when I get round to adding them), 
+
 ## Credits
 
 * Team Beef are DrBeef,  Baggyg,  Bummser
@@ -128,7 +140,9 @@ JKXR\Projects\Android\libs\arm64-v8a
 * JKXR Companion App: BaggyG
 * Additional Development Contributions: MuadDib, BaggyG
 * VR Compatible Weapon Models: Vince Crusty  and  Elin
-* With Special Thanks to: Team Beef patrons, all Team Beef discord members, 
+* VR Compatible Hand Models: LennyGuy20
+
+With Special Thanks to: Team Beef patrons, all Team Beef discord members, 
 the OpenJK Development Team and Raven Software for
 creating and open-sourcing these wonderful games
 
