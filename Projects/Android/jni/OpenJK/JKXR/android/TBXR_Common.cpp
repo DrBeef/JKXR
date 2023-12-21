@@ -1972,7 +1972,11 @@ void TBXR_submitFrame()
 
 		if (usingScreenLayer) {
 			usingScreenLayer = qfalse;
-			VR_ResetRenderer();
+			float configuredSuperSampling = Cvar_VariableValue("vr_super_sampling");
+			if (configuredSuperSampling != 0.0f && configuredSuperSampling != superSampling)
+			{
+				VR_ResetRenderer();
+			}
 		}
 
 		memset(&projection_layer, 0, sizeof(XrCompositionLayerProjection));
