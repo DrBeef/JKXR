@@ -117,6 +117,24 @@ This control scheme on how to play can also be found in the Controls -> JKXR HEL
 ![Control Scheme](https://github.com/DrBeef/JKXR/blob/main/z_vr_assets_base/gfx/menus/control_scheme.jpg)
 
 
+### OpenXR runtimes information for PCVR Headsets
+
+We recommend the following combinations to get the optimal experience while playing JKXR on PCVR:
+
+**Valve Index** -> Via SteamVR (SteamVR OpenXR Runtime) -> This will be standard for Valve Index Users
+
+**HTC Vive** -> Via SteamVR (SteamVR OpenXR Runtime) -> This will be standard for Valve Index Users
+
+**Meta Headsets** -> Link / Airlink (Oculus OpenXR Runtime) -> Make sure this is set via the Oculus desktop app Settings->General->OpenXR Runtime
+
+**Pimax** -> Currently unplayable. We have been in discussions with Pimax and there is a new PimaxPlay that fixes the issues (upside down screens). 
+When released the game must be played via unofficial PimaxXR OpenXR runtime (https://github.com/mbucchia/Pimax-OpenXR). Do not play via SteamVR OpenXR runtime
+
+**Pico** - Our honest option is the best version on Pico is the standalone version on Sidequest. If you are determined to use PCVR, the only working option is via Virtual Desktop. Ensure you have set SteamVR as the OpenXR Runtime in the Virtual Desktop Streamer app (see picture)
+
+Do not play via Streaming Assistant / VDXR
+
+
 ## Building from Source
 
 If you wish to build JK XR from source, then you need the following:
