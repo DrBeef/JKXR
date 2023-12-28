@@ -40,6 +40,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKA\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKA\jagamex86_64.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKA\TeamBeefVR.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKA\OpenAL32.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\JKA\rdsp-vanilla_x86_64.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Dev\Quest\JKXR\JKXR-PCVR-Installer\packaged_mods_credits.txt"; DestDir: "{app}"; Flags: ignoreversion
