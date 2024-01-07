@@ -86,6 +86,8 @@ We recommend the following combinations to get the optimal experience while play
 
 **Meta Headsets** -> Link / Airlink (Oculus OpenXR Runtime) -> Make sure this is set via the Oculus desktop app Settings->General->OpenXR Runtime
 
+**Windows Mixed Reality (WMR) Devices** (I.e. HP G2) -> Make sure you set the SteamVR to be the default OpenXR runtime. 
+
 **Pimax** -> Currently unplayable. We have been in discussions with Pimax and there is a new PimaxPlay that fixes the issues (upside down screens). 
 When released the game must be played via unofficial PimaxXR OpenXR runtime (https://github.com/mbucchia/Pimax-OpenXR). Do not play via SteamVR OpenXR runtime
 
