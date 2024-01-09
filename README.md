@@ -7,6 +7,8 @@
 
 [SideQuest Latest Version (Pico Headsets)](https://sidequestvr.com/app/15541)
 
+[PCVR Installers (found on the latest release here)](https://github.com/DrBeef/JKXR/releases)
+
 JK XR is a VR port of the Jedi Knight games using OpenXR (the open standard for virtual and augmented reality devices) and is based on the excellent OpenJK port, originally forked from: https://github.com/JACoders/OpenJK
 
 
