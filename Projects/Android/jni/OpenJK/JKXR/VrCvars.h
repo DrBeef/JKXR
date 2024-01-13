@@ -35,3 +35,7 @@ extern cvar_t   *vr_use_gesture_boundary;
 extern cvar_t   *vr_align_weapons; // Only used for development
 extern cvar_t   *vr_refresh;
 extern cvar_t   *vr_super_sampling;
+extern cvar_t	*vr_engage_trigger;
+extern cvar_t	*vr_release_trigger;
+extern cvar_t	*vr_engage_trigger_index;
+extern cvar_t	*vr_release_trigger_index;

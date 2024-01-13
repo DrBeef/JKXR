@@ -48,6 +48,10 @@ cvar_t  *vr_use_gesture_boundary;
 cvar_t  *vr_align_weapons;
 cvar_t  *vr_refresh;
 cvar_t  *vr_super_sampling;
+cvar_t  *vr_engage_trigger;
+cvar_t  *vr_release_trigger;
+cvar_t  *vr_engage_trigger_index;
+cvar_t  *vr_release_trigger_index;
 
 ovrInputStateTrackedRemote leftTrackedRemoteState_old;
 ovrInputStateTrackedRemote leftTrackedRemoteState_new;
