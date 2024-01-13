@@ -15,6 +15,7 @@ cvar_t	*vr_turn_mode;
 cvar_t	*vr_turn_angle;
 cvar_t	*vr_positional_factor;
 cvar_t	*vr_walkdirection;
+cvar_t	*vr_3rdperson_digital_direction;
 cvar_t	*vr_weapon_pitchadjust;
 cvar_t	*vr_saber_pitchadjust;
 cvar_t	*vr_control_scheme;

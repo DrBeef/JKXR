@@ -39,6 +39,8 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 	vr.right_handed = vr_control_scheme->value < 10 ||
             vr_control_scheme->value == 99; // Always right-handed for weapon calibration
 
+    bool thirdPersonActive = !!((int) Cvar_VariableValue("cg_thirdPerson"));
+
     static bool dominantGripPushed = false;
 
     //Need this for the touch screen
@@ -808,7 +810,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 vr.offhandoffset[1] = pOff->Pose.position.y - vr.hmdposition[1];
                 vr.offhandoffset[2] = pOff->Pose.position.z - vr.hmdposition[2];
 
-                if (vr_walkdirection->value == 0) {
+                if (vr_walkdirection->value == 0 && !thirdPersonActive) {
                     controllerYawHeading = vr.offhandangles[ANGLES_ADJUSTED][YAW] - vr.hmdorientation[YAW];
                 } else {
                     controllerYawHeading = 0.0f;
@@ -954,6 +956,17 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
             vec2_t v;
             rotateAboutOrigin(x, y, controllerYawHeading, v);
 
+            // If in third person, use digital input (North, North-East, East, South-East etc)
+            // for movement as it allows execution of player special moves correctly in JKA
+            if (thirdPersonActive && vr_3rdperson_digital_direction->integer)
+            {
+                float angle = RAD2DEG(atan2f(v[1], v[0])) + 22.5;
+                int segment = angle / 45.0f;
+                angle = segment * 45.0f;
+                v[0] = nlf * cosf(DEG2RAD(angle));
+                v[1] = nlf * sinf(DEG2RAD(angle));
+            }
+
             float move_speed_multiplier = 1.0f;
             switch (vr.move_speed)
             {
@@ -968,7 +981,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
                 break;
             }
 
-            if (vr_always_run->integer)
+            if (vr_always_run->integer || vr_3rdperson_digital_direction->integer)
             {
                 move_speed_multiplier = 1.0f;
             }
@@ -1072,7 +1085,7 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
                 if (!usingSnapTurn && fabs(primaryJoystickX) > 0.1f) //smooth turn
                 {
-                    vr.snapTurn -= ((vr_turn_angle->value / 10.0f) *
+                    vr.snapTurn -= ((vr_turn_angle->value / 25.0f) *
                                     primaryJoystickX);
                     if (vr.snapTurn > 180.0f) {
                         vr.snapTurn -= 360.f;
@@ -1158,7 +1171,6 @@ void HandleInput_Default( ovrInputStateTrackedRemote *pDominantTrackedRemoteNew,
 
         // Process "use" gesture
         if (vr_gesture_triggered_use->integer) {
-            bool thirdPersonActive = !!((int) Cvar_VariableValue("cg_thirdPerson"));
             bool gestureUseAllowed = !vr.weapon_stabilised && !vr.cin_camera && !vr.misc_camera && !vr.remote_turret && !vr.emplaced_gun && !vr.in_vehicle && !thirdPersonActive;
             // Off-hand gesture
             float distanceToBody = sqrt(vr.offhandoffset[0]*vr.offhandoffset[0] + vr.offhandoffset[2]*vr.offhandoffset[2]);

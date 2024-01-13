@@ -2,6 +2,7 @@ extern cvar_t	*vr_turn_mode;
 extern cvar_t	*vr_turn_angle;
 extern cvar_t	*vr_positional_factor;
 extern cvar_t	*vr_walkdirection;
+extern cvar_t	*vr_3rdperson_digital_direction;
 extern cvar_t	*vr_weapon_pitchadjust;
 extern cvar_t	*vr_saber_pitchadjust;
 extern cvar_t	*vr_control_scheme;

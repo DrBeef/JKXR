@@ -246,6 +246,7 @@ void VR_Init()
 	vr_turn_angle = Cvar_Get( "vr_turn_angle", "45", CVAR_ARCHIVE);
 	vr_positional_factor = Cvar_Get( "vr_positional_factor", "12", CVAR_ARCHIVE);
     vr_walkdirection = Cvar_Get( "vr_walkdirection", "1", CVAR_ARCHIVE);
+	vr_3rdperson_digital_direction = Cvar_Get( "vr_3rdperson_digital_direction", "1", CVAR_ARCHIVE);
 	vr_weapon_pitchadjust = Cvar_Get( "vr_weapon_pitchadjust", "-20.0", CVAR_ARCHIVE);
 	vr_saber_pitchadjust = Cvar_Get( "vr_saber_pitchadjust", "-13.36", CVAR_ARCHIVE);
     vr_virtual_stock = Cvar_Get( "vr_virtual_stock", "0", CVAR_ARCHIVE);
