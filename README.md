@@ -82,20 +82,18 @@ Download the PCVR installers from the release page and use them to install to th
 
 We recommend the following combinations to get the optimal experience while playing JKXR on PCVR:
 
-**Valve Index** -> Via SteamVR (SteamVR OpenXR Runtime) -> This will be standard for Valve Index Users
+**Valve Index** -> Via SteamVR (SteamVR OpenXR Runtime)
 
-**HTC Vive** -> Via SteamVR (SteamVR OpenXR Runtime) -> This will be standard for Valve Index Users
+**HTC Vive** -> Via SteamVR (SteamVR OpenXR Runtime)
 
-**Meta Headsets** -> Link / Airlink (Oculus OpenXR Runtime) -> Make sure this is set via the Oculus desktop app Settings->General->OpenXR Runtime
+**Meta Headsets** -> Link / Airlink (Oculus OpenXR Runtime) / SteamLink / Virtual Desktop (VDXR or SteamVR)
 
 **Windows Mixed Reality (WMR) Devices** (I.e. HP G2) -> Make sure you set the SteamVR to be the default OpenXR runtime. 
 
 **Pimax** -> Currently unplayable. We have been in discussions with Pimax and there is a new PimaxPlay that fixes the issues (upside down screens). 
 When released the game must be played via unofficial PimaxXR OpenXR runtime (https://github.com/mbucchia/Pimax-OpenXR). Do not play via SteamVR OpenXR runtime
 
-**Pico** - Our honest option is the best version on Pico is the standalone version on Sidequest. If you are determined to use PCVR, the only working option is via Virtual Desktop. Ensure you have set SteamVR as the OpenXR Runtime in the Virtual Desktop Streamer app (see picture)
-
-Do not play via Streaming Assistant / VDXR
+**Pico** - Virtual Desktop (VDXR or SteamVR) / Streaming Assistant (Currently Untested)
 
 
 ## Copying the Full Game files to your Meta Quest / Pico
