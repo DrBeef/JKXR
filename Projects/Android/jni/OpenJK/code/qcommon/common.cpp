@@ -1371,7 +1371,7 @@ void Com_Frame( void ) {
 		TBXR_FrameSetup();
 
 		// write config file if anything changed
-		Com_WriteConfiguration();
+		//Com_WriteConfiguration();
 
 		//
 		// main event loop
@@ -1571,6 +1571,10 @@ Com_Shutdown
 =================
 */
 void Com_Shutdown (void) {
+
+	// write config file if anything changed
+	Com_WriteConfiguration();
+
 	CM_ClearMap();
 
 	if (logfile) {
