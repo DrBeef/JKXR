@@ -1,4 +1,2 @@
-rootProject.projectDir = new File(settingsDir, '../..')
+//rootProject.projectDir = settingsDir
 rootProject.name = "JKXR"
-
-include ':', 'Projects:Android'
