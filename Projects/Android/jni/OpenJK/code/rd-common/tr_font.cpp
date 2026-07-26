@@ -30,6 +30,10 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "../qcommon/stringed_ingame.h"
 
+#ifdef JK2_MODE
+#include "../qcommon/strippublic.h"
+#endif
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // This file is shared in the single and multiplayer codebases, so be CAREFUL WHAT YOU ADD/CHANGE!!!!!
@@ -52,14 +56,27 @@ typedef enum
 //
 Language_e GetLanguageEnum()
 {
-#ifndef JK2_MODE
+#ifdef JK2_MODE
+	if ( !sp_language )
+		return eWestern;
+
+	switch ( sp_language->integer )
+	{
+		case SP_LANGUAGE_KOREAN:
+			return eKorean;
+		case SP_LANGUAGE_TAIWANESE:
+			return eTaiwanese;
+		case SP_LANGUAGE_JAPANESE:
+			return eJapanese;
+		default:
+			return eWestern;
+	}
+#else
 	static int			iSE_Language_ModificationCount = -1234;	// any old silly value that won't match the cvar mod count
-#endif
 	static Language_e	eLanguage = eWestern;
 
 	// only re-strcmp() when language string has changed from what we knew it as...
 	//
-#ifndef JK2_MODE
 	if (iSE_Language_ModificationCount != se_language->modificationCount )
 	{
 		iSE_Language_ModificationCount  = se_language->modificationCount;
@@ -73,9 +90,9 @@ Language_e GetLanguageEnum()
 		else	if ( Language_IsThai()		)	eLanguage = eThai;
 		else	eLanguage = eWestern;
 	}
-#endif
 
 	return eLanguage;
+#endif
 }
 
 struct SBCSOverrideLanguages_t
@@ -692,7 +709,7 @@ unsigned int AnyLanguage_ReadCharFromString( char *psText, int *piAdvanceCount, 
 	const byte *psString = (const byte *) psText;	// avoid sign-promote bug
 	unsigned int uiLetter;
 
-	if ( Language_IsKorean() )
+	if ( GetLanguageEnum() == eKorean )
 	{
 		if ( Korean_ValidKSC5601Hangul( psString[0], psString[1] ))
 		{
@@ -712,7 +729,7 @@ unsigned int AnyLanguage_ReadCharFromString( char *psText, int *piAdvanceCount, 
 		}
 	}
 	else
-	if ( Language_IsTaiwanese() )
+	if ( GetLanguageEnum() == eTaiwanese )
 	{
 		if ( Taiwanese_ValidBig5Code( (psString[0] * 256) + psString[1] ))
 		{
@@ -731,7 +748,7 @@ unsigned int AnyLanguage_ReadCharFromString( char *psText, int *piAdvanceCount, 
 		}
 	}
 	else
-	if ( Language_IsJapanese() )
+	if ( GetLanguageEnum() == eJapanese )
 	{
 		if ( Japanese_ValidShiftJISCode( psString[0], psString[1] ))
 		{
@@ -1108,9 +1125,14 @@ void CFontInfo::UpdateAsianIfNeeded( bool bForceReEval /* = false */ )
 		{
 			int iCappedHeight = mHeight < 16 ? 16: mHeight;	// arbitrary limit on small char sizes because Asian chars don't squash well
 
-			if (m_iLanguageModificationCount != se_language->modificationCount || !AsianGlyphsAvailable() || bForceReEval)
+#ifdef JK2_MODE
+			const int languageModification = Language_GetIntegerValue();
+#else
+			const int languageModification = se_language->modificationCount;
+#endif
+			if (m_iLanguageModificationCount != languageModification || !AsianGlyphsAvailable() || bForceReEval)
 			{
-				m_iLanguageModificationCount  = se_language->modificationCount;
+				m_iLanguageModificationCount = languageModification;
 
 				int iGlyphTPs = 0;
 				const char *psLang = NULL;
