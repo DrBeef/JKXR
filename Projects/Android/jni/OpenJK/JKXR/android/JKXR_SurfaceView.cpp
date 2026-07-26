@@ -59,7 +59,7 @@ bool VR_UseScreenLayer()
 	vr.using_screen_layer = _UI_IsFullscreen() ||
 			(bool)((vr.cin_camera && !vr.immersive_cinematics) ||
 			vr.misc_camera ||
-			(inGameCinematic && !vr.immersive_cinematics) ||
+			inGameCinematic ||
 //            (cls.state == CA_DISCONNECTED) ||
             (cls.state == CA_CINEMATIC) ||
             (cls.state == CA_LOADING) ||
